@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Vscode默认配置文件只能编译单cpp文件。若是需要多文件编译或者需要分别设置Include头文件夹、Source资源文件夹，则需要修改配置三个.json文件(tasks.json、launch.json、c_cpp_properties.json ) 注：个人习惯将.h头文件放到Include目录、.c.cpp源文件放到Source文件夹下面，输出文件.exe文件放到out文件夹下面  .vs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于vscode如何对多文件进行调试">
+<meta property="og:url" content="http://example.com/2023/04/16/%E5%85%B3%E4%BA%8Evscode%E5%A6%82%E4%BD%95%E5%AF%B9%E5%A4%9A%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="Vscode默认配置文件只能编译单cpp文件。若是需要多文件编译或者需要分别设置Include头文件夹、Source资源文件夹，则需要修改配置三个.json文件(tasks.json、launch.json、c_cpp_properties.json ) 注：个人习惯将.h头文件放到Include目录、.c.cpp源文件放到Source文件夹下面，输出文件.exe文件放到out文件夹下面  .vs">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:\Users\86191\OneDrive\%E5%9B%BE%E7%89%87\%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7\2023-04-16.png">
+<meta property="article:published_time" content="2023-04-16T08:48:07.000Z">
+<meta property="article:modified_time" content="2023-04-16T08:56:34.063Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\86191\OneDrive\%E5%9B%BE%E7%89%87\%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7\2023-04-16.png">
+
+<link rel="canonical" href="http://example.com/2023/04/16/%E5%85%B3%E4%BA%8Evscode%E5%A6%82%E4%BD%95%E5%AF%B9%E5%A4%9A%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>关于vscode如何对多文件进行调试 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/16/%E5%85%B3%E4%BA%8Evscode%E5%A6%82%E4%BD%95%E5%AF%B9%E5%A4%9A%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于vscode如何对多文件进行调试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-16 16:48:07 / 修改时间：16:56:34" itemprop="dateCreated datePublished" datetime="2023-04-16T16:48:07+08:00">2023-04-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Vscode默认配置文件只能编译单cpp文件。若是需要多文件编译或者需要分别设置Include头文件夹、Source资源文件夹，则需要修改配置三个.json文件(tasks.json、launch.json、c_cpp_properties.json )</p>
+<p>注：个人习惯将.h头文件放到Include目录、.c.cpp源文件放到Source文件夹下面，输出文件.exe文件放到out文件夹下面</p>
+<ul>
+<li>.vscode文件夹存放.json文件夹，实际使用中可以直接拷贝过来使用，而没必要每次都新建修改一遍</li>
+<li>c_cpp_properties.json配置文件默认是不会产生的，快捷键ctrl+shift+p 再输入configuration便会出现</li>
+<li>默认工作空间只有.vscode文件夹，.cpp文件直接放在工作空间根目录的。示例中include、source以及out文件夹可以利用Create C++ project创建工程模板才能在.json中修改配置</li>
+</ul>
+<h2 id="tasks-json文件"><a href="#tasks-json文件" class="headerlink" title="tasks.json文件"></a>tasks.json文件</h2><p>需要修改的地方主要有三处，可直接复制使用</p>
+<ul>
+<li>修改 -g后面的目录</li>
+<li>修改-o后面的目录</li>
+<li>添加 -I 及后面的目录</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;tasks&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;type&quot;: &quot;shell&quot;,        //任务执行的是shell命令</span><br><span class="line">            &quot;label&quot;: &quot;C/C++: g++.exe build active file&quot;,   	//和launch.josn 中的 preLaunchTask 必须一样</span><br><span class="line">            &quot;command&quot;: &quot;C:\\c\\software\\mingw64\\bin\\g++.exe&quot;,  //命令是g++，也可以直接写g++</span><br><span class="line">            &quot;args&quot;: [  </span><br><span class="line">                &quot;-g&quot;,    //生成和调试有关的信息</span><br><span class="line">                &quot;-Wall&quot;, // 开启额外警告 </span><br><span class="line">				&quot;$&#123;workspaceFolder&#125;\\src\\*.cpp&quot;,  //当前工作空间下文件夹source目录名下的所有cpp文件。 source对应工程目录下的source文件夹名字，可自行修改   </span><br><span class="line">                &quot;-I&quot;,&quot;$&#123;workspaceFolder&#125;\\include&quot;,      // 参数-I 和工程路径 指明了项目中要引用的非标准头文件的位置。 include对应工程目录下的include文件夹名字，可自行修改                   </span><br><span class="line">                &quot;-o&quot;,                      </span><br><span class="line">                &quot;$&#123;workspaceFolder&#125;\\bulid\\$&#123;fileBasenameNoExtension&#125;.exe&quot;, //指定输出的文件名为out，默认a.exe。out对应工程目录下的out文件夹名字，可自行修改 </span><br><span class="line">                &quot;-std=c++17&quot;,                                      //使用c++17标准编译</span><br><span class="line">                &quot;-finput-charset=UTF-8&quot;,                           //输入编译器默认文本编码 默认为utf-8</span><br><span class="line">                &quot;-fexec-charset=GB18030&quot;,                          //输出exe文件编码 </span><br><span class="line">            ],</span><br><span class="line">            &quot;options&quot;: &#123;</span><br><span class="line">                &quot;cwd&quot;: &quot;C:\\c\\software\\mingw64\\bin&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;problemMatcher&quot;: [</span><br><span class="line">                &quot;$gcc&quot;</span><br><span class="line">            ],</span><br><span class="line">            &quot;group&quot;: &#123;</span><br><span class="line">                &quot;kind&quot;: &quot;build&quot;,</span><br><span class="line">                &quot;isDefault&quot;: true</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;version&quot;: &quot;2.0.0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="launch-json文件"><a href="#launch-json文件" class="headerlink" title="launch.json文件"></a>launch.json文件</h2><p>需要修改的地方有以下：</p>
+<ol>
+<li>“program”目录</li>
+<li>“cwd”</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;version&quot;: &quot;0.2.0&quot;,</span><br><span class="line">    &quot;configurations&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;g++.exe &quot;,  // 该调试任务的名字，启动调试时会在待选列表中显示</span><br><span class="line">            &quot;type&quot;: &quot;cppdbg&quot;,</span><br><span class="line">            &quot;request&quot;: &quot;launch&quot;,</span><br><span class="line">            &quot;program&quot;: &quot;$&#123;workspaceFolder&#125;\\build\\$&#123;fileBasenameNoExtension&#125;.exe&quot;,  //需要运行/调试的是当前打开文件的目录中，名字和当前文件相同，但扩展名为exe的程序。和tasks.json中-o后面的目录一样的</span><br><span class="line">            &quot;args&quot;: [],</span><br><span class="line">            &quot;stopAtEntry&quot;: false,  // 这一项控制是否在入口处暂停，默认false不暂停，改为true暂停</span><br><span class="line">            &quot;cwd&quot;: &quot;$&#123;workspaceFolder&#125;\\build&quot;, //调试程序时的工作目录 。out对应工程目录下的out文件夹</span><br><span class="line">            &quot;environment&quot;: [],</span><br><span class="line">            &quot;externalConsole&quot;: false,  // 这一项控制是否启动外部控制台（独立的黑框）运行程序，默认false表示在集成终端中运行</span><br><span class="line">            &quot;MIMode&quot;: &quot;gdb&quot;,</span><br><span class="line">            &quot;miDebuggerPath&quot;: &quot;C:\\c\\software\\mingw64\\bin\\gdb.exe&quot;,  // 调试器路径，必须与你自己的电脑相符</span><br><span class="line">            &quot;setupCommands&quot;: [</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;description&quot;: &quot;为 gdb 启用整齐打印&quot;,</span><br><span class="line">                    &quot;text&quot;: &quot;-enable-pretty-printing&quot;,</span><br><span class="line">                    &quot;ignoreFailures&quot;: true</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            &quot;preLaunchTask&quot;: &quot;g++.exe build active file&quot;  // 调试会话开始前执行的任务，一般为编译程序，c++为g++, c为gcc 这个名字一定要跟tasks.json中的任务名字大小写一致</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="c-cpp-properties-json"><a href="#c-cpp-properties-json" class="headerlink" title="c_cpp_properties.json"></a>c_cpp_properties.json</h2><p>默认不会产生。快捷键ctrl+shift+p 再输入configuration便会出现。<br>修改的地方只有一处：</p>
+<p>“includePath” 将include文件夹添加进去即可，注意格式！！<br>注：“compilerPath” 同launch.json。为编译器文件目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;configurations&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;Win32&quot;,</span><br><span class="line">            &quot;includePath&quot;: [</span><br><span class="line">                &quot;$&#123;workspaceFolder&#125;/**&quot;,</span><br><span class="line">                &quot;$&#123;workspaceFolder&#125;\\include\\**&quot;</span><br><span class="line">            ],</span><br><span class="line">            &quot;defines&quot;: [</span><br><span class="line">                &quot;_DEBUG&quot;,</span><br><span class="line">                &quot;UNICODE&quot;,</span><br><span class="line">                &quot;_UNICODE&quot;</span><br><span class="line">            ],</span><br><span class="line">            &quot;cStandard&quot;: &quot;c17&quot;,</span><br><span class="line">            &quot;cppStandard&quot;: &quot;c++17&quot;,</span><br><span class="line">            &quot;compilerPath&quot;: &quot;C:\\c\\software\\mingw64\\bin\\gdb.exe&quot;,</span><br><span class="line">            &quot;intelliSenseMode&quot;: &quot;windows-gcc-x64&quot;,</span><br><span class="line">            &quot;configurationProvider&quot;: &quot;ms-vscode.makefile-tools&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;version&quot;: 4</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结</p>
+<ul>
+<li>这三个配置文件可以各拷贝一份，新建工程时，直接放.vscode下面。软件在打开时会直接读取.json文件。</li>
+<li>.vscode通常就是放配置文件的，除这三个常用的之外还有settings.json，用来配置编辑器等外观性质的东西。</li>
+<li>VSCode下c++多文件夹项目编译调试还可以用makefile、cmake等工具实现，适用于大型项目文件时使用</li>
+</ul>
+<p><img src="C:\Users\86191\OneDrive\图片\屏幕快照\2023-04-16.png" alt="2023-04-16"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/13/c-%E5%87%BD%E6%95%B0/" rel="prev" title="c++ 函数">
+      <i class="fa fa-chevron-left"></i> c++ 函数
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tasks-json%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">tasks.json文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#launch-json%E6%96%87%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">launch.json文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#c-cpp-properties-json"><span class="nav-number">3.</span> <span class="nav-text">c_cpp_properties.json</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
