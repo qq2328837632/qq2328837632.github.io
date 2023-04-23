@@ -147,6 +147,444 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/23/linux%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/23/linux%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">linux基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-23 14:32:54 / 修改时间：20:27:07" itemprop="dateCreated datePublished" datetime="2023-04-23T14:32:54+08:00">2023-04-23</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Linux的目录结构"><a href="#Linux的目录结构" class="headerlink" title="Linux的目录结构"></a>Linux的目录结构</h1><p>是一个树型结构<br>Windows系统可以拥有多个盘符,如C盘、D盘、E盘<br>Linux没有盘符这个概念,只有一个根目录&#x2F;，所有文件都在它下面</p>
+<p>在Linux系统中，路径之间的层级关系，使用:&#x2F;来表示</p>
+<p>在Windows系统中，路径之间的层级关系，使用:\来表示</p>
+<p>D:\data\work\hello.txt<br>注意:<br>D:表示D盘 ,\表示层级关系</p>
+<p>&#x2F;usr&#x2F;local&#x2F;hello.txt<br>注意:<br>开头的&#x2F;表示根目录,后面的&#x2F;表示层级关系</p>
+<h2 id="ctrl-l清屏"><a href="#ctrl-l清屏" class="headerlink" title="ctrl+l清屏"></a>ctrl+l清屏</h2><h2 id="crtl-c中断"><a href="#crtl-c中断" class="headerlink" title="crtl+c中断"></a>crtl+c中断</h2><h1 id="Linux命令"><a href="#Linux命令" class="headerlink" title="Linux命令"></a>Linux命令</h1><h2 id="Linux命令基础格式"><a href="#Linux命令基础格式" class="headerlink" title="Linux命令基础格式"></a>Linux命令基础格式</h2><p>无论是什么命令，用于什么用途，在Linux中，命令有其通用的格式:</p>
+<p>command [-options] [parameter]</p>
+<ul>
+<li>command:命令本身</li>
+<li>-options:[可选,非必填]命令的一些<strong>选项</strong>,可以通过选项控制命令的行为细节 </li>
+<li>parameter: [可选，非必填]命令的<strong>参数</strong>，多数用于命令的指向目标等</li>
+</ul>
+<p>语法中的[]表示可选的意思</p>
+<h3 id="ls命令的参数的作用"><a href="#ls命令的参数的作用" class="headerlink" title="ls命令的参数的作用"></a>ls命令的参数的作用</h3><ul>
+<li>可以指定要查看的文件夹(目录)的内容,如果不给定参数,就查看当前工作目录的内容</li>
+</ul>
+<h4 id="ls命令的选项"><a href="#ls命令的选项" class="headerlink" title="ls命令的选项:"></a>ls命令的选项:</h4><ul>
+<li>-a选项,可以展示出隐藏的内容</li>
+<li>以.开头的文件或文件夹默认被隐藏，需要-a才能显示出来</li>
+<li>-l选项,以列表的形式展示内容，并展示更多细节</li>
+<li>-h选项,需要和-l选项搭配使用，以更加人性化的方式显示文件的大小单位</li>
+</ul>
+<h4 id="命令的选项组合使用"><a href="#命令的选项组合使用" class="headerlink" title="命令的选项组合使用"></a>命令的选项组合使用</h4><ul>
+<li>命令的选项是可以组合使用的,比如: ls -lah,等同于ls -a -l -h</li>
+</ul>
+<h3 id="cd切换工作目录"><a href="#cd切换工作目录" class="headerlink" title="cd切换工作目录"></a>cd切换工作目录</h3><p>当Linux终端（命令行）打开的时候，会默认以用户的HOME目录作为当前的工作目录我们可以通过cd命令，更改当前所在的工作目录。<br>cd命令来自英文:Change Directory<br>语法: <code>cd [Linux路径]</code></p>
+<ul>
+<li>cd命令无需选项，只有参数，表示要切换到哪个目录下</li>
+<li>cd命令直接执行，不写参数，表示回到用户的HOME目录</li>
+</ul>
+<h3 id="pwd查看当前工作目录"><a href="#pwd查看当前工作目录" class="headerlink" title="pwd查看当前工作目录"></a>pwd查看当前工作目录</h3><p>通过ls来验证当前的工作目录，其实是不恰当的。</p>
+<p>我们可以通过pwd命令，来查看当前所在的工作目录。</p>
+<p>pwd命令来自:Print Work Directory</p>
+<p>语法:pwd</p>
+<ul>
+<li>pwd命令，无选项，无参数，直接输入pwd即可</li>
+</ul>
+<h3 id="特殊路径符"><a href="#特殊路径符" class="headerlink" title="特殊路径符:"></a>特殊路径符:</h3><ul>
+<li>. 表示当前目录，比如cd .&#x2F;Desktop表示切换到当前目录下的Desktop目录内，和cd Desktop效果一致</li>
+<li>.. 表示上一级目录，比如: cd .. 即可切换到上一级目录，cd ..&#x2F; ..切换到上二级的目录</li>
+<li>~ 表示HOME目录，比如:cd~ 即可切换到HOME目录或cd ~&#x2F;Desktop,切换到HOME内的Desktop目录</li>
+</ul>
+<h3 id="mkdir命令"><a href="#mkdir命令" class="headerlink" title="mkdir命令"></a>mkdir命令</h3><p>通过mkdir命令可以创建新的目录（文件夹)</p>
+<p>mkdir来自英文:Make Directory<br>语法:<code>mkdir [-p] Linux路径</code></p>
+<ul>
+<li>参数必填，表示Linux路径，即要创建的文件夹路径，相对路径或绝对路径均可</li>
+<li>-p选项可选，表示自动创建不存在的父目录，适用于创建连续多层级的目录</li>
+</ul>
+<p>注意︰创建文件夹需要修改权限，请确保操作均在HOME目录内，不要在HOME外操作涉及到权限问题，HOME外无法成功</p>
+<h3 id="touch创建文件"><a href="#touch创建文件" class="headerlink" title="touch创建文件"></a>touch创建文件</h3><p>可以通过touch命令创建文件</p>
+<p>语法: <code>touch Linux路径</code></p>
+<ul>
+<li>.touch命令无选项，参数必填，表示要创建的文件路径，相对、绝对、特殊路径符均可以使用</li>
+</ul>
+<h3 id="cat命令查看文件内容"><a href="#cat命令查看文件内容" class="headerlink" title="cat命令查看文件内容"></a>cat命令查看文件内容</h3><p>准备好文件内容后，可以通过cat查看内容。</p>
+<p>语法:<code>cat Linux路径</code></p>
+<ul>
+<li><p>cat同样没有选项，只有必填参数，参数表示:被查看的文件路径，相对、绝对,</p>
+<p>特殊路径符都可以使用</p>
+</li>
+</ul>
+<h3 id="more命令查看文件内容"><a href="#more命令查看文件内容" class="headerlink" title="more命令查看文件内容"></a>more命令查看文件内容</h3><p>more命令同样可以查看文件内容，同cat不同的是:. </p>
+<ul>
+<li>cat是直接将内容全部显示出来</li>
+<li>more支持翻页，如果文件内容过多，可以一页页的展示</li>
+</ul>
+<p>语法:<code>more Linux路径</code></p>
+<ul>
+<li>同样没有选项，只有必填参数，参数表示:被查看的文件路径，相对、绝对、特殊路径符都可以使用</li>
+</ul>
+<p>Linux系统内置有一个文件，路径为:&#x2F;etc&#x2F;services，可以使用more命令查看<br>more &#x2F;etc&#x2F;services</p>
+<ul>
+<li>在查看的过程中，通过空格翻页。</li>
+<li>通过q退出查看</li>
+</ul>
+<h3 id="cp命令复制文件文件夹"><a href="#cp命令复制文件文件夹" class="headerlink" title="cp命令复制文件文件夹"></a>cp命令复制文件文件夹</h3><p>cp命令可以用于复制文件&#x2F;文件夹，cp命令来自英文单词: copy</p>
+<p>语法: cp [-r] 参数1参数2</p>
+<ul>
+<li>-r选项，可选，用于复制文件夹使用，表示递归。</li>
+<li>参数1,Linux路径，表示被复制的文件或文件夹。</li>
+<li>参数2，Linux路径，表示要复制去的地方</li>
+</ul>
+<h3 id="mv移动文件或文件夹"><a href="#mv移动文件或文件夹" class="headerlink" title="mv移动文件或文件夹"></a>mv移动文件或文件夹</h3><p>mv命令可以用于移动文件\文件夹，mv命令来自英文单词:move</p>
+<p>语法:<code>mv参数1参数2</code></p>
+<ul>
+<li>参数1,Linux路径，表示被移动的文件或文件夹</li>
+<li>参数2，Linux路径，表示要移动去的地方，如果目标不存在，则进行改名，确保目标存在</li>
+</ul>
+<h3 id="rm删除文件、文件夹"><a href="#rm删除文件、文件夹" class="headerlink" title="rm删除文件、文件夹"></a>rm删除文件、文件夹</h3><p>rm命令可用于删除文件、文件夹</p>
+<p>rm命令来自英文单词:remove</p>
+<p>语法: <code>rm [-r -f] 参数1参数2 ......参数N</code></p>
+<ul>
+<li>同cp命令一样，-r选项用于删除文件夹</li>
+<li>-f表示force，强制删除（不会弹出提示确认信息)<ul>
+<li>普通用户删除内容不会弹出提示，只有root管理员用户删除内容会有提示</li>
+<li>所以一般普通用户用不到-f选项</li>
+</ul>
+</li>
+<li>参数1、参数2、…….、参数N表示要删除的文件或文件夹路径，按照空格隔开</li>
+</ul>
+<p>rm命令支持通配符 * ，用来做模糊匹配</p>
+<ul>
+<li><p>符号 * 表示通配符，即匹配任意内容（包含空)，示例:.</p>
+</li>
+<li><p>test*，表示匹配任何以test开头的内容</p>
+</li>
+<li><p>*test，表示匹配任何以test结尾的内容 </p>
+</li>
+<li><p>*test *，表示匹配任何包含test的内容</p>
+</li>
+<li><p>演示强制删除，-f选项</p>
+</li>
+<li><p>可以通过 su - root，并输入密码123456（和普通用户默认一样）临时切换到root用户体验</p>
+</li>
+<li><p>通过输入exit命令，退回普通用户。</p>
+</li>
+</ul>
+<h3 id="which命令"><a href="#which命令" class="headerlink" title="which命令"></a>which命令</h3><p>我们在前面学习的Linux命令，其实它们的本体就是一个个的二进制可执行程序。和Windows系统中的.exe文件，是一个意思。</p>
+<p>我们可以通过which命令，查看所使用的一系列<strong>命令</strong>的程序文件存放在哪里</p>
+<p>语法: <code>which 要查找的命令</code></p>
+<h3 id="find命令–按文件名查找文件"><a href="#find命令–按文件名查找文件" class="headerlink" title="find命令–按文件名查找文件"></a>find命令–按文件名查找文件</h3><p>同样，在Linux系统中，我们可以通过find命令去搜索指定的文件。</p>
+<p>语法:<code>find 起始路径 -name  &quot;被查找文件名&quot;</code></p>
+<p>被查找文件名，支持使用通配符*来做模糊查询。</p>
+<h3 id="find命令-按文件大小查找文件"><a href="#find命令-按文件大小查找文件" class="headerlink" title="find命令-按文件大小查找文件"></a>find命令-按文件大小查找文件</h3><p>语法: <code>find 起始路径 -size  +/-n[kMG]</code></p>
+<ul>
+<li>+、-表示大于和小于</li>
+<li>n表示大小数字</li>
+<li>kMG表示大小单位，k(小写字母)表示kb，M表示MB，G表示GB</li>
+</ul>
+<p>示例:</p>
+<ul>
+<li>查找小于10KB的文件: find  &#x2F; -size  -10k</li>
+<li>查找大于100MB的文件: find &#x2F; -size +100M</li>
+<li>查找大于1GB的文件: find &#x2F; -size +1G</li>
+</ul>
+<h3 id="grep命令"><a href="#grep命令" class="headerlink" title="grep命令"></a>grep命令</h3><p>可以通过grep命令，从文件中通过关键字过滤<strong>文件行</strong>。</p>
+<p>语法: <code>grep [-n] 关键字文件路径</code></p>
+<ul>
+<li>选项-n，可选，表示在结果中显示匹配的行的行号。</li>
+<li>参数，关键字，必填，表示过滤的关键字，带有空格或其它特殊符号，建议使用” ”将关键字包围起来。</li>
+<li>参数，文件路径，必填，表示要过滤内容的文件路径，可作为内容输入端口</li>
+</ul>
+<h3 id="wc命令做数量统计"><a href="#wc命令做数量统计" class="headerlink" title="wc命令做数量统计"></a>wc命令做数量统计</h3><p>可以通过wc命令统计文件的行数、单词数量等</p>
+<p>语法: <code>wc [-c -m -l -w] 文件路径</code></p>
+<ul>
+<li>选项，-c，统计bytes数量。</li>
+<li>选项，-m，统计字符数量</li>
+<li>选项，-l，统计行数</li>
+<li>选项，-w，统计单词数量</li>
+<li>参数，文件路径，被统计的文件，可作为内容输入端口</li>
+</ul>
+<h3 id="管道符"><a href="#管道符" class="headerlink" title="管道符"></a>管道符</h3><p>管道符:l<br>管道符的含义是:将管道符左边命令的结果，作为右边命令的输入</p>
+<ul>
+<li>cat itheima.txt的输出结果（文件内容)。</li>
+<li>作为右边grep命令的输入（被过滤文件)</li>
+</ul>
+<p><code>cat itheima.txt | grep itheima</code>还可以嵌套</p>
+<h3 id="echo命令"><a href="#echo命令" class="headerlink" title="echo命令"></a>echo命令</h3><p>可以使用echo命令在命令行内输出指定内容</p>
+<p>语法:<code>echo 输出的内容</code></p>
+<ul>
+<li><p>无需选项，只有一个参数，表示要输出的内容，复杂内容可以用” ”包围</p>
+</li>
+<li><p>带有空格或\等特殊符号，建议使用双引号包围</p>
+</li>
+<li><p>因为不包围的话，空格后很容易被识别为参数2，尽管echo不受影响，但是要养成习惯哦</p>
+</li>
+</ul>
+<h3 id="反引号-96"><a href="#反引号-96" class="headerlink" title="反引号&#96;"></a>反引号&#96;</h3><p>本意是想，输出当前的工作路径，但是pwd被作为普通字符输出了。<br>我们可以通过将命令用反引号（通常也称之为飘号) &#96; 将其包围<br>被   飘号包围的内容，会被作为命令执行，而非普通字符</p>
+<h3 id="重定向符"><a href="#重定向符" class="headerlink" title="重定向符"></a>重定向符</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;,将左侧命令的结果，覆盖写入到符号右侧指定的文件中</span><br><span class="line">&gt;&gt;,将左侧命令的结果，追加写入到符号右侧指定的文件中</span><br></pre></td></tr></table></figure>
+
+<h3 id="tail命令"><a href="#tail命令" class="headerlink" title="tail命令"></a>tail命令</h3><p>使用tail命令，可以查看文件尾部内容，跟踪文件的最新更改，</p>
+<p>语法如下:<code>tail [-f -num ] Linux路径</code></p>
+<ul>
+<li>参数，Linux路径，表示被跟踪的文件路径。</li>
+<li>选项，-f，表示持续跟踪</li>
+<li>选项，-num，表示，查看尾部多少行，不填默认10行</li>
+</ul>
+<h3 id="vi-vim编辑器介绍"><a href="#vi-vim编辑器介绍" class="headerlink" title="vi\vim编辑器介绍"></a>vi\vim编辑器介绍</h3><p>vi\vim是visual interface的简称，是Linux中最经典的文本编辑器</p>
+<p>同图形化界面中的文本编辑器一样，vi是命令行下对文本文件进行编辑的绝佳选择</p>
+<p>vim是vi的加强版本，兼容vi的所有指令，不仅能编辑文本，而且还具有shell程序编辑的功能，可以不同颜色的字体来辨别语法的正确性，极大方便了程序的设计和编辑性。</p>
+<h4 id="vi-vim编辑器的三种工作模式"><a href="#vi-vim编辑器的三种工作模式" class="headerlink" title="vi\vim编辑器的三种工作模式"></a>vi\vim编辑器的三种工作模式</h4><p>命令模式(Command mode)，最开始状态</p>
+<ul>
+<li>命令模式下，所敲的按键编辑器都理解为命令，以命令驱动执行不同的功能，此模型下，不能自由进行文本编辑。输入i o a进入输入模式，退出输入<strong>：wq</strong></li>
+</ul>
+<p>输入模式(lnsert mode)</p>
+<ul>
+<li>也就是所谓的编辑模式、插入模式。此模式下，可以对文件内容进行自由编辑。ESC键进入命令模式</li>
+</ul>
+<p>底线命令模式(Last line mode)</p>
+<ul>
+<li>以**:**开始，通常用于文件的保存、退出。命令以回车结束运行</li>
+</ul>
+<ol>
+<li>如果文件路径表示的文件不存在，那么此命令会用于编辑新文件</li>
+<li>如果文件路径表示的文件存在，那么此命令用于编辑已有文件</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>命令模式</td>
+<td>i</td>
+<td>在当前光标位置进入输入模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>a</td>
+<td>在当前光标位置之后进入输入模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>I</td>
+<td>在当前行的开头，进入输入模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>A</td>
+<td>在当前行的结尾，进入输入模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>o</td>
+<td>在当前光标下一行进入输入模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>O</td>
+<td>在当前光标上一行进入输入模式</td>
+</tr>
+<tr>
+<td>输入模式</td>
+<td>esc</td>
+<td>任何情况下输入esc都能回到命令模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>0</td>
+<td>移动光标到当前行的开头</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>$</td>
+<td>移动光标到当前行的结尾</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>pageup( Pgup)</td>
+<td>向上翻页</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>pangdown( PgDn)</td>
+<td>向下翻页</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>&#x2F;</td>
+<td>进入搜索模式</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>n</td>
+<td>向下继续搜索</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>N</td>
+<td>向上继续搜索</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>dd</td>
+<td>删除光标所在行的内容</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>ndd</td>
+<td>n是数字，表示删除当前光标向下n行</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>yy</td>
+<td>复制当前行</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>nyy</td>
+<td>n是数字，复制当前行和下面的n行</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>p</td>
+<td>粘贴复制的内容</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>u</td>
+<td>撤销修改</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>crtl+r</td>
+<td>反向撤销修改</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>gg</td>
+<td>跳到首行</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>G</td>
+<td>跳到行尾</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>dG</td>
+<td>从当前行开始，向下全部删除</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>dgg</td>
+<td>从当前行开始，向上全部删除</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>d$</td>
+<td>从当前光标开始，删除到本行的结尾</td>
+</tr>
+<tr>
+<td>命令模式</td>
+<td>d0</td>
+<td>从当前光标开始，删除到本行的开头</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:wq</td>
+<td>保存并退出</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:q</td>
+<td>仅退出</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:q!</td>
+<td>强制退出</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:w</td>
+<td>仅保存</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:set nu</td>
+<td>显示行号</td>
+</tr>
+<tr>
+<td>底线命令模式</td>
+<td>:set paste</td>
+<td>设置粘贴模式,主要是为了保证外部复制不会格式错乱</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/16/c%E5%92%8Cc++/%E5%85%B3%E4%BA%8Evscode%E5%A6%82%E4%BD%95%E5%AF%B9%E5%A4%9A%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2201,198 +2639,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/03/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/03/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c/" class="post-title-link" itemprop="url">第五天 c++</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-03 09:24:35" itemprop="dateCreated datePublished" datetime="2023-04-03T09:24:35+08:00">2023-04-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-22 11:32:50" itemprop="dateModified" datetime="2023-04-22T11:32:50+08:00">2023-04-22</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><h3 id="多态的基本概念"><a href="#多态的基本概念" class="headerlink" title="多态的基本概念"></a>多态的基本概念</h3><p>多态是C++面向对象三大特性之一</p>
-<p>多态分为两类:</p>
-<ul>
-<li>静态多态:函数重载和运算符重载属于静态多态，复用函数名</li>
-<li>动态多态:派生类和虚函数实现运行时多态</li>
-</ul>
-<p>静态多态和动态多态区别:</p>
-<ul>
-<li>静态多态的函数地址早绑定–编译阶段确定函数地址</li>
-<li>动态多态的函数地址晚绑定–运行阶段确定函数地址</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;iostream&gt;</span><br><span class="line">#include &lt;windows.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">class Animal</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	// Speak函数就是虚函数</span><br><span class="line">	//函数前面加上virtual关键字，变成虚函数，那么编译器在编译的时候就不能确定函数调用了。</span><br><span class="line">	//vfptr-虚函教（表）指针</span><br><span class="line">	//v- virtual</span><br><span class="line">	//f - function</span><br><span class="line">	//ptr - pointer</span><br><span class="line">	virtual void speak()&#123;</span><br><span class="line">		cout &lt;&lt; &quot;动物在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">class Cat :public Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	void speak()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;小猫在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;	</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line">class Dog :public Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	void speak( )&#123;</span><br><span class="line">		cout &lt;&lt;&quot;小狗在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//我们希望传入什么对象，那么就调用什么对象的函数</span><br><span class="line">//如果函数地址在编译阶段就能确定，那么静态联编</span><br><span class="line">//如果函数地址在运行阶段才能确定，就是动态联编</span><br><span class="line"></span><br><span class="line">void DoSpeak( Animal &amp; animal)&#123;//Animal &amp; animal=cat;引用指向子类对象,如果没有virtual，则编译阶段就确定函数调用Animal了，则不能实现动态调用了</span><br><span class="line">	animal.speak( );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//多态满足条件:</span><br><span class="line">//1、有继承关系</span><br><span class="line">//2、子类重写父类中的虚函数，这里就是speak函数</span><br><span class="line">//多态使用:</span><br><span class="line">//父类指针或引用指向子类对象</span><br><span class="line">void test01()&#123;</span><br><span class="line">	Cat cat;</span><br><span class="line">	DoSpeak(cat);//用引用也可以。引用不用手动释放内存。指针不用实例化对象。各有优劣,即引用时不能写成	//DoSpeak(new Cat);</span><br><span class="line">	Dog dog;</span><br><span class="line">	DoSpeak( dog);</span><br><span class="line">&#125;</span><br><span class="line">int main() &#123;</span><br><span class="line">    SetConsoleOutputCP(65001);</span><br><span class="line">	test01();</span><br><span class="line">	//test02();</span><br><span class="line">	system( &quot;pause&quot; );</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结:</p>
-<p>多态满足条件</p>
-<ul>
-<li>有继承关系</li>
-<li>子类<strong>重写</strong>父类中的虚函数</li>
-</ul>
-<p>多态信用条件</p>
-<ul>
-<li>父类指针或引用指向子类对象</li>
-</ul>
-<p>重写:函数返回值类型	函数名	参数列表	完全—致称为重写</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//重写	函数返回值类型	函数名参	数列表完全相同</span><br><span class="line">virtual void speak ()</span><br><span class="line">&#123;</span><br><span class="line">	cout&lt;&lt;”小猫在说话”&lt;&lt; endl:</span><br><span class="line">&#125;</span><br><span class="line">当子类重写父类的虚函数</span><br><span class="line">这里不是子类中的虚函数表内部会替换成子类的虚函数地址，而是添加，因为替换的话，子类的虚函数就会丢失父类的虚函数地址，但实际上子类的虚函数表中同时有父类的虚函数地址和它自己的虚函数地址，通过使用方式不同，如利用父类指针或引用指向子类这种方式，来区分到底是使用子类虚数表里两个虚数表中的哪一个</span><br></pre></td></tr></table></figure>
-
-<h3 id="多态案例一-计算器类"><a href="#多态案例一-计算器类" class="headerlink" title="多态案例一-计算器类"></a>多态案例一-计算器类</h3><p>案例描述:</p>
-<p>分别利用普通写法和多态技术，设计实现两个操作数进行运算的计算器类</p>
-<p>多态的优点:</p>
-<ul>
-<li>代码组织结构清晰。可读性强</li>
-<li>利于前期和后期的扩展以及维护</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">//普通实现</span><br><span class="line">class calculator &#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult( string oper)&#123;</span><br><span class="line">		if (oper == &quot;+&quot;) &#123;</span><br><span class="line">			return m_Num1 + m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (oper == &quot;-&quot;) &#123;</span><br><span class="line">			return m_Num1 - m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (oper ==“*&quot;)&#123;</span><br><span class="line">			return m_Num1 *m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">	//如果要提供新的运算，需要修改源码</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_Num1;</span><br><span class="line">	int m_Num2;</span><br><span class="line">&#125;;</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	//普通实现测试</span><br><span class="line">	Calculator c;</span><br><span class="line">	c.m_Num1 = 10;</span><br><span class="line">	c.m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; c.m_Num1 &lt;&lt; &quot; + &quot; &lt;&lt; c.m_Num2&lt;&lt; &quot; - &quot; &lt;&lt; c.getResult(&quot;+&quot;) &lt;&lt; endl;</span><br><span class="line">	cout &lt; c.m_Num1 &lt;&lt; &quot; . &quot; &lt;&lt; c.m_Num2&lt;&lt; &quot; = &quot; &lt;&lt; c.getResult(&quot;-&quot;) &lt;&lt; endl;</span><br><span class="line">	cout &lt; c.m_Num1 &lt;&lt;”*&quot; &lt;&lt; c.m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; c.getResult(&quot;*&quot;) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">//多态实现</span><br><span class="line">//抽象计算器类</span><br><span class="line">//多态优点:代码组织结构清晰，可读性强，利于前期和后期的扩展以及维护</span><br><span class="line">class Abstractcalculator</span><br><span class="line">&#123;</span><br><span class="line">public :</span><br><span class="line">	virtual int getResult()&#123;</span><br><span class="line">		return 0;</span><br><span class="line">	&#125;</span><br><span class="line">		int m_Num1;</span><br><span class="line">		int m_Num2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//加法计算器</span><br><span class="line">class Addcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 + m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//减法计算器</span><br><span class="line">class Subcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 - m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//乘法计算器</span><br><span class="line">class Mulcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 * m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void teste2()&#123;</span><br><span class="line">	//创建加法计算器</span><br><span class="line">	Abstractcalculator *abc = new Addcalculator;//多态使用:</span><br><span class="line">	//父类指针或引用指向子类对象,这里是父类指针指向子类对象</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt; abc-&gt;m_Num1 &lt;&lt; &quot; + &quot; &lt;&lt; abc-&gt;m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;//用完了记得销毁</span><br><span class="line">	//创建减法计算器</span><br><span class="line">	abc = new Subcalculator;</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; abc-&gt;m_Num1 &lt;&lt; &quot; -&quot; &lt;&lt; abc-&gt;m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;</span><br><span class="line">	//创建乘法计算器</span><br><span class="line">	abc = new MulCalculator;</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; abc-&gt;m_Num1 &lt;&lt;&quot; * &quot; &lt;&lt; abc-&gt;m_Num2 〈&lt; &quot; - &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;</span><br><span class="line">	&#125; </span><br></pre></td></tr></table></figure>
-
-<p>总结:C++开发提倡利用多森设计程序架构，因为多态优点很多</p>
-<h3 id="纯虚函数和抽象类"><a href="#纯虚函数和抽象类" class="headerlink" title="纯虚函数和抽象类"></a>纯虚函数和抽象类</h3><p>在多态中，通常父类中虚函数的实现是毫无意义的，主要都是调用子类重写的内容</p>
-<p>因此可以将虚函数改为纯虚函数</p>
-<p>纯虚函数语法:virtual 	返回值类型	函数名	(参数列表)&#x3D; 0;</p>
-<p>当类中有了纯虚函数，这个类也称为<strong>抽象类</strong></p>
-<p>抽象类特点:</p>
-<ul>
-<li>无法实例化对象</li>
-<li>子类必须重写抽象类中的纯虚函数，否则也属于抽象类</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class Base&#123;</span><br><span class="line">public:</span><br><span class="line">	//纯虚函数</span><br><span class="line">	//类中只要有一个纯虚函数就称为抽象类</span><br><span class="line">	//抽象类无法实例化对象,但是能定义一个指向该类的指针</span><br><span class="line">	//子类必须重写父类中的纯虚函数，否则也属于抽象类</span><br><span class="line">	virtual void func() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">class Son :public Base&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void func()&#123;</span><br><span class="line">		cout &lt;&lt; &quot;func调用&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	Base * base = NULL;</span><br><span class="line">	// base = new Base; </span><br><span class="line">	//错误，抽象类无法实例化对象</span><br><span class="line">	base = new Son;</span><br><span class="line">	base-&gt;func( );</span><br><span class="line">	delete base; //记得销毁</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="虚析构和纯虚析构"><a href="#虚析构和纯虚析构" class="headerlink" title="虚析构和纯虚析构"></a>虚析构和纯虚析构</h3><p>多态使用时，如果子类中有属性开辟到堆区，那么父类指针在释放时无法调用到子类的析构代码</p>
-<p>解决方式:将父类中的析构函数改为<strong>虚析构</strong>或者纯虚析构</p>
-<p>虚析构和纯虚析构共性:</p>
-<ul>
-<li>可以解决父类指针释放子类对象</li>
-<li>都需要有具体的函数实现</li>
-</ul>
-<p>虚析构和纯虚析构区别:</p>
-<ul>
-<li>如果是纯虚析构，该类属于抽象类，无法实例化对象</li>
-</ul>
-<p>在基类析构函数声明为virtual的时候，delete基类指针，会先调用派生类的析构函数，再调用基类的析构函数。在基类析构函数没有声明为virtual的时候，delete基类指针，只会调用基类的析构函数，而不会调用派生类的析构函数，这样会造成销毁对象的不完全。</p>
-<p>虚析构语法:</p>
-<p><code>virtual ~类名( )&#123;&#125;</code></p>
-<p>纯虚析构语法:</p>
-<p><code>virtual	~类名()= 0;</code></p>
-<p><code>类名::~类名()&#123;&#125;</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">class Animal &#123;</span><br><span class="line">public:</span><br><span class="line">	Animal()&#123;</span><br><span class="line">	cout &lt;&lt; &quot;Animal构造函数调用!&quot; &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Speak() = 0;</span><br><span class="line">	//析构函数加上virtual关键字，变成虚析构函数</span><br><span class="line">	//virtual ~Animal()</span><br><span class="line">	//&#123;</span><br><span class="line">	//cout &lt;&lt; &quot;Animal虚析构函数调用! &quot;&lt;&lt;endl;</span><br><span class="line">    //&#125;</span><br><span class="line">	virtual ~Animal() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">Animal : :~Animal()&#123;</span><br><span class="line">	cout &lt;&lt;&quot;Animal纯虚析构函数调用!&quot; &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">//和包含普通纯虚函数的类一样，包含了纯虚析构函数的类也是一个抽象类。不能够被实例化。</span><br><span class="line">class Cat : public Animal &#123;</span><br><span class="line">public:</span><br><span class="line">	Cat(string name)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;cat构造函数调用!&quot; &lt;&lt;endl;</span><br><span class="line">		m_Name = new string( name);</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Speak()&#123;</span><br><span class="line">		cout &lt;&lt; *m_Name &lt;&lt;&quot;小猫在说话!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	~Cat()</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;cat析构函数调用!&quot;&lt;&lt; endl;</span><br><span class="line">		if (this-&gt;m_Name != NULL)&#123;</span><br><span class="line">		delete m_Name;</span><br><span class="line">		m_Name = NULL;//置空是为了防止出现野指针</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	string *m_Name;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	Animal *animal = new Cat( &quot;Tom&quot; ) ;</span><br><span class="line">	animal-&gt;Speak();</span><br><span class="line">	//通过父类指针去释放，会导致子类对象可能清理不干净，造成内存泄漏</span><br><span class="line">	//怎么解决?给基类增加一个虚析构函数</span><br><span class="line">	//虚析构函数就是用来解决通过父类指针释放子类对象</span><br><span class="line">	delete animal;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结：</p>
-<p>1.虚析构或纯虚析构就是用来解决通过父类指针释放子类对象</p>
-<p>2.如果子类中没有堆区数据，可以不写为虚析构或纯虚析构</p>
-<p>3.拥有纯虚析构函数的类也属于抽象类</p>
-<p>抽象类不能实例化,但是能定义一个指向该类的指针</p>
-<h1 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h1><p>程序运行时产生的数据都属于临时数据，程序—旦运行结束都会被释放通过文件可以将数据持久化</p>
-<p>C++中对文件操作需要包含头文件&lt; fstream &gt;</p>
-<p>文件类型分为两种:</p>
-<p>1.文本文件-文件以文本的ASCII码形式存储在计算机中</p>
-<p>2.二进制文件-文件以文本的二进制形式存储在计算机中，用户一般不能直接读懂它们</p>
-<p>操作文件的三大类:</p>
-<ul>
-<li>ofstream:写操作</li>
-<li>ifstream:读操作</li>
-<li>fstream :读写操作</li>
-</ul>
-<h3 id="写文件步骤如下"><a href="#写文件步骤如下" class="headerlink" title="写文件步骤如下:"></a>写文件步骤如下:</h3><p>1.包含头文件</p>
-<p>#include <fstream></p>
-<p>2.创建流对象<br>ofstream ofs;&#x2F;&#x2F;读文件则为ifstream ofs</p>
-<p>3.打开文件<br>ofs.open(“文件路径”,打开方式);&#x2F;&#x2F;读文件则为ifs.open(“文件路径”,打开方式)</p>
-<p>4.写数据</p>
-<p>ofs &lt;&lt;”写入的数据”;</p>
-<p>5.关闭文件</p>
-<p>ofs.close();&#x2F;&#x2F;读文件则为ifs.close()</p>
-<p>文件打开方式:</p>
-<table>
-<thead>
-<tr>
-<th>打开方式</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ios:in</td>
-<td>为读文件而打开文件</td>
-</tr>
-<tr>
-<td>ios::out</td>
-<td>为写文件而打开文件</td>
-</tr>
-<tr>
-<td>ios:.ate</td>
-<td>初始位置:文件尾</td>
-</tr>
-<tr>
-<td>ios:.app</td>
-<td>追加方式写文件</td>
-</tr>
-<tr>
-<td>ios:trunc</td>
-<td>如果文件存在先删除，再创建</td>
-</tr>
-<tr>
-<td>ios:binary</td>
-<td>二进制方式</td>
-</tr>
-</tbody></table>
-<p>注意:文件打开方式可以配合使用，利用|操作符</p>
-<p>例如:用二进制方式写文件<code>ios ::binary | ios:: out</code></p>
-<h3 id="读文件步骤如下"><a href="#读文件步骤如下" class="headerlink" title="读文件步骤如下:"></a>读文件步骤如下:</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">ifs.open(&quot;test.txt&quot;, ios ::in);</span><br><span class="line">if ( !ifs.is_open())</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt;&quot;文件打开失败”&lt;&lt; endl;</span><br><span class="line">	return;</span><br><span class="line">&#125;</span><br><span class="line">//第—种方式</span><br><span class="line">//char buf[1024] =&#123; 0 &#125;;</span><br><span class="line">// while (ifs &gt;&gt; buf)</span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;</span><br><span class="line">	//&#125;</span><br><span class="line">//第二种</span><br><span class="line">//char buf[ 1024] - &#123; 0 &#125;;</span><br><span class="line">// while (ifs.getline(buf,sizeof( buf) )); </span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;	</span><br><span class="line">//&#125;</span><br><span class="line">//第三种</span><br><span class="line">//string buf;</span><br><span class="line">// while (getline(ifs, buf )) </span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;</span><br><span class="line">// &#125;</span><br><span class="line">char c;</span><br><span class="line">while ((c = ifs.get()) !=EOF)&#123;//EOF end of file</span><br><span class="line">	cout &lt;&lt; c;</span><br><span class="line">&#125;</span><br><span class="line">ifs.close();</span><br></pre></td></tr></table></figure>
-
-<p>在 C++ 中，ifstream 是用于从文件中读取数据的输入流对象。它通过空格字符（空格符、制表符、换行符等）来分隔输入数据。在默认情况下，每次读取一定数量的字符（通常是一个单词或一行），直到遇到空格字符或换行为止。如果需要，可以使用 getline 函数来读取整行数据，而不是只读取到第一个空格字符。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2462,7 +2708,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
