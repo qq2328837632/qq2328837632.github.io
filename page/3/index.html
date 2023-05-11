@@ -147,6 +147,449 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/21/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/21/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第七天 c语言</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-03-21 16:25:11 / 修改时间：21:12:34" itemprop="dateCreated datePublished" datetime="2023-03-21T16:25:11+08:00">2023-03-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="C-强制类型转换"><a href="#C-强制类型转换" class="headerlink" title="C 强制类型转换"></a>C 强制类型转换</h1><p>强制类型转换是把变量从一种类型转换为另一种数据类型。例如，如果您想存储一个 long 类型的值到一个简单的整型中，您需要把 long 类型强制转换为 int 类型。您可以使用<strong>强制类型转换运算符</strong>来把值显式地从一种类型转换为另一种类型，如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(type_name) expression</span><br></pre></td></tr></table></figure>
+
+<p>请看下面的实例，使用强制类型转换运算符把一个整数变量除以另一个整数变量，得到一个浮点数：</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   int sum = 17, count = 5;</span><br><span class="line">   double mean;</span><br><span class="line"> </span><br><span class="line">   mean = (double) sum / count;</span><br><span class="line">   printf(&quot;Value of mean : %f\n&quot;, mean );</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Value of mean : 3.400000</span><br></pre></td></tr></table></figure>
+
+<p>这里要注意的是强制类型转换运算符的<strong>优先级大于除法</strong>，因此 <strong>sum</strong> 的值首先被转换为 <strong>double</strong> 型，然后除以 count，得到一个类型为 double 的值。</p>
+<h2 id="整数提升"><a href="#整数提升" class="headerlink" title="整数提升"></a>整数提升</h2><p>整数提升是指把小于 <strong>int</strong> 或 <strong>unsigned int</strong> 的整数类型转换为 <strong>int</strong> 或 <strong>unsigned int</strong> 的过程：比如将char类型的字符转化成ascii码再与int型计算得到int型。</p>
+<h2 id="常用的算术转换"><a href="#常用的算术转换" class="headerlink" title="常用的算术转换"></a>常用的算术转换</h2><p><strong>常用的算术转换</strong>是<strong>隐式地</strong>把值强制转换为相同的类型。编译器首先执行<strong>整数提升</strong>，如果操作数类型不同，则它们会被转换为下列层次中出现的最高层次的类型：</p>
+<p>char,short–&gt;int–&gt;unsigned int–&gt;long–&gt;unsigned long–&gt;long long–&gt;unsigned long long–&gt;float–&gt;double–&gt;long double</p>
+<p>float、double、long double 类型赋值给整数类型：直接截断小数.</p>
+<hr>
+<p>为了提高效率，C 语言对于不同的两个类型将直接转换成较高类型计算。</p>
+<p>举个例子：对于已经分别被定义且被赋值，类型为 <strong>double</strong> 和 <strong>int</strong> 的 <strong>a</strong> 和 <strong>b</strong>：</p>
+<p>假设如果进行 <strong>a + b</strong> 运算，那么b将直接被隐式转换为 <strong>double</strong> 类型，然后再进行运算，不能理解为逐层转换（即不能理解为b先转换为unsigned int类型，再转换为 <strong>long &#x3D;&gt; unsigned long &#x3D;&gt; long long &#x3D;&gt; unsigned long long &#x3D;&gt; float &#x3D;&gt; double</strong>类型，最后再进行运算）。</p>
+<p><strong>p.s:</strong> 说到运算，对于 <strong>char</strong> 和 <strong>short</strong> 类型，进行运算时将会被隐式转换为 <strong>int</strong></p>
+<hr>
+<p>常用的算术转换不适用于赋值运算符、逻辑运算符 &amp;&amp; 和 ||。</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>C 语言中 printf 输出 double 和 float 都可以用 <strong>%f</strong> 占位符 可以混用，而 double 可以额外用 <strong>%lf</strong>。</p>
+<p>而 scanf 输入情况下 double 必须用 <strong>%lf</strong>，float 必须用 <strong>%f</strong> 不能混用。</p>
+<hr>
+<p><strong>强制类型转换只是临时类型转换，并不影响变量本身储存的值</strong>，看如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main() &#123;</span><br><span class="line">  float a = 6.9;</span><br><span class="line">  printf(&quot;%.3f&quot;, a);</span><br><span class="line">  putchar(&#x27;\n&#x27;);</span><br><span class="line">  ((int)a);</span><br><span class="line">  printf(&quot;%.3f&quot;, a);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">6.900</span><br><span class="line">6.900</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补-0"><a href="#存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补-0" class="headerlink" title="存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补 0"></a>存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补 0</h3><p>假设有如下定义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char c = 56;//1个字节,8位二进制</span><br><span class="line">short num = 67;//2个字节,16位二进制</span><br><span class="line">int m;//4个字节,32位二进制</span><br><span class="line">long long int n;//8个字节,64位二进制</span><br></pre></td></tr></table></figure>
+
+<p>如果执行以下操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m = ((int)c);</span><br><span class="line">n = ((long long)num);</span><br></pre></td></tr></table></figure>
+
+<p>那么它们在内存以 2 进制格式分别存储为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">                                                               00111000  //Binary of &#x27;c&#x27;</span><br><span class="line">                                                      00000000 01000011  //Binary of&#x27;num&#x27;</span><br><span class="line">                                    00000000 00000000 00000000 00111000  //Binary of &#x27;m&#x27;</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000011  //Binary of &#x27;n&#x27;</span><br></pre></td></tr></table></figure>
+
+<h3 id="存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型"><a href="#存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型" class="headerlink" title="存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型"></a>存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型</h3><p>假设定义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">long long int l = 223372036854775807;</span><br></pre></td></tr></table></figure>
+
+<p>进行赋值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int i = (int)l;</span><br></pre></td></tr></table></figure>
+
+<p>它们在内存以2进制格式分别存储为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">00000011 00011001 10010011 10101111 00011101 01111011 11111111 11111111  //Binary of &#x27;l&#x27;</span><br><span class="line">                                    00011101 01111011 11111111 11111111  //Binary of &#x27;v&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><strong>p.s:</strong> 此时的 v&#x3D;494665727。</p>
+<p>顺带说明一下，如果变量 “l” 的后 32 个字节都为 1，那么 v 将等于 -1。因为负数在计算机都以补码形式存在，即</p>
+<p>后 32 个字节都为 1的是补码变为原码就为-1.</p>
+<h3 id="unsigned类型赋值给非unsigned类型：直接传递数值"><a href="#unsigned类型赋值给非unsigned类型：直接传递数值" class="headerlink" title="unsigned类型赋值给非unsigned类型：直接传递数值"></a>unsigned类型赋值给非unsigned类型：直接传递数值</h3><p><strong>注意：</strong>如果 unsigned 类型储存的量太大，强制类型转换后可能会出现非 unsigned 类型的值的绝对值不等于 unsigned 类型的值的绝对值的情况。</p>
+<p>说到 “unsigned 类型储存的量太大”，顺带说一下，虽然 printf 输出 int 和 unsigned int 时可以混用 %d（或%i）和 %u（或%ui），但还是建议输出 int 类型的时候用 %d（或%i），输出 unsigned int 类型时用 %u（或%ui）（其它类型同理&lt;如%ul等&gt;）</p>
+<h3 id="非-unsigned-类型赋值给-unsigned-类型：直接传递数值"><a href="#非-unsigned-类型赋值给-unsigned-类型：直接传递数值" class="headerlink" title="非 unsigned 类型赋值给 unsigned 类型：直接传递数值"></a>非 unsigned 类型赋值给 unsigned 类型：直接传递数值</h3><p>给个小技巧：如果你想“临时”给一个不知道正负的非 unsigned 类型的变量加上绝对值，可以使用abs函数，但利用(unsigned)(非unsigned类型变量名)可以节省一点内存开销</p>
+<p>但是也有弊端：可能会出现 unsigned-unsigned 永远大于 0 的情况（不确定）</p>
+<h1 id="C-错误处理"><a href="#C-错误处理" class="headerlink" title="C 错误处理"></a>C 错误处理</h1><p>C 语言不提供对错误处理的直接支持，但是作为一种系统编程语言，它以返回值的形式允许您访问底层数据。在发生错误时，大多数的 C 或 UNIX 函数调用返回 1 或 NULL，同时会设置一个错误代码 <strong>errno</strong>，该错误代码是全局变量，表示在函数调用期间发生了错误。您可以在 errno.h 头文件中找到各种各样的错误代码。</p>
+<p>所以，C 程序员可以通过检查返回值，然后根据返回值决定采取哪种适当的动作。开发人员应该在程序初始化时，把 errno 设置为 0，这是一种良好的编程习惯。0 值表示程序中没有错误。</p>
+<h2 id="errno、perror-和-strerror"><a href="#errno、perror-和-strerror" class="headerlink" title="errno、perror() 和 strerror()"></a>errno、perror() 和 strerror()</h2><p>C 语言提供了 <strong>perror()</strong> 和 <strong>strerror()</strong> 函数来显示与 <strong>errno</strong> 相关的文本消息。</p>
+<ul>
+<li><strong>perror()</strong> 函数显示您传给它的字符串，后跟一个冒号、一个空格和当前 errno 值的文本表示形式。</li>
+<li><strong>strerror()</strong> 函数，返回一个指针，指针指向当前 errno 值的文本表示形式。</li>
+</ul>
+<p>让我们来模拟一种错误情况，尝试打开一个不存在的文件。您可以使用多种方式来输出错误消息，在这里我们使用函数来演示用法。另外有一点需要注意，您应该使用 <strong>stderr 文件流</strong>来输出所有的错误。</p>
+<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">extern int errno ;</span><br><span class="line"> </span><br><span class="line">int main ()</span><br><span class="line">&#123;</span><br><span class="line">   FILE * pf;</span><br><span class="line">   int errnum;</span><br><span class="line">   pf = fopen (&quot;unexist.txt&quot;, &quot;rb&quot;);</span><br><span class="line">   if (pf == NULL)</span><br><span class="line">   &#123;</span><br><span class="line">      errnum = errno;</span><br><span class="line">      fprintf(stderr, &quot;错误号: %d\n&quot;, errno);</span><br><span class="line">      perror(&quot;通过 perror 输出错误&quot;);</span><br><span class="line">      fprintf(stderr, &quot;打开文件错误: %s\n&quot;, strerror( errnum ));</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      fclose (pf);</span><br><span class="line">   &#125;</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>fprintf是C&#x2F;C++中的一个格式化库函数，位于头文件中，其作用是格式化输出到一个流文件中；</p>
+<p>函数原型为int fprintf( FILE <em>stream, const char <em>format, [ argument ]…)，fprintf()函数根据指定的格式(format)，向输出流(stream)写入数据(argument)。将内容输出到指定.txt中FILE</em> fp &#x3D; NULL;<br>fp &#x3D; fopen(“e:\gz.txt”,”w+”);fprintf(fp,”%d,%x,%o”,10,10,10);将内容输出到屏幕,使用stdout或者stderr:fprintf(stdout,”%d,%x,%o”,10,10,10);stdout和stderr，stdout是标准的输出流，而stderr是标准的错误输出流。stdout和stderr的类型都是FILE</em>，在stdio.h中定义。默认情况下，stdout和stderr中的数据都会被打印到屏幕上。</p>
+<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">错误号: 2</span><br><span class="line">通过 perror 输出错误: No such file or directory</span><br><span class="line">打开文件错误: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>windows上述代码里 errno 的值从而得出不同的错误类型，从 43 之后就一直是 Unknown error 错误类型。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">Value of errno: 0</span><br><span class="line">Error opening file: No error</span><br><span class="line"></span><br><span class="line">Value of errno: 1</span><br><span class="line">Error opening file: Operation not permitted</span><br><span class="line"></span><br><span class="line">Value of errno: 2</span><br><span class="line">Error opening file: No such file or directory</span><br><span class="line"></span><br><span class="line">Value of errno: 3</span><br><span class="line">Error opening file: No such process</span><br><span class="line"></span><br><span class="line">Value of errno: 4</span><br><span class="line">Error opening file: Interrupted function call</span><br><span class="line"></span><br><span class="line">Value of errno: 5</span><br><span class="line">Error opening file: Input/output error</span><br><span class="line"></span><br><span class="line">Value of errno: 6</span><br><span class="line">Error opening file: No such device or address</span><br><span class="line"></span><br><span class="line">Value of errno: 7</span><br><span class="line">Error opening file: Arg list too long</span><br><span class="line"></span><br><span class="line">Value of errno: 8</span><br><span class="line">Error opening file: Exec format error</span><br><span class="line"></span><br><span class="line">Value of errno: 9</span><br><span class="line">Error opening file: Bad file descriptor</span><br><span class="line"></span><br><span class="line">Value of errno: 10</span><br><span class="line">Error opening file: No child processes</span><br><span class="line"></span><br><span class="line">Value of errno: 11</span><br><span class="line">Error opening file: Resource temporarily unavailable</span><br><span class="line"></span><br><span class="line">Value of errno: 12</span><br><span class="line">Error opening file: Not enough space</span><br><span class="line"></span><br><span class="line">Value of errno: 13</span><br><span class="line">Error opening file: Permission denied</span><br><span class="line"></span><br><span class="line">Value of errno: 14</span><br><span class="line">Error opening file: Bad address</span><br><span class="line"></span><br><span class="line">Value of errno: 15</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 16</span><br><span class="line">Error opening file: Resource device</span><br><span class="line"></span><br><span class="line">Value of errno: 17</span><br><span class="line">Error opening file: File exists</span><br><span class="line"></span><br><span class="line">Value of errno: 18</span><br><span class="line">Error opening file: Improper link</span><br><span class="line"></span><br><span class="line">Value of errno: 19</span><br><span class="line">Error opening file: No such device</span><br><span class="line"></span><br><span class="line">Value of errno: 20</span><br><span class="line">Error opening file: Not a directory</span><br><span class="line"></span><br><span class="line">Value of errno: 21</span><br><span class="line">Error opening file: Is a directory</span><br><span class="line"></span><br><span class="line">Value of errno: 22</span><br><span class="line">Error opening file: Invalid argument</span><br><span class="line"></span><br><span class="line">Value of errno: 23</span><br><span class="line">Error opening file: Too many open files in system</span><br><span class="line"></span><br><span class="line">Value of errno: 24</span><br><span class="line">Error opening file: Too many open files</span><br><span class="line"></span><br><span class="line">Value of errno: 25</span><br><span class="line">Error opening file: Inappropriate I/O control operation</span><br><span class="line"></span><br><span class="line">Value of errno: 26</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 27</span><br><span class="line">Error opening file: File too large</span><br><span class="line"></span><br><span class="line">Value of errno: 28</span><br><span class="line">Error opening file: No space left on device</span><br><span class="line"></span><br><span class="line">Value of errno: 29</span><br><span class="line">Error opening file: Invalid seek</span><br><span class="line"></span><br><span class="line">Value of errno: 30</span><br><span class="line">Error opening file: Read-only file system</span><br><span class="line"></span><br><span class="line">Value of errno: 31</span><br><span class="line">Error opening file: Too many links</span><br><span class="line"></span><br><span class="line">Value of errno: 32</span><br><span class="line">Error opening file: Broken pipe</span><br><span class="line"></span><br><span class="line">Value of errno: 33</span><br><span class="line">Error opening file: Domain error</span><br><span class="line"></span><br><span class="line">Value of errno: 34</span><br><span class="line">Error opening file: Result too large</span><br><span class="line"></span><br><span class="line">Value of errno: 35</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 36</span><br><span class="line">Error opening file: Resource deadlock avoided</span><br><span class="line"></span><br><span class="line">Value of errno: 37</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 38</span><br><span class="line">Error opening file: Filename too long</span><br><span class="line"></span><br><span class="line">Value of errno: 39</span><br><span class="line">Error opening file: No locks available</span><br><span class="line"></span><br><span class="line">Value of errno: 40</span><br><span class="line">Error opening file: Function not implemented</span><br><span class="line"></span><br><span class="line">Value of errno: 41</span><br><span class="line">Error opening file: Directory not empty</span><br><span class="line"></span><br><span class="line">Value of errno: 42</span><br><span class="line">Error opening file: Illegal byte sequence</span><br><span class="line"></span><br><span class="line">Value of errno: 43</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 44</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 45</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 46</span><br><span class="line">Error opening file: Unknown error</span><br></pre></td></tr></table></figure>
+
+<h2 id="程序退出状态"><a href="#程序退出状态" class="headerlink" title="程序退出状态"></a>程序退出状态</h2><p>通常情况下，程序成功执行完一个操作正常退出的时候会带有值 EXIT_SUCCESS。在这里，EXIT_SUCCESS 是宏，它被定义为 0。</p>
+<p>如果程序中存在一种错误情况，当您退出程序时，会带有状态值 EXIT_FAILURE，被定义为 -1。</p>
+<p>exit（）函数关闭了所有打开的文件并终止程序，exit()函数的参数会被传递给一些操作系统，通常的约定是正常终止的程序传递值0,非正常终止的程序传递非0值。</p>
+<p>exit（!0）； &#x2F;&#x2F;表示异常退出<br>exit（0）； &#x2F;&#x2F;表示正常退出</p>
+<p>return 0；<br>exit（0）；<br>这两者之间表达的效果是相同的。<br>但是：不同的是，main（） 函数在一个递归程序中，exit（）会终止程序，但是return将控制权交给递归上一级直至到最初的一级。</p>
+<p>exit() 的参数，是给自己的父进程使用的。通常一个程序的父进程可能是任何进程，因此我们无法预期我们的父进程是否规定必须要有这个<strong>返回值</strong>，那么我们应当提供这个返回值，以保证不同的父进程的需求得到满足。</p>
+<p>虽然现在大多数平台下，直接在 main() 函数里面 return 可以退出程序。但是在某些平台下，在 main() 函数里面 return 会导致程序永远不退出（因为代码已经执行完毕，程序却还没有收到要退出的指令）。换句话说，为了兼容性考虑，在特定的平台下，程序最后一行必须使用 exit() 才能正常退出，这是 exit() 存在的重要价值。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/20/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/20/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第六天 c语言</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-03-20 10:28:59 / 修改时间：19:57:21" itemprop="dateCreated datePublished" datetime="2023-03-20T10:28:59+08:00">2023-03-20</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="C-文件读写"><a href="#C-文件读写" class="headerlink" title="C 文件读写"></a>C 文件读写</h1><h2 id="打开文件"><a href="#打开文件" class="headerlink" title="打开文件"></a>打开文件</h2><p>您可以使用 <strong>fopen( )</strong> 函数来<strong>创建一个新的文件或者打开一个已有的文件</strong>，这个调用会初始化类型 <strong>FILE</strong> 的一个对象，类型 <strong>FILE</strong> 包含了所有用来控制流的必要的信息。下面是这个函数调用的原型：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FILE *fopen( const char *filename, const char *mode );</span><br></pre></td></tr></table></figure>
+
+<p>对 fopen()函数补充说明几点：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FILE *fopen( const char * filename, const char * mode );</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>该函数可能执行失败，返回值是NULL，安全起见必须对返回值进行合法性判断；</li>
+<li>该函数有多种模式，其中r+和w+看似一样，都是读写其实还是有几点区别的；</li>
+<li>1.模式r+找不到文件不会自动新建，而w+会；</li>
+<li>2.模式r+打开文件后，不会清除文件原数据，若直接开始写入，只会从起始位置开始进行<strong>覆盖</strong>，而w+会直接<strong>清零</strong>后，再开始读写；</li>
+<li>模式的合法性说明：不能用大写，只能是小写，且rb+和r+b都是合法的，但br+和+rb等都是非法的，w和a也是一样的处理；</li>
+<li>模式w的自动新建文件是有条件的，只有对应的路径存在(即文件所在的文件夹存在)，文件不存在才会新建，否则是不会新建的，返回NULL</li>
+</ul>
+<p>在这里，<strong>filename</strong> 是字符串，用来命名文件，访问模式 <strong>mode</strong> 的值可以是下列值中的一个：</p>
+<table>
+<thead>
+<tr>
+<th align="left">模式</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">r</td>
+<td align="left">打开一个已有的文本文件，允许读取文件。</td>
+</tr>
+<tr>
+<td align="left">w</td>
+<td align="left">打开一个文本文件，允许写入文件。如果文件不存在，则会创建一个新文件。在这里，您的程序会从文件的开头写入内容。如果文件存在，则该会被截断为零长度，重新写入。</td>
+</tr>
+<tr>
+<td align="left">a</td>
+<td align="left">打开一个文本文件，以追加模式写入文件。如果文件不存在，则会创建一个新文件。在这里，您的程序会在已有的文件内容中追加内容。</td>
+</tr>
+<tr>
+<td align="left">r+</td>
+<td align="left">打开一个文本文件，允许读写文件。</td>
+</tr>
+<tr>
+<td align="left">w+</td>
+<td align="left">打开一个文本文件，允许读写文件。如果文件已存在，则文件会被截断为零长度，如果文件不存在，则会创建一个新文件。</td>
+</tr>
+<tr>
+<td align="left">a+</td>
+<td align="left">打开一个文本文件，允许读写文件。如果文件不存在，则会创建一个新文件。读取会从文件的开头开始，写入则只能是追加模式。</td>
+</tr>
+</tbody></table>
+<p>如果处理的是二进制文件，则需使用下面的访问模式来取代上面的访问模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;rb&quot;, &quot;wb&quot;, &quot;ab&quot;, &quot;rb+&quot;, &quot;r+b&quot;, &quot;wb+&quot;, &quot;w+b&quot;, &quot;ab+&quot;, &quot;a+b&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭文件"><a href="#关闭文件" class="headerlink" title="关闭文件"></a>关闭文件</h2><p>为了关闭文件，请使用 fclose( ) 函数。函数的原型如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fclose( FILE *fp );</span><br></pre></td></tr></table></figure>
+
+<p>如果成功关闭文件，<strong>fclose( )</strong> 函数<strong>返回零</strong>，如果关闭文件时发生错误，函数返回 <strong>EOF</strong>。这个函数实际上，会清空缓冲区中的数据，关闭文件，并释放用于该文件的所有内存。EOF 是一个定义在头文件 <strong>stdio.h</strong> 中的常量。</p>
+<p>C 标准库提供了各种函数来按字符或者以固定长度字符串的形式读写文件。</p>
+<h2 id="写入文件"><a href="#写入文件" class="headerlink" title="写入文件"></a>写入文件</h2><p>下面是把字符写入到流中的最简单的函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fputc( int c, FILE *fp );</span><br></pre></td></tr></table></figure>
+
+<p>函数 <strong>fputc()</strong> 把参数 c 的字符值写入到 fp 所指向的输出流中。如果写入成功，它会返回写入的字符，如果发生错误，则会返回 <strong>EOF</strong>。您可以使用下面的函数来把一个以 null 结尾的字符串写入到流中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fputs( const char *s, FILE *fp );</span><br></pre></td></tr></table></figure>
+
+<p>函数 <strong>fputs()</strong> 把字符串 <strong>s</strong> 写入到 fp 所指向的输出流中。如果写入成功，它会返回一个非负值，如果发生错误，则会返回 <strong>EOF</strong>。您也可以使用 <strong>int fprintf(FILE *fp,const char *format, …)</strong> 函数把一个字符串写入到文件中。尝试下面的实例：</p>
+<blockquote>
+<p><strong>注意：</strong>请确保您<strong>有可用的 tmp 目录</strong>，如果不存在该目录，则需要在您的计算机上先创建该目录。</p>
+<p><strong>&#x2F;tmp</strong> 一般是 Linux 系统上的临时目录，如果你在 Windows 系统上运行，则需要修改为本地环境中已存在的目录，例如: <strong>C:\tmp</strong>、<strong>D:\tmp</strong>等。</p>
+</blockquote>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   FILE *fp = NULL;</span><br><span class="line"> </span><br><span class="line">   fp = fopen(&quot;/tmp/test.txt&quot;, &quot;w+&quot;);</span><br><span class="line">   fprintf(fp, &quot;This is testing for fprintf...\n&quot;);</span><br><span class="line">   fputs(&quot;This is testing for fputs...\n&quot;, fp);</span><br><span class="line">   fclose(fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当上面的代码被编译和执行时，它会在 &#x2F;tmp 目录中创建一个新的文件 <strong>test.txt</strong>，并使用两个不同的函数写入两行。接下来让我们来读取这个文件。</p>
+<h2 id="读取文件"><a href="#读取文件" class="headerlink" title="读取文件"></a>读取文件</h2><p>下面是从文件读取单个字符的最简单的函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fgetc( FILE * fp );</span><br></pre></td></tr></table></figure>
+
+<p><strong>fgetc()</strong> 函数从 fp 所指向的输入文件中读取一个字符。返回值是读取的字符，如果发生错误则返回 <strong>EOF</strong>。下面的函数允许您从流中读取一个字符串：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">char *fgets( char *buf, int n, FILE *fp );</span><br></pre></td></tr></table></figure>
+
+<p>函数 <strong>fgets()</strong> 从 fp 所指向的输入流中读取 n - 1 个字符。它会把读取的字符串复制到缓冲区 <strong>buf</strong>，并在最后追加一个 <strong>null</strong> 字符来终止字符串。</p>
+<p>如果这个函数在读取最后一个字符之前就遇到一个<strong>换行符 ‘\n’</strong> 或文件的末尾 EOF，则只会返回读取到的字符，<strong>包括换行符</strong>。您也可以使用 <strong>int fscanf(FILE *fp, const char *format, …)</strong> 函数来从文件中读取字符串，但是在遇到<strong>第一个空格和换行符</strong>时，它会停止读取。</p>
+<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   FILE *fp = NULL;</span><br><span class="line">   char buff[255];</span><br><span class="line"> </span><br><span class="line">   fp = fopen(&quot;/tmp/test.txt&quot;, &quot;r&quot;);</span><br><span class="line">   fscanf(fp, &quot;%s&quot;, buff);</span><br><span class="line">   printf(&quot;1: %s\n&quot;, buff );</span><br><span class="line"> </span><br><span class="line">   fgets(buff, 255, (FILE*)fp);</span><br><span class="line">   printf(&quot;2: %s\n&quot;, buff );</span><br><span class="line">   </span><br><span class="line">   fgets(buff, 255, (FILE*)fp);</span><br><span class="line">   printf(&quot;3: %s\n&quot;, buff );</span><br><span class="line">   fclose(fp);</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当上面的代码被编译和执行时，它会读取上一部分创建的文件，产生下列结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1: This</span><br><span class="line">2: is testing for fprintf...</span><br><span class="line"></span><br><span class="line">3: This is testing for fputs...</span><br></pre></td></tr></table></figure>
+
+<p>首先，<strong>fscanf()</strong> 方法只读取了 <strong>This</strong>，因为它在后边遇到了一个空格。其次，调用 <strong>fgets()</strong> 读取剩余的部分，直到行尾。最后，调用 <strong>fgets()</strong> 完整地读取第二行。<strong>依次读取</strong></p>
+<h2 id="fseek-可以移动文件指针到指定位置读-或插入写"><a href="#fseek-可以移动文件指针到指定位置读-或插入写" class="headerlink" title="fseek 可以移动文件指针到指定位置读,或插入写:"></a>fseek 可以移动文件指针到指定位置读,或插入写:</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fseek(FILE *stream, long offset, int whence);</span><br></pre></td></tr></table></figure>
+
+<p>fseek 设置当前读写点到 offset 处, whence 可以是 SEEK_SET,SEEK_CUR,SEEK_END 这些值决定是从文件头、当前点和文件尾计算偏移量 offset。</p>
+<p>你可以定义一个文件指针 <strong>FILE *fp</strong>,当你打开一个文件时，文件指针指向开头，你要指到多少个字节，只要控制偏移量就好，例如, 相对当前位置往后移动一个字节：<strong>fseek(fp,1,SEEK_CUR);</strong> 中间的值就是偏移量。 如果你要往前移动一个字节，直接改为负值就可以：**fseek(fp,-1,SEEK_CUR)**。</p>
+<p>执行以下实例前，确保当前目录下 <strong>test.txt</strong> 文件已创建：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main()&#123;   </span><br><span class="line">    FILE *fp = NULL;</span><br><span class="line">    fp = fopen(&quot;test.txt&quot;, &quot;r+&quot;);  // 确保 test.txt 文件已创建</span><br><span class="line">    fprintf(fp, &quot;This is testing for fprintf...\n&quot;);   </span><br><span class="line">    fseek(fp, 10, SEEK_SET);</span><br><span class="line">    if (fputc(65,fp) == EOF) &#123;//将65对应字符值A替换掉当前指针指向的s，函数 fputc() 把参数 c 的字符值写入到 fp 所指向的输出流中。如果写入成功，它会返回写入的字符，如果发生错误，则会返回 EOF</span><br><span class="line">        printf(&quot;fputc fail&quot;);   </span><br><span class="line">    &#125;   </span><br><span class="line">    fclose(fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结束后，打开 test.txt 文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">This is teAting for fprintf...</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong> 只有用 <strong>r+</strong> 模式打开文件才能插入内容，<strong>w</strong> 或 <strong>w+</strong> 模式都会清空掉原来文件的内容再来写，<strong>a</strong> 或 <strong>a+</strong> 模式即总会在文件最尾添加内容，哪怕用 fseek() 移动了文件指针位置。</p>
+<h1 id="C-预处理器"><a href="#C-预处理器" class="headerlink" title="C 预处理器"></a>C 预处理器</h1><p><strong>C 预处理器</strong>不是编译器的组成部分，但是它是编译过程中一个单独的步骤。简言之，C 预处理器只不过是一个文本替换工具而已，它们会指示编译器在实际编译之前完成所需的预处理。我们将把 C 预处理器（C Preprocessor）简写为 CPP。</p>
+<p>所有的预处理器命令都是以井号（#）开头。它必须是第一个非空字符，为了增强可读性，预处理器指令应从第一列开始。下面列出了所有重要的预处理器指令：</p>
+<table>
+<thead>
+<tr>
+<th align="left">指令</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">#define</td>
+<td align="left">定义宏</td>
+</tr>
+<tr>
+<td align="left">#include</td>
+<td align="left">包含一个源代码文件</td>
+</tr>
+<tr>
+<td align="left">#undef</td>
+<td align="left">取消已定义的宏</td>
+</tr>
+<tr>
+<td align="left">#ifdef</td>
+<td align="left">如果宏已经定义，则返回真</td>
+</tr>
+<tr>
+<td align="left">#ifndef</td>
+<td align="left">如果宏没有定义，则返回真</td>
+</tr>
+<tr>
+<td align="left">#if</td>
+<td align="left">如果给定条件为真，则编译下面代码</td>
+</tr>
+<tr>
+<td align="left">#else</td>
+<td align="left">#if 的替代方案</td>
+</tr>
+<tr>
+<td align="left">#elif</td>
+<td align="left">如果前面的 #if 给定条件不为真，当前条件为真，则编译下面代码</td>
+</tr>
+<tr>
+<td align="left">#endif</td>
+<td align="left">结束一个 #if……#else 条件编译块</td>
+</tr>
+<tr>
+<td align="left">#error</td>
+<td align="left">当遇到标准错误时，输出错误消息</td>
+</tr>
+<tr>
+<td align="left">#pragma</td>
+<td align="left">使用标准化方法，向编译器发布特殊的命令到编译器中</td>
+</tr>
+</tbody></table>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &quot;myheader.h&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这些指令告诉 CPP 从<strong>系统库</strong>中获取 stdio.h，并添加文本到当前的源文件中。下一行告诉 CPP 从本地目录中获取 <strong>myheader.h</strong>，并添加内容到当前的源文件中。</p>
+<hr>
+<p>这些指令告诉 CPP 从<strong>系统库</strong>中获取 stdio.h，并添加文本到当前的源文件中。下一行告诉 CPP 从本地目录中获取 <strong>myheader.h</strong>，并添加内容到当前的源文件中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#undef  FILE_SIZE</span><br><span class="line">#define FILE_SIZE 42</span><br></pre></td></tr></table></figure>
+
+<p>这个指令告诉 CPP 取消已定义的 FILE_SIZE，并定义它为 42。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MESSAGE</span><br><span class="line">   #define MESSAGE &quot;You wish!&quot;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<p>这个指令告诉 CPP 只有当 MESSAGE 未定义时，才定义 MESSAGE。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#ifdef DEBUG</span><br><span class="line">   /* Your debugging statements here */</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<p>这个指令告诉 CPP 如果<strong>定义了 DEBUG，则执行处理语句</strong>。在编译时，如果您向 gcc 编译器传递了 <em>-DDEBUG</em> 开关量，这个指令就非常有用。它定义了 DEBUG，您可以在编译期间<strong>随时开启或关闭调试</strong>。</p>
+<hr>
+<h2 id="预定义宏"><a href="#预定义宏" class="headerlink" title="预定义宏"></a>预定义宏</h2><p>ANSI C 定义了许多宏。在编程中您可以使用这些宏，但是不能直接修改这些预定义的宏。</p>
+<table>
+<thead>
+<tr>
+<th align="left">宏</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>DATE</strong></td>
+<td align="left">当前日期，一个以 “MMM DD YYYY” 格式表示的字符常量。</td>
+</tr>
+<tr>
+<td align="left"><strong>TIME</strong></td>
+<td align="left">当前时间，一个以 “HH:MM:SS” 格式表示的字符常量。</td>
+</tr>
+<tr>
+<td align="left"><strong>FILE</strong></td>
+<td align="left">这会包含当前文件名，一个字符串常量。</td>
+</tr>
+<tr>
+<td align="left"><strong>LINE</strong></td>
+<td align="left">这会包含当前行号，一个十进制常量。</td>
+</tr>
+<tr>
+<td align="left"><strong>STDC</strong></td>
+<td align="left">当编译器以 ANSI 标准编译时，则定义为 1。</td>
+</tr>
+</tbody></table>
+<h2 id="预处理器运算符"><a href="#预处理器运算符" class="headerlink" title="预处理器运算符"></a>预处理器运算符</h2><p>C 预处理器提供了下列的运算符来帮助您创建宏：</p>
+<h3 id="宏延续运算符（-）"><a href="#宏延续运算符（-）" class="headerlink" title="宏延续运算符（\）"></a>宏延续运算符（\）</h3><p>一个宏通常写在一个单行上。但是如果宏太长，一个单行容纳不下，则使用宏延续运算符（\）。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define  message_for(a, b)  \</span><br><span class="line">    printf(#a &quot; and &quot; #b &quot;: We love you!\n&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="字符串常量化运算符（-）"><a href="#字符串常量化运算符（-）" class="headerlink" title="字符串常量化运算符（#）"></a>字符串常量化运算符（#）</h3><p>在宏定义中，当需要把一个宏的参数转换为字符串常量时，则使用字符串常量化运算符（#）。在宏中使用的该运算符有一个特定的参数或参数列表。例如：</p>
+<h4 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#define  message_for(a, b)  \</span><br><span class="line">    printf(#a &quot; and &quot; #b &quot;: We love you!\n&quot;)</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   message_for(Carole, Debra);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="标记粘贴运算符（-）"><a href="#标记粘贴运算符（-）" class="headerlink" title="标记粘贴运算符（##）"></a>标记粘贴运算符（##）</h3><p>宏定义内的标记粘贴运算符（##）会合并两个参数。它允许在宏定义中两个独立的标记被合并为一个标记。例如：</p>
+<h4 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#define tokenpaster(n) printf (&quot;token&quot; #n &quot; = %d&quot;, token##n)</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   int token34 = 40;</span><br><span class="line">   </span><br><span class="line">   tokenpaster(34);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">token34 = 40</span><br></pre></td></tr></table></figure>
+
+<p>这是怎么发生的，因为这个实例会从编译器产生下列的实际输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf (&quot;token34 = %d&quot;, token34);</span><br></pre></td></tr></table></figure>
+
+<p>这个实例演示了 token##n 会连接到 token34 中，在这里，我们使用了<strong>字符串常量化运算符（#）</strong>和<strong>标记粘贴运算符（##）</strong>。</p>
+<h3 id="defined-运算符"><a href="#defined-运算符" class="headerlink" title="defined() 运算符"></a>defined() 运算符</h3><p>预处理器 <strong>defined</strong> 运算符是用在常量表达式中的，用来确定一个标识符是否已经使用 #define 定义过。如果指定的标识符已定义，则值为真（非零）。如果指定的标识符未定义，则值为假（零）。下面的实例演示了 defined() 运算符的用法：</p>
+<h4 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#if !defined (MESSAGE)</span><br><span class="line">   #define MESSAGE &quot;You wish!&quot;</span><br><span class="line">#endif</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;Here is the message: %s\n&quot;, MESSAGE);  </span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用#define含参时，参数括号很重要，如上例中省略括号会导致运算错误：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">#define square(x) ((x) * (x))</span><br><span class="line"></span><br><span class="line">#define square_1(x) (x * x)</span><br><span class="line"></span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;square 5+4 is %d\n&quot;, square(5+4));  </span><br><span class="line">   printf(&quot;square_1 5+4 is %d\n&quot;, square_1(5+4)); </span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">square 5+4 is 81</span><br><span class="line">square_1 5+4 is 29</span><br></pre></td></tr></table></figure>
+
+<p>原因:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">square   等价于   （5+4）*（5+4）=81</span><br><span class="line">square_1 等价于   5+4*5+4=29</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="关于两数值的交换"><a href="#关于两数值的交换" class="headerlink" title="关于两数值的交换"></a>关于两数值的交换</h1><p>异或运算可以达到交换两数的目的，代码如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    a = a^b;</span><br><span class="line">    b = a^b;</span><br><span class="line">    a = a^b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>但不推荐使用这种方式</strong>，附上常用的临时变量方法对比说明。</p>
+<p>临时变量方法:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    int tmp = a;</span><br><span class="line">    a = b;</span><br><span class="line">    b = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于临时变量法，每次赋值只要读取一个变量的值到寄存器，然后再从寄存器写回到另一个变量中即可，前后涉及两次内存写入操作； 但是对于异或运算操作，每次都需要读取两个数据到寄存器中，再进行运算操作，之后把结果写回到变量中，前后共需要三次内存写入操作。 另外一点，异或操作的代码可读性差。</p>
+<p>如果使用C语言实现上述两种方法，并用gcc编译器编译，可以使用命令 <strong>gcc -S swap.c</strong> 查看相应的汇编代码，临时变量法代码行数更少，另外使用 <strong>gcc</strong> 编译器时，用异或运算交换数组会出错。</p>
+<p>在不引入临时变量的基础上，交换两数的值还可以使用三次加减法，代码如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    a = a + b;</span><br><span class="line">    b = a - b;</span><br><span class="line">    a = a - b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式同样需要三次内存写入操作，同时代码可读性也较差。</p>
+<h1 id="C-头文件"><a href="#C-头文件" class="headerlink" title="C 头文件"></a>C 头文件</h1><p><strong>C 语言中 include &lt;&gt; 与include “” 的区别?</strong></p>
+<p><strong>#include &lt; &gt;</strong> 引用的是编译器的类库路径里面的头文件。</p>
+<p><strong>#include “ “</strong> 引用的是你程序目录的相对路径中的头文件，如果在程序目录没有找到引用的头文件则到编译器的类库路径的目录下找该头文件。</p>
+<h2 id="只引用一次头文件"><a href="#只引用一次头文件" class="headerlink" title="只引用一次头文件"></a>只引用一次头文件</h2><p>如果一个头文件被引用两次，编译器会处理两次头文件的内容，这将产生错误。为了防止这种情况，标准的做法是把文件的整个内容放在条件编译语句中，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef HEADER_FILE</span><br><span class="line">#define HEADER_FILE</span><br><span class="line"></span><br><span class="line">the entire header file file</span><br><span class="line"></span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<p>这种结构就是通常所说的包装器 <strong>#ifndef</strong>。当再次引用头文件时，条件为假，因为 HEADER_FILE 已定义。此时，预处理器会跳过文件的整个内容，编译器会忽略它。</p>
+<p>在有多个 <strong>.h</strong> 文件和多个 <strong>.c</strong> 文件的时候，往往我们会用一个 <strong>global.h</strong> 的头文件来包括所有的 <strong>.h</strong> 文件，然后在除 <strong>global.h</strong> 文件外的头文件中 包含 <strong>global.h</strong> 就可以实现所有头文件的包含，同时不会乱。方便在各个文件里面调用其他文件的函数或者变量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef _GLOBAL_H</span><br><span class="line">#define _GLOBAL_H</span><br><span class="line">#include &lt;fstream&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line">#include &lt;Config.h&gt;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/19/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1180,7 +1623,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-22 19:45:07" itemprop="dateModified" datetime="2023-04-22T19:45:07+08:00">2023-04-22</time>
+                <time title="修改时间：2023-04-24 20:27:52" itemprop="dateModified" datetime="2023-04-24T20:27:52+08:00">2023-04-24</time>
               </span>
 
           
@@ -1292,7 +1735,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

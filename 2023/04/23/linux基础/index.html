@@ -28,7 +28,7 @@
 <meta property="og:description" content="Linux的目录结构是一个树型结构Windows系统可以拥有多个盘符,如C盘、D盘、E盘Linux没有盘符这个概念,只有一个根目录&#x2F;，所有文件都在它下面 在Linux系统中，路径之间的层级关系，使用:&#x2F;来表示 在Windows系统中，路径之间的层级关系，使用:\来表示 D:\data\work\hello.txt注意:D:表示D盘 ,\表示层级关系 &#x2F;usr&amp;#x2F">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-04-23T06:32:54.000Z">
-<meta property="article:modified_time" content="2023-04-23T12:27:07.733Z">
+<meta property="article:modified_time" content="2023-05-09T14:02:23.420Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 
@@ -172,10 +172,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-04-23 14:32:54 / 修改时间：20:27:07" itemprop="dateCreated datePublished" datetime="2023-04-23T14:32:54+08:00">2023-04-23</time>
+              <time title="创建时间：2023-04-23 14:32:54" itemprop="dateCreated datePublished" datetime="2023-04-23T14:32:54+08:00">2023-04-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-09 22:02:23" itemprop="dateModified" datetime="2023-05-09T22:02:23+08:00">2023-05-09</time>
+              </span>
 
           
 
@@ -193,7 +199,11 @@
 <p>在Windows系统中，路径之间的层级关系，使用:\来表示</p>
 <p>D:\data\work\hello.txt<br>注意:<br>D:表示D盘 ,\表示层级关系</p>
 <p>&#x2F;usr&#x2F;local&#x2F;hello.txt<br>注意:<br>开头的&#x2F;表示根目录,后面的&#x2F;表示层级关系</p>
-<h2 id="ctrl-l清屏"><a href="#ctrl-l清屏" class="headerlink" title="ctrl+l清屏"></a>ctrl+l清屏</h2><h2 id="crtl-c中断"><a href="#crtl-c中断" class="headerlink" title="crtl+c中断"></a>crtl+c中断</h2><h1 id="Linux命令"><a href="#Linux命令" class="headerlink" title="Linux命令"></a>Linux命令</h1><h2 id="Linux命令基础格式"><a href="#Linux命令基础格式" class="headerlink" title="Linux命令基础格式"></a>Linux命令基础格式</h2><p>无论是什么命令，用于什么用途，在Linux中，命令有其通用的格式:</p>
+<h2 id="ctrl-l清屏"><a href="#ctrl-l清屏" class="headerlink" title="ctrl+l清屏"></a>ctrl+l清屏</h2><h2 id="crtl-c中断"><a href="#crtl-c中断" class="headerlink" title="crtl+c中断"></a>crtl+c中断</h2><h2 id="crtl-d退出或登出"><a href="#crtl-d退出或登出" class="headerlink" title="crtl+d退出或登出"></a>crtl+d退出或登出</h2><ul>
+<li>可以通过快捷键:ctrl + d,退出账户的登录</li>
+<li>或者退出某些特定程序的专属页面，比如python</li>
+</ul>
+<h1 id="Linux命令"><a href="#Linux命令" class="headerlink" title="Linux命令"></a>Linux命令</h1><h2 id="Linux命令基础格式"><a href="#Linux命令基础格式" class="headerlink" title="Linux命令基础格式"></a>Linux命令基础格式</h2><p>无论是什么命令，用于什么用途，在Linux中，命令有其通用的格式:</p>
 <p>command [-options] [parameter]</p>
 <ul>
 <li>command:命令本身</li>
@@ -240,7 +250,7 @@
 <h3 id="touch创建文件"><a href="#touch创建文件" class="headerlink" title="touch创建文件"></a>touch创建文件</h3><p>可以通过touch命令创建文件</p>
 <p>语法: <code>touch Linux路径</code></p>
 <ul>
-<li>.touch命令无选项，参数必填，表示要创建的文件路径，相对、绝对、特殊路径符均可以使用</li>
+<li>touch命令无选项，参数必填，表示要创建的文件路径，相对、绝对、特殊路径符均可以使用</li>
 </ul>
 <h3 id="cat命令查看文件内容"><a href="#cat命令查看文件内容" class="headerlink" title="cat命令查看文件内容"></a>cat命令查看文件内容</h3><p>准备好文件内容后，可以通过cat查看内容。</p>
 <p>语法:<code>cat Linux路径</code></p>
@@ -302,7 +312,7 @@
 </li>
 <li><p>可以通过 su - root，并输入密码123456（和普通用户默认一样）临时切换到root用户体验</p>
 </li>
-<li><p>通过输入exit命令，退回普通用户。</p>
+<li><p>通过输入exit命令，退回普通用户,也可以回退到root用户。也可以使用ctrl+d</p>
 </li>
 </ul>
 <h3 id="which命令"><a href="#which命令" class="headerlink" title="which命令"></a>which命令</h3><p>我们在前面学习的Linux命令，其实它们的本体就是一个个的二进制可执行程序。和Windows系统中的.exe文件，是一个意思。</p>
@@ -568,6 +578,261 @@
 <td></td>
 </tr>
 </tbody></table>
+<h3 id="sudo命令"><a href="#sudo命令" class="headerlink" title="sudo命令"></a>sudo命令</h3><p>Su命令</p>
+<ul>
+<li>可以切换用户，语法:<code>su [-] [用户名]</code></li>
+<li>-表示切换后加载环境变量,建议带上</li>
+<li>用户可以省略,省略默认切换到root</li>
+</ul>
+<p>在我们得知root密码的时候，可以通过su命令切换到root得到最大权限。但是我们不建议长期使用root用户，避免带来系统损坏。</p>
+<p>我们可以使用sudo命令，为普通的命令授权,临时以root身份执行。</p>
+<p>语法:<code>sudo 其它命令</code></p>
+<ul>
+<li>在其它命令之前，带上sudo,即可为这一条命令临时赋予root授权</li>
+<li>但是并不是所有的用户，都有权利使用sudo，我们需要为普通用户配置sudo认证</li>
+</ul>
+<h4 id="为普通用户配置sudo认证"><a href="#为普通用户配置sudo认证" class="headerlink" title="为普通用户配置sudo认证"></a>为普通用户配置sudo认证</h4><ul>
+<li>切换到root用户,执行visudo命令，会自动通过vi编辑器打开:&#x2F;etc&#x2F;sudoers。</li>
+<li>在文件的最后添加:<br><code>itheima ALL=(ALL)		NOPASSWD: ALL</code><br>其中最后的NOPASSWD:ALL表示使用sudo命令，无需输入密码，itheima是用户名</li>
+<li>最后通过wq保存</li>
+<li>切换回普通用户<br><code>[itheima@localhost ~]$ sudo ls /root</code></li>
+<li><code>anaconda-ks.cfg	original-ks.cfg</code></li>
+<li><code>[itheima@localhost ~]$ sudo mkdir /test</code></li>
+<li><code>[itheima@localhost ~]$</code></li>
+<li>执行的命令，均以root运行</li>
+</ul>
+<h2 id="用户、用户组"><a href="#用户、用户组" class="headerlink" title="用户、用户组"></a>用户、用户组</h2><p>Linux系统中可以:</p>
+<ul>
+<li>配置多个用户</li>
+<li>配置多个用户组</li>
+<li>用户可以加入多个用户组中</li>
+</ul>
+<h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><p>以下命令需root用户执行。</p>
+<ul>
+<li><p>创建用户</p>
+<p>​	useradd [-g -d]用户名<br>​		选项: -g指定用户的组，不指定-g，会创建同名组并自动加入，指定-g需要组已经存在，如已存在同名组，必须使用-g</p>
+<p>​		选项:-d指定用户HOME路径，不指定，HOME目录默认在:&#x2F;home&#x2F;用户名</p>
+</li>
+<li><p>删除用户</p>
+<ul>
+<li>​	userdel [-r]用户名<br>​		选项:-r，删除用户的HOME目录，不使用-r，删除用户时，HOME目录保留</li>
+</ul>
+</li>
+<li><p>查看用户所属组</p>
+<ul>
+<li><p>id[用户名]</p>
+<p>​	参数:用户名，被查看的用户，如果不提供则查看自身。</p>
+</li>
+</ul>
+</li>
+<li><p>修改用户所属组</p>
+<ul>
+<li>usermod -aG 用户组 用户名，将指定用户加入指定用户组，一个用户可以在多个用户组。</li>
+</ul>
+</li>
+</ul>
+<h3 id="getent"><a href="#getent" class="headerlink" title="getent"></a>getent</h3><p>使用getent命令，可以查看当前系统中有哪些用户</p>
+<p>语法: getent passwd</p>
+<p>共有7份信息，分别是:<br>用户名:密码(x):用户ID:组ID:描述信息(无用):HOME目录:执行终端(默认bash)</p>
+<p>使用getent命令,同样可以查看当前系统中有哪些用户组</p>
+<p>语法:getent group</p>
+<p>包含3份信息,组名称:组认证(显示为x):组ID</p>
+<h2 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h2><p>ls -l后</p>
+<p>drwxr-xr-x 2 xiaohuilin xiaohuilin 4096 9月  12  2021 公共的</p>
+<p>举例: d rwx r-x r-x，表示:</p>
+<ul>
+<li>这是一个文件夹，首字母d表示( -表示文件 d表示文件夹 I表示软链接)</li>
+<li>所属用户（第一个xiaohuilin）对d的权限是:有r有w有x, rwx</li>
+<li>所属用户组（第二个xiaohuilin）的权限是:有r无w有x, r-x( -表示无此权限)</li>
+<li>其它用户的权限是：有r无w有x,r-x</li>
+</ul>
+<p>rwx代表什么</p>
+<p>r表示读权限</p>
+<p>w表示写权限</p>
+<p>x表示执行权限</p>
+<p>针对文件、文件夹的不同，rwx的含义有细微差别</p>
+<ul>
+<li>r ,针对文件可以查看文件内容<ul>
+<li>针对文件夹，可以查看文件夹内容，如ls命令</li>
+</ul>
+</li>
+<li>w，针对文件表示可以修改此文件<ul>
+<li>针对文件夹，可以在文件夹内:创建、删除、改名等操作</li>
+</ul>
+</li>
+<li>x,针对文件表示可以将文件作为程序执行<ul>
+<li>针对文件夹，表示可以更改工作目录到此文件夹，即cd进入</li>
+</ul>
+</li>
+</ul>
+<h2 id="chmod命令"><a href="#chmod命令" class="headerlink" title="chmod命令"></a>chmod命令</h2><p>我们可以使用chmod命令，修改文件、文件夹的权限信息。</p>
+<p>注意，只有文件、文件夹的所属用户或root用户可以修改。</p>
+<p>语法: <code>chmod [-R] 权限 文件或文件夹</code></p>
+<ul>
+<li>选项:-R，对文件夹内的全部内容应用同样的操作</li>
+</ul>
+<p>示例:</p>
+<ul>
+<li>chmod u&#x3D;rwx,g&#x3D;rx,o&#x3D;x hello.txt，将文件权限修改为:rwxr-x–x<ul>
+<li>其中:u表示user所属用户权限, g表示group组权限,o表示other其它用户权限</li>
+</ul>
+</li>
+<li>chmod -R u&#x3D;rwx,g&#x3D;rx,0&#x3D;x test,将文件夹test以及文件夹内全部内容权限设置为:rwxr-x–x</li>
+</ul>
+<p>除此之外，还有快捷写法: chmod 751 hello.txt<br>将hello.txt的权限修改为751,r记为4, w记为2,x记为1</p>
+<h2 id="chown命令"><a href="#chown命令" class="headerlink" title="chown命令"></a>chown命令</h2><p>使用chown命令，可以修改文件、文件夹的所属用户和用户组<br>普通用户无法修改所属为其它用户或组，所以此命令只适用于root用户执行</p>
+<p>语法: <code>chown[-R] [用户][:][用户组] 文件或文件夹</code></p>
+<ul>
+<li>选项，-R，同chmod,对文件夹内全部内容应用相同规则</li>
+<li>选项，用户，修改所属用户</li>
+<li>选项，用户组,修改所属用户组</li>
+<li>:用于分隔用户和用户组</li>
+</ul>
+<p>示例:</p>
+<ul>
+<li>chown root hello.txt,将hello.txt所属用户修改为root</li>
+<li>chown :root hello.txt,将hello.txt所属用户组修改为root</li>
+<li>chown root:itheima hello.txt,将hello.txt所属用户修改为root,用户组修改为itheima</li>
+<li>chown -R root test,将文件夹test的所属用户修改为root并对文件夹内全部内容应用同样规则</li>
+</ul>
+<h2 id="历史命令搜索"><a href="#历史命令搜索" class="headerlink" title="历史命令搜索"></a>历史命令搜索</h2><p><code>history</code></p>
+<ul>
+<li>可以通过:!命令前缀，自动执行上次匹配前缀的命令</li>
+<li>可以通过快捷键:ctrl + r,输入内容去匹配历史命令</li>
+</ul>
+<p>如果搜索到的内容是你需要的，那么∶</p>
+<ul>
+<li>回车键可以直接执行</li>
+<li>键盘左右键，可以得到此命令（不执行)</li>
+</ul>
+<h2 id="光标移动快捷键"><a href="#光标移动快捷键" class="headerlink" title="光标移动快捷键"></a>光标移动快捷键</h2><ul>
+<li>ctrl+ a,跳到命令开头</li>
+<li>ctrl+e,跳到命令结尾</li>
+<li>ctrl＋键盘左键,向左跳一个单词</li>
+<li>ctrl＋键盘右键,向右跳一个单词</li>
+</ul>
+<h2 id="清屏"><a href="#清屏" class="headerlink" title="清屏"></a>清屏</h2><ul>
+<li><p>通过快捷键ctrl+l，可以清空终端内容</p>
+</li>
+<li><p>或通过命令clear得到同样效果</p>
+</li>
+</ul>
+<h2 id="systemctl命令"><a href="#systemctl命令" class="headerlink" title="systemctl命令"></a>systemctl命令</h2><p>Linux系统很多软件(内置或第三方)均支持使用systemctl命令控制:启动、停止、开机自启</p>
+<p>能够被systemctl管理的软件，一般也称之为:服务</p>
+<p>语法: <code>systemctl start | stop | status | enable | disable 服务名</code></p>
+<ul>
+<li><p>start启动</p>
+</li>
+<li><p>stop关闭</p>
+</li>
+<li><p>status查看状态</p>
+</li>
+<li><p>enable开启开机自启</p>
+</li>
+<li><p>disable关闭开机自启</p>
+</li>
+</ul>
+<p>系统内置的服务比较多，比如:</p>
+<ul>
+<li><p>NetworkManager,主网络服务</p>
+</li>
+<li><p>network,副网络服务</p>
+</li>
+<li><p>firewalld，防火墙服务</p>
+</li>
+<li><p>sshd, ssh服务(FinalShell远程登录Linux使用的就是这个服务)</p>
+</li>
+</ul>
+<h2 id="ln命令创建软连接"><a href="#ln命令创建软连接" class="headerlink" title="ln命令创建软连接"></a>ln命令创建软连接</h2><p>在系统中创建软链接,可以将文件、文件夹链接到其它位置。</p>
+<p>类似windows系统中的《快捷方式》</p>
+<p>语法: <code>ln -s 参数1参数2</code></p>
+<ul>
+<li>-s选项,创建软连接</li>
+<li>参数1:被链接的文件或文件夹</li>
+<li>参数2:要链接去的目的地</li>
+</ul>
+<p>实例:</p>
+<ul>
+<li>ln -s &#x2F;etc&#x2F;yum.conf ~&#x2F;yum.conf</li>
+<li>ln -s &#x2F;etc&#x2F;yum ~&#x2F;yum</li>
+</ul>
+<h2 id="date命令"><a href="#date命令" class="headerlink" title="date命令"></a>date命令</h2><p>通过date命令可以在命令行中查看系统的时间</p>
+<p>语法: <code>date [-d][+格式化字符串]</code></p>
+<ul>
+<li><p>-d按照给定的字符串显示日期，一般用于日期计算</p>
+</li>
+<li><p>格式化字符串:通过特定的字符串标记,来控制显示的日期格式</p>
+<ul>
+<li><p>%Y	年</p>
+</li>
+<li><p>%y	年份后两位数字(00..99)</p>
+</li>
+<li><p>%m	月份(01..12)</p>
+</li>
+<li><p>%d	日(01..31)</p>
+</li>
+<li><p>%H	小时(00..23)</p>
+</li>
+<li><p>%M	分钟(00..59)</p>
+</li>
+<li><p>%S	秒(00..60)</p>
+</li>
+<li><p>%s	自1970-01-01	00::00::00 UTC到现在的秒数</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="特殊IP地址"><a href="#特殊IP地址" class="headerlink" title="特殊IP地址"></a>特殊IP地址</h2><ul>
+<li>127.0.0.1，这个IP地址用于指代本机</li>
+<li>0.0.0.0,特殊lP地址<ul>
+<li>可以用于指代本机</li>
+<li>可以在端口绑定中用来确定绑定关系（后续讲解)</li>
+<li>在一些IP地址限制中，表示所有IP的意思,如放行规则设置为0.0.0.0,表示允许任意IP访问</li>
+</ul>
+</li>
+</ul>
+<h2 id="在Linux中修改主机名"><a href="#在Linux中修改主机名" class="headerlink" title="在Linux中修改主机名"></a>在Linux中修改主机名</h2><ul>
+<li>可以使用命令:hostname查看主机名</li>
+<li>可以使用命令: hostnamectl set-hostname主机名,修改主机名（需root)</li>
+</ul>
+<p>什么是域名解析（主机名映射)</p>
+<ul>
+<li>可以通过主机名找到对应计算机的IP地址,这就是主机名映射（域名解析)</li>
+<li>先通过系统本地的记录去查找，如果找不到就联网去公开DNS服务器去查找</li>
+</ul>
+<h2 id="ping命令"><a href="#ping命令" class="headerlink" title="ping命令"></a>ping命令</h2><p>可以通过ping命令,检查指定的网络服务器是否是可联通状态</p>
+<p>语法: <code>ping [-c num] ip或主机名</code></p>
+<ul>
+<li>选项:-c，检查的次数，不使用-c选项,将无限次数持续检查</li>
+<li>参数: ip或主机名，被检查的服务器的ip地址或主机名地址</li>
+</ul>
+<h2 id="wget命令"><a href="#wget命令" class="headerlink" title="wget命令"></a>wget命令</h2><p>wget是非交互式的文件下载器,可以在命令行内下载网络文件</p>
+<p>语法: <code>wget [-b] url</code></p>
+<ul>
+<li>选项: -b，可选，后台下载,会将日志写入到当前工作目录的wget-log文件</li>
+<li>参数: url，下载链接</li>
+</ul>
+<h2 id="curl命令"><a href="#curl命令" class="headerlink" title="curl命令"></a>curl命令</h2><p>curl可以发送http网络请求,可用于:下载文件、获取信息等</p>
+<p>语法: <code>curl [-O] url</code></p>
+<ul>
+<li>选项:-O，用于下载文件，当url是下载链接时,可以使用此选项保存文件</li>
+<li>参数: url，要发起请求的网络地址</li>
+</ul>
+<h2 id="使用top命令可以"><a href="#使用top命令可以" class="headerlink" title="使用top命令可以:"></a>使用top命令可以:</h2><p>类似Windows任务售理器·查看CPU、内存、进程的信息</p>
+<h2 id="使用df命令可以"><a href="#使用df命令可以" class="headerlink" title="使用df命令可以:"></a>使用df命令可以:</h2><p>查看磁盘使用率</p>
+<h2 id="使用iostat可以"><a href="#使用iostat可以" class="headerlink" title="使用iostat可以:"></a>使用iostat可以:</h2><p>查看磁盘速率等信息</p>
+<h2 id="使用sar-n-DEV命令可以"><a href="#使用sar-n-DEV命令可以" class="headerlink" title="使用sar -n DEV命令可以:"></a>使用sar -n DEV命令可以:</h2><p>查看网络情况</p>
+<h2 id="什么是环境变量"><a href="#什么是环境变量" class="headerlink" title="什么是环境变量"></a>什么是环境变量</h2><p>环境变量是一组信息记录,类型是KeyValue型(名称&#x3D;值)，用于操作系统运行的时候记录关键信息</p>
+<h2 id="通过env命令可以查看当前系统配置的环境变量信息"><a href="#通过env命令可以查看当前系统配置的环境变量信息" class="headerlink" title="通过env命令可以查看当前系统配置的环境变量信息"></a>通过env命令可以查看当前系统配置的环境变量信息</h2><h2 id="通过-符号，可以取出环境变量的值"><a href="#通过-符号，可以取出环境变量的值" class="headerlink" title="通过$符号，可以取出环境变量的值"></a>通过$符号，可以取出环境变量的值</h2><h2 id="什么是PATH，作用是"><a href="#什么是PATH，作用是" class="headerlink" title="什么是PATH，作用是"></a>什么是PATH，作用是</h2><p>环境变量PATH会记录一组目录，目录之间用**:**隔开。这里记录的是命令的搜索路径，当执行命令会从记录中记录的目录中挨个搜索要执行的命令并执行。<br>可以通过修改这个项目的值,加入自定义的命令搜索路径<br>如<code>export PATH=$PATH:自定义路径</code></p>
+<h2 id="如何修改环境变量"><a href="#如何修改环境变量" class="headerlink" title="如何修改环境变量"></a>如何修改环境变量</h2><ul>
+<li>临时生效: export名称&#x3D;值</li>
+<li>永久生效:<ul>
+<li>针对用户:~&#x2F;bashrc文件中配置</li>
+<li>针对全部用户:&#x2F;etc&#x2F;profile文件中配置。</li>
+<li>配置完成，可以通过source命令立刻生效</li>
+</ul>
+</li>
+</ul>
 
     </div>
 
@@ -586,7 +851,10 @@
     <a href="/2023/04/16/c%E5%92%8Cc++/%E5%85%B3%E4%BA%8Evscode%E5%A6%82%E4%BD%95%E5%AF%B9%E5%A4%9A%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/" rel="prev" title="关于vscode如何对多文件进行调试">
       <i class="fa fa-chevron-left"></i> 关于vscode如何对多文件进行调试
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/24/c-%E7%B1%BB/" rel="next" title="c++类">
+      c++类 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -645,7 +913,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">Linux的目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ctrl-l%E6%B8%85%E5%B1%8F"><span class="nav-number">1.1.</span> <span class="nav-text">ctrl+l清屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#crtl-c%E4%B8%AD%E6%96%AD"><span class="nav-number">1.2.</span> <span class="nav-text">crtl+c中断</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Linux命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E5%91%BD%E4%BB%A4%E5%9F%BA%E7%A1%80%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">Linux命令基础格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E5%91%BD%E4%BB%A4%E7%9A%84%E5%8F%82%E6%95%B0%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">ls命令的参数的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ls%E5%91%BD%E4%BB%A4%E7%9A%84%E9%80%89%E9%A1%B9"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">ls命令的选项:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E7%9A%84%E9%80%89%E9%A1%B9%E7%BB%84%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">命令的选项组合使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cd%E5%88%87%E6%8D%A2%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">cd切换工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pwd%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95"><span class="nav-number">2.1.3.</span> <span class="nav-text">pwd查看当前工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E8%B7%AF%E5%BE%84%E7%AC%A6"><span class="nav-number">2.1.4.</span> <span class="nav-text">特殊路径符:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mkdir%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.5.</span> <span class="nav-text">mkdir命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#touch%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.6.</span> <span class="nav-text">touch创建文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cat%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.7.</span> <span class="nav-text">cat命令查看文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#more%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.8.</span> <span class="nav-text">more命令查看文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cp%E5%91%BD%E4%BB%A4%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.9.</span> <span class="nav-text">cp命令复制文件文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mv%E7%A7%BB%E5%8A%A8%E6%96%87%E4%BB%B6%E6%88%96%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.10.</span> <span class="nav-text">mv移动文件或文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rm%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E3%80%81%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.11.</span> <span class="nav-text">rm删除文件、文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#which%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.12.</span> <span class="nav-text">which命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find%E5%91%BD%E4%BB%A4%E2%80%93%E6%8C%89%E6%96%87%E4%BB%B6%E5%90%8D%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.13.</span> <span class="nav-text">find命令–按文件名查找文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find%E5%91%BD%E4%BB%A4-%E6%8C%89%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.14.</span> <span class="nav-text">find命令-按文件大小查找文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grep%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.15.</span> <span class="nav-text">grep命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wc%E5%91%BD%E4%BB%A4%E5%81%9A%E6%95%B0%E9%87%8F%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.1.16.</span> <span class="nav-text">wc命令做数量统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%AC%A6"><span class="nav-number">2.1.17.</span> <span class="nav-text">管道符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#echo%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.18.</span> <span class="nav-text">echo命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BC%95%E5%8F%B7-96"><span class="nav-number">2.1.19.</span> <span class="nav-text">反引号&#96;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91%E7%AC%A6"><span class="nav-number">2.1.20.</span> <span class="nav-text">重定向符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tail%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.21.</span> <span class="nav-text">tail命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vi-vim%E7%BC%96%E8%BE%91%E5%99%A8%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.22.</span> <span class="nav-text">vi\vim编辑器介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vi-vim%E7%BC%96%E8%BE%91%E5%99%A8%E7%9A%84%E4%B8%89%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.1.22.1.</span> <span class="nav-text">vi\vim编辑器的三种工作模式</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">Linux的目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ctrl-l%E6%B8%85%E5%B1%8F"><span class="nav-number">1.1.</span> <span class="nav-text">ctrl+l清屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#crtl-c%E4%B8%AD%E6%96%AD"><span class="nav-number">1.2.</span> <span class="nav-text">crtl+c中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#crtl-d%E9%80%80%E5%87%BA%E6%88%96%E7%99%BB%E5%87%BA"><span class="nav-number">1.3.</span> <span class="nav-text">crtl+d退出或登出</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Linux命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E5%91%BD%E4%BB%A4%E5%9F%BA%E7%A1%80%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">Linux命令基础格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E5%91%BD%E4%BB%A4%E7%9A%84%E5%8F%82%E6%95%B0%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">ls命令的参数的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ls%E5%91%BD%E4%BB%A4%E7%9A%84%E9%80%89%E9%A1%B9"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">ls命令的选项:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E7%9A%84%E9%80%89%E9%A1%B9%E7%BB%84%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">命令的选项组合使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cd%E5%88%87%E6%8D%A2%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">cd切换工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pwd%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95"><span class="nav-number">2.1.3.</span> <span class="nav-text">pwd查看当前工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E8%B7%AF%E5%BE%84%E7%AC%A6"><span class="nav-number">2.1.4.</span> <span class="nav-text">特殊路径符:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mkdir%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.5.</span> <span class="nav-text">mkdir命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#touch%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.6.</span> <span class="nav-text">touch创建文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cat%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.7.</span> <span class="nav-text">cat命令查看文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#more%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-number">2.1.8.</span> <span class="nav-text">more命令查看文件内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cp%E5%91%BD%E4%BB%A4%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.9.</span> <span class="nav-text">cp命令复制文件文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mv%E7%A7%BB%E5%8A%A8%E6%96%87%E4%BB%B6%E6%88%96%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.10.</span> <span class="nav-text">mv移动文件或文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rm%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E3%80%81%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">2.1.11.</span> <span class="nav-text">rm删除文件、文件夹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#which%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.12.</span> <span class="nav-text">which命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find%E5%91%BD%E4%BB%A4%E2%80%93%E6%8C%89%E6%96%87%E4%BB%B6%E5%90%8D%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.13.</span> <span class="nav-text">find命令–按文件名查找文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find%E5%91%BD%E4%BB%A4-%E6%8C%89%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.14.</span> <span class="nav-text">find命令-按文件大小查找文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grep%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.15.</span> <span class="nav-text">grep命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wc%E5%91%BD%E4%BB%A4%E5%81%9A%E6%95%B0%E9%87%8F%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.1.16.</span> <span class="nav-text">wc命令做数量统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%AC%A6"><span class="nav-number">2.1.17.</span> <span class="nav-text">管道符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#echo%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.18.</span> <span class="nav-text">echo命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BC%95%E5%8F%B7-96"><span class="nav-number">2.1.19.</span> <span class="nav-text">反引号&#96;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91%E7%AC%A6"><span class="nav-number">2.1.20.</span> <span class="nav-text">重定向符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tail%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.21.</span> <span class="nav-text">tail命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vi-vim%E7%BC%96%E8%BE%91%E5%99%A8%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.22.</span> <span class="nav-text">vi\vim编辑器介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vi-vim%E7%BC%96%E8%BE%91%E5%99%A8%E7%9A%84%E4%B8%89%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.1.22.1.</span> <span class="nav-text">vi\vim编辑器的三种工作模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo%E5%91%BD%E4%BB%A4"><span class="nav-number">2.1.23.</span> <span class="nav-text">sudo命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E6%99%AE%E9%80%9A%E7%94%A8%E6%88%B7%E9%85%8D%E7%BD%AEsudo%E8%AE%A4%E8%AF%81"><span class="nav-number">2.1.23.1.</span> <span class="nav-text">为普通用户配置sudo认证</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E3%80%81%E7%94%A8%E6%88%B7%E7%BB%84"><span class="nav-number">2.2.</span> <span class="nav-text">用户、用户组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="nav-number">2.2.1.</span> <span class="nav-text">用户管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getent"><span class="nav-number">2.2.2.</span> <span class="nav-text">getent</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%83%E9%99%90"><span class="nav-number">2.3.</span> <span class="nav-text">权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#chmod%E5%91%BD%E4%BB%A4"><span class="nav-number">2.4.</span> <span class="nav-text">chmod命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#chown%E5%91%BD%E4%BB%A4"><span class="nav-number">2.5.</span> <span class="nav-text">chown命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%86%E5%8F%B2%E5%91%BD%E4%BB%A4%E6%90%9C%E7%B4%A2"><span class="nav-number">2.6.</span> <span class="nav-text">历史命令搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%89%E6%A0%87%E7%A7%BB%E5%8A%A8%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="nav-number">2.7.</span> <span class="nav-text">光标移动快捷键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E5%B1%8F"><span class="nav-number">2.8.</span> <span class="nav-text">清屏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#systemctl%E5%91%BD%E4%BB%A4"><span class="nav-number">2.9.</span> <span class="nav-text">systemctl命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ln%E5%91%BD%E4%BB%A4%E5%88%9B%E5%BB%BA%E8%BD%AF%E8%BF%9E%E6%8E%A5"><span class="nav-number">2.10.</span> <span class="nav-text">ln命令创建软连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#date%E5%91%BD%E4%BB%A4"><span class="nav-number">2.11.</span> <span class="nav-text">date命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%AE%8AIP%E5%9C%B0%E5%9D%80"><span class="nav-number">2.12.</span> <span class="nav-text">特殊IP地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8Linux%E4%B8%AD%E4%BF%AE%E6%94%B9%E4%B8%BB%E6%9C%BA%E5%90%8D"><span class="nav-number">2.13.</span> <span class="nav-text">在Linux中修改主机名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ping%E5%91%BD%E4%BB%A4"><span class="nav-number">2.14.</span> <span class="nav-text">ping命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wget%E5%91%BD%E4%BB%A4"><span class="nav-number">2.15.</span> <span class="nav-text">wget命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#curl%E5%91%BD%E4%BB%A4"><span class="nav-number">2.16.</span> <span class="nav-text">curl命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8top%E5%91%BD%E4%BB%A4%E5%8F%AF%E4%BB%A5"><span class="nav-number">2.17.</span> <span class="nav-text">使用top命令可以:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8df%E5%91%BD%E4%BB%A4%E5%8F%AF%E4%BB%A5"><span class="nav-number">2.18.</span> <span class="nav-text">使用df命令可以:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8iostat%E5%8F%AF%E4%BB%A5"><span class="nav-number">2.19.</span> <span class="nav-text">使用iostat可以:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8sar-n-DEV%E5%91%BD%E4%BB%A4%E5%8F%AF%E4%BB%A5"><span class="nav-number">2.20.</span> <span class="nav-text">使用sar -n DEV命令可以:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">2.21.</span> <span class="nav-text">什么是环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87env%E5%91%BD%E4%BB%A4%E5%8F%AF%E4%BB%A5%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E7%9A%84%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%BF%A1%E6%81%AF"><span class="nav-number">2.22.</span> <span class="nav-text">通过env命令可以查看当前系统配置的环境变量信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-%E7%AC%A6%E5%8F%B7%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%8F%96%E5%87%BA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E7%9A%84%E5%80%BC"><span class="nav-number">2.23.</span> <span class="nav-text">通过$符号，可以取出环境变量的值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFPATH%EF%BC%8C%E4%BD%9C%E7%94%A8%E6%98%AF"><span class="nav-number">2.24.</span> <span class="nav-text">什么是PATH，作用是</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">2.25.</span> <span class="nav-text">如何修改环境变量</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -659,7 +927,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

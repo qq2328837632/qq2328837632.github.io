@@ -28,7 +28,7 @@
 <meta property="og:description" content="如果以前使用过C语言，您可能觉得前面讨论的#define语句已经足够完成这样的工作了。但const比#defien好。首先，它能够明确指定类型。其次，可以使用C++的作用域规则将定义限制在特定的函数或文件中（作用域规则描述了名称在各种模块中的可知程度，将在第9章讨论)。第三，可以将const用于更复杂的类型，如第4章将介绍的数组和结构。 提示:如果读者在学习C++之前学习过C语言，并打算使用#de">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-04-03T08:59:54.000Z">
-<meta property="article:modified_time" content="2023-04-14T11:56:57.828Z">
+<meta property="article:modified_time" content="2023-04-26T04:37:35.277Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 
@@ -180,7 +180,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-14 19:56:57" itemprop="dateModified" datetime="2023-04-14T19:56:57+08:00">2023-04-14</time>
+                <time title="修改时间：2023-04-26 12:37:35" itemprop="dateModified" datetime="2023-04-26T12:37:35+08:00">2023-04-26</time>
               </span>
 
           
@@ -298,6 +298,23 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const int *p = nullptr;// p是一个指向整型常量的指针</span><br><span class="line">constexpr int *q= nullptr; //q是一个指向整数的常量指针</span><br></pre></td></tr></table></figure>
 
 <p>p和q的类型相差甚远，p是一个指向常量的指针，而q是一个常量指针，其中的关键在于constexpr把它所定义的对象置为了顶层const。</p>
+<hr>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">cin.<span class="built_in">tie</span>(<span class="number">0</span>),cout.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>一.sync_with_stdio</strong><br>这个函数是一个“是否兼容stdio”的开关，C++为了兼容C，保证程序在使用了<code>std::printf</code>和<code>std::cout</code>的时候不发生混乱，将输出流绑到了一起。<br><code>cin</code>，<code>cout</code>之所以效率低，是因为先把要输出的东西存入缓冲区，再输出，导致效率降低，而这段语句可以来打消iostream的输入输出缓存，可以节省许多时间，使效率与scanf与printf相差无几.</p>
+<p><strong>应用</strong><br>在ACM里，经常出现数据集超大造成 cin <strong>运行超时</strong> &#x2F;<code>Time Limit Exceeded</code>【TLE】的情况。这时候大部分人（包括原来我也是）认为这是cin的效率不及scanf的错，甚至还上升到C语言和C++语言的执行效率层面的无聊争论。其实像上文所说，这<strong>只是C++为了兼容而采取的保守措施</strong>。我们可以<strong>在IO之前将stdio解除绑定</strong>，这样做了之后要注意不要同时混用cout&#x2F;cin和printf&#x2F;scanf之类。</p>
+<p><strong>二.tie</strong><br><code>tie</code>是将两个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=stream&spm=1001.2101.3001.7020">stream</a>绑定的函数，空参数的话返回当前的输出流指针。<br>在默认的情况下<code>cin</code>绑定的是<code>cout</code>，每次执行 &lt;&lt; 操作符的时候都要调用flush，这样会增加IO负担。可以通过<code>tie(0)</code>（0表示NULL）来解除<code>cin</code>与<code>cout</code>的绑定，进一步加快执行效率。</p>
+<hr>
+<h3 id="c-11"><a href="#c-11" class="headerlink" title="c++11"></a>c++11</h3><p>在 C++11新标准中，如果我们需要默认的行为，那么可以通过在参数列表后面写上&#x3D; default来要求编译器生成构造函数。其中，&#x3D; default 既可以和声明一起出现在类的内部，也可以作为定义出现在类的外部。和其他函数一样，如果&#x3D; default在类的内部，则默认构造函数是内联的;如果它在类的外部，则该成员默认情况下不是内联的。</p>
+<h3 id="构造函数初始值列表"><a href="#构造函数初始值列表" class="headerlink" title="构造函数初始值列表"></a>构造函数初始值列表</h3><p>接下来我们介绍类中定义的另外两个构造函数:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sales_data(const std: :string &amp;s): bookNo(s) &#123;&#125;</span><br><span class="line">Sales_data (const std: :string &amp;s,unsigned n, double p):</span><br><span class="line">bookNo(s), units_sold(n),revenue(p*n)&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个定义中出现了新的部分，即冒号以及冒号和花括号之间的代码，其中花括号定义了(空的）函数体。我们把新出现的部分称为构造函数初始值列表(constructor initialize list)，它负责为新创建的对象的一个或几个数据成员赋初值。构造函数初始值是成员名字的一个列表，每个名字后面紧跟括号括起来的(或者在花括号内的）成员初始值。不同成员的初始化通过逗号分隔开来。</p>
+<p>含有三个参数的构造函数分别使用它的前两个参数初始化成员 bookNo和units_sold,revenue的初始值则通过将售出图书总数和每本书单价相乘计算得到。<br>只有一个string类型参数的构造函数使用这个string对象初始化bookNo，对于units sold和revenue则没有显式地初始化。当某个数据成员被构造函数初始值列表忽略时，它将以与合成默认构造函数相同的方式<strong>隐式初始化</strong>。在此例中，这样的成员使用类内初始值初始化，因此只接受一个string参数的构造函数等价于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//与上面定义的那个构造函数效果相同</span><br><span class="line">Sales_ data(const std: :string &amp;s):</span><br><span class="line">bookNo (s) , units_sold(0), revenue(0)&#123;&#125;</span><br><span class="line">std::string bookNo;</span><br><span class="line">unsigned units_sold = 0;</span><br><span class="line">double revenue = 0.0;</span><br></pre></td></tr></table></figure>
+
+<p>通常情况下，构造函数使用类内初始值不失为一种好的选择，因为只要这样的初始值存在我们就能确保为成员赋予了一个正确的值。不过，如果你的编译器不支持类内初始值，则所有构造函数都应该显式地初始化每个内置类型的成员。</p>
 
     </div>
 
@@ -378,7 +395,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">默认初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%A6%82%E5%BF%B5-%E9%9D%99%E6%80%81%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">关键概念:静态类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83"><span class="nav-number">3.</span> <span class="nav-text">变量命名规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%80%BC"><span class="nav-number">4.</span> <span class="nav-text">指针值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE-%E5%88%9D%E5%A7%8B%E5%8C%96%E6%89%80%E6%9C%89%E6%8C%87%E9%92%88"><span class="nav-number">5.</span> <span class="nav-text">建议:初始化所有指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%8B%E5%80%BC%E5%92%8C%E6%8C%87%E9%92%88"><span class="nav-number">6.</span> <span class="nav-text">赋值和指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%90%91%E6%8C%87%E9%92%88%E7%9A%84%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">指向指针的引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const"><span class="nav-number">8.</span> <span class="nav-text">const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%92%8C-const"><span class="nav-number">9.</span> <span class="nav-text">指针和 const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const%E6%8C%87%E9%92%88"><span class="nav-number">10.</span> <span class="nav-text">const指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E5%B1%82const"><span class="nav-number">11.</span> <span class="nav-text">顶层const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constexpr%E5%8F%98%E9%87%8F"><span class="nav-number">12.</span> <span class="nav-text">constexpr变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E9%9D%A2%E5%80%BC%E7%B1%BB%E5%9E%8B"><span class="nav-number">13.</span> <span class="nav-text">字面值类型</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">默认初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%A6%82%E5%BF%B5-%E9%9D%99%E6%80%81%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">关键概念:静态类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83"><span class="nav-number">3.</span> <span class="nav-text">变量命名规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%80%BC"><span class="nav-number">4.</span> <span class="nav-text">指针值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE-%E5%88%9D%E5%A7%8B%E5%8C%96%E6%89%80%E6%9C%89%E6%8C%87%E9%92%88"><span class="nav-number">5.</span> <span class="nav-text">建议:初始化所有指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%8B%E5%80%BC%E5%92%8C%E6%8C%87%E9%92%88"><span class="nav-number">6.</span> <span class="nav-text">赋值和指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%90%91%E6%8C%87%E9%92%88%E7%9A%84%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">指向指针的引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const"><span class="nav-number">8.</span> <span class="nav-text">const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%92%8C-const"><span class="nav-number">9.</span> <span class="nav-text">指针和 const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const%E6%8C%87%E9%92%88"><span class="nav-number">10.</span> <span class="nav-text">const指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E5%B1%82const"><span class="nav-number">11.</span> <span class="nav-text">顶层const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constexpr%E5%8F%98%E9%87%8F"><span class="nav-number">12.</span> <span class="nav-text">constexpr变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E9%9D%A2%E5%80%BC%E7%B1%BB%E5%9E%8B"><span class="nav-number">13.</span> <span class="nav-text">字面值类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-11"><span class="nav-number">14.</span> <span class="nav-text">c++11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%88%9D%E5%A7%8B%E5%80%BC%E5%88%97%E8%A1%A8"><span class="nav-number">15.</span> <span class="nav-text">构造函数初始值列表</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -392,7 +409,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
