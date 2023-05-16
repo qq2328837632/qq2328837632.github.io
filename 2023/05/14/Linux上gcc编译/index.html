@@ -28,7 +28,7 @@
 <meta property="og:description" content="gcc 编译 4 步骤GCC（GNU Compiler Collection）是由 GNU 开发的编程语言编译器。 GCC最初代表“GNU C Compiler”，当时只支持C语言。 后来又扩展能够支持更多编程语言，包括 C++、Fortran 和 Java 等。 GCC 编译工具链在编译一个C源文件时需要经过以下 4 步：  预处理：为把头文件的代码、宏之类的内容转换成生成的.i文件，还是C代码">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-05-14T02:41:46.000Z">
-<meta property="article:modified_time" content="2023-05-16T09:15:39.186Z">
+<meta property="article:modified_time" content="2023-05-16T13:01:36.488Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 
@@ -180,7 +180,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-16 17:15:39" itemprop="dateModified" datetime="2023-05-16T17:15:39+08:00">2023-05-16</time>
+                <time title="修改时间：2023-05-16 21:01:36" itemprop="dateModified" datetime="2023-05-16T21:01:36+08:00">2023-05-16</time>
               </span>
 
           
@@ -290,6 +290,46 @@
 <h2 id="头文件守卫："><a href="#头文件守卫：" class="headerlink" title="头文件守卫："></a>头文件守卫：</h2><p>防止头文件被重复包含 </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#ifndef _HEAD_H_ </span><br><span class="line">#define _HEAD_H_ </span><br><span class="line">...... </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
 
+<h2 id="gdb-调试基础指令"><a href="#gdb-调试基础指令" class="headerlink" title="gdb 调试基础指令"></a>gdb 调试基础指令</h2><p>使用 gdb 之前，要求对文件进行编译时增加-g 参数，加了这个参数过后生成的编译文件会大一些， 这是因为增加了 gdb 调试内容 </p>
+<p>gdb 调试工具： 大前提：程序是你自己写的。 —逻辑错误 </p>
+<p>基础指令： </p>
+<p>​	-g：使用该参数编译可以执行文件，得到调试表。 </p>
+<p>​	gdb .&#x2F;a.out </p>
+<p>​	list： list 1 列出源码。根据源码指定 行号设置断点。 断点那一行不会执行</p>
+<p>​	b： b 20 在 20 行位置设置断点。 </p>
+<p>​	run&#x2F;r: 运行程序 </p>
+<p>​	n&#x2F;next: 下一条指令（会越过函数） </p>
+<p>​	next&#x2F;n :下一个，调用函数就跑 </p>
+<p>​	step&#x2F;s :单步，会进入调用的函数 </p>
+<p>​	要注意的是，如果是系统函数，按 s 就出不来了，这时用 until+行号直接执行到行号处</p>
+<p>​	s&#x2F;step: 下一条指令（会进入函数） </p>
+<p>​	p&#x2F;print：p i 查看变量的值。 </p>
+<p>​	continue：继续执行断点后续指令。 </p>
+<p>​	finish：结束当前函数调用。 </p>
+<p>​	quit：退出 gdb 当前调试。 </p>
+<p>其他指令： </p>
+<p>​	run：使用 run 查找段错误出现位置。 </p>
+<p>​	set args： 设置 main 函数命令行参数 （在 start、run 之前） </p>
+<p>​	run 字串 1 字串 2 …: 设置 main 函数命令行参数 </p>
+<p>​	info b: 查看断点信息表 </p>
+<p>​	b 20 if i &#x3D; 5： 设置条件断点。 </p>
+<p>​	ptype：查看变量类型。 </p>
+<p>​	bt：列出当前程序正存活着的栈帧。 </p>
+<p>​	frame： 根据栈帧编号，切换栈帧。 </p>
+<p>​	display：设置跟踪变量 </p>
+<p>​	undisplay：取消设置跟踪变量。 使用跟踪变量的编号。</p>
+<p>没有符号被读取—编译时没加-g 参数 </p>
+<p>file 后面加使用-g 编译的文件，可以不用退出，gdb 直接读取后进行调试。</p>
+<h2 id="makefile-基础规则"><a href="#makefile-基础规则" class="headerlink" title="makefile 基础规则"></a>makefile 基础规则</h2><p>makefile： 管理项目。 </p>
+<p>命名：makefile 	Makefile — make 命令 </p>
+<p>1 个规则： </p>
+<p>目标：依赖条件 </p>
+<p>​	（一个 tab 缩进）命令 </p>
+<ol>
+<li>目标的时间必须晚于依赖条件的时间，否则，更新目标 </li>
+<li>依赖条件如果不存在，找寻新的规则去产生依赖条件。</li>
+</ol>
+<p>ALL：指定 makefile 的终极目标（第一行）。</p>
 
     </div>
 
@@ -367,7 +407,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#gcc-%E7%BC%96%E8%AF%91-4-%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.</span> <span class="nav-text">gcc 编译 4 步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%93%E5%A4%B4%E6%96%87%E4%BB%B6%E5%92%8C%E6%BA%90%E7%A0%81%E4%B8%8D%E5%9C%A8%E4%B8%80%E4%B8%AA%E7%9B%AE%E5%BD%95%E4%B8%8B%E6%97%B6%EF%BC%8C%E9%9C%80%E8%A6%81%E6%8C%87%E5%AE%9A%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">当头文件和源码不在一个目录下时，需要指定头文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%92%8C%E9%9D%99%E6%80%81%E5%BA%93%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94"><span class="nav-number">1.2.</span> <span class="nav-text">动态库和静态库理论对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">静态库制作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C-%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%8D%E7%BD%AE%E6%97%A0%E5%85%B3%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">动态库制作-生成与位置无关代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%8A%A0%E8%BD%BD%E9%94%99%E8%AF%AF%E5%8E%9F%E5%9B%A0%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">动态库加载错误原因及解决方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%8A%A0%E8%BD%BD%E9%94%99%E8%AF%AF%E5%8E%9F%E5%9B%A0%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-2"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">动态库加载错误原因及解决方式 2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%AE%B5%E5%90%88%E5%B9%B6"><span class="nav-number">1.2.3.</span> <span class="nav-text">数据段合并</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E5%AE%88%E5%8D%AB%EF%BC%9A"><span class="nav-number">1.3.</span> <span class="nav-text">头文件守卫：</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#gcc-%E7%BC%96%E8%AF%91-4-%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.</span> <span class="nav-text">gcc 编译 4 步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%93%E5%A4%B4%E6%96%87%E4%BB%B6%E5%92%8C%E6%BA%90%E7%A0%81%E4%B8%8D%E5%9C%A8%E4%B8%80%E4%B8%AA%E7%9B%AE%E5%BD%95%E4%B8%8B%E6%97%B6%EF%BC%8C%E9%9C%80%E8%A6%81%E6%8C%87%E5%AE%9A%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">当头文件和源码不在一个目录下时，需要指定头文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%92%8C%E9%9D%99%E6%80%81%E5%BA%93%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94"><span class="nav-number">1.2.</span> <span class="nav-text">动态库和静态库理论对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">静态库制作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%88%B6%E4%BD%9C-%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%8D%E7%BD%AE%E6%97%A0%E5%85%B3%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">动态库制作-生成与位置无关代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%8A%A0%E8%BD%BD%E9%94%99%E8%AF%AF%E5%8E%9F%E5%9B%A0%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">动态库加载错误原因及解决方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BA%93%E5%8A%A0%E8%BD%BD%E9%94%99%E8%AF%AF%E5%8E%9F%E5%9B%A0%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-2"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">动态库加载错误原因及解决方式 2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%AE%B5%E5%90%88%E5%B9%B6"><span class="nav-number">1.2.3.</span> <span class="nav-text">数据段合并</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E5%AE%88%E5%8D%AB%EF%BC%9A"><span class="nav-number">1.3.</span> <span class="nav-text">头文件守卫：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-%E8%B0%83%E8%AF%95%E5%9F%BA%E7%A1%80%E6%8C%87%E4%BB%A4"><span class="nav-number">1.4.</span> <span class="nav-text">gdb 调试基础指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#makefile-%E5%9F%BA%E7%A1%80%E8%A7%84%E5%88%99"><span class="nav-number">1.5.</span> <span class="nav-text">makefile 基础规则</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
