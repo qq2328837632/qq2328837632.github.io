@@ -233,7 +233,7 @@
 <p>用法:</p>
 <ul>
 <li>这些仿函数所产生的对象，用法和一般函数完全相同</li>
-<li>使用内建函数对象，需要引入头文件#include<functional></li>
+<li>使用内建函数对象，需要引入头文件#include<functional></functional></li>
 </ul>
 <h2 id="算术仿函数"><a href="#算术仿函数" class="headerlink" title="算术仿函数"></a>算术仿函数</h2><p>功能描述:</p>
 <ul>
@@ -241,20 +241,20 @@
 </ul>
 <p>其中negate是一元运算，其他都是二元运算仿函数原型:</p>
 <ul>
-<li><p>template<class T> T plus<T>&#x2F;&#x2F;加法仿函数</p>
+<li><p>template<class t> T plus<T>&#x2F;&#x2F;加法仿函数</T></class></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plus&lt;int&gt; p;</span><br><span class="line">cout &lt;&lt; p( 10，20) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
 
 
 </li>
-<li><p>template<class T> T minus<T>&#x2F;&#x2F;减法仿函数</p>
+<li><p>template<class t> T minus<T>&#x2F;&#x2F;减法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T multiplies<T>&#x2F;&#x2F;乘法仿函数</p>
+<li><p>template<class t> T multiplies<T>&#x2F;&#x2F;乘法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T divides<T>&#x2F;&#x2F;除法仿函数</p>
+<li><p>template<class t> T divides<T>&#x2F;&#x2F;除法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T modulus<T>&#x2F;&#x2F;取模仿函数</p>
+<li><p>template<class t> T modulus<T>&#x2F;&#x2F;取模仿函数</T></class></p>
 </li>
-<li><p>template<class T> T negate<T>&#x2F;&#x2F;取反仿函数</p>
+<li><p>template<class t> T negate<T>&#x2F;&#x2F;取反仿函数</T></class></p>
 </li>
 </ul>
 <h2 id="关系仿函数"><a href="#关系仿函数" class="headerlink" title="关系仿函数"></a>关系仿函数</h2><p>功能描述:</p>
@@ -263,20 +263,20 @@
 </ul>
 <p>仿函数原型:</p>
 <ul>
-<li><p>template<class T> bool equal_to<T>&#x2F;&#x2F;等于</p>
+<li><p>template<class t> bool equal_to<T>&#x2F;&#x2F;等于</T></class></p>
 </li>
-<li><p>template<class T> bool not_equal_to<T>&#x2F;&#x2F;不等于</p>
+<li><p>template<class t> bool not_equal_to<T>&#x2F;&#x2F;不等于</T></class></p>
 </li>
-<li><p>template<class T> bool greater<T>&#x2F;&#x2F;大于</p>
+<li><p>template<class t> bool greater<T>&#x2F;&#x2F;大于</T></class></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//降序</span><br><span class="line">// sort(v.begin(), v.end()，MyCompare() ) ;</span><br><span class="line">sort(v.begin()， v.end(),greater&lt;int&gt;());</span><br></pre></td></tr></table></figure>
 
 
 </li>
-<li><p>template<class T> bool greater_equal<T>&#x2F;&#x2F;大于等于</p>
+<li><p>template<class t> bool greater_equal<T>&#x2F;&#x2F;大于等于</T></class></p>
 </li>
-<li><p>template<class T> bool less<T>&#x2F;&#x2F;小于</p>
+<li><p>template<class t> bool less<T>&#x2F;&#x2F;小于</T></class></p>
 </li>
-<li><p>template<class T> bool less_equal<T>&#x2F;&#x2F;小于等于</p>
+<li><p>template<class t> bool less_equal<T>&#x2F;&#x2F;小于等于</T></class></p>
 </li>
 </ul>
 <p>总结:关系仿函数中最常用的就是greater&lt;&gt;大于,因为默认是less小于</p>
@@ -286,15 +286,15 @@
 </ul>
 <p>函数原型:</p>
 <ul>
-<li>template<class T> bool logical_and<T>&#x2F;&#x2F;逻辑与</li>
-<li>template<class T> bool logical_or<T>&#x2F;&#x2F;逻辑或</li>
-<li>template<class T> bool logical_not<T>&#x2F;&#x2F;逻辑非</li>
+<li>template<class t> bool logical_and<T>&#x2F;&#x2F;逻辑与</T></class></li>
+<li>template<class t> bool logical_or<T>&#x2F;&#x2F;逻辑或</T></class></li>
+<li>template<class t> bool logical_not<T>&#x2F;&#x2F;逻辑非</T></class></li>
 </ul>
 <h1 id="STL-常用算法"><a href="#STL-常用算法" class="headerlink" title="STL-常用算法"></a>STL-常用算法</h1><p>概述:</p>
 <ul>
-<li>算法主要是由头文件<algorithm><functional><numeric>组成。</li>
-<li><algorithm>是所有STL头文件中最大的一个，范围涉及到比较、交换、查找、遍历操作、复制、修改等等<numeric>体积很小，只包括几个在序列上面进行简单数学运算的模板函数</li>
-<li><functional>定义了一些模板类,用以声明函数对象。</li>
+<li>算法主要是由头文件<algorithm><functional><numeric>组成。</numeric></functional></algorithm></li>
+<li><algorithm>是所有STL头文件中最大的一个，范围涉及到比较、交换、查找、遍历操作、复制、修改等等<numeric>体积很小，只包括几个在序列上面进行简单数学运算的模板函数</numeric></algorithm></li>
+<li><functional>定义了一些模板类,用以声明函数对象。</functional></li>
 </ul>
 <h2 id="常用遍历算法"><a href="#常用遍历算法" class="headerlink" title="常用遍历算法"></a>常用遍历算法</h2><p>算法简介:</p>
 <ul>

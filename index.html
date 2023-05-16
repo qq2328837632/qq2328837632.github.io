@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-16 16:33:49" itemprop="dateModified" datetime="2023-05-16T16:33:49+08:00">2023-05-16</time>
+                <time title="修改时间：2023-05-16 17:15:39" itemprop="dateModified" datetime="2023-05-16T17:15:39+08:00">2023-05-16</time>
               </span>
 
           
@@ -237,6 +237,11 @@
 <h2 id="动态库和静态库理论对比"><a href="#动态库和静态库理论对比" class="headerlink" title="动态库和静态库理论对比"></a>动态库和静态库理论对比</h2><p>静态库在文件中静态展开，所以有多少文件就展开多少次，非常吃内存，100M 展开 100 次，就是 1G， 但是这样的好处就是静态加载的速度快 </p>
 <p>使用动态库会将动态库加载到内存，10 个文件也只需要加载一次，然后这些文件用到库的时候临时去加载，速度慢一些，但是很省内存 </p>
 <p>动态库和静态库各有优劣，根据实际情况合理选用即可。</p>
+<ul>
+<li>1.动态库是否加载到内存,取决于程序是否运行</li>
+<li>2.动态库每次加载的位置不固定</li>
+<li>3.动、静态库共存时,编译器默认使用动态库</li>
+</ul>
 <h3 id="静态库制作"><a href="#静态库制作" class="headerlink" title="静态库制作"></a>静态库制作</h3><p>静态库名字以 lib 开头，以.a 结尾 ，.a是ELF文件，可重定位目标文件。</p>
 <p>例如：<code>libmylib.a</code> </p>
 <p>静态库生成指令 <code>ar rcs libmylib.a file1.o</code></p>
@@ -410,7 +415,7 @@
 <td>8</td>
 </tr>
 </tbody></table>
-<h2 id="访问信息"><a href="#访问信息" class="headerlink" title="访问信息"></a>访问信息</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" alt="image-20230515185054534"></p>
+<h2 id="访问信息"><a href="#访问信息" class="headerlink" title="访问信息"></a>访问信息</h2><p><img src="/.com//image-20230515185054534.jpg" alt="image-20230515185054534"></p>
 <h3 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h3><p>MOV指令源和目的类型的组合。记住，<strong>第一个是源操作数，第二个是目的操作数。</strong></p>
 <p>源操作数指定的值是一个立即数，存储在寄存器中或者内存中。目的操作数指定一个位置，要么是一个寄存器或者，要么是一个内存地址。</p>
 <p>寄存器部分的大小必须与指令最后一个字符(‘b’，‘w’，‘1’或‘q’)指定的大小匹配。大多数情况中，MOV指令只会更新目的操作数指定的那些寄存器字节或内存位置。唯一的例外是movl指令以寄存器作为目的时，它会把该寄存器的高位4字节设置为0。造成这个例外的原因是x86-64采用的惯例，即任何为寄存器生成32位值的指令都会把该寄存器的高位部分置成0。</p>
@@ -510,7 +515,7 @@
 
 <p>不过这种行为对于C程序来说是没有保证的，所以应该保持位移量小于待移位值的位数。另一方面，Java 特别要求位移数量应该按照我们前面所讲的求模的方法来计算。</p>
 <h2 id="补码编码"><a href="#补码编码" class="headerlink" title="补码编码"></a>补码编码</h2><p>采用补码表示的32位大端法机器（符合习惯，先输出低地址的高位）上输出打印16进制时：是看补码来转换。</p>
-<p>原理:补码编码的定义<br><img src="C:\Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
+<p>原理:补码编码的定义<br><img src="/.com//Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
 <p>例如1001（-1）的补码是1111可以根据上面计算-8+7&#x3D;-1</p>
 <p><strong>负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码</strong>。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的</p>
 <p>对于大多数C语言的实现，处理同样字长的有符号数和无符号数之间相互转换的一般规则是:数值可能会改变，但是<strong>位模式不变</strong>。</p>
@@ -1472,7 +1477,7 @@
 <li>.vscode通常就是放配置文件的，除这三个常用的之外还有settings.json，用来配置编辑器等外观性质的东西。</li>
 <li>VSCode下c++多文件夹项目编译调试还可以用makefile、cmake等工具实现，适用于大型项目文件时使用</li>
 </ul>
-<p><img src="C:\Users\86191\OneDrive\图片\屏幕快照\2023-04-16.png" alt="2023-04-16"></p>
+<p><img src="/.com//Users\86191\OneDrive\图片\屏幕快照\2023-04-16.png" alt="2023-04-16"></p>
 
       
     </div>
@@ -1861,7 +1866,7 @@
 </ul>
 <p>函数原型:<br>swap(container c1, container c2);</p>
 <p>&#x2F;&#x2F;互换两个相同类型容器的元素<br>&#x2F;&#x2F; c1容器1<br>&#x2F;&#x2F; c2容器2</p>
-<h2 id="常用算术生成算法"><a href="#常用算术生成算法" class="headerlink" title="常用算术生成算法"></a>常用算术生成算法</h2><p>注意:<br>算术生成算法属于小型算法，使用时包含的头文件为#include <numeric></p>
+<h2 id="常用算术生成算法"><a href="#常用算术生成算法" class="headerlink" title="常用算术生成算法"></a>常用算术生成算法</h2><p>注意:<br>算术生成算法属于小型算法，使用时包含的头文件为#include <numeric></numeric></p>
 <p>算法简介:</p>
 <ul>
 <li>accumplate	&#x2F;&#x2F;计算容器元素累计总和</li>
@@ -2029,7 +2034,7 @@
 <p>用法:</p>
 <ul>
 <li>这些仿函数所产生的对象，用法和一般函数完全相同</li>
-<li>使用内建函数对象，需要引入头文件#include<functional></li>
+<li>使用内建函数对象，需要引入头文件#include<functional></functional></li>
 </ul>
 <h2 id="算术仿函数"><a href="#算术仿函数" class="headerlink" title="算术仿函数"></a>算术仿函数</h2><p>功能描述:</p>
 <ul>
@@ -2037,20 +2042,20 @@
 </ul>
 <p>其中negate是一元运算，其他都是二元运算仿函数原型:</p>
 <ul>
-<li><p>template<class T> T plus<T>&#x2F;&#x2F;加法仿函数</p>
+<li><p>template<class t> T plus<T>&#x2F;&#x2F;加法仿函数</T></class></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plus&lt;int&gt; p;</span><br><span class="line">cout &lt;&lt; p( 10，20) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
 
 
 </li>
-<li><p>template<class T> T minus<T>&#x2F;&#x2F;减法仿函数</p>
+<li><p>template<class t> T minus<T>&#x2F;&#x2F;减法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T multiplies<T>&#x2F;&#x2F;乘法仿函数</p>
+<li><p>template<class t> T multiplies<T>&#x2F;&#x2F;乘法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T divides<T>&#x2F;&#x2F;除法仿函数</p>
+<li><p>template<class t> T divides<T>&#x2F;&#x2F;除法仿函数</T></class></p>
 </li>
-<li><p>template<class T> T modulus<T>&#x2F;&#x2F;取模仿函数</p>
+<li><p>template<class t> T modulus<T>&#x2F;&#x2F;取模仿函数</T></class></p>
 </li>
-<li><p>template<class T> T negate<T>&#x2F;&#x2F;取反仿函数</p>
+<li><p>template<class t> T negate<T>&#x2F;&#x2F;取反仿函数</T></class></p>
 </li>
 </ul>
 <h2 id="关系仿函数"><a href="#关系仿函数" class="headerlink" title="关系仿函数"></a>关系仿函数</h2><p>功能描述:</p>
@@ -2059,20 +2064,20 @@
 </ul>
 <p>仿函数原型:</p>
 <ul>
-<li><p>template<class T> bool equal_to<T>&#x2F;&#x2F;等于</p>
+<li><p>template<class t> bool equal_to<T>&#x2F;&#x2F;等于</T></class></p>
 </li>
-<li><p>template<class T> bool not_equal_to<T>&#x2F;&#x2F;不等于</p>
+<li><p>template<class t> bool not_equal_to<T>&#x2F;&#x2F;不等于</T></class></p>
 </li>
-<li><p>template<class T> bool greater<T>&#x2F;&#x2F;大于</p>
+<li><p>template<class t> bool greater<T>&#x2F;&#x2F;大于</T></class></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//降序</span><br><span class="line">// sort(v.begin(), v.end()，MyCompare() ) ;</span><br><span class="line">sort(v.begin()， v.end(),greater&lt;int&gt;());</span><br></pre></td></tr></table></figure>
 
 
 </li>
-<li><p>template<class T> bool greater_equal<T>&#x2F;&#x2F;大于等于</p>
+<li><p>template<class t> bool greater_equal<T>&#x2F;&#x2F;大于等于</T></class></p>
 </li>
-<li><p>template<class T> bool less<T>&#x2F;&#x2F;小于</p>
+<li><p>template<class t> bool less<T>&#x2F;&#x2F;小于</T></class></p>
 </li>
-<li><p>template<class T> bool less_equal<T>&#x2F;&#x2F;小于等于</p>
+<li><p>template<class t> bool less_equal<T>&#x2F;&#x2F;小于等于</T></class></p>
 </li>
 </ul>
 <p>总结:关系仿函数中最常用的就是greater&lt;&gt;大于,因为默认是less小于</p>
@@ -2082,15 +2087,15 @@
 </ul>
 <p>函数原型:</p>
 <ul>
-<li>template<class T> bool logical_and<T>&#x2F;&#x2F;逻辑与</li>
-<li>template<class T> bool logical_or<T>&#x2F;&#x2F;逻辑或</li>
-<li>template<class T> bool logical_not<T>&#x2F;&#x2F;逻辑非</li>
+<li>template<class t> bool logical_and<T>&#x2F;&#x2F;逻辑与</T></class></li>
+<li>template<class t> bool logical_or<T>&#x2F;&#x2F;逻辑或</T></class></li>
+<li>template<class t> bool logical_not<T>&#x2F;&#x2F;逻辑非</T></class></li>
 </ul>
 <h1 id="STL-常用算法"><a href="#STL-常用算法" class="headerlink" title="STL-常用算法"></a>STL-常用算法</h1><p>概述:</p>
 <ul>
-<li>算法主要是由头文件<algorithm><functional><numeric>组成。</li>
-<li><algorithm>是所有STL头文件中最大的一个，范围涉及到比较、交换、查找、遍历操作、复制、修改等等<numeric>体积很小，只包括几个在序列上面进行简单数学运算的模板函数</li>
-<li><functional>定义了一些模板类,用以声明函数对象。</li>
+<li>算法主要是由头文件<algorithm><functional><numeric>组成。</numeric></functional></algorithm></li>
+<li><algorithm>是所有STL头文件中最大的一个，范围涉及到比较、交换、查找、遍历操作、复制、修改等等<numeric>体积很小，只包括几个在序列上面进行简单数学运算的模板函数</numeric></algorithm></li>
+<li><functional>定义了一些模板类,用以声明函数对象。</functional></li>
 </ul>
 <h2 id="常用遍历算法"><a href="#常用遍历算法" class="headerlink" title="常用遍历算法"></a>常用遍历算法</h2><p>算法简介:</p>
 <ul>
@@ -2201,7 +2206,7 @@
 <h3 id="stack常用接口"><a href="#stack常用接口" class="headerlink" title="stack常用接口"></a>stack常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
 <p>构造函数:</p>
 <ul>
-<li>stack<T> stk;&#x2F;&#x2F;stack采用模板类实现, stack对象的默认构造形式</li>
+<li>stack<T> stk;&#x2F;&#x2F;stack采用模板类实现, stack对象的默认构造形式</T></li>
 <li>stack( const stack &amp;stk);&#x2F;&#x2F;拷贝构造函数</li>
 </ul>
 <p>赋值操作:</p>
@@ -2229,7 +2234,7 @@
 <h3 id="queue-常用接口"><a href="#queue-常用接口" class="headerlink" title="queue 常用接口"></a>queue 常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
 <p>构造函数:</p>
 <ul>
-<li>queue<T> que;&#x2F;&#x2F;queue采用模板类实现，queue对象的默认构造形式</li>
+<li>queue<T> que;&#x2F;&#x2F;queue采用模板类实现，queue对象的默认构造形式</T></li>
 <li>queue(const queue &amp;que) ;&#x2F;&#x2F;拷贝构造函数</li>
 </ul>
 <p>赋值操作:</p>
@@ -2267,7 +2272,7 @@
 <p>总结:STL中List和vector是两个最常被使用的容器，各有优缺点</p>
 <h3 id="list构造函数"><a href="#list构造函数" class="headerlink" title="list构造函数"></a>list构造函数</h3><p>函数原型:</p>
 <ul>
-<li>list<T> lst;&#x2F;&#x2F;list采用采用模板类实现,对象的默认构造形式:</li>
+<li>list<T> lst;&#x2F;&#x2F;list采用采用模板类实现,对象的默认构造形式:</T></li>
 <li>list(beg,end) ;&#x2F;&#x2F;构造函数将[beg, end)区间中的元素拷贝给本身。</li>
 <li>list(n,elem) ;&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
 <li>list(const list &amp;lst);&#x2F;&#x2F;拷贝构造函数。</li>
