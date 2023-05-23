@@ -20,19 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="date: 2023-03-12 16:33:26tags:执行hexo n “如何使用github&#x2F;hexo发布博客” ，就会在blog&#x2F;source&#x2F;_posts路径下生成一个md文件，用markdown工具编辑好之后，御三套（hexo cleanhexo ghexo d）走一波就可以你写的内容啦 使用“— 标题 —”命名标题 C++函数分文件编写配置 mingw">
+  <meta name="description" content="系统调用 内核提供的函数  库调用 程序库中的函数 open 函数open 函数： int open(char *pathname, int flags)  	#include  &lt;unistd.h&gt;  参数： pathname: 欲打开的文件路径名 	flags：文件打开方式： #include  &lt;unistd.h&gt; O_RDONLY|O_WRONLY|O_RDWR|O">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何使用github&#x2F;hexo发布博客">
-<meta property="og:url" content="http://example.com/2023/03/12/c%E5%92%8Cc++/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8github-hexo%E5%8F%91%E5%B8%83%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:title" content="Linux系统编程-文件IO">
+<meta property="og:url" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/index.html">
 <meta property="og:site_name" content="肖汇林的博客">
-<meta property="og:description" content="date: 2023-03-12 16:33:26tags:执行hexo n “如何使用github&#x2F;hexo发布博客” ，就会在blog&#x2F;source&#x2F;_posts路径下生成一个md文件，用markdown工具编辑好之后，御三套（hexo cleanhexo ghexo d）走一波就可以你写的内容啦 使用“— 标题 —”命名标题 C++函数分文件编写配置 mingw">
+<meta property="og:description" content="系统调用 内核提供的函数  库调用 程序库中的函数 open 函数open 函数： int open(char *pathname, int flags)  	#include  &lt;unistd.h&gt;  参数： pathname: 欲打开的文件路径名 	flags：文件打开方式： #include  &lt;unistd.h&gt; O_RDONLY|O_WRONLY|O_RDWR|O">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-03-12T08:33:26.968Z">
-<meta property="article:modified_time" content="2023-05-20T11:27:44.525Z">
+<meta property="og:image" content="http://example.com/.com//image-20230523223219656.png">
+<meta property="article:published_time" content="2023-05-21T02:50:39.000Z">
+<meta property="article:modified_time" content="2023-05-23T14:33:46.796Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/.com//image-20230523223219656.png">
 
-<link rel="canonical" href="http://example.com/2023/03/12/c%E5%92%8Cc++/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8github-hexo%E5%8F%91%E5%B8%83%E5%8D%9A%E5%AE%A2/">
+<link rel="canonical" href="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
 
 
 <script id="page-configurations">
@@ -45,7 +47,7 @@
   };
 </script>
 
-  <title>如何使用github/hexo发布博客 | 肖汇林的博客</title>
+  <title>Linux系统编程-文件IO | 肖汇林的博客</title>
   
 
 
@@ -150,7 +152,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/12/c%E5%92%8Cc++/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8github-hexo%E5%8F%91%E5%B8%83%E5%8D%9A%E5%AE%A2/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -163,7 +165,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          如何使用github/hexo发布博客
+          Linux系统编程-文件IO
         </h1>
 
         <div class="post-meta">
@@ -173,14 +175,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-03-12 16:33:26" itemprop="dateCreated datePublished" datetime="2023-03-12T16:33:26+08:00">2023-03-12</time>
+              <time title="创建时间：2023-05-21 10:50:39" itemprop="dateCreated datePublished" datetime="2023-05-21T10:50:39+08:00">2023-05-21</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-20 19:27:44" itemprop="dateModified" datetime="2023-05-20T19:27:44+08:00">2023-05-20</time>
+                <time title="修改时间：2023-05-23 22:33:46" itemprop="dateModified" datetime="2023-05-23T22:33:46+08:00">2023-05-23</time>
               </span>
 
           
@@ -194,15 +196,47 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="date-2023-03-12-16-33-26"><a href="#date-2023-03-12-16-33-26" class="headerlink" title="date: 2023-03-12 16:33:26"></a>date: 2023-03-12 16:33:26</h2><p>tags:执行hexo n “如何使用github&#x2F;hexo发布博客” ，就会在blog&#x2F;source&#x2F;_posts路径下生成一个md文件，用markdown工具编辑好之后，御三套（<br><strong>hexo clean</strong><br><strong>hexo g</strong><br><strong>hexo d</strong>）走一波就可以你写的内容啦</p>
-<p>使用“—</p>
-<p>标题</p>
-<p>—”命名标题</p>
-<h1 id="C-函数分文件编写配置"><a href="#C-函数分文件编写配置" class="headerlink" title="C++函数分文件编写配置"></a>C++函数分文件编写配置</h1><ul>
-<li>mingw32-make打mingw后按tab自动补全</li>
-<li>mingw32-make clean会清理掉.o和.exe文件</li>
-<li>output&#x2F;main</li>
-</ul>
+        <p>系统调用 内核提供的函数 </p>
+<p>库调用 程序库中的函数</p>
+<h2 id="open-函数"><a href="#open-函数" class="headerlink" title="open 函数"></a>open 函数</h2><p>open 函数： <code>int open(char *pathname, int flags)  	#include  &lt;unistd.h&gt;</code> </p>
+<p>参数： pathname: 欲打开的文件路径名 	flags：文件打开方式： <code>#include  &lt;unistd.h&gt; O_RDONLY|O_WRONLY|O_RDWR|O_CREAT|O_APPEND|O_TRUNC|O_EXCL|O_NONBLOCK ....</code> </p>
+<p>返回值： 成功： 打开文件所得到对应的 文件描述符（整数） </p>
+<p>失败： -1， 设置 errno </p>
+<p><code>int open(char *pathname, int flags， mode_t mode) 	123 775</code> </p>
+<p>参数： pathname: 欲打开的文件路径名 </p>
+<p>flags：文件打开方式O_RDONLY|O_WRONLY|O_RDWR|O_CREAT|O_APPEND|O_TRUNC|O_EXCL|O_NONBLOCK …. </p>
+<p>mode: 参数 3 使用的前提， 参 2 指定了 O_CREAT。 取值 8 进制数，用来描述文件的 访问权限。</p>
+<p> rwx 0664 创建文件最终权限 &#x3D; mode &amp; ~umask (umask是系统默认0002取反775)</p>
+<p>返回值： 成功： 打开文件所得到对应的 文件描述符（整数） </p>
+<p>失败： -1， 设置 errno </p>
+<p>close 函数： <code>int close(int fd);</code></p>
+<h2 id="read和write实现cp"><a href="#read和write实现cp" class="headerlink" title="read和write实现cp"></a>read和write实现cp</h2><p>read函数：</p>
+<p>  <code>ssize_t read(int fd, void *buf, size_t count);</code></p>
+<p>  参数：</p>
+<p>​    fd：文件描述符</p>
+<p>​    buf：存数据的缓冲区</p>
+<p>​    count：缓冲区大小</p>
+<p>  返回值：</p>
+<p>​    0：读到文件末尾。</p>
+<p>​    成功； &gt; 0 读到的字节数。</p>
+<p>​    失败： -1， 设置 errno</p>
+<p>​    -1： 并且 errno &#x3D; EAGIN 或 EWOULDBLOCK, 说明不是read失败，而是read在以非阻塞方式读一个设备文件（网络文件），并且文件无数据。</p>
+<p>write函数：</p>
+<p>  <code>ssize_t write(int fd, const void *buf, size_t count);</code></p>
+<p>  参数：</p>
+<p>​    fd：文件描述符</p>
+<p>​    buf：待写出数据的缓冲区</p>
+<p>​    count：数据大小</p>
+<p>  返回值：</p>
+<p>​    成功； 写入的字节数。</p>
+<p>​    失败： -1， 设置 errno</p>
+<p><img src="/.com//image-20230523223219656.png" alt="image-20230523223219656"></p>
+<p>可以在复制函数里加入错误检测：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(fd1 == -1)&#123;</span><br><span class="line"></span><br><span class="line">  perror(“open argv[1] error”);</span><br><span class="line"></span><br><span class="line">  exit(1);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>错误处理函数：    与 errno 相关。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;xxx error: %d\n&quot;, errno);</span><br><span class="line"></span><br><span class="line">char *strerror(int errnum);</span><br><span class="line"></span><br><span class="line">printf(&quot;xxx error: %s\n&quot;, strerror(errno));</span><br><span class="line"></span><br><span class="line">void perror(const char *s);</span><br><span class="line"></span><br><span class="line">  perror(&quot;open error&quot;);</span><br></pre></td></tr></table></figure>
+
 
     </div>
 
@@ -218,13 +252,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/03/12/c%E5%92%8Cc++/hello-world/" rel="prev" title="Hello World">
-      <i class="fa fa-chevron-left"></i> Hello World
+    <a href="/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/" rel="prev" title="Linux上gcc编译">
+      <i class="fa fa-chevron-left"></i> Linux上gcc编译
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/03/13/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%80%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" rel="next" title="第一天 c语言">
-      第一天 c语言 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -283,7 +314,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#date-2023-03-12-16-33-26"><span class="nav-number">1.</span> <span class="nav-text">date: 2023-03-12 16:33:26</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E5%87%BD%E6%95%B0%E5%88%86%E6%96%87%E4%BB%B6%E7%BC%96%E5%86%99%E9%85%8D%E7%BD%AE"><span class="nav-number"></span> <span class="nav-text">C++函数分文件编写配置</span></a></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#open-%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">open 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#read%E5%92%8Cwrite%E5%AE%9E%E7%8E%B0cp"><span class="nav-number">2.</span> <span class="nav-text">read和write实现cp</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
