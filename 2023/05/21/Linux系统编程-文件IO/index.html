@@ -27,12 +27,12 @@
 <meta property="og:site_name" content="肖汇林的博客">
 <meta property="og:description" content="系统调用 内核提供的函数  库调用 程序库中的函数 open 函数open 函数： int open(char *pathname, int flags)  	#include  &lt;unistd.h&gt;  参数： pathname: 欲打开的文件路径名 	flags：文件打开方式： #include  &lt;unistd.h&gt; O_RDONLY|O_WRONLY|O_RDWR|O">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/.com//image-20230523223219656.png">
+<meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png">
 <meta property="article:published_time" content="2023-05-21T02:50:39.000Z">
 <meta property="article:modified_time" content="2023-05-23T14:33:46.796Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/.com//image-20230523223219656.png">
+<meta name="twitter:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png">
 
 <link rel="canonical" href="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
 
@@ -230,7 +230,7 @@
 <p>  返回值：</p>
 <p>​    成功； 写入的字节数。</p>
 <p>​    失败： -1， 设置 errno</p>
-<p><img src="/.com//image-20230523223219656.png" alt="image-20230523223219656"></p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" alt="image-20230523223219656"></p>
 <p>可以在复制函数里加入错误检测：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(fd1 == -1)&#123;</span><br><span class="line"></span><br><span class="line">  perror(“open argv[1] error”);</span><br><span class="line"></span><br><span class="line">  exit(1);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 

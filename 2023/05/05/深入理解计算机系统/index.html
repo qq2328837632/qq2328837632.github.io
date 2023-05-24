@@ -27,12 +27,12 @@
 <meta property="og:site_name" content="肖汇林的博客">
 <meta property="og:description" content="第2章 信息的表示和处理文字编码的Unicode标准基本编码，称为Unicode的“统一字符集”，使用32位来表示字符。这好像要求文本串中每个字符要占用4个字节。不过，可以有一些替代编码，常见的字符只需要1个或2个字节，而不太常用的字符需要多一些的字节数。特别地，UTF-8表示将每个字符编码为一个字节序列，这样标准ASCII字符还是使用和它们在ASCII 中一样的单字节编码，这也就意味着所有的AS">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/.com//Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230507151108343.png">
+<meta property="og:image" content="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230507151108343.png">
 <meta property="article:published_time" content="2023-05-05T08:12:22.000Z">
 <meta property="article:modified_time" content="2023-05-11T09:40:00.054Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/.com//Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230507151108343.png">
+<meta name="twitter:image" content="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230507151108343.png">
 
 <link rel="canonical" href="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">
 
@@ -209,7 +209,7 @@
 
 <p>不过这种行为对于C程序来说是没有保证的，所以应该保持位移量小于待移位值的位数。另一方面，Java 特别要求位移数量应该按照我们前面所讲的求模的方法来计算。</p>
 <h2 id="补码编码"><a href="#补码编码" class="headerlink" title="补码编码"></a>补码编码</h2><p>采用补码表示的32位大端法机器（符合习惯，先输出低地址的高位）上输出打印16进制时：是看补码来转换。</p>
-<p>原理:补码编码的定义<br><img src="/.com//Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
+<p>原理:补码编码的定义<br><img src="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
 <p>例如1001（-1）的补码是1111可以根据上面计算-8+7&#x3D;-1</p>
 <p><strong>负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码</strong>。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的</p>
 <p>对于大多数C语言的实现，处理同样字长的有符号数和无符号数之间相互转换的一般规则是:数值可能会改变，但是<strong>位模式不变</strong>。</p>
