@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-23 22:33:46" itemprop="dateModified" datetime="2023-05-23T22:33:46+08:00">2023-05-23</time>
+                <time title="修改时间：2023-05-25 19:56:33" itemprop="dateModified" datetime="2023-05-25T19:56:33+08:00">2023-05-25</time>
               </span>
 
           
@@ -227,11 +227,43 @@
 <p>​    成功； 写入的字节数。</p>
 <p>​    失败： -1， 设置 errno</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" alt="image-20230523223219656"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" class title="This is an test image">
+
 <p>可以在复制函数里加入错误检测：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(fd1 == -1)&#123;</span><br><span class="line"></span><br><span class="line">  perror(“open argv[1] error”);</span><br><span class="line"></span><br><span class="line">  exit(1);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>错误处理函数：    与 errno 相关。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;xxx error: %d\n&quot;, errno);</span><br><span class="line"></span><br><span class="line">char *strerror(int errnum);</span><br><span class="line"></span><br><span class="line">printf(&quot;xxx error: %s\n&quot;, strerror(errno));</span><br><span class="line"></span><br><span class="line">void perror(const char *s);</span><br><span class="line"></span><br><span class="line">  perror(&quot;open error&quot;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="系统调用和库函数比较—预读入缓输出"><a href="#系统调用和库函数比较—预读入缓输出" class="headerlink" title="系统调用和库函数比较—预读入缓输出"></a>系统调用和库函数比较—预读入缓输出</h2><p>所以系统函数并不是一定比库函数牛逼，能使用库函数的地方就使用库函数。 标准 IO 函数（如fputc&#x2F;fgetc）自带用户缓冲区（一般是4096，即4kb再向内核写入），系统调用（read&#x2F;write 这块，每次写一个字节，自己定义buf为1，会疯狂进行内核态和用户态的切换，所以非常耗时）无用户级缓冲。系统缓冲区是都有的。</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" alt="image-20230525171335770"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" class title="This is an test image">
+
+<h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" alt="image-20230525185325288"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" class title="This is an test image">
+
+<p>文件描述符是指向一个文件结构体的指针 </p>
+<p>PCB 进程控制块：本质 结构体。</p>
+<p> 成员：文件描述符表。 </p>
+<p>文件描述符：0&#x2F;1&#x2F;2&#x2F;3&#x2F;4。。。。&#x2F;1023 表中可用的最小的。 </p>
+<p>0 - STDIN_FILENO </p>
+<p>1 - STDOUT_FILENO </p>
+<p>2 - STDERR_FILENO</p>
+<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞、非阻塞： 是设备文件、网络文件的属性。</p>
+<p>产生阻塞的场景。 读设备文件。读网络文件。（读常规文件无阻塞概念。） &#x2F;dev&#x2F;tty – 终端文件。 </p>
+<p>open(“&#x2F;dev&#x2F;tty”, O_RDWR|O_NONBLOCK)	 — 设置 &#x2F;dev&#x2F;tty (当前终端)非阻塞状态。(默认为阻塞状态)</p>
+<h2 id="fcntl-改文件属性"><a href="#fcntl-改文件属性" class="headerlink" title="fcntl 改文件属性"></a>fcntl 改文件属性</h2><p>fcntl 用来改变一个【已经打开】的文件的 访问控制属性 </p>
+<p>重点掌握两个参数的使用， F_GETFL，F_SETFL </p>
+<p>fcntl： </p>
+<p>​	int (int fd, int cmd, …) </p>
+<p>fd 文件描述符 cmd 命令，决定了后续参数个数 </p>
+<p>int flgs &#x3D; fcntl(fd, F_GETFL);</p>
+<p>flgs |&#x3D; O_NONBLOCK </p>
+<p>fcntl(fd, F_SETFL, flgs); </p>
+<p>获取文件状态： F_GETFL </p>
+<p>设置文件状态： F_SETFL</p>
+<p>终端文件默认是阻塞读的，这里用 fcntl 将其更改为非阻塞读</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;unistd.h&gt;</span><br><span class="line">2. #include &lt;fcntl.h&gt;</span><br><span class="line">3. #include &lt;errno.h&gt;</span><br><span class="line">4. #include &lt;stdio.h&gt;</span><br><span class="line">5. #include &lt;stdlib.h&gt;</span><br><span class="line">6. #include &lt;string.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. #define MSG_TRY &quot;try again\n&quot;</span><br><span class="line">9.</span><br><span class="line">10. int main(void)</span><br><span class="line">11. &#123;</span><br><span class="line">12. char buf[10];</span><br><span class="line">13. int flags, n;</span><br><span class="line">14.</span><br><span class="line">15. flags = fcntl(STDIN_FILENO, F_GETFL); //获取 stdin 属性信息</span><br><span class="line">16. if(flags == -1)&#123;</span><br><span class="line">17. perror(&quot;fcntl error&quot;);</span><br><span class="line">18. exit(1);</span><br><span class="line">19. &#125;</span><br><span class="line">20. flags |= O_NONBLOCK;</span><br><span class="line">21. int ret = fcntl(STDIN_FILENO, F_SETFL, flags);</span><br><span class="line">22. if(ret == -1)&#123;</span><br><span class="line">23. perror(&quot;fcntl error&quot;);</span><br><span class="line">24. exit(1);</span><br><span class="line">25. &#125;</span><br><span class="line">26.</span><br><span class="line">27. tryagain:</span><br><span class="line">28. n = read(STDIN_FILENO, buf, 10);</span><br><span class="line">29. if(n &lt; 0)&#123;</span><br><span class="line">30. if(errno != EAGAIN)&#123;</span><br><span class="line">31. perror(&quot;read /dev/tty&quot;);</span><br><span class="line">32. exit(1);</span><br><span class="line">33. &#125;</span><br><span class="line">34. sleep(3);</span><br><span class="line">35. write(STDOUT_FILENO, MSG_TRY, strlen(MSG_TRY));</span><br><span class="line">36. goto tryagain;</span><br><span class="line">37. &#125;</span><br><span class="line">38. write(STDOUT_FILENO, buf, n);</span><br><span class="line">39.</span><br><span class="line">40. return 0;</span><br><span class="line">41. &#125;</span><br></pre></td></tr></table></figure>
 
 
       
@@ -532,7 +564,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-24 15:09:27" itemprop="dateModified" datetime="2023-05-24T15:09:27+08:00">2023-05-24</time>
+                <time title="修改时间：2023-05-25 15:10:56" itemprop="dateModified" datetime="2023-05-25T15:10:56+08:00">2023-05-25</time>
               </span>
 
           
@@ -660,7 +692,16 @@
 <h2 id="异数的数据结构"><a href="#异数的数据结构" class="headerlink" title="异数的数据结构"></a>异数的数据结构</h2><h3 id="联合"><a href="#联合" class="headerlink" title="联合"></a>联合</h3><p>还可以观察到，一个联合的总的大小等于它最大字段的大小。<br>在一些下上文中，联合十分有用。但是，它也能引起一些讨厌的错误，因为它们绕过了C语言类型系统提供的安全措施。一种应用情况是，我们事先知道对一个数据结构中的两个不同字段的使用是互斥的，那么将这两个字段声明为联合的一部分，而不是结构的一部分，会减小分配空间的总量。</p>
 <p>开始的跳转表的汇编代码声明在第2行包含下面这样的命令:<br>.align 8<br>这就保证了它后面的数据(在此，是跳转表的开始)的起始地址是8的倍数。因为每个表项长8个字节，后面的元素都会遵守8字节对齐的限制。</p>
 <h2 id="在机器级程序中将控制与数据结合起来"><a href="#在机器级程序中将控制与数据结合起来" class="headerlink" title="在机器级程序中将控制与数据结合起来"></a>在机器级程序中将控制与数据结合起来</h2><h3 id="理解指针"><a href="#理解指针" class="headerlink" title="理解指针"></a>理解指针</h3><p>leaq指令是设计用来计算内存引用的地址的，&amp;运算符的机器代码实现常常用这条指令来计算表达式的值。</p>
+<h3 id="GDB命令"><a href="#GDB命令" class="headerlink" title="GDB命令"></a>GDB命令</h3><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" alt="image-20230524151520753"></p>
+<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" class title="This is an test image">
+
 <p>GDB的命令语法有点晦涩，但是在线帮助信息(用GDB的 help命令调用)能克服这些毛病。相对于使用命令行接口来访问GDB，许多程序员更愿意使用DDD，它是 GDB的一个扩展，提供了图形用户界面。</p>
+<h3 id="内存越界引用和缓冲区溢出"><a href="#内存越界引用和缓冲区溢出" class="headerlink" title="内存越界引用和缓冲区溢出"></a>内存越界引用和缓冲区溢出</h3><p>更好一点的版本是使用fgets函数，它包括一个参数，限制<strong>待读入的最大字节数</strong>。通常，使用gets或其他任何能导致存储溢出的函数，都是不好的编程习惯。不幸的是，很多常用的库函数，包括strcpy、strcat和 sprintf都有一个属性——不需要告诉它们目标缓冲区的大小，就产生一个字节序列[97]。超过待读入最大字节数就可能发生错误，这样的情况就会导致缓冲区溢出漏洞。</p>
+<p>如在栈上分配了24个字节，待读入最大字节为8</p>
+<p>echo执行时栈的组织。该程序把栈指针减去了24，在栈上分配了24个字节。字符数组buf位于栈顶，可以看到,%rsp被复制到%rdi作为调用gets和puts 的参数。这个调用的参数和存储的返回指针之间的16字节是未被使用的。只要用户输人不超过7个字符，gets返回的字符串(包括结尾的null)就能够放进为buf分配的空间里。不过，长一些的字符串就会导致gets覆盖栈上存储的某些信息。随着字符串变长，下面的信息会被破坏:</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" alt="image-20230525102612348"></p>
+<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" class title="This is an test image">
+
 
       
     </div>
