@@ -33,8 +33,16 @@
 <meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png">
 <meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png">
 <meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png">
+<meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png">
+<meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png">
+<meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png">
+<meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png">
+<meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png">
+<meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png">
+<meta property="og:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png">
+<meta property="og:image" content="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png">
 <meta property="article:published_time" content="2023-05-21T02:50:39.000Z">
-<meta property="article:modified_time" content="2023-05-25T11:56:33.895Z">
+<meta property="article:modified_time" content="2023-05-27T12:07:23.853Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png">
@@ -187,7 +195,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-25 19:56:33" itemprop="dateModified" datetime="2023-05-25T19:56:33+08:00">2023-05-25</time>
+                <time title="修改时间：2023-05-27 20:07:23" itemprop="dateModified" datetime="2023-05-27T20:07:23+08:00">2023-05-27</time>
               </span>
 
           
@@ -258,7 +266,7 @@
 <p>0 - STDIN_FILENO </p>
 <p>1 - STDOUT_FILENO </p>
 <p>2 - STDERR_FILENO</p>
-<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞、非阻塞： 是设备文件、网络文件的属性。</p>
+<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞、非阻塞： 是<strong>设备文件、网络文件</strong>的属性。普通创建的文件没有。</p>
 <p>产生阻塞的场景。 读设备文件。读网络文件。（读常规文件无阻塞概念。） &#x2F;dev&#x2F;tty – 终端文件。 </p>
 <p>open(“&#x2F;dev&#x2F;tty”, O_RDWR|O_NONBLOCK)	 — 设置 &#x2F;dev&#x2F;tty (当前终端)非阻塞状态。(默认为阻塞状态)</p>
 <h2 id="fcntl-改文件属性"><a href="#fcntl-改文件属性" class="headerlink" title="fcntl 改文件属性"></a>fcntl 改文件属性</h2><p>fcntl 用来改变一个【已经打开】的文件的 访问控制属性 </p>
@@ -274,6 +282,91 @@
 <p>终端文件默认是阻塞读的，这里用 fcntl 将其更改为非阻塞读</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;unistd.h&gt;</span><br><span class="line">2. #include &lt;fcntl.h&gt;</span><br><span class="line">3. #include &lt;errno.h&gt;</span><br><span class="line">4. #include &lt;stdio.h&gt;</span><br><span class="line">5. #include &lt;stdlib.h&gt;</span><br><span class="line">6. #include &lt;string.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. #define MSG_TRY &quot;try again\n&quot;</span><br><span class="line">9.</span><br><span class="line">10. int main(void)</span><br><span class="line">11. &#123;</span><br><span class="line">12. char buf[10];</span><br><span class="line">13. int flags, n;</span><br><span class="line">14.</span><br><span class="line">15. flags = fcntl(STDIN_FILENO, F_GETFL); //获取 stdin 属性信息</span><br><span class="line">16. if(flags == -1)&#123;</span><br><span class="line">17. perror(&quot;fcntl error&quot;);</span><br><span class="line">18. exit(1);</span><br><span class="line">19. &#125;</span><br><span class="line">20. flags |= O_NONBLOCK;</span><br><span class="line">21. int ret = fcntl(STDIN_FILENO, F_SETFL, flags);</span><br><span class="line">22. if(ret == -1)&#123;</span><br><span class="line">23. perror(&quot;fcntl error&quot;);</span><br><span class="line">24. exit(1);</span><br><span class="line">25. &#125;</span><br><span class="line">26.</span><br><span class="line">27. tryagain:</span><br><span class="line">28. n = read(STDIN_FILENO, buf, 10);</span><br><span class="line">29. if(n &lt; 0)&#123;</span><br><span class="line">30. if(errno != EAGAIN)&#123;</span><br><span class="line">31. perror(&quot;read /dev/tty&quot;);</span><br><span class="line">32. exit(1);</span><br><span class="line">33. &#125;</span><br><span class="line">34. sleep(3);</span><br><span class="line">35. write(STDOUT_FILENO, MSG_TRY, strlen(MSG_TRY));</span><br><span class="line">36. goto tryagain;</span><br><span class="line">37. &#125;</span><br><span class="line">38. write(STDOUT_FILENO, buf, n);</span><br><span class="line">39.</span><br><span class="line">40. return 0;</span><br><span class="line">41. &#125;</span><br></pre></td></tr></table></figure>
 
+<h2 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek 函数"></a>lseek 函数</h2><p>lseek 函数： <code>off_t lseek(int fd, off_t offset, int whence);</code></p>
+<p> 参数： fd：文件描述符 		offset： 偏移量，就是将读写指针从 whence 指定位置向后偏移 offset 个单位 		whence：起始偏移位置：开始，读到，结尾 SEEK_SET&#x2F;SEEK_CUR&#x2F;SEEK_END </p>
+<p>返回值： 成功：较起始位置偏移量 失败：-1 errno </p>
+<p>应用场景： </p>
+<ol>
+<li><p>文件的“读”、“写”使用同一偏移位置。 2. 使用 lseek 获取文件大小 3. 使用 lseek 拓展文件大小：要想使文件大小真正拓展，必须引起 IO 操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int lenth = lseek ( fd,101，SEEK_END);</span><br><span class="line">printf( &quot;file size: %d\n&quot; , lenth) ;</span><br><span class="line">write(fd,&quot;$&quot;，1);</span><br></pre></td></tr></table></figure>
+
+<p>​			 使用 truncate 函数，直接拓展文件。 <code>int ret = truncate(&quot;dict.cp&quot;, 250);</code>&#x2F;&#x2F;dict.cp是必须存在的</p>
+</li>
+</ol>
+<p>lseek 示例，写一个句子到空白文件，完事调整光标位置，读取刚才写那个文件。 这个示例中，如果不调整光标位置，是读取不到内容的，因为读写指针在内容的末尾 代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;unistd.h&gt;</span><br><span class="line">4. #include &lt;string.h&gt;</span><br><span class="line">5. #include &lt;fcntl.h&gt;</span><br><span class="line">6.</span><br><span class="line">7. int main(void)</span><br><span class="line">8. &#123;</span><br><span class="line">9. int fd, n;</span><br><span class="line">10. char msg[] = &quot;It&#x27;s a test for lseek\n&quot;;</span><br><span class="line">11. char ch;</span><br><span class="line">12.</span><br><span class="line">13. fd = open(&quot;lseek.txt&quot;, O_RDWR|O_CREAT, 0644);</span><br><span class="line">14. if(fd &lt; 0)&#123;</span><br><span class="line">15. perror(&quot;open lseek.txt error&quot;);</span><br><span class="line">16. exit(1);</span><br><span class="line">17. &#125;</span><br><span class="line">18.</span><br><span class="line">19. write(fd, msg, strlen(msg)); //使用 fd 对打开的文件进行写操作，问价读写位置位于文件结尾处。</span><br><span class="line">20.</span><br><span class="line">21. lseek(fd, 0, SEEK_SET); //修改文件读写指针位置，位于文件开头。 注释该行会怎样呢？</span><br><span class="line">22.</span><br><span class="line">23. while((n = read(fd, &amp;ch, 1)))&#123;</span><br><span class="line">24. if(n &lt; 0)&#123;</span><br><span class="line">25. perror(&quot;read error&quot;);</span><br><span class="line">26. exit(1);</span><br><span class="line">27. &#125;</span><br><span class="line">28. write(STDOUT_FILENO, &amp;ch, n); //将文件内容按字节读出，写出到屏幕</span><br><span class="line">29. &#125;</span><br><span class="line">30.</span><br><span class="line">31. close(fd);</span><br><span class="line">32.</span><br><span class="line">33. return 0;</span><br><span class="line">34. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面这个代码用 lseek 的偏移来读取文件大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int lenth = lseek(fd,0,SEEK_END);</span><br><span class="line">printf ( &quot;file size: %d\n&quot; , lenth) ;</span><br></pre></td></tr></table></figure>
+
+<p>对于写文件再读取那个例子，由于文件写完之后未关闭，读写指针在文件末尾，所以不调节指针，直 接读取不到内容。</p>
+<p> lseek 读取的文件大小总是相对文件头部而言。 </p>
+<p>用 lseek 读取文件大小实际用的是读写指针初末位置的偏移差，一个新开文件，读写指针初位置都在 文件开头。如果用这个来扩展文件大小，必须引起 IO 才行，于是就至少要写入一个字符。上面代码 出现 lseek 返回 799，ls 查看为 800 的原因是，lseek 读取到偏移差的时候，还没有写入最后的‘$’ 符号. 末尾那一大堆^@，是文件空洞，如果自己写进去的也想保持队形，就写入“\0”。 </p>
+<p>拓展文件直接使用 truncate，简单粗暴： 使用 truncate 函数，直接拓展文件。 int ret &#x3D; truncate(“dict.cp”, 250);</p>
+<h2 id="传入传出参数"><a href="#传入传出参数" class="headerlink" title="传入传出参数"></a>传入传出参数</h2><p>传入参数： 1. 指针作为函数参数。 2. 同常有 const 关键字修饰。 3. 指针指向有效区域， 在函数内部做读操作。</p>
+<p> 传出参数： 1. 指针作为函数参数。 2. 在函数调用之前，指针指向的空间可以无意义，但必须有效。 3. 在函数内部，做写操作。 4。函数调用结束后，充当函数返回值。 </p>
+<p>传入传出参数： 1. 指针作为函数参数。 2. 在函数调用之前，指针指向的空间有实际意义。 3. 在函数内部，先做读操作，后做写操作。 4. 函数调用结束后，充当函数返回值</p>
+<h2 id="目录项和-inode"><a href="#目录项和-inode" class="headerlink" title="目录项和 inode"></a>目录项和 inode</h2><p>一个文件主要由两部分组成，dentry(目录项)和 </p>
+<p>​	inode inode 本质是结构体，存储文件的属性信息，如：权限、类型、大小、时间、用户、盘快位置… 也叫做文件属性管理结构，大多数的 inode 都存储在磁盘上。 </p>
+<p>​	少量常用、近期使用的 inode 会被缓存到内存中。 </p>
+<p>所谓的删除文件，就是删除 inode，但是数据其实还是在硬盘上，以后会覆盖掉。</p>
+<h2 id="stat-函数"><a href="#stat-函数" class="headerlink" title="stat 函数"></a>stat 函数</h2><p>获取文件属性，（从 inode 结构体中获取） </p>
+<p>stat&#x2F;lstat 函数： <code>int stat(const char *path, struct stat *buf);</code> </p>
+<p>参数： </p>
+<p>​	path： 文件路径 </p>
+<p>​	buf：（传出参数） 存放文件属性，inode 结构体指针。 </p>
+<p>返回值： </p>
+<p>​	成功： 0 </p>
+<p>​	失败： -1 errno </p>
+<p>获取文件大小： buf.st_size </p>
+<p>获取文件类型： buf.st_mode </p>
+<p>获取文件权限： buf.st_mode </p>
+<p>符号穿透：stat 会。lstat 不会。</p>
+<p>下面这个例子是获取文件大小的正规军解法，用 stat：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" alt="image-20230526211019247"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man 2 stat</span><br><span class="line">进入之后G</span><br><span class="line">一般比较大的函数或者是难度大的有example</span><br></pre></td></tr></table></figure>
+
+<p>stat 会拿到符号链接指向那个文件或目录的属性。 不想穿透符号就用 lstat（两个除了穿透符号这个性质以外就一样）</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" alt="image-20230526213815013"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">用sb.st_mode &amp; SIFMT前4位就是SIFMT与上文件得出的mode</span><br><span class="line">switch (sb.st_mode &amp; S_IFMT) &#123;</span><br><span class="line">           case S_IFBLK:  printf(&quot;block device\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFCHR:  printf(&quot;character device\n&quot;);        br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFDIR:  printf(&quot;directory\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFIFO:  printf(&quot;FIFO/pipe\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFLNK:  printf(&quot;symlink\n&quot;);                 br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFREG:  printf(&quot;regular file\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFSOCK: printf(&quot;socket\n&quot;);                  br</span><br><span class="line">eak;</span><br><span class="line">           default:       printf(&quot;unknown?\n&quot;);                br</span><br><span class="line">eak;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="link-和-Unlink-隐式回收"><a href="#link-和-Unlink-隐式回收" class="headerlink" title="link 和 Unlink 隐式回收"></a>link 和 Unlink 隐式回收</h2><p>硬链接数就是 dentry 数目 </p>
+<p>link 就是用来创建硬链接的 </p>
+<p>link 可以用来实现 mv 命令 </p>
+<p>函数原型： <code>int link(const char *oldpath, const char *newpath)</code> 用这个来实现 mv，用 oldpath 来创建 newpath，完事儿删除 oldpath 就行。 </p>
+<p>删除一个链接 <code>int unlink(const char *pathname)</code> </p>
+<p>unlink 是删除一个文件的目录项 dentry，使硬链接数-1 </p>
+<p>unlink 函数的特征：清除文件时，如果文件的硬链接数到 0 了，没有 dentry 对应，但该文件仍不会 马上被释放，要等到所有打开文件的进程关闭该文件，系统才会挑时间将该文件释放掉。</p>
+<p>在程序中加入段错误成分，段错误在 unlink 之前，由于发生段错误，程序后续删除 temp.txt 的 dentry 部分就不会再执行，temp.txt 就保留了下来，这是不科学的。 </p>
+<p>在编程中以下几类做法容易导致段错误,基本上是<strong>错误地使用指针引起的</strong>。 所谓的段错误就是指访问的内存超出了系统所给这个程序的内存空间，段错误应该就是访问了不可访问的内存，这个内存区要么是不存在的，要么是受到系统保护的。</p>
+<p>解决办法是检测 fd 有效性后，立即释放 temp.txt，由于进程未结束，虽然 temp.txt 的硬链接数已 经为 0，但还不会立即释放，仍然存在，要等到程序执行完才会释放。这样就能避免程序出错导致临 时文件保留下来。</p>
+<p>因为文件创建后，硬链接数立马减为 0，即使程序异常退出，这个文件也会被清理掉。这时候的内容 是写在内核空间的缓冲区。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">1. /*</span><br><span class="line">2. *unlink 函数是删除一个 dentry</span><br><span class="line">3. */</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;fcntl.h&gt;</span><br><span class="line">6. #include &lt;stdlib.h&gt;</span><br><span class="line">7. #include &lt;string.h&gt;</span><br><span class="line">8. #include &lt;stdio.h&gt;</span><br><span class="line">9.</span><br><span class="line">10.</span><br><span class="line">11. int main(void)</span><br><span class="line">12. &#123;</span><br><span class="line">13. int fd, ret;</span><br><span class="line">14. char *p = &quot;test of unlink\n&quot;;</span><br><span class="line">15. char *p2 = &quot;after write something.\n&quot;;</span><br><span class="line">16.</span><br><span class="line">17. fd = open(&quot;temp.txt&quot;, O_RDWR|O_CREAT|O_TRUNC, 0644);</span><br><span class="line">18. if(fd &lt; 0)&#123;</span><br><span class="line">19. perror(&quot;open temp error&quot;);</span><br><span class="line">20. exit(1);</span><br><span class="line">21. &#125;</span><br><span class="line">22.</span><br><span class="line">23. ret = unlink(&quot;temp.txt&quot;); //具备了被释放的条件</span><br><span class="line">24. if(ret &lt; 0)&#123;</span><br><span class="line">25. perror(&quot;unlink error&quot;);</span><br><span class="line">26. exit(1);</span><br><span class="line">27. &#125;</span><br><span class="line">28.</span><br><span class="line">29. ret = write(fd, p, strlen(p));</span><br><span class="line">30. if (ret == -1) &#123;</span><br><span class="line">31. perror(&quot;-----write error&quot;);</span><br><span class="line">32. &#125;</span><br><span class="line">33.</span><br><span class="line">34. printf(&quot;hi! I&#x27;m printf\n&quot;);</span><br><span class="line">35. ret = write(fd, p2, strlen(p2));</span><br><span class="line">36. if (ret == -1) &#123;</span><br><span class="line">37. perror(&quot;-----write error&quot;);</span><br><span class="line">38. &#125;</span><br><span class="line">39.</span><br><span class="line">40. printf(&quot;Enter anykey continue\n&quot;);</span><br><span class="line">41. getchar();</span><br><span class="line">42.</span><br><span class="line">43. close(fd);</span><br><span class="line">44.</span><br><span class="line">45. return 0;</span><br><span class="line">46. &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>隐式回收</strong>： </p>
+<p>​		当进程结束运行时，所有进程打开的文件会被关闭，申请的内存空间会被释放。系统的这一特性 称之为隐式回收系统资源。 </p>
+<p>​		比如上面那个程序，要是没有在程序中关闭文件描述符，没有隐式回收的话，这个文件描述符会保留， 多次出现这种情况会导致系统文件描述符耗尽。所以隐式回收会在程序结束时收回它打开的文件使用 的文件描述符。</p>
+<p><strong>文件描述符</strong>（file descriptor）就是内核为了高效管理这些已经被打开的文件所创建的索引，其是一个非负整数（通常是小整数），用于指代被打开的文件，所有执行I&#x2F;O操作的系统调用都通过文件描述符来实现。同时还规定系统刚刚启动的时候，0是标准输入，1是标准输出，2是标准错误。这意味着如果此时去打开一个新的文件，它的文件描述符会是3，再打开一个文件文件描述符就是4……</p>
+<h2 id="文件目录-rwx-权限差异"><a href="#文件目录-rwx-权限差异" class="headerlink" title="文件目录 rwx 权限差异"></a>文件目录 rwx 权限差异</h2><p>vi 目录 会得到目录项的列表</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" alt="image-20230527200057726"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" class title="This is an test image">
+
+<h2 id="目录操作函数"><a href="#目录操作函数" class="headerlink" title="目录操作函数"></a>目录操作函数</h2><p>目录操作函数： <code>DIR * opendir(char *name);</code> </p>
+<p><code>int closedir(DIR *dp);</code></p>
+<p><code>struct dirent *readdir(DIR * dp);</code> </p>
+<p><code>struct dirent &#123; </code></p>
+<p><code>inode </code></p>
+<p><code>char dname[256]; &#125;</code></p>
+<p> 没有写目录操作，因为目录写操作就是创建文件。可以用 touch</p>
+<p>下面用目录操作函数实现一个 ls 操作：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" alt="image-20230527200502344"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" class title="This is an test image">
+
+<p>要隐藏这个.和..的话，在输出文件名的时候判定一下，只输出不是.和..的就行了</p>
 
     </div>
 
@@ -351,7 +444,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#open-%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">open 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#read%E5%92%8Cwrite%E5%AE%9E%E7%8E%B0cp"><span class="nav-number">2.</span> <span class="nav-text">read和write实现cp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8C%E5%BA%93%E5%87%BD%E6%95%B0%E6%AF%94%E8%BE%83%E2%80%94%E9%A2%84%E8%AF%BB%E5%85%A5%E7%BC%93%E8%BE%93%E5%87%BA"><span class="nav-number">3.</span> <span class="nav-text">系统调用和库函数比较—预读入缓输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">4.</span> <span class="nav-text">文件描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E"><span class="nav-number">5.</span> <span class="nav-text">阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fcntl-%E6%94%B9%E6%96%87%E4%BB%B6%E5%B1%9E%E6%80%A7"><span class="nav-number">6.</span> <span class="nav-text">fcntl 改文件属性</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#open-%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">open 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#read%E5%92%8Cwrite%E5%AE%9E%E7%8E%B0cp"><span class="nav-number">2.</span> <span class="nav-text">read和write实现cp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%92%8C%E5%BA%93%E5%87%BD%E6%95%B0%E6%AF%94%E8%BE%83%E2%80%94%E9%A2%84%E8%AF%BB%E5%85%A5%E7%BC%93%E8%BE%93%E5%87%BA"><span class="nav-number">3.</span> <span class="nav-text">系统调用和库函数比较—预读入缓输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">4.</span> <span class="nav-text">文件描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E"><span class="nav-number">5.</span> <span class="nav-text">阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fcntl-%E6%94%B9%E6%96%87%E4%BB%B6%E5%B1%9E%E6%80%A7"><span class="nav-number">6.</span> <span class="nav-text">fcntl 改文件属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lseek-%E5%87%BD%E6%95%B0"><span class="nav-number">7.</span> <span class="nav-text">lseek 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E5%85%A5%E4%BC%A0%E5%87%BA%E5%8F%82%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">传入传出参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E9%A1%B9%E5%92%8C-inode"><span class="nav-number">9.</span> <span class="nav-text">目录项和 inode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stat-%E5%87%BD%E6%95%B0"><span class="nav-number">10.</span> <span class="nav-text">stat 函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#link-%E5%92%8C-Unlink-%E9%9A%90%E5%BC%8F%E5%9B%9E%E6%94%B6"><span class="nav-number">11.</span> <span class="nav-text">link 和 Unlink 隐式回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95-rwx-%E6%9D%83%E9%99%90%E5%B7%AE%E5%BC%82"><span class="nav-number">12.</span> <span class="nav-text">文件目录 rwx 权限差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E6%93%8D%E4%BD%9C%E5%87%BD%E6%95%B0"><span class="nav-number">13.</span> <span class="nav-text">目录操作函数</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
