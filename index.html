@@ -147,6 +147,72 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/" class="post-title-link" itemprop="url">Linux进程相关</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-06-01 21:35:45 / 修改时间：22:03:42" itemprop="dateCreated datePublished" datetime="2023-06-01T21:35:45+08:00">2023-06-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="进程和程序以及-CPU-相关"><a href="#进程和程序以及-CPU-相关" class="headerlink" title="进程和程序以及 CPU 相关"></a>进程和程序以及 CPU 相关</h2><p>进程：<br>        程序：死的。只占用磁盘空间。 ——剧本。<br>        进程；活的。运行起来的程序。占用内存、cpu 等系统资源。 ——戏。<br>并发和并行：并行是宏观上并发，微观上串行</p>
+<p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601213825110.png" alt="image-20230601213825110"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601213825110.png" class title="This is an test image">
+
+<h2 id="虚拟内存和物理内存映射关系"><a href="#虚拟内存和物理内存映射关系" class="headerlink" title="虚拟内存和物理内存映射关系"></a>虚拟内存和物理内存映射关系</h2><p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" alt="image-20230601215722575"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" class title="This is an test image">
+
+<p>Linux下只有两级。从用户空间到内核空间进的时候，需要借助mmu，帮助完成全级切换。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/31/%E5%85%B3%E4%BA%8Evim%E7%9A%84%E4%B8%80%E4%BA%9B%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -260,10 +326,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-05-29 11:40:04 / 修改时间：15:09:57" itemprop="dateCreated datePublished" datetime="2023-05-29T11:40:04+08:00">2023-05-29</time>
+              <time title="创建时间：2023-05-29 11:40:04" itemprop="dateCreated datePublished" datetime="2023-05-29T11:40:04+08:00">2023-05-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-31 15:00:38" itemprop="dateModified" datetime="2023-05-31T15:00:38+08:00">2023-05-31</time>
+              </span>
 
           
 
@@ -279,7 +351,8 @@
           <h1 id="第五章优化程序性能"><a href="#第五章优化程序性能" class="headerlink" title="第五章优化程序性能"></a>第五章优化程序性能</h1><p>研究程序的汇编代码表示是理解编译器以及产生的代码会如何运行的最有效手段之一。仔细研究内循环的代码是一个很好的开端，识别出降低性能的属性，例如过多的内存引用和对寄存器使用不当。从汇编代码开始，我们还可以预测什么操作会并行执行，以及它们会如何使用处理器资源。正如我们会看到的，常常通过确认关键路径(critical path)来决定执行一个循环所需要的时间(或者说，至少是一个时间下界)。所谓<strong>关键路径</strong>是在循环的反复执行过程中形成的数据相关链。然后，我们会回过头来修改源代码，试着控制编译器使之产生更有效率的实现。</p>
 <p>大多数编译器，包括GCC，一直都在更新和改进，特别是在优化能力方面。一个有用的策略是只重写程序到编译器由此就能产生有效代码所需要的程度就好了。这样，能尽量避免损害代码的可读性、模块性和可移植性，就好像我们使用的是具有最低能力的编译器。同样，通过测量值和检查生成的汇编代码，反复修改源代码和分析它的性能是很有帮助的。</p>
 <p>对于新手程序员来说，不断修改源代码，试图欺骗编译器产生有效的代码，看起来很奇怪，但这确实是编写很多高性能程序的方式。比较于另一种方法—用汇编语言写代码，这种间接的方法具有的优点是:虽然性能不一定是最好的，但得到的代码仍然能够在其他机器上运行。</p>
-<h2 id="优化编译器的能力和局限性"><a href="#优化编译器的能力和局限性" class="headerlink" title="优化编译器的能力和局限性"></a>优化编译器的能力和局限性</h2><p>现代编译器运用复杂精细的算法来确定一个程序中计算的是什么值，以及它们是被如何使用的。然后会利用一些机会来简化表达式，在几个不同的地方使用同一个计算，以及降低一个给定的计算必须被执行的次数。大多数编译器，包括GCC，向用户提供了一些对它们所使用的优化的控制。就像在第3章中讨论过的，最简单的控制就是指定优化级别。例如，以命令行选项“-Og”调用GCC是让GCC使用一组基本的优化。以选项“-O1”或更高(如“-O2”或“-O3”)调用GCC会让它使用更大量的优化。这样做可以进一步提高程序的性能，但是也可能增加程序的规模，也可能使标准的调试工具更难对程序进行调试。我们的表述，虽然对于大多数使用GCC的软件项目来说，优化级别-o2已经成为了被接受的标准，但是还是主要考虑以优化级别-o1编译出的代码。我们特意限制了优化级别，以展示写C语言函数的不同方法如何影响编译器产生代码的效率。我们会发现可以写出的C代码，即使用-o1选项编译得到的性能，也比用可能的最高的优化等级编译一个更原始的版本得到的性能好。</p>
+<h2 id="优化编译器的能力和局限性"><a href="#优化编译器的能力和局限性" class="headerlink" title="优化编译器的能力和局限性"></a>优化编译器的能力和局限性</h2><p>现代编译器运用复杂精细的算法来确定一个程序中计算的是什么值，以及它们是被如何使用的。然后会利用一些机会来简化表达式，在几个不同的地方使用同一个计算，以及降低一个给定的计算必须被执行的次数。大多数编译器，包括GCC，向用户提供了一些对它们所使用的优化的控制。就像在第3章中讨论过的，最简单的控制就是指定优化级别。例如，以命令行选项“-Og”调用GCC是让GCC使用一组基本的优化。以选项“-O1”或更高(如“-O2”或“-O3”)调用GCC会让它使用更大量的优化。这样做可以进一步提高程序的性能，但是也可能增加程序的规模，也可能使标准的调试工具更难对程序进行调试。我们的表述，虽然对于大多数使用GCC的软件项目来说，优化级别-O2已经成为了被接受的标准，但是还是主要考虑以优化级别-O1编译出的代码。我们特意限制了优化级别，以展示写C语言函数的不同方法如何影响编译器产生代码的效率。我们会发现可以写出的C代码，即使用-O1选项编译得到的性能，也比用可能的最高的优化等级编译一个更原始的版本得到的性能好。</p>
+<p>未经优化的代码是从C语言代码到机器代码的直接翻译，通常效率明显较低。简单地使用命令行选项“-O1”，就会进行一些基本的优化。正如可以看到的，程序员不需要做什么，就会显著地提高程序性能–—超过两个数量级。通常，养成至少使用这个级别优化的习惯是很好的。(使用-Og优化级别能得到相似的性能结果。)</p>
 <h3 id="用内联函数替换优化函数调用"><a href="#用内联函数替换优化函数调用" class="headerlink" title="用内联函数替换优化函数调用"></a>用内联函数替换优化函数调用</h3><p>包含函数调用的代码可以用一个称为内联函数替换(inline substitution，或者简称“内联(inlining)”)的过程进行优化，此时，将函数调用替换为函数体。</p>
 <p>GCC的最近版本会尝试进行这种形式的优化，要么是被用命令行选项“-finline”指示时，要么是使用优化等级-O1或者更高的等级时。遗憾的是，GCC只尝试在单个文件中定义的函数的内联。这就意味着它将无法应用于常见的情况，即一组库函数在一个文件中被定义，却被其他文件内的函数所调用。</p>
 <p>在某些情况下，最好能阻止编译器执行内联替换。一种情况是用符号调试器来评估代码，比如GDB。如果一个函数调用已经用内联替换优化过了，那么任何对这个调用进行追踪或设置断点的尝试都会失败。还有一种情况是用代码剖析的方式来评估程序性能。用内联替换消除的函数调用是无法被正确剖析的。</p>
@@ -333,7 +406,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-29 16:17:24" itemprop="dateModified" datetime="2023-05-29T16:17:24+08:00">2023-05-29</time>
+                <time title="修改时间：2023-06-01 21:34:33" itemprop="dateModified" datetime="2023-06-01T21:34:33+08:00">2023-06-01</time>
               </span>
 
           
@@ -506,6 +579,25 @@
 
 <p>要隐藏这个.和..的话，在输出文件名的时候判定一下，只输出不是.和..的就行了</p>
 <h2 id="应用程序的系统调用过程"><a href="#应用程序的系统调用过程" class="headerlink" title="应用程序的系统调用过程"></a>应用程序的系统调用过程</h2><p>应用程序-&gt;标库函数-&gt;系统调用-&gt;驱动-&gt;硬件</p>
+<h2 id="递归遍历目录实现"><a href="#递归遍历目录实现" class="headerlink" title="递归遍历目录实现"></a>递归遍历目录实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">先写个简易版的，可以判定文件，读取文件大小：</span><br><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;pthread.h&gt;</span><br><span class="line">6. #include &lt;sys/stat.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. void isFile(char *name)&#123;</span><br><span class="line">9. int ret = 0;</span><br><span class="line">10. struct stat sb;</span><br><span class="line">11.</span><br><span class="line">12. ret = stat(name, &amp;sb);</span><br><span class="line">13. if(ret == -1)&#123;</span><br><span class="line">14. perror(&quot;stat error&quot;);</span><br><span class="line">15. return;</span><br><span class="line">16. &#125;</span><br><span class="line">17.</span><br><span class="line">18. if(S_ISDIR(sb.st_mode))&#123;</span><br><span class="line">19.</span><br><span class="line">20. &#125;</span><br><span class="line">21. printf(&quot;%s\t%ld\n&quot;, name, sb.st_size);</span><br><span class="line">22.</span><br><span class="line">23. return;</span><br><span class="line">24. &#125;</span><br><span class="line">25. int main(int argc, char *argv[])&#123;</span><br><span class="line">26. if(argc == 1) &#123;</span><br><span class="line">27. isFile(&quot;.&quot;);</span><br><span class="line">28. &#125;</span><br><span class="line">29. else &#123;</span><br><span class="line">30. isFile(argv[1]);</span><br><span class="line">31. &#125;</span><br><span class="line">32.</span><br><span class="line">33. return 0;</span><br><span class="line">34. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面完善功能，把对目录的递归处理补全，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;sys/stat.h&gt;</span><br><span class="line">6. #include &lt;dirent.h&gt;</span><br><span class="line">7. #include &lt;pthread.h&gt;</span><br><span class="line">8.</span><br><span class="line">9. void isFile(char *name);</span><br><span class="line">10.</span><br><span class="line">11. // 打开目录读取,处理目录</span><br><span class="line">12. void read_dir(char *dir, void (*func)(char *))</span><br><span class="line">13. &#123;</span><br><span class="line">14. char path[256];</span><br><span class="line">15. DIR *dp;</span><br><span class="line">16. struct dirent *sdp;</span><br><span class="line">17.</span><br><span class="line">18. dp = opendir(dir);</span><br><span class="line">19. if (dp == NULL) &#123;</span><br><span class="line">20. perror(&quot;opendir error&quot;);</span><br><span class="line">21. return;</span><br><span class="line">22. &#125;</span><br><span class="line">23. // 读取目录项</span><br><span class="line">24. while((sdp = readdir(dp)) != NULL) &#123;</span><br><span class="line">25. if (strcmp(sdp-&gt;d_name, &quot;.&quot;) == 0 || strcmp(sdp-&gt;d_name, &quot;..&quot;) == 0) &#123;</span><br><span class="line">26. continue;</span><br><span class="line">27. &#125;</span><br><span class="line">28. //fprintf();</span><br><span class="line">29. // 目录项本身不可访问, 拼接. 目录/目录项</span><br><span class="line">30. sprintf(path, &quot;%s/%s&quot;, dir, sdp-&gt;d_name);</span><br><span class="line">31.</span><br><span class="line">32. // 判断文件类型,目录递归进入,文件显示名字/大小</span><br><span class="line">33. //isFile(path);</span><br><span class="line">34. (*func)(path);</span><br><span class="line">35. &#125;</span><br><span class="line">36.</span><br><span class="line">37. closedir(dp);</span><br><span class="line">38.</span><br><span class="line">39. return ;</span><br><span class="line">40. &#125;</span><br><span class="line">41.</span><br><span class="line">42. void isFile(char *name)</span><br><span class="line">43. &#123;</span><br><span class="line">44. int ret = 0;</span><br><span class="line">45. struct stat sb;</span><br><span class="line">46.</span><br><span class="line">47. // 获取文件属性, 判断文件类型</span><br><span class="line">48. ret = stat(name, &amp;sb);</span><br><span class="line">49. if (ret == -1) &#123;</span><br><span class="line">50. perror(&quot;stat error&quot;);</span><br><span class="line">51. return ;</span><br><span class="line">52. &#125;</span><br><span class="line">53. // 是目录文件</span><br><span class="line">54. if (S_ISDIR(sb.st_mode)) &#123;</span><br><span class="line">55. read_dir(name, isFile);</span><br><span class="line">56. &#125;</span><br><span class="line">57. // 是普通文件, 显示名字/大小</span><br><span class="line">58. printf(&quot;%10s\t\t%ld\n&quot;, name, sb.st_size);</span><br><span class="line">59.</span><br><span class="line">60. return;</span><br><span class="line">61. &#125;</span><br><span class="line">62.</span><br><span class="line">63.</span><br><span class="line">64. int main(int argc, char *argv[])</span><br><span class="line">65. &#123;</span><br><span class="line">66. // 判断命令行参数</span><br><span class="line">67. if (argc == 1) &#123;</span><br><span class="line">68. isFile(&quot;.&quot;);</span><br><span class="line">69. &#125; else &#123;</span><br><span class="line">70. isFile(argv[1]);</span><br><span class="line">71. &#125;</span><br><span class="line">72.</span><br><span class="line">73. return 0;</span><br><span class="line">74. &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="dup-和-dup2"><a href="#dup-和-dup2" class="headerlink" title="dup 和 dup2"></a>dup 和 dup2</h2><p>用来做重定向，本质就是复制文件描述符：<br>dup 和 dup2：<br><code>int dup(int oldfd);</code> 文件描述符复制。<br>oldfd: 已有文件描述符<br>返回：新文件描述符，这个描述符和 oldfd 指向相同内容。<br><code>int dup2(int oldfd, int newfd);</code> 文件描述符复制，oldfd 拷贝给 newfd。返回 newfd</p>
+<p>下面讲 dup2（dupto）： 下面这个例子，将一个已有文件描述符 fd1 复制给另一个文件描述符 fd2，<strong>然后用 fd2 修改 fd1</strong> 指向 的文件：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" alt="image-20230531192509565"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" class title="This is an test image">
+
+<p>上面那个例子，fd1 是打开 hello.c 的文件描述符，fd2 是打开 hello2.c 的文件描述符 用 dup2 将 fd1 复制给了 fd2，于是在对 fd2 指向的文件进行写操作时，实际上就是对 fd1 指向的 hello.c 进行写操作。 这里需要注意一个问题，由于 hello.c 和 hello2.c 都是空文件，所以直接写进去没关系。但如果 hello.c 是非空的，写进去的内容默认从文件头部开始写，会覆盖原有内容。</p>
+<p>dup2 也可以用于标准输入输出的重定向。 下面这个例子，将输出到 STDOUT 的内容重定向到文件里：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" alt="image-20230531192739775"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" class title="This is an test image">
+
+<p>这个程序，将 fd1 的内容复制给了 fd2，使得原来指向 hello2.c 的 fd2 也指向了 hello.c 并通过 fd2 向 hello.c 里写入了…。完事儿将标准输出重定向至 fd1，就是将要显示在标准输出的内容，写入了 fd1 指向的文件，就是 hello.c 中 这里有一点和上面程序不同，就是 hello.c 是处于打开状态的，连续写入两段话，写入… 的时候，读写指针在这句话末尾，就不会覆盖前面这句话。 这里再强调一下，打开一个文件，读写指针默认在文件头，如果文件本身有内容，直接写入会覆盖有内容。</p>
+<h2 id="fcntl-实现-dup-描述符"><a href="#fcntl-实现-dup-描述符" class="headerlink" title="fcntl 实现 dup 描述符"></a>fcntl 实现 dup 描述符</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fcntl 函数实现 dup：</span><br><span class="line">	int fcntl(int fd, int cmd, ....)</span><br><span class="line">	cmd: F_DUPFD</span><br><span class="line">	参 3: 被占用的，返回最小可用的。</span><br><span class="line">			未被占用的， 返回=该值的文件描述符。</span><br></pre></td></tr></table></figure>
+
+<p>对于 fcntl 中的参数 0，这个表示 0 被占用，fcntl 使用文件描述符表中的最小文件描述符返回 假设传入 0，传一个 7，且 7 未被占用，则会返回 7 所以这个参数可以这样理解，你传入一个文件描述符 k，如果 k 没被占用，则直接用 k 复制 fd1 的内 容。如果 k 被占用，则返回描述符表中最小可用描述符，也就是自己指定一个一志愿，如果行，就返 回这个。如果不行，国家给你分配一个最小的。</p>
 
       
     </div>
@@ -2010,207 +2102,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/13/c%E5%92%8Cc++/c-%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/13/c%E5%92%8Cc++/c-%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">c++ 函数</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-13 16:38:09" itemprop="dateCreated datePublished" datetime="2023-04-13T16:38:09+08:00">2023-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-29 15:00:00" itemprop="dateModified" datetime="2023-05-29T15:00:00+08:00">2023-05-29</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h1><h2 id="参数传递"><a href="#参数传递" class="headerlink" title="参数传递"></a>参数传递</h2><h3 id="指针或引用形参与const"><a href="#指针或引用形参与const" class="headerlink" title="指针或引用形参与const"></a>指针或引用形参与const</h3><p>形参的初始化方式和变量的初始化方式是一样的,所以回顾通用的初始化规则有助于理解本节知识。我们可以使用非常量初始化一个底层const对象，但是反过来不行;同时一个普通的引用必须用同类型的对象初始化。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int i = 42;</span><br><span class="line">const int *cp = &amp;i;//正确:但是cp不能改变i</span><br><span class="line">const int &amp;r = i;//正确:但是r不能改变i</span><br><span class="line">const int &amp;r2 = 42;//正确:</span><br><span class="line">int *p=cp;//错误:p的类型和cp的类型不匹配</span><br><span class="line">int &amp;r3 = r;//错误:r3的类型和r的类型不匹配</span><br><span class="line">int &amp;r4=42;//错误:不能用字面值初始化一个非常量引用</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;arr两端的括号必不可少</span><br><span class="line">	f(int &amp;arr[10])//错误:将arr声明成了引用的数组</span><br><span class="line">	f(int (&amp;arr)[10])//正确:arr是具有10个整数的整型数组的引用</span><br></pre></td></tr></table></figure>
-
-<h3 id="main-处理命令行选项"><a href="#main-处理命令行选项" class="headerlink" title="main:处理命令行选项"></a>main:处理命令行选项</h3><p>main函数是演示C++程序如何向函数传递数组的好例子。到目前为止，我们定义的main函数都只有空形参列表:<br>int main()[ …}</p>
-<p>然而，有时我们确实需要给main传递实参，一种常见的情况是用户通过设置一组选项来确定函数所要执行的操作。例如，假定 main函数位于可执行文件prog之内，我们可以向程序传递下面的选项:<br><code>prog -d -o ofile data0</code><br>这些命令行选项通过两个（可选的）形参传递给main函数:</p>
-<p>int main(int argc,char  * argv[]){…}<br>第二个形参argv是一个数组，它的元素是指向C风格字符串的指针:第一个形参arge表示数组中字符串的数量。因为第二个形参是数组，所以main函数也可以定义成:<br>int main(int arge,char  * * argv) { …}<br>其中argv指向char*。</p>
-<p>当实参传给main函数之后，argv的第一个元素指向程序的名字或者一个空字符串，接下来的元素依次传递命令行提供的实参。最后一个指针之后的元素值保证为0。<br>以上面提供的<strong>命令行</strong>为例，argc应该等于5，argv应该包含如下的C风格字符串:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">argv[0] = &quot;prog&quot; ;//或者argv [0]也可以指向一个空字符串</span><br><span class="line">argv[1] = &quot;-d&quot;;</span><br><span class="line">argv[2] = &quot;-o&quot; ;</span><br><span class="line">argv[3] = &quot;ofile&quot; ;</span><br><span class="line">argv[4]= &quot;data0&quot;;</span><br><span class="line">argv [5] = 0;</span><br></pre></td></tr></table></figure>
-
-<p>当使用argv中的实参时,一定要记得可选的实参从argv[1]开始; </p>
-<p>argv[0]保存程序的名字，而非用户输入。</p>
-<h3 id="含有可变形参的函数"><a href="#含有可变形参的函数" class="headerlink" title="含有可变形参的函数"></a>含有可变形参的函数</h3><p>为了编写能处理不同数量实参的函数，C++11新标准提供了两种主要的方法:如果所有的实参类型相同,可以传递一个名为initializer_list的标准库类型;如果实参的类型不同，我们可以编写一种特殊的函数，也就是所谓的可变参数模板</p>
-<p>和vector一样，initializer_list也是一种模板类型(参见3.3节,第86页)。定义initializer_list对象时，必须说明列表中所含元素的类型:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">initializer_list&lt;string&gt; ls;// initializer_list的元素类型是stringinitializer_list&lt;int&gt; li;// initializer_list的元素类型是int</span><br></pre></td></tr></table></figure>
-
-<p>和 vector不一样的是，initializer_list对象中的元素永远是常量值，我们无法改变initializer_list对象中元素的值。</p>
-<p>编写一个函数，它的参数是initializer_list类型的对象，函数的功能是计算列表中所有元素的和。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;initializer_list&gt;</span><br><span class="line"></span><br><span class="line">int counter_int(std::initializer_list&lt;int&gt; il)</span><br><span class="line">&#123;</span><br><span class="line">	int cnt_i = 0;</span><br><span class="line">	for(auto e : il)</span><br><span class="line">		cnt_i += e;</span><br><span class="line">	return cnt_i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">	std::cout &lt;&lt; counter_int(&#123;1,2,3,4,5&#125;) &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">	return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="省略符形参"><a href="#省略符形参" class="headerlink" title="省略符形参"></a>省略符形参</h3><p>省略符形参是为了便于C++程序访问某些特殊的C代码而设置的,这些代码使用了名为varargs的C标准库功能。通常，省略符形参不应用于其他目的。你的C编译器文档会描述如何使用varargs。</p>
-<p>省略符形参应该仅仅用于C和C++通用的类型。特别应该注意的是，大多数类类型的对象在传递给省略符形参时都无法正确拷贝。</p>
-<p>省略符形参只能出现在形参列表的最后一个位置，它的形式无外乎以下两种:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void foo (parm_list, ...);</span><br><span class="line">void foo(.. .);</span><br></pre></td></tr></table></figure>
-
-<p>第一种形式指定了 foo函数的部分形参的类型，对应于这些形参的实参将会执行正常的类型检查。<strong>省略符形参所对应的实参无须类型检查</strong>。在第一种形式中，形参声明后面的逗号是可选的。</p>
-<h3 id="引用返回左值"><a href="#引用返回左值" class="headerlink" title="引用返回左值"></a>引用返回左值</h3><p>函数的返回类型决定函数调用是否是左值。调用一个返回引用的函数得到左值，其他返回类型得到右值。可以像使用其他左值那样来使用返回引用的函数的调用，特别是，我们能为返回类型是非常量引用的函数的结果赋值:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">char &amp;get_val(string &amp;str, string::size_type ix)</span><br><span class="line">&#123;</span><br><span class="line">	return str[ix];//get_val假定索引值是有效的</span><br><span class="line">&#125;</span><br><span class="line">int main()&#123;</span><br><span class="line">	string s( &quot;a value&quot;);</span><br><span class="line">	cout &lt;&lt;s&lt; endl;//输出a value</span><br><span class="line">	get_val(s,0）=&#x27;A&#x27;;//将s[0]的值改为A</span><br><span class="line">	cout c&lt;s&lt;c endl ;//输出A value</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把函数调用放在赋值语句的左侧可能看起来有点奇怪，但其实这没什么特别的。返回值是引用，因此调用是个左值，和其他左值一样它也能出现在赋值运算符的左侧。</p>
-<p>如果返回类型是常量引用，我们不能给调用的结果赋值，这一点和我们熟悉的情况是一样的。</p>
-<h3 id="列表初始化返回值"><a href="#列表初始化返回值" class="headerlink" title="列表初始化返回值"></a>列表初始化返回值</h3><p>C++11新标准规定，函数可以返回花括号包围的值的列表。类似于其他返回结果，此处的列表也用来对表示函数返回的临时量进行初始化。如果列表为空，临时量执行值初始化；否则，返回的值由函数的返回类型决定。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;strings process()</span><br><span class="line">&#123;</span><br><span class="line">	// ...</span><br><span class="line">	//expected和actual是string对象</span><br><span class="line">	if (expected.empty())</span><br><span class="line">		return &#123;&#125;;//返回一个空vector对象</span><br><span class="line">	else if (expected -= actual)</span><br><span class="line">		return &#123;&quot;functionx&quot;，&quot;okay&quot;&#125;;//返回列表初始化的vector对象</span><br><span class="line">	else</span><br><span class="line">		return &#123; &quot;functionx&quot;,expected,actual&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="主函数main的返回值"><a href="#主函数main的返回值" class="headerlink" title="主函数main的返回值"></a>主函数main的返回值</h3><p>任何返回类型不是void的函数都必须返回一个值，但此规则的一个例外情况：允许main没有返回值就可结束。如果程序控制执行到主函数main的最后一个语句都还没有返回，那么编译器会隐式地插入返回0的语句。<br>关于main返回的另一个特别之处在于如何处理它的返回值。可将main返回值视为状态指示器。返回0表示程序运行成功，其他大部分返回值则失败。非0返回值的意义因机器不同而不同，为使返回值独立于机器，头文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define EXIT_SUCCESS    0</span><br><span class="line">#define EXIT_FAILURE    1</span><br></pre></td></tr></table></figure>
-
-<h2 id="返回数组指针"><a href="#返回数组指针" class="headerlink" title="返回数组指针"></a>返回数组指针</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int( *func (int i))[10];</span><br></pre></td></tr></table></figure>
-
-<p>可以按照以下的顺序来逐层理解该声明的含义:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func(int i)表示调用func函数时需要一个int类型的实参。</span><br><span class="line">(*func(int i))意味着我们可以对函数调用的结果执行解引用操作。</span><br><span class="line">(*func(int i))[10]表示解引用func 的调用将得到一个大小是10的数组。</span><br><span class="line">int (*func(int i))[10]表示数组中的元素是int类型。</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用尾置返回类型"><a href="#使用尾置返回类型" class="headerlink" title="使用尾置返回类型"></a>使用尾置返回类型</h3><p>在C++11新标准中还有一种可以<strong>简化上述func声明</strong>的方法,就是使用尾置返回类型(trailing return type)。任何函数的定义都能使用尾置返回，但是这种形式对于返回类型比较复杂的函数最有效，比如返回类型是数组的指针或者数组的引用。尾置返回类型跟在形参列表后面并以一个-&gt;符号开头。为了表示函数真正的返回类型跟在形参列表之后，我们在本应该出现返回类型的地方放置一个auto:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// func接受一个int类型的实参，返回一个指针，该指针指向含有10个整数的数组</span><br><span class="line">auto func(int i)-&gt; int(*)[10];</span><br></pre></td></tr></table></figure>
-
-<p>因为我们把函数的返回类型放在了形参列表之后，所以可以清楚地看到 func函数返回的是一个指针,并且该指针指向了含有10个整数的数组。</p>
-<h3 id="使用decltype"><a href="#使用decltype" class="headerlink" title="使用decltype"></a>使用decltype</h3><p>还有一种情况，如果我们知道函数返回的指针将指向哪个数组，就可以使用decltype关键字声明返回类型。例如，下面的函数返回一个指针，该指针根据参数i的不同指向两个已知数组中的某一个:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int odd[] =&#123; 1,3,5, 7,9&#125;;</span><br><span class="line">int even[] =&#123;0,2,4,6,8&#125;;</span><br><span class="line">//返回一个指针,该指针指向含有5个整数的数组</span><br><span class="line">decltype(odd) *arrPtr(int i)</span><br><span class="line">&#123;</span><br><span class="line">	return (i%2) ? &amp;odd : &amp;even;//返回一个指向数组的指针</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>有一个地方需要注意:decltype并不负责把数组类型转换成对应的指针，所以decltype 的结果是个数组，要想表示 arrPtr返回指针还必须在函数声明时加一个*符号。</p>
-<h2 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h2><h3 id="重载和const形参"><a href="#重载和const形参" class="headerlink" title="重载和const形参"></a>重载和const形参</h3><p>顶层const不影响传入函数的对象。一个拥有顶层const的形参无法和另一个没有顶层const的形参区分开来:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Record lookup (Phone) ;</span><br><span class="line">Record lookup (const Phone);//重复声明了Record lookup (Phone)</span><br><span class="line">Record lookup (Phone*);</span><br><span class="line">Record lookup (Phone* const);//重复声明了Record lookup(Phone* )</span><br></pre></td></tr></table></figure>
-
-<p>在这两组函数声明中，每一组的第二个声明和第一个声明是等价的。</p>
-<p>另一方面，如果形参是某种类型的指针或引用，则通过区分其指向的是常量对象还是非常量对象可以实现函数重载，此时的const是底层的:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//对于接受引用或指针的函数来说，对象是常量还是非常量对应的形参不同</span><br><span class="line">//定义了4个独立的重载函数</span><br><span class="line">Record lookup(Account&amp;) ;//函数作用于Account的引用</span><br><span class="line">Record lookup(const Account&amp;);//新函数，作用于常量引用</span><br><span class="line">Record lookup(Account*);//新函数，作用于指向Account的指针</span><br><span class="line">Record lookup(const Account*);//新函数，作用于指向常量的指针</span><br></pre></td></tr></table></figure>
-
-<h3 id="const-cast和重载"><a href="#const-cast和重载" class="headerlink" title="const_cast和重载"></a>const_cast和重载</h3><p>const_cast在重载函数的情景中最有用。举个例子，shorterString函数:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//比较两个string对象的长度，返回较短的那个引用</span><br><span class="line">const string &amp;shorterString(const string &amp;sl,const string &amp;s2)&#123;</span><br><span class="line">	return sl.size(&lt;=s2.size() ? s1: s2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个函数的参数和返回类型都是 const string的引用。我们可以对两个非常量的string 实参调用这个函数，但返回的结果仍然是const string的引用。因此我们需要一种新的shorterstring函数，当它的实参不是常量时，得到的结果是一个普通的引用，使用const_cast可以做到这一点:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">string &amp;shorterString(string &amp;sl,string &amp;s2)</span><br><span class="line">&#123;</span><br><span class="line">	auto &amp;r = shorterString(const_cast&lt;const string6&gt;(s1)，</span><br><span class="line">						const cast&lt;const string &amp;&gt;(s2));</span><br><span class="line">	return constcast&lt;string&amp;&gt;(r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个版本的函数中，首先将它的实参强制转换成对const的引用，然后调用了shorterString函数的const版本。const版本返回对const string 的引用，这个引用事实上绑定在了某个初始的非常量实参上。因此，我们可以再将其转换回一个普通的string&amp;，这显然是安全的。</p>
-<h2 id="特殊用途语言特性"><a href="#特殊用途语言特性" class="headerlink" title="特殊用途语言特性"></a>特殊用途语言特性</h2><h3 id="内联函数和-constexpr函数"><a href="#内联函数和-constexpr函数" class="headerlink" title="内联函数和 constexpr函数"></a>内联函数和 constexpr函数</h3><p>使用shorterstring 函数也存在一个潜在的缺点:调用函数一般比求等价表达式的值要慢一些。在大多数机器上，一次函数调用其实包含着一系列工作:调用前要先保存寄存器，并在返回时恢复:可能需要拷贝实参;程序转向一个新的位置继续执行。</p>
-<h4 id="内联函数可避免函数调用的开销"><a href="#内联函数可避免函数调用的开销" class="headerlink" title="内联函数可避免函数调用的开销"></a>内联函数可避免函数调用的开销</h4><p>将函数指定为内联函数（inline)，通常就是将它在每个调用点上“内联地”展开。假设我们把shorterString函数定义成内联函数，则如下调用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; shorterstring (s1, s2)&lt;&lt;endl;</span><br><span class="line">//将在编译过程中展开成类似于下面的形式</span><br><span class="line">cout&lt;&lt;(s1.size()&lt; s2.size()?sl : s2)&lt;&lt; endl;</span><br><span class="line">//从而消除了shorterString函数的运行时开销。</span><br></pre></td></tr></table></figure>
-
-<p>在shorterstring函数的返回类型前面加上关键字inline,这样就可以将它声明成内联函数了:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//内联版本:寻找两个string对象中较短的那个</span><br><span class="line">inline const string &amp;</span><br><span class="line">shorterString(const string &amp;s1,const string &amp;s2)</span><br><span class="line">&#123;</span><br><span class="line">	return s1.size() &lt;= s2.size() ?sl: s2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>一般来说，内联机制用于优化规模较小、流程直接、频繁调用的函数。很多编译器都不支持内联递归函数，而且一个75行的函数也不大可能在调用点内联地展开。</p>
-<h4 id="constexpr函数"><a href="#constexpr函数" class="headerlink" title="constexpr函数"></a>constexpr函数</h4><p>constexpr函数(constexpr function)是指能用于常量表达式(的函数。定义constexpr函数的方法与其他函数类似，不过要遵循几项约定:<strong>函数的返回类型及所有形参的类型都得是字面值类型(<strong>到目前为止接触过的数据类型中，算术类型、引用和指针都属于字面值类型。自定义类sales item、IO库、string 类型则不属于字面值类型，也就不能被定义成constexpr。其他一些字面值类型将在后面介绍)，而且函数体中</strong>必须有且只有一条return语句</strong>（constexpr函数不一定返回常量表达式）:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">constexpr int new_sz() &#123; return 42;&#125;</span><br><span class="line">constexpr int foo = new_sz();//正确:foo是一个常量表达式</span><br></pre></td></tr></table></figure>
-
-<p>我们把new _sz定义成无参数的 constexpr函数。因为编译器能在程序编译时验证new_sz 函数返回的是常量表达式，所以可以用new_sz函数初始化constexpr类型的变量foo.</p>
-<p>执行该初始化任务时，编译器把对constexpr函数的调用替换成其结果值。为了能在编译过程中随时展开，<strong>constexpr函数被隐式地指定为内联函数</strong>。</p>
-<p>constexpr函数体内也可以包含其他语句，只要这些语句在运行时不执行任何操作就行。例如，constexpr函数中可以有空语句、类型别名以及using声明。</p>
-<h3 id="把内联函数和constexpr函数放在头文件内"><a href="#把内联函数和constexpr函数放在头文件内" class="headerlink" title="把内联函数和constexpr函数放在头文件内"></a>把内联函数和constexpr函数放在头文件内</h3><p>和其他函数不一样，内联函数和 constexpr函数可以在程序中<strong>多次定义</strong>。毕竟，编译器要想展开函数仅有函数声明是不够的，还需要函数的定义。不过，对于某个给定的内联函数或者constexpr函数来说，它的多个定义必须完全一致。基于这个原因，内联函数和 constexpr函数通常定义在头文件中。</p>
-<h2 id="调试帮助"><a href="#调试帮助" class="headerlink" title="调试帮助"></a>调试帮助</h2><p>C+程序员有时会用到一种类似于头文件保护的技术，以便有选择地执行调试代码。基本思想是，程序可以包含一些用于调试的代码，但是这些代码只在开发程序时使用。当应用程序编写完成准备发布时，要先屏蔽掉调试代码。这种方法用到两项预处理功能:assert和 NDEBUG。</p>
-<h3 id="assert预处理宏"><a href="#assert预处理宏" class="headerlink" title="assert预处理宏"></a>assert预处理宏</h3><p>assert是一种预处理宏( preprocessor marco)。所谓预处理宏其实是一个预处理变量,它的行为有点类似于内联函数。assert宏使用一个表达式作为它的条件:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">assert (expr) ;</span><br></pre></td></tr></table></figure>
-
-<p>首先对expr求值，如果表达式为假(即0)，assert输出信息并终止程序的执行。如果表达式为真（即非0)，assert什么也不做。</p>
-<p>assert宏定义在cassert头文件中。如我们所知，预处理名字由预处理器而非编译器管理,因此我们可以直接使用预处理名字而无须提供using声明。也就是说，我们应该使用assert而不是std::assert，也不需要为assert提供using声明。</p>
-<p>assert宏常用于检查“不能发生”的条件。例如，一个对输入文本进行操作的程序可能要求所有给定单词的长度都大于某个阈值。此时,程序可以包含一条如下所示的语句:<br><code>assert(word.size(&gt;threshold);</code></p>
-<h3 id="NDEBUG-预处理变量"><a href="#NDEBUG-预处理变量" class="headerlink" title="NDEBUG 预处理变量"></a>NDEBUG 预处理变量</h3><p>assert 的行为依赖于一个名为NDEBUG 的预处理变量的状态。如果定义了NDEBUG,则assert什么也不做。默认状态下没有定义NDEBUG,此时assert将执行运行时检查。</p>
-<p>我们可以使用一个#define语句定义 NDEBUG，从而关闭调试状态。同时，很多编译器都提供了一个命令行选项使我们可以定义预处理变量:<br><code>$ cc-D NDEBUG main.C # use/D with the Microsoft compiler</code></p>
-<p>这条命令的作用等价于在main.c文件的一开始写#define NDEBUG。</p>
-<p>定义NDEBUG能避免检查各种条件所需的运行时开销,当然此时根本就不会执行运行时检查。因此，assert应该仅用于验证那些确实不可能发生的事情。我们可以把assert当成调试程序的一种辅助手段，但是不能用它替代真正的运行时逻辑检查，也不能替代程序本身应该包含的错误检查。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">_ _ func _ _是编译器定义的一个局部静态变量，用于存放函数的名字</span><br><span class="line"></span><br><span class="line">_ _ FILE  _ _ 存放文件名的字符串字面值。</span><br><span class="line"></span><br><span class="line">_ _ LINE _ _ 存放当前行号的整型字面值。</span><br><span class="line"></span><br><span class="line">_ _ TIME _ _ 存放文件编译时间的字符串字面值。</span><br><span class="line"></span><br><span class="line">_ _ DATE_ _ 存放文件编译日期的字符串字面值。</span><br></pre></td></tr></table></figure>
-
-<p>可以使用这些常量在错误消息中提供更多信息</p>
-<p>练习6.48:说明下面这个循环的含义，它对assert的使用合理吗?</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">string s;</span><br><span class="line">while (cin &gt;&gt;S&amp;&amp;S!=sought)&#123;]//空函数体</span><br><span class="line">assert (cin);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">这不是一个好的assert用法。assert宏通常用于检查“不能发生”的条件。但是assert总是在用户直接输入EOF时发生，所以检查是没有意义的。使用assert(!cin || s == sought)更好</span><br><span class="line">【出题思路】</span><br><span class="line">assert是一种预处理宏，当assert的条件为真时什么也不做，当它的条件为假时输出信息并终止程序。</span><br><span class="line">【解答】</span><br><span class="line">该程序对assert 的使用有不合理之处。在调试器打开的情况下，当用户输入字符串 s并且s 的内容与 sought不相等时，执行循环体，否则继续执行assert(cin);语句。换句话说，程序执行到assert的原因可能有两个，一是用户终止了输入，二是用户输入的内容正好与sought 的内容一样。如果用户尝试终止输入（事实上用户总有停止输入结束程序的时候)，则assert的条件为假，输出错误信息，这与程序的原意是不相符的。</span><br><span class="line">当调试器关闭时，assert 什么也不做。</span><br></pre></td></tr></table></figure>
-
-<h2 id="函数指针"><a href="#函数指针" class="headerlink" title="函数指针"></a>函数指针</h2><p>函数指针指向的是函数而非对象。和其他指针一样，函数指针指向某种特定类型。函数的类型由它的返回类型和形参类型共同决定，与函数名无关。例如:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//比较两个string对象的长度</span><br><span class="line">bool lengthCompare(const string &amp;,const string &amp;);</span><br></pre></td></tr></table></figure>
-
-<p>该函数的类型是bool(const string&amp;,const string&amp;)。要想声明一个可以指向该函数的指针，只需要用指针替换函数名即可:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// pf指向一个函数，该函数的参数是两个const string的引用，返回值是bool类型</span><br><span class="line">bool (*pf) (const string &amp;,const string &amp;);//未初始化</span><br></pre></td></tr></table></figure>
-
-<p>从我们声明的名字开始观察，pf前面有个*，因此pf是指针;右侧是形参列表，表示pf指向的是函数;再观察左侧，发现函数的返回类型是布尔值。因此，pf 就是一个指向函数的指针，其中该函数的参数是两个const string 的引用，返回值是bool类型。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*pf两端的括号必不可少。如果不写这对括号，则pf是一个返回值为bool指针的函数:</span><br><span class="line">//声明一个名为pf的函数，该函数返回bool*</span><br><span class="line">bool *pf(const string &amp;, const string &amp;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用函数指针"><a href="#使用函数指针" class="headerlink" title="使用函数指针"></a>使用函数指针</h3><p>当我们把函数名作为一个值使用时，该函数自动地转换成指针。例如，按照如下形式我们可以将lengthCompare的地址赋给pf:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pf = lengthCompare;//pf指向名为lengthCompare的函数</span><br><span class="line">pf=&amp;lengthCompare;//等价的赋值语句:取地址符是可选的</span><br></pre></td></tr></table></figure>
-
-<p>此外，我们还能直接使用指向函数的指针调用该函数，无须提前解引用指针(*..):</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bool bl = pf( &quot;hello&quot;, &quot;goodbye&quot; );//调用lengthCompare函数</span><br><span class="line">bool b2= (*pf) ( &quot;hello&quot;, &quot;goodbye&quot; );//一个等价的调用</span><br><span class="line">bool b3= lengthCompare (&quot;hello&quot;,&quot;goodbye&quot;);//另一个等价的调用</span><br></pre></td></tr></table></figure>
-
-<h3 id="函数指针形参"><a href="#函数指针形参" class="headerlink" title="函数指针形参"></a>函数指针形参</h3><p>和数组类似，虽然不能定义函数类型的形参，但是形参可以是指向函数的指针。此时，形参看起来是函数类型，实际上却是当成指针使用:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//第三个形参是函数类型，它会自动地转换成指向函数的指针</span><br><span class="line">void useBigger(const string &amp;s1,const string &amp;s2,</span><br><span class="line">	bool pf(const string &amp;,const string &amp;));</span><br><span class="line">//等价的声明;显式地将形参定义成指向函数的指针</span><br><span class="line">void useBigger(const string &amp;s1,const string &amp;s2，</span><br><span class="line">	bool (*pf) (const string &amp;,const string &amp;));</span><br></pre></td></tr></table></figure>
-
-<p>我们可以直接把函数作为实参使用，此时它会<strong>自动转换成指针</strong>:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//自动将函数lengthCompare转换成指向该函数的指针</span><br><span class="line">useBigger(sl, s2, lengthCompare) ;</span><br></pre></td></tr></table></figure>
-
-<p>正如 useBigger的声明语句所示，直接使用函数指针类型显得冗长而烦琐。类型别名和decltype能让我们简化使用了函数指针的代码:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//Func和Func2是函数类型</span><br><span class="line">typedef bool Func(const string&amp;,const string&amp;) ;</span><br><span class="line">typedef decltype(lengthcompare) Func2;//等价的类型</span><br><span class="line">// FuncP和FuncP2是指向函数的指针</span><br><span class="line">typedef bool(*FuncP) (const string&amp;,const string&amp;);</span><br><span class="line">typedef decltype(lengthCompare) *FuncP2;</span><br><span class="line">//等价的类型</span><br></pre></td></tr></table></figure>
-
-<p>我们使用typedef定义自己的类型。Func和 Func2是函数类型，而FuncP和 FuncP2是指针类型。需要注意的是，decltype返回函数类型，此时不会将函数类型自动转换成指针类型。因为decltype的结果是函数类型,所以只有在结果前面加上*才能得到指针。</p>
-<h3 id="返回指向函数的指针"><a href="#返回指向函数的指针" class="headerlink" title="返回指向函数的指针"></a>返回指向函数的指针</h3><p>和数组类似，虽然不能返回一个函数，但是能返回指向函数类型的指针。然而，我们必须把返回类型写成指针形式，编译器不会自动地将函数返回类型当成对应的指针类型处理。与往常一样，要想声明一个返回函数指针的函数，最简单的办法是使用类型别名:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">using F= int(int*,int);//F是函数类型，不是指针</span><br><span class="line">using PF = int(*)(int*, int);//PF是指针类型</span><br><span class="line">其中我们使用类型别名将F定义成函数类型，将PF定义成指向函数类型的指针。必须时刻注意的是，和函数类型的形参不一样，返回类型不会自动地转换成指针。我们必须显式地将返回类型指定为指针:</span><br><span class="line">PF f1 (int);//正确:PF是指向函数的指针,f1返回指向函数的指针</span><br><span class="line">F f1(int);//错误:F是函数类型，f1不能返回一个函数</span><br><span class="line">F*f1(int) ;//正确:显式地指定返回类型是指向函数的指针</span><br><span class="line">当然，我们也能用下面的形式直接声明f1:</span><br><span class="line">int(*f1 (int))(int*, int);</span><br></pre></td></tr></table></figure>
-
-<p>按照由内向外的顺序阅读这条声明语句:我们看到f1有形参列表，所以f1是个函数;f1前面有*，所以f1返回一个指针;进一步观察发现，指针的类型本身也包含形参列表,因此指针指向函数，该函数的返回类型是int。</p>
-<p>出于完整性的考虑,有必要提醒读者我们还可以使用尾置返回类型的方式声明一个返回函数指针的函数:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">auto f1(int) -&gt; int (*)(int*,int);</span><br></pre></td></tr></table></figure>
-
-<h3 id="将auto和decltype用于函数指针类型"><a href="#将auto和decltype用于函数指针类型" class="headerlink" title="将auto和decltype用于函数指针类型"></a>将auto和decltype用于函数指针类型</h3><p>如果我们明确知道返回的函数是哪一个，就能使用decltype简化书写函数指针返回类型的过程。例如假定有两个函数，它们的返回类型都是 string ::size_type，并且各有两个 const strings类型的形参，此时我们可以编写第三个函数，它接受一个string类型的参数，返回一个指针，该指针指向<strong>前两个函数中的一个</strong>:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">string::size_type sumLength(const string&amp;,const string&amp;);</span><br><span class="line">string::size_type largerLength (const string&amp;,const string&amp;);</span><br><span class="line">//根据其形参的取值，getFcn函数返回指向sumLength或者largerLength 的指针decltype (sumLength) *getFcn(const string &amp;);</span><br><span class="line">//getFcn有形参列表，所以getFcn是个函数</span><br><span class="line"></span><br><span class="line">//声明 getFcn 唯一需要注意的地方是，牢记当我们将decltype作用于某个函数时，它返回函数类型而非指针类型。因此，我们显式地加上*以表明我们需要返回指针，而非函数本身。</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decltype(*p)`得到的类型是`int &amp;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2280,7 +2171,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">35</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

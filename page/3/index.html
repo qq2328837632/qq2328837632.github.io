@@ -147,6 +147,156 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/31/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%89%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/31/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%89%E5%A4%A9-c/" class="post-title-link" itemprop="url">第三天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-31 09:53:22" itemprop="dateCreated datePublished" datetime="2023-03-31T09:53:22+08:00">2023-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-01 21:04:23" itemprop="dateModified" datetime="2023-04-01T21:04:23+08:00">2023-04-01</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="函数提高"><a href="#函数提高" class="headerlink" title="函数提高"></a>函数提高</h1><h2 id="函数默认参数"><a href="#函数默认参数" class="headerlink" title="函数默认参数"></a>函数默认参数</h2><p>在C++中，函数的形参列表中的形参是可以有默认值的。</p>
+<p>语法:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">返回值类型	函数名	(参数=默认值)&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">//参数值传递会覆盖默认参数</span><br><span class="line">int func(int a,int b=20,int c=30)&#123;</span><br><span class="line">return a+b+c;</span><br><span class="line">&#125;</span><br><span class="line">//注意事项</span><br><span class="line">//1.错误，默认参数在前面则后面也必须默认值</span><br><span class="line">//int func2(int a=10,int b,int c)&#123;</span><br><span class="line">//return a+b+c;</span><br><span class="line">//&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//2.如果函数声明有默认值，函数实现的时候不能有默认参数，相反依此</span><br><span class="line">int func2(int a,intb);</span><br><span class="line">int func2(int a=10,int b=10)&#123;</span><br><span class="line">	return a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main()&#123;</span><br><span class="line">func(10,30,30);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数重载"><a href="#函数重载" class="headerlink" title="函数重载"></a>函数重载</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//函数重载的注意事项</span><br><span class="line">//1、引用作为重载的条件</span><br><span class="line">void func (int &amp;a)//int &amp;a = 10;不合法</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt; &quot;func(int &amp;a)调用&quot;&lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void func (const int &amp;a) // const int &amp;a = 10;合法代码</span><br><span class="line">&#123;</span><br><span class="line">	cout&lt;&lt; &quot;func (const int &amp;a)调用&quot;&lt;&lt; end1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()&#123;</span><br><span class="line">	int a=10;</span><br><span class="line">	func(a);//输出第一个</span><br><span class="line">	func(10);//输出第二个</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="类和对象"><a href="#类和对象" class="headerlink" title="类和对象"></a>类和对象</h1><p>类中的属性和行为我们统一称为成员</p>
+<p>属性称为	成员属性	成员变量</p>
+<p>行为称为	成员函数	成员方法</p>
+<h2 id="封装意义"><a href="#封装意义" class="headerlink" title="封装意义:"></a>封装意义:</h2><p>类在设计时，可以把属性和行为放在不同的权限下，加以控制访问权限有三种:</p>
+<p>1.public	公共权限</p>
+<p>2.protected	保护权限</p>
+<p>3.private	私有权限<br>示例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//三种权限</span><br><span class="line">//公共权限public	类内可以访问类外可以访问</span><br><span class="line">//保护权限protected	类内可以访问类外不可以访问</span><br><span class="line">//私有权限private	类内可以访问类外不可以访问</span><br></pre></td></tr></table></figure>
+
+<h2 id="struct和class区别"><a href="#struct和class区别" class="headerlink" title="struct和class区别"></a>struct和class区别</h2><p>在C++中struct和class唯—的区别就在于默认的访问权限不同</p>
+<p>区别:<br>struct默认权限为公共</p>
+<p>class 默认权限为私有</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class C1&#123;</span><br><span class="line">	int m_A;//默认是私有权限</span><br><span class="line">&#125;;</span><br><span class="line">struct C2&#123;</span><br><span class="line">	int m_A;//默认是公共权限</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>结构体声明通常不包括public或private的访问修饰符。</p>
+<p>struct是为了兼容c而存在的,在以后尽量使用class.</p>
+<h2 id="成员属性设置为私有"><a href="#成员属性设置为私有" class="headerlink" title="成员属性设置为私有"></a>成员属性设置为私有</h2><p>优点1:将所有成员属性设置为私有，可以自己控制读写权限。</p>
+<p>优点2:对于写权限，我们可以检测数据的有效性。</p>
+<h2 id="构造函数和析构函数"><a href="#构造函数和析构函数" class="headerlink" title="构造函数和析构函数"></a>构造函数和析构函数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">class Person&#123;</span><br><span class="line">public:</span><br><span class="line">	//1.构造函数</span><br><span class="line">	//没有返回值不用写void//函数名与类名相同</span><br><span class="line">	//构造函数可以有参数，可以发生重载</span><br><span class="line">	//创建对象的时候，构造函数会自动调用，而且只调用一次</span><br><span class="line">	Person()</span><br><span class="line">	&#123;</span><br><span class="line">	cout &lt;&lt;&quot;Person构造函数的调用&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">	Person(int age)</span><br><span class="line">	&#123;</span><br><span class="line">	cout &lt;&lt;&quot;Person有参构造函数的调用&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">	//1.2拷贝构造函数</span><br><span class="line">	Person( const Person &amp;p )&#123;</span><br><span class="line">	//将传入的人身上的所有属性，拷贝到我身上</span><br><span class="line">	age = p.age;</span><br><span class="line">	&#125;</span><br><span class="line">	//2.析构函数进行清理的操作</span><br><span class="line">	//没有返回值不写void</span><br><span class="line">	//函数名和类名相同在名称前加~</span><br><span class="line">	//析构函数不可以有参数的，不可以发生重载</span><br><span class="line">	//对象在销毁前会自动调用析构函数，而且只会调用一次</span><br><span class="line">	~Person()</span><br><span class="line">	&#123;</span><br><span class="line">	cout &lt;&lt;&quot;Person析构函数的调用&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">int main()&#123;</span><br><span class="line">	Person p2=Person(10);//有参构造，也可写成Person p2(10);</span><br><span class="line">	Person p3=Person(p2);//拷贝构造,也可写成Person p3(p2);</span><br><span class="line">	//注意:调用无参构造函数不能加括号，如果加了编译器认为这是一个函数声明(void fuc();)</span><br><span class="line">	Person p2();</span><br><span class="line">	Person(10);//匿名对象﹑特点:当前行执行结束后，系统会立即回收掉匿名对象</span><br><span class="line">	//不要利用拷贝构造函数初始化匿名对象瞭编译器会认为Person (p3) === Person p3;</span><br><span class="line">	//Person(p3);//错误的</span><br><span class="line">	//3、隐式转换法</span><br><span class="line">	Person p4 = 10; //相当于写了Person p4 = Person(10) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>构造和析构都是必须有的实现，如果我们自己不提供，编译器会提供一个空实现的构造和析构</p>
+<h2 id="拷贝构造函数调用时机"><a href="#拷贝构造函数调用时机" class="headerlink" title="拷贝构造函数调用时机"></a>拷贝构造函数调用时机</h2><p>C++中拷贝构造函数调用时机通常有三种情况：</p>
+<p>使用一个已经创建完毕的对象来初始化一个新对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Person p2=Person(10);//有参构造，也可写成Person p2(10);</span><br><span class="line">Person p3=Person(p2);//拷贝构造,也可写成Person p3(p2);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>值传递的方式给函数参数传值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void doWork ( Person p)&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">void test02()&#123;</span><br><span class="line">	Person p;//相当于值传递，调用了拷贝函数</span><br><span class="line">	doWork(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>以值方式返回局部对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Person doWork2()&#123;</span><br><span class="line">	Person pl;</span><br><span class="line">	return p1;//p1是局部对象，会拷贝一个新的person类型返回</span><br><span class="line">&#125;</span><br><span class="line">void test03 ()&#123;</span><br><span class="line">	Person p = doWork2();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="构造函数调用规则"><a href="#构造函数调用规则" class="headerlink" title="构造函数调用规则"></a>构造函数调用规则</h2><p>默认情况下，c++编译器至少给一个类添加3个函数</p>
+<p>1．默认构造函数(无参，函数体为空)</p>
+<p>2．默认析构函数(无参，函数体为空)</p>
+<p>3．默认拷贝构造函数，对属性进行值拷贝</p>
+<p>构造函数调用规则如下:</p>
+<ul>
+<li>如果用户定义有参构造函数，c++不在提供默认无参构造，但是会提供默认拷贝构造。</li>
+<li>如果用户定义拷贝构造函数，C++不会再提供其他构造函数。（拷贝构造函数也是有参数的，所以编译器不会提供无参构造函数了）</li>
+</ul>
+<h2 id="4-2-5深拷贝与浅拷贝"><a href="#4-2-5深拷贝与浅拷贝" class="headerlink" title="4.2.5深拷贝与浅拷贝"></a>4.2.5深拷贝与浅拷贝</h2><p>深浅拷贝是面试经典问题，也是常见的一个坑</p>
+<p>浅拷贝:简单的赋值拷贝操作</p>
+<p>深拷贝:在堆区重新申请空间，进行拷贝操作</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">Person (int age , int height)</span><br><span class="line">&#123;</span><br><span class="line">	m_Age = age;</span><br><span class="line">	m_Height =new int(height) ;//创建堆区</span><br><span class="line">	cout &lt;&lt; &quot;Person的有参构造函数调用&quot;&lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">/*自己实现拷贝构造函数解决浅拷贝带来的问题</span><br><span class="line">若不自己实现，则有问题，浅拷贝是对成员变量的简单赋值,拷贝时会直接拷贝堆的地址,所以p2的height指针=p1的height指针,即两个height指针指向堆区的同一个地址</span><br><span class="line">p2在进行拷贝初婚化时使用的是编译器提供的浅拷贝</span><br><span class="line">函数test01结束后，p1和p2把同一个空间释放了两次。所以程序崩了</span><br><span class="line">*/</span><br><span class="line">Person(const Person &amp;p)</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt; &quot;Person拷贝构造函数调用&quot;&lt;&lt; endl;</span><br><span class="line">	m_Age = p.m_Age;</span><br><span class="line">	//m_Height = p.m_Height;编译器默认实现就是这行代码</span><br><span class="line">	//深拷贝操作</span><br><span class="line">	m_Height = new int(*p.m_Height) ;</span><br><span class="line">&#125;</span><br><span class="line">~Person()</span><br><span class="line">&#123;</span><br><span class="line">//析构代码，将堆区开辟数据做释放操作</span><br><span class="line">	if (m_Height != NULL)</span><br><span class="line">	&#123;</span><br><span class="line">		delete m_Height;</span><br><span class="line">		m_Height = NULL;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;&quot;Person的析构函数调用&quot;&lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_Age;</span><br><span class="line">	int *m_Height;</span><br></pre></td></tr></table></figure>
+
+<p>总结:如果属性有在堆区开辟的，一定要自己提供拷贝构造函数，防止浅拷贝带来的问题</p>
+<h2 id="4-2-6初始化列表"><a href="#4-2-6初始化列表" class="headerlink" title="4.2.6初始化列表"></a>4.2.6初始化列表</h2><p>作用:</p>
+<p>C++提供了初始化列表语法，用来初始化属性</p>
+<p>语法:构造函数()∶属性1(值1) ,属性2(值2) … {}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public:</span><br><span class="line">	//初始化列表初始化属性</span><br><span class="line">    Person(int a, int , int c) :m_A(a), m_B(b), m_c(c)</span><br><span class="line">    &#123;</span><br><span class="line">    .</span><br><span class="line">    .</span><br><span class="line">    &#125;</span><br><span class="line">    int m_A;</span><br><span class="line">    int m_B;</span><br><span class="line">    int m_C;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类对象作为类成员"><a href="#类对象作为类成员" class="headerlink" title="类对象作为类成员"></a>类对象作为类成员</h2><p>C++类中的成员可以是另一个类的对象，我们称该成员为对象成员<br>例如∶</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class A&#123;&#125;</span><br><span class="line">class B</span><br><span class="line">&#123;</span><br><span class="line">	A a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>B类中有对象A作为成员，A为对象成员</p>
+<p>当其他类对象作为本类成员，构造时候先构造类对象(A)，再构造自身(B ),析构的顺序与构造相反，取木块同理。不可能直接取前面的那个，只有将后面的先取出来才能取到前面的那个。<br>而创建对象也是。我需要用phone对象补全person就需要先创建phone而person因为在后面，所以取的时候先取它。</p>
+<h2 id="静态成员"><a href="#静态成员" class="headerlink" title="静态成员"></a>静态成员</h2><p>静态成员就是在成员变量和成员函数前加上关键字static，称为静态成员</p>
+<p>静态成员分为:</p>
+<ul>
+<li>静态成员变量</li>
+</ul>
+<p>所有对象共享同一份数据。</p>
+<p>在编译阶段分配内存。编译阶段就分配内存─代码还未开始前(即程序还未运行前),在全局区优先分配好内存</p>
+<p>类内声明，类外初始化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class Person</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	//1所有对象都共享同一份数据</span><br><span class="line">	//2编译阶段就分配内存</span><br><span class="line">	//3类内声明，类外初始化操作</span><br><span class="line">	static int m_A;</span><br><span class="line">private:</span><br><span class="line">	static int m_B;//静态成员变量也是有访问权限的，私有的类外访问不到</span><br><span class="line">&#125;;</span><br><span class="line">int Person::m_A = 100;//这里强调一下，是必须在类外写一下，否则报错，可以不付初值，默认初值是0,加Person是为了说明他是Person类的static </span><br><span class="line">int Person::m_B = 100;</span><br><span class="line">void test()&#123;</span><br><span class="line">	//静态成员变量不属于某个对象上，所有对象都共享同一份数据</span><br><span class="line">	//因此静态成员变量有两种访问方式</span><br><span class="line">	//1、通过对象进行访问</span><br><span class="line">	Person p;</span><br><span class="line">	cout &lt;&lt; p.m_A &lt;&lt; endl;</span><br><span class="line">	//2、通过类名进行访问</span><br><span class="line">	cout &lt;&lt;Person::m_A &lt;&lt; end1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>静态成员函数</li>
+</ul>
+<p>所有对象共享同一个函数</p>
+<p>静态成员函数只能访问静态成员变量，因为如果静态成员函数里有非静态成员变量，class会判断不出非静态成员变量是在什么地方定义的,所以无法确定是否是类成员</p>
+<p>静态成员函数也是有访问权限的，私有的类外访问不到静态成员函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//因此静态函数有两种访问方式</span><br><span class="line">	//1、通过对象进行访问</span><br><span class="line">	Person p;</span><br><span class="line">	p.func();</span><br><span class="line">	//2、通过类名进行访问</span><br><span class="line">	Person::func();</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/30/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%8C%E5%A4%A9-c/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1581,198 +1731,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/16/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%89%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/16/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%89%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第三天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-03-16 10:14:44" itemprop="dateCreated datePublished" datetime="2023-03-16T10:14:44+08:00">2023-03-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-03-22 16:59:16" itemprop="dateModified" datetime="2023-03-22T16:59:16+08:00">2023-03-22</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main ()</span><br><span class="line">&#123;</span><br><span class="line">    int var_runoob = 10;</span><br><span class="line">    int *p;              // 定义指针变量</span><br><span class="line">    p = &amp;var_runoob;</span><br><span class="line"> </span><br><span class="line">   printf(&quot;var_runoob 变量的地址： %p\n&quot;, p);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>1）p是一个指针，存储var的地址</p>
-<p>2）p的类型必须与var类型一致，因为整形指针只能存储整形变量的指针</p>
-<p><strong>指针的一些复杂说明：</strong></p>
-<ul>
-<li><strong>int p;</strong> – 这是一个普通的整型变量</li>
-<li><strong>int *p;</strong> – 首先从 p 处开始,先与*结合,所以说明 p 是一个指针, 然后再与 int 结合, 说明指针所指向的内容的类型为 int 型。所以 p 是一个返回整型数据的指针。</li>
-<li><strong>int p[3]</strong> – 首先从 p 处开始,先与[] 结合,说明 p 是一个数组, 然后与 int 结合, 说明数组里的元素是整型的, 所以 p 是一个由整型数据组成的数组。</li>
-<li><strong>int *p[3];</strong> – 首先从 p 处开始, 先与 [] 结合, 因为其优先级比 * 高,所以 p 是一个数组, 然后再与 * 结合, 说明数组里的元素是指针类型, 然后再与 int 结合, 说明指针所指向的内容的类型是整型的, 所以 p 是一个由返回整型数据的指针所组成的数组。</li>
-<li><strong>int (*p)[3];</strong> – 首先从 p 处开始, 先与 * 结合,说明 p 是一个指针然后再与 [] 结合(与”()”这步可以忽略,只是为了改变优先级), 说明指针所指向的内容是一个数组, 然后再与int 结合, 说明数组里的元素是整型的。所以 p 是一个指向由整型数据组成的数组的指针。</li>
-<li>*<em>int *<em>p;</em></em> – 首先从 p 开始, 先与 * 结合, 说是 p 是一个指针, 然后再与 * 结合, 说明指针所指向的元素是指针, 然后再与 int 结合, 说明该指针所指向的元素是整型数据。由于二级指针以及更高级的指针极少用在复杂的类型中, 所以后面更复杂的类型我们就不考虑多级指针了, 最多只考虑一级指针。</li>
-<li><strong>int p(int);</strong> – 从 p 处起,先与 () 结合, 说明 p 是一个函数, 然后进入 () 里分析, 说明该函数有一个整型变量的参数, 然后再与外面的 int 结合, 说明函数的返回值是一个整型数据。</li>
-<li><strong>int (*p)(int);</strong> – 从 p 处开始, 先与指针结合, 说明 p 是一个指针, 然后与()结合, 说明指针指向的是一个函数, 然后再与()里的 int 结合, 说明函数有一个int 型的参数, 再与最外层的 int 结合, 说明函数的返回类型是整型, 所以 p 是一个指向有一个整型参数且返回类型为整型的函数的指针。</li>
-<li><strong>int *(*p(int))[3];</strong> – 可以先跳过, 不看这个类型, 过于复杂从 p 开始,先与 () 结合, 说明 p 是一个函数, 然后进入 () 里面, 与 int 结合, 说明函数有一个整型变量参数, 然后再与外面的 * 结合, 说明函数返回的是一个指针, 然后到最外面一层, 先与[]结合, 说明返回的指针指向的是一个数组, 然后再与 * 结合, 说明数组里的元素是指针, 然后再与 int 结合, 说明指针指向的内容是整型数据。所以 p 是一个参数为一个整数据且返回一个指向由整型指针变量组成的数组的指针变量的函数。</li>
-</ul>
-<h2 id="C-指针的算术运算"><a href="#C-指针的算术运算" class="headerlink" title="C 指针的算术运算"></a>C 指针的算术运算</h2><p>假设 <strong>ptr</strong> 是一个指向地址 1000 的整型指针，是一个 32 位的整数，让我们对该指针执行下列的算术运算：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr++</span><br></pre></td></tr></table></figure>
-
-<p>在执行完上述的运算之后，<strong>ptr</strong> 将指向位置 1004，因为 ptr 每增加一次，它都将指向下一个整数位置，即当前位置往后移 4 字节。这个运算会在不影响内存位置中实际值的情况下，移动指针到下一个内存位置。如果 <strong>ptr</strong> 指向一个地址为 1000 的字符，上面的运算会导致指针指向位置 1001，因为下一个字符位置是在 1001。</p>
-<p>我们概括一下：</p>
-<ul>
-<li>指针的每一次递增，它其实会指向下一个元素的存储单元。</li>
-<li>指针的每一次递减，它都会指向前一个元素的存储单元。</li>
-<li>指针在递增和递减时跳跃的字节数取决于指针所指向变量数据类型长度，比如 int 就是 4 个字节。</li>
-</ul>
-<h2 id="指针数组"><a href="#指针数组" class="headerlink" title="指针数组"></a>指针数组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int *ptr[MAX];</span><br></pre></td></tr></table></figure>
-
-<p>在这里，把 <strong>ptr</strong> 声明为一个数组，由 MAX 个整数指针组成。因此，ptr 中的每个元素，都是一个指向 int 值的指针。</p>
-<p><strong>add:</strong></p>
-<p>const的好处，是引入了常量的概念，让我们不要去修改某一块不该修改的内存，使某一值被保护起来避免出现错误，在编码过程中考虑const是良好的习惯，无论是常量的定义还是类中的const函数。<br>static我认为最大的用处在于共享。static设置了函数或变量的存储方式：存储在静态存储区域。它使得局部变量和类成员变量的生命周期变长了（因为其存储方式的特殊性）。它使类成员函数更像是一份各个对象共享的代码，使类成员变量也能在各个对象之间共享，它虽然不属于类中的成员，却能被同一类的各个对象为之所用。</p>
-<p>在函数前加static，则此函数成为<strong>静态函数（内部函数）</strong>，我们用static修饰函数的主要目的是：<strong>用来表示不能被其它文件访问的一个函数（和用static修饰全局变量的目的一样，都是不允许其它文件访问）。</strong>这样一来便有一个好处：<strong>程序员不用担心自己编写的函数与其他文件的函数同名</strong>。</p>
-<p>具有全局作用域，只初始化一次，它与全局变量的区别在于如果程序包含多个文件的话，它作用于定义它的文件里，不能作用到其它文件里，即<strong>被 static 关键字修饰过的变量具有文件作用域。</strong>（使得作用域仅限于被定义的文件中 即，从变量定义到本文件结尾处，其他文件不论通过什么方式都不能访问）。</p>
-<p>const和static（<strong>怀疑</strong>）修饰的全局变量如果要在多个文件之间共享，则可以在其他文件需要时使用extern关键字,声明外部变量，使用时一定包含所定义变量所在的文件:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//file.h</span><br><span class="line">const int a = 10;</span><br><span class="line">static int b = 100;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//file2</span><br><span class="line">#include “file.h”</span><br><span class="line"></span><br><span class="line">extern const int a;</span><br><span class="line">extern int b;//不需加static关键字</span><br></pre></td></tr></table></figure>
-
-<p>无论对于const修饰的变量a还是static变量b，这样做的结果是，整个工程的程序链接完成后，所有需要使用该变量的程序共享同一个这个变量的存储区域。</p>
-<p><strong>指针数组</strong>：指针的数组，实际是一个数组，长度由数组本身决定，这个数组的所有元素都是指针类型，存放的都是地址。<strong>int *a[3]<strong>：为什么这里是指针数组，</strong>[]</strong> 的优先级高于 ***** ，所以这是一个数组，而 ***** 修饰数组，所以是指针数组，数组的元素是整型的指针。</p>
-<p><strong>int *prt[ 10 ] ; *prt[ 1 ],*prt[ 2 ],*prt[ 3 ]……</strong> 数组中每个元素都指向一个地址。</p>
-<p><strong>数组指针</strong>：数组的指针，实际是一个指针，长度固定(32 位系统下占 4 个字节)，这个指针指向数组，但指向的数组占多少个字节不确定。**int (*a)[3]**：同样的方式，首先括号的优先级最高，所以 *<strong>a</strong> 是指针，而 <strong>[]</strong> 修饰 *<strong>a</strong> ，所以是数组指针，一个指向 3 个元素的一维数组指针。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int  a[5]=&#123; 1,2,3,4,5 &#125;;    //定义一个一维数组 a</span><br><span class="line">int  (*prt)[5];      // 步长为 5 的数组指针，即 prt 指向的数组里有 5 个元素  </span><br><span class="line">prt=&amp;a;    // 把数组 a 的地址付给 prt，则 prt 为数组 a 的地址，*prt 表示数组 a 本身</span><br><span class="line">prt[ 0 ];    //表示数组首元素的地址</span><br><span class="line">*prt[ 0 ]；  //表示数组的首元素的值，即为数组 a 的 1</span><br><span class="line">**prt;         //表示数组的首元素的值，即为数组 a 的 1</span><br><span class="line">*prt[ 1 ] ;   //表示指向数组的下一行元素的首元素的值，但是a是一维数组，只有一行，所以指向的地址中的值不确定</span><br></pre></td></tr></table></figure>
-
-<p>数组指针加 1，步长为所指向数组的列数，即为下一行的首地址，只在二维及以上维度的数组中有意义，一维数组只有一行，无意义。</p>
-<h2 id="C-指向指针的指针"><a href="#C-指向指针的指针" class="headerlink" title="C 指向指针的指针"></a>C 指向指针的指针</h2><p>指针更像是一个找地址开门取物品的操作。其中 ***** 就是这个动作重复的次数，<strong>ptr</strong> 是取东西的门牌号也就是地址值：</p>
-<ul>
-<li>*<strong>ptr</strong> 是完成一次开门取东西操作最终取出来的东西。</li>
-<li>*<strong>*ptr</strong> 是完成两次开门取物.需要注意的是第一次取得的是第二次要开的门的门牌号或者说地址，然后根据门牌号继续开门取物。 所以 *<strong>ptr</strong> 或者 *<strong>*ptr</strong> 一定是取出来的东西，即为数值。而 <strong>ptr</strong> 一定是门牌号，即为地址值。</li>
-</ul>
-<h2 id="C-传递指针给函数"><a href="#C-传递指针给函数" class="headerlink" title="C 传递指针给函数"></a>C 传递指针给函数</h2><h3 id="指针和函数的关系"><a href="#指针和函数的关系" class="headerlink" title="指针和函数的关系"></a>指针和函数的关系</h3><p><strong>1、函数指针（指向函数的指针）</strong></p>
-<p>一个函数在编译之后，会占据一部分内存，而它的函数名，就是这段函数的首地址。</p>
-<p>可以把一个指针声明成为一个指向函数的指针。</p>
-<p>C 语言规定函数名会被转换为指向这个函数的指针，除非这个函数名作为 &amp; 操作符或 sizeof 操作符的操作数(注意：函数名用于 sizeof 的操作数是非法的)。也就是说 f &#x3D; test; 中 test 被自动转换为 &amp;test，而 f &#x3D; &amp;test; 中已经显示使用了 &amp;test，所以 test 就不会再发生转换了。因此直接引用函数名等效于在函数名上应用 &amp; 运算符，两种方法都会得到指向该函数的指针。</p>
-<p>指向函数的指针必须初始化，或者具有 0 值，才能在函数调用中使用。</p>
-<p>与数组一样：</p>
-<ul>
-<li>（1）禁止对指向函数的指针进行自增运算++</li>
-<li>（2）禁止对函数名赋值，函数名也不能用于进行算术运算。</li>
-</ul>
-<p>示例1:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int fun1(int,int);</span><br><span class="line">int fun1(int a, int b)&#123; </span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br><span class="line">int main()&#123;</span><br><span class="line">    int (*pfun1)(int,int); </span><br><span class="line">    pfun1=fun1;//这里&amp;fun1和fun1的值和类型都一样，用哪个无所谓 </span><br><span class="line">    int a=(*pfun1)(5,7); //通过函数指针调用函数。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>示例2:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">int Max(int x, int y)  //定义Max函数</span><br><span class="line">&#123;</span><br><span class="line">    int z;</span><br><span class="line">    if (x &gt; y) &#123;</span><br><span class="line">        z = x;</span><br><span class="line">    &#125;else &#123; </span><br><span class="line">        z = y;</span><br><span class="line">    &#125;</span><br><span class="line">    return z;</span><br><span class="line">&#125;</span><br><span class="line">int main() &#123;//定义一个函数指针</span><br><span class="line">    int(*p)(int, int);</span><br><span class="line">    int a, b, c;//把函数Max赋给指针变量p, 使p指向Max函数</span><br><span class="line">    p = Max;</span><br><span class="line">    printf(&quot;please enter a and b:&quot;);</span><br><span class="line">    scanf(&quot;%d%d&quot;, &amp;a, &amp;b);//通过函数指针调用Max函数</span><br><span class="line">    c = (*p)(a, b);</span><br><span class="line">    printf(&quot;a = %d\nb = %d\nmax = %d\n&quot;, a, b, c);</span><br><span class="line">    system(&quot;pause&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>示例3:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt; </span><br><span class="line">void test( )&#123;</span><br><span class="line">    printf(&quot;test called!/n&quot;);</span><br><span class="line">&#125; </span><br><span class="line">int main( )&#123;   </span><br><span class="line">    void (*f) ( );   </span><br><span class="line">    f = test;     </span><br><span class="line">    f ( ); </span><br><span class="line">    (*f)( );    </span><br><span class="line">    //test++;             // error，标准禁止对指向函数的指针进行自增运算          </span><br><span class="line">    //test = test + 2;    // error，不能对函数名赋值，函数名也不能用于进行算术运算          </span><br><span class="line">    printf(&quot;%p/n&quot;, test);          </span><br><span class="line">    printf(&quot;%p/n&quot;, &amp;test);          </span><br><span class="line">    printf(&quot;%p/n&quot;, *test);  </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">test called!</span><br><span class="line">test called!</span><br><span class="line">004013EE004013EE004013EE</span><br></pre></td></tr></table></figure>
-
-<p>这里的玄学就是 *test 为什么能和上面两个之前介绍过的输出一样的值。</p>
-<p>首先来看函数名 test，是一个符号用来标识一个函数的入口地址，在使用中函数名会被转换为指向这个函数的指针，指针的值就是函数的入口地址，&amp;test 在前面已经说了：显示获取函数的地址。*test 可以认为由于 test 已经被转换成了函数指针, 指向这个函数，所以 *test 就是取这个指针所指向的函数名，而又根据函数名会被转换指向该函数的指针的规则，这个函数也转变成了一个指针，所以 <em>test 最终也是一个指向函数 test 的指针。也就是说:</em>(*<em>test –&gt; *(&amp;test) –&gt; test –&gt; &amp;test</em>)。</p>
-<h2 id="C-从函数返回指针"><a href="#C-从函数返回指针" class="headerlink" title="C 从函数返回指针"></a>C 从函数返回指针</h2><p>C 不支持在调用函数时返回局部变量的地址，除非定义局部变量为 static 变量。</p>
-<p>因为局部变量是存储在内存的栈区内，当函数调用结束后，局部变量所占的内存地址便被释放了，因此当其函数执行完毕后，函数内的变量便不再拥有那个内存地址，所以不能返回其指针。</p>
-<p>除非将其变量定义为 static 变量，static 变量的值存放在内存中的静态数据区，不会随着函数执行的结束而被清除，故能返回其地址。</p>
-<h2 id="一些其他的："><a href="#一些其他的：" class="headerlink" title="一些其他的："></a>一些其他的：</h2><p>sizeof(数组名)返回的是数组的大小</p>
-<p>sizeof(ca)&#x3D;7，注意此处包含一个结束符<br>sizeof(cb)&#x3D;18，</p>
-<p>sizeof(一维数组指针)返回的是数组单个元素指针的大小，即系统指针的长度，32位系统为4，64位系统位8</p>
-<p>64位：sizeof(pca)&#x3D;8，32位：sizeof(pca)&#x3D;4</p>
-<p>sizeof(*一维数组指针)返回的是数组单个元素对应类型的大小</p>
-<p>sizeof(*pca)&#x3D;1，char的大小</p>
-<p>sizeof(二维数组指针)返回的是二维数组行指针的大小，32位系统为行数×4，64位系统位行数×8</p>
-<p>sizeof(pcb)等同于sizeof(pcb[0])、sizeof(pcb[1])、sizeof(pcb[2])</p>
-<p>64位：sizeof(pcb)&#x3D;24，3行×8，注意二维数组每一行的结尾没有结束符’\0’，所以是行长度为8</p>
-<p>32位：sizeof(pcb)&#x3D;12，3行×4，</p>
-<p>sizeof(*二维数组指针)返回的是系统指针的长度，32位系统为4，64位系统位8</p>
-<p>64位：sizeof(pcb)&#x3D;8，32位：sizeof(pcb)&#x3D;4</p>
-<p>sizeof(**二维数组指针)返回的是数组单个元素指针的大小，即char的大小</p>
-<p>sizeof(**pcb)&#x3D;1</p>
-<hr>
-<p><strong>下面总结一下数组的数组名(数组中储存的也是数组)的问题:</strong></p>
-<p>声明了一个数组 **TYPE array[n]**，则数组名称 array 就有了两重含义：</p>
-<ul>
-<li>第一，它代表整个数组，它的类型是 **TYPE[n]**；</li>
-<li>第二，它是一个常量指针，该指针的类型是 **TYPE***，该指针指向的类型是 <strong>TYPE</strong>，也就是数组单元的类型，该指针指向的内存区就是数组第 0 号单元，该指针自己占有单独的内存区，注意它和数组第 0 号单元占据的内存区是不同的。该指针的值是不能修改的，即类似 array++ 的表达式是错误的。在不同的表达式中数组名 array 可以扮演不同的角色。在表达式 sizeof(array) 中，数组名 array 代表数组本身，故这时 sizeof 函数测出的是整个数组的大小。</li>
-</ul>
-<p>在表达式 <em>array 中，array 扮演的是指针，因此这个表达式的结果就是数组第 0 号单元的值。*<em>sizeof(*array)</em></em> 测出的是数组单元的大小。</p>
-<p>表达式 array+n（其中n&#x3D;0，1，2，…..）中，array 扮演的是指针，故array+n 的结果是一个指针，它的类型是 <strong>TYPE *<strong>，它指向的类型是 TYPE，它指向数组第 n 号单元。</strong>故sizeof(array+n)测出的是指针类型的大小。在 32 位程序中结果是 4。</strong></p>
-<hr>
-<p>这里 <strong>&amp;</strong> 是取地址运算符，***** 是间接运算符。</p>
-<p><strong>&amp;a</strong> 的运算结果是一个指针，指针的类型是 a 的类型加个 *，指针所指向的类型是 a 的类型，指针所指向的地址嘛，那就是 a 的地址。</p>
-<p>*<strong>p</strong> 的运算结果就五花八门了。总之 *p 的结果是p 所指向的东西，这个东西有这些特点：它的类型是 p 指向的类型，它所占用的地址是 p 所指向的地址。</p>
-<p>实例:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">int a=12; int b; int *p; int **ptr;</span><br><span class="line">p=&amp;a; //&amp;a 的结果是一个指针，类型是int*，指向的类型是</span><br><span class="line">//int，指向的地址是a 的地址。</span><br><span class="line">*p=24; //*p 的结果，在这里它的类型是int，它所占用的地址是</span><br><span class="line">//p 所指向的地址，显然，*p 就是变量a。</span><br><span class="line">ptr=&amp;p; //&amp;p 的结果是个指针，该指针的类型是p 的类型加个*，</span><br><span class="line">//在这里是int **。该指针所指向的类型是p 的类型，这</span><br><span class="line">//里是int*。该指针所指向的地址就是指针p 自己的地址。</span><br><span class="line">*ptr=&amp;b; //*ptr 是个指针，&amp;b 的结果也是个指针，且这两个指针</span><br><span class="line">//的类型和所指向的类型是一样的，所以用&amp;b 来给*ptr 赋</span><br><span class="line">//值就是毫无问题的了。</span><br><span class="line">**ptr=34; //*ptr 的结果是ptr 所指向的东西，在这里是一个指针，</span><br><span class="line">//对这个指针再做一次*运算，结果是一个int 类型的变量。</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>实例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">char *str[3]=&#123;</span><br><span class="line">    &quot;Hello,thisisasample!&quot;,</span><br><span class="line">    &quot;Hi,goodmorning.&quot;,</span><br><span class="line">    &quot;Helloworld&quot;</span><br><span class="line">&#125;;</span><br><span class="line">char s[80]；</span><br><span class="line">strcpy(s,str[0]); //也可写成strcpy(s,*str);</span><br><span class="line">strcpy(s,str[1]); //也可写成strcpy(s,*(str+1));</span><br><span class="line">strcpy(s,str[2]); //也可写成strcpy(s,*(str+2));</span><br></pre></td></tr></table></figure>
-
-<p>上例中，str 是一个三单元的数组，该数组的每个单元都是一个指针，这些指针各指向一个字符串。把指针数组名 str 当作一个指针的话，它指向数组的第 0 号单元，它的类型是 char **，它指向的类型是 char *。</p>
-<p><em>str 也是一个指针，它的类型是 char <em>，它所指向的类型是 char，它指向的地址是字符串 “Hello,thisisasample!” 的第一个字符的地址，即 ‘H’ 的地址。**注意:字符串相当于是一个数组, 在内存中以数组的形式储存, 只不过字符串是一个数组常量, 内容不可改变,且只能是右值.如果看成指针的话, 他即是常量指针, 也是指针常量。</em></em></p>
-<p>str+1 也是一个指针，它指向数组的第 1 号单元，它的类型是 char*<em>，它指向的类型是 char</em>。</p>
-<p><em>(str+1) 也是一个指针，它的类型是 char</em>，它所指向的类型是 char，它指向 “Hi,goodmorning.” 的第一个字符 ‘H’。</p>
-<hr>
-<p>例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int(*ptr)[10];</span><br></pre></td></tr></table></figure>
-
-<p>则在 32 位程序中，有：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sizeof(int(*)[10])==4</span><br><span class="line">sizeof(int[10])==40</span><br><span class="line">sizeof(ptr)==4</span><br></pre></td></tr></table></figure>
-
-<p>实际上，sizeof(对象)测出的都是对象自身的类型的大小，而不是别的什么类型的大小。</p>
-<hr>
-<p>在指针的强制类型转换：<strong>ptr1&#x3D;(TYPE *)ptr2</strong> 中，如果 sizeof(ptr2的类型)大于 sizeof(ptr1 的类型)，那么在使用指针 ptr1 来访问 ptr2 所指向的存储区时是安全的。如果 sizeof(ptr2 的类型) 小于sizeof(ptr1 的类型)，那么在使用指针ptr1 来访问ptr2 所指向的存储区时是不安全的。</p>
-<p>如果ptr2不是指针类型则</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">char s=&#x27;a&#x27;;</span><br><span class="line">int *ptr;</span><br><span class="line">ptr=(int *)&amp;s;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1842,7 +1800,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">35</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
