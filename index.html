@@ -170,10 +170,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-06-01 21:35:45 / 修改时间：22:03:42" itemprop="dateCreated datePublished" datetime="2023-06-01T21:35:45+08:00">2023-06-01</time>
+              <time title="创建时间：2023-06-01 21:35:45" itemprop="dateCreated datePublished" datetime="2023-06-01T21:35:45+08:00">2023-06-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-09 21:43:53" itemprop="dateModified" datetime="2023-06-09T21:43:53+08:00">2023-06-09</time>
+              </span>
 
           
 
@@ -194,6 +200,43 @@
 <img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" class title="This is an test image">
 
 <p>Linux下只有两级。从用户空间到内核空间进的时候，需要借助mmu，帮助完成全级切换。</p>
+<h2 id="pcb-进程控制块"><a href="#pcb-进程控制块" class="headerlink" title="pcb 进程控制块"></a>pcb 进程控制块</h2><p>PCB 进程控制块：进程 id<br>文件描述符表<br>进程状态： 初始态、就绪态、运行态、挂起态、终止态。<br>进程工作目录位置<br>*umask 掩码 （进程的概念）<br>信号相关信息资源。<br>用户 id 和组 id<br>ps aux 返回结果里，第二列是进程 id</p>
+<p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212449400.png" alt="image-20230609212449400"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212449400.png" class title="This is an test image">
+
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">echo $PATH 查看环境变量</span><br><span class="line">path 环境变量里记录了一系列的值，当运行一个可执行文件时，系统会去环境变量记录的位置里查</span><br><span class="line">找这个文件并执行。</span><br><span class="line">echo $TERM 查看终端</span><br><span class="line">echo $LANG 查看语言</span><br><span class="line">env 查看所有环境变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="fork-函数原理"><a href="#fork-函数原理" class="headerlink" title="fork 函数原理"></a>fork 函数原理</h2><p>fork 函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pid_t fork(void)</span><br><span class="line">创建子进程。父子进程各自返回。父进程返回子进程 pid。 子进程返回 0.</span><br><span class="line">getpid();getppid();</span><br><span class="line">循环创建 N 个子进程模型。 每个子进程标识自己的身份。</span><br></pre></td></tr></table></figure>
+
+<p>父子进程相同： 刚 fork 后。 data 段、text 段、堆、栈、环境变量、全局变量、宿主目录位置、进程工作目录位 置、信号处理方式</p>
+<p>父子进程不同： 进程 id、返回值、各自的父进程、进程创建时间、闹钟、未决信号集</p>
+<p>父子进程共享： 读时共享、写时复制。———————— 全局变量。 1. 文件描述符 2. mmap 映射区</p>
+<h2 id="fork-创建子进程"><a href="#fork-创建子进程" class="headerlink" title="fork 创建子进程"></a>fork 创建子进程</h2><p>下面是一个 fork 函数的例子，代码如下：</p>
+<p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212838706.png" alt="image-20230609212838706"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212838706.png" class title="This is an test image">
+
+<p>fork 之前的代码，父子进程都有，但是只有父进程执行了，子进程没有执行，fork 之后的代码，父子进程都有机会执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">两个函数：</span><br><span class="line">pid_t getpid() 获取当前进程 id</span><br><span class="line">pid_t getppid() 获取当前进程的父进程 id</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212951089.png" alt="image-20230609212951089"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212951089.png" class title="This is an test image">
+
+<h2 id="循环创建多个子进程"><a href="#循环创建多个子进程" class="headerlink" title="循环创建多个子进程"></a>循环创建多个子进程</h2><p>所以，直接用个 for 循环是要出事情的，因为子进程也会 fork 新的进程 这里，对调用 fork 的进程进行判定，只让父进程 fork 新的进程就行，代码如下：</p>
+<p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609213428815.png" alt="image-20230609213428815"></p>
+<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609213428815.png" class title="This is an test image">
+
+<p>出现了问题：进程多了一个，而且不是按顺序来的。这里多出的一个，是父进程，因为父进程才有 i&#x3D;5 跳出循环这一步。所以，对父进程进行判定并处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if(i=5)</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;parent&quot;);</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">	printf(&quot;..&quot;,i+1);</span><br></pre></td></tr></table></figure>
+
+<p>现在还有两个问题，<br>    一个就是包括父进程在内的所有进程不是按顺序出现，多运行几次，发现是随机序列出现的。这<br>是要因为，对操作系统而言，这几个子进程几乎是同时出现的，它们和父进程一起争夺 cpu，谁抢到，<br>谁打印，所以出现顺序是随机的。<br>    第二问题就是终端提示符混在了输出里，这个是因为，loop_fork 是终端的子进程，一旦<br>loop_fork 执行完，终端就会打印提示符。就像之前没有子进程的程序，一旦执行完，就出现了终端<br>提示符。这里也就是这个道理，loop_fork 执行完了，终端提示符出现，然而 loop_fork 的子进程还<br>没执行完，所以输出就混在一起了。</p>
+<p>通过 sleep 延时来解决父进程先结束这个问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(i=5)</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;parent&quot;);</span><br><span class="line">	sleep(1);</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">	printf(&quot;..&quot;,i+1);</span><br></pre></td></tr></table></figure>
+
+<p>最后来解决子进程乱序输出的问题，解决方法很简单，让第 1 个子进程少等，第二个子进程多等， 后面子进程等待时间依次增加，这样就能实现有序输出。</p>
+<h2 id="父子进程共享哪些内容"><a href="#父子进程共享哪些内容" class="headerlink" title="父子进程共享哪些内容"></a>父子进程共享哪些内容</h2><p>父子进程相同： 刚 fork 后。 data 段、text 段、堆、栈、环境变量、全局变量、宿主目录位置、进程工作目录位 置、信号处理方式</p>
+<p>父子进程不同： 进程 id、返回值、各自的父进程、进程创建时间、闹钟、未决信号集</p>
+<p>父子进程共享： 读时共享、写时复制。———————— 全局变量。 1. 文件描述符 2. mmap 映射区</p>
 
       
     </div>
