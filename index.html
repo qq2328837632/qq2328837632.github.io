@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-16 19:55:36" itemprop="dateModified" datetime="2023-06-16T19:55:36+08:00">2023-06-16</time>
+                <time title="修改时间：2023-06-17 21:54:52" itemprop="dateModified" datetime="2023-06-17T21:54:52+08:00">2023-06-17</time>
               </span>
 
           
@@ -306,6 +306,83 @@
 </ul>
 <p>可修改sa_flags参数来设置被信号中断后系统调用是否重启。SA_INTERRURT不重启。SA_RESTART重启。</p>
 <p>sa_flags 还有很多可选参数，适用于不同情况。如:捕捉到信号后，在执行捕捉函数期间，不希望自动阻塞该信号，可将sa_flags设置为SA_NODEFER，除非sa_mask中包含该信号。</p>
+<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><p>会话：多个进程组的集合<br>创建会话的 6 点注意事项：</p>
+<ol>
+<li>调用进程不能是进程组组长，该进程变成新会话首进程</li>
+<li>该进程成为一个新进程组的组长进程</li>
+<li>需要 root 权限（ubuntu 不需要）</li>
+<li>新会话丢弃原有的控制终端，该会话没有控制终端</li>
+<li>该调用进程是组长进程，则出错返回</li>
+<li>建立新会话时，先调用 fork，父进程终止，子进程调用 setsid</li>
+</ol>
+<p>getsid 函数：<br><code>pid_t getsid(pid_t pid)</code> 获取当前进程的会话 id<br>成功返回调用进程会话 ID，失败返回-1，设置 error<br>setsid 函数：<br><code>pid_t setsid(void)</code> 创建一个会话，并以自己的 ID 设置进程组 ID，同时也是新会话的 ID<br>成功返回调用进程的会话 ID，失败返回-1，设置 error</p>
+<h2 id="守护进程创建步骤分析"><a href="#守护进程创建步骤分析" class="headerlink" title="守护进程创建步骤分析"></a>守护进程创建步骤分析</h2><p>守护进程：<br>daemon 进程。通常运行于操作系统后台，脱离控制终端。一般不与用户直接交互。周期性的等待某个事件发生或周期性执行某一动作。<br>不受用户登录注销影响。通常采用以 d 结尾的命名方式。</p>
+<p>创建守护进程，最关键的一步是调用 setsid 函数创建一个新的 Session，并成为 Session Leader</p>
+<p>守护进程创建步骤：</p>
+<ol>
+<li>fork 子进程，让父进程终止。</li>
+<li>子进程调用 setsid() 创建新会话</li>
+<li>通常根据需要，改变工作目录位置 chdir()， 防止目录被卸载。比如目录是在U盘上，卸载就会出问题。</li>
+<li>通常根据需要，重设 umask 文件权限掩码，影响新文件的创建权限。 022 – 755 0345 — 432 r—wx-w- 422,x权限默认不给，创建目录是432，创建文件没有x就是422.（可能是<strong>出于安全的考虑，linux系统新建文件默认没有执行权限</strong>，其最大权限为rw-rw-rw-（666），新建目录的最大权限为rwx-rwx-rwx（777）。）</li>
+<li>通常根据需要，关闭&#x2F;重定向 文件描述符</li>
+<li>守护进程 业务逻辑。while（）</li>
+</ol>
+<p>下面这个例子，创建一个守护进程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;sys/stat.h&gt;</span><br><span class="line">3. #include &lt;fcntl.h&gt;</span><br><span class="line">4. #include &lt;stdlib.h&gt;</span><br><span class="line">5. #include &lt;string.h&gt;</span><br><span class="line">6. #include &lt;unistd.h&gt;</span><br><span class="line">7. #include &lt;errno.h&gt;</span><br><span class="line">8. #include &lt;pthread.h&gt;</span><br><span class="line">9.</span><br><span class="line">10. void sys_err(const char *str)</span><br><span class="line">11. &#123;</span><br><span class="line">12. perror(str);</span><br><span class="line">13. exit(1);</span><br><span class="line">14. &#125;</span><br><span class="line">15.</span><br><span class="line">16. int main(int argc, char *argv[])</span><br><span class="line">17. &#123;</span><br><span class="line">18. pid_t pid;</span><br><span class="line">19. int ret, fd;</span><br><span class="line">20.</span><br><span class="line">21. pid = fork();</span><br><span class="line">22. if (pid &gt; 0) // 父进程终止</span><br><span class="line">23. exit(0);</span><br><span class="line">24.</span><br><span class="line">25. pid = setsid(); //创建新会话</span><br><span class="line">26. if (pid == -1)</span><br><span class="line">27. sys_err(&quot;setsid error&quot;);</span><br><span class="line">28.</span><br><span class="line">29. ret = chdir(&quot;/home/zhcode/Code/code146&quot;); // 改变工作目录位置</span><br><span class="line">30. if (ret == -1)</span><br><span class="line">31. sys_err(&quot;chdir error&quot;);</span><br><span class="line">32.</span><br><span class="line">33. umask(0022); // 改变文件访问权限掩码</span><br><span class="line">34.</span><br><span class="line">35. close(STDIN_FILENO); // 关闭文件描述符 0</span><br><span class="line">36.</span><br><span class="line">37. fd = open(&quot;/dev/null&quot;, O_RDWR); // fd --&gt; 0**文件描述符fd默认会给最小的，如果0，1，2关闭，则会给0**</span><br><span class="line">38. if (fd == -1)</span><br><span class="line">39. sys_err(&quot;open error&quot;);</span><br><span class="line">40.</span><br><span class="line">41. dup2(fd, STDOUT_FILENO); // 重定向 stdout 和 stderr,因为不需要与用户交互，/dev/null这是一个空洞文件</span><br><span class="line">42. dup2(fd, STDERR_FILENO);</span><br><span class="line">43.</span><br><span class="line">44. while (1); // 模拟 守护进程业务.</span><br><span class="line">45.</span><br><span class="line">46. return 0;</span><br><span class="line">47. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>不会受到用户登录注销影响，会话不会结束，只有kill才行。</p>
+<h2 id="线程概念"><a href="#线程概念" class="headerlink" title="线程概念"></a>线程概念</h2><p>线程概念：<br>进程：有独立的 进程地址空间。有独立的 pcb。 分配资源的最小单位。<br>线程：有独立的 pcb。没有独立的进程地址空间。 最小单位的执行。<br>ps -Lf 进程 id —&gt; 线程号。LWP –》cpu 执行的最小单位（线程）。</p>
+<p>ps -Lf 进程号 查看进程的线程</p>
+<p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230617155342436.png" alt="image-20230617155342436"></p>
+<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230617155342436.png" class title="This is an test image">
+
+<p>一个进程的线程越多，争取cpu的概率越大，但是会有峰值，然后降低</p>
+<h2 id="三级映射"><a href="#三级映射" class="headerlink" title="三级映射"></a>三级映射</h2><h3 id="Linux内核线程实现原理"><a href="#Linux内核线程实现原理" class="headerlink" title="Linux内核线程实现原理"></a>Linux内核线程实现原理</h3><p>类Unix系统中，早期是没有“线程”概念的，80年代才引入，借助进程机制实现出了线程的概念。因此在这类系统中，进程和线程关系密切。</p>
+<p>1.轻量级进程(light-weight process)，也有 PCB，创建线程使用的底层函数和进程一样，都是clone</p>
+<p>2.从内核里看进程和线程是一样的，都有各自不同的PCB，但是PCB 中指向内存资源的三级页表是相同的</p>
+<p>3.进程可以蜕变成线程。</p>
+<p>4.线程可看做寄存器和栈的集合（寄存器在cpu上用来计算，栈帧开辟在栈上，目的是执行函数和存放局部变量，临时值和形参）</p>
+<p>5.在 linux 下，线程是最小的执行单位;进程是最小的分配资源单位。</p>
+<p>查看Lwp号:<code>ps -lf pid</code>查看指定线程的 lwp号。</p>
+<h3 id="进程控制块PCB"><a href="#进程控制块PCB" class="headerlink" title="进程控制块PCB."></a>进程控制块PCB.</h3><p>我们知道,每个进程在内核中都有一个进程控制块(PCB)来维护进程相关的信息，Linux内核的进程控制块是task_struct结构体。</p>
+<p><code>/usr/src/linux-headers-3.16.0-30/include/linux/sched.h</code>.文件中可以查看struct task_struct结构体定义。其内部成员有很多，我们重点掌握以下部分即可:</p>
+<ul>
+<li>进程id。系统中每个进程有唯一的id，在c语言中用pid_t类型表示，其实就是一个非负整数。</li>
+<li>进程的状态，有就绪、运行、挂起、停止等状态。</li>
+<li>进程切换时需要保存和恢复的一些cPu寄存器。</li>
+<li>描述虚拟地址空间的信息</li>
+<li>描述控制终端的信息。</li>
+<li>当前工作目录(Current Working Directory)。</li>
+<li>umask掩码。</li>
+<li>文件描述符表，包含很多指向file结构体的指针。</li>
+<li>和信号相关的信息。</li>
+<li>用户id和组id。</li>
+<li>会话(Session）和进程组。</li>
+<li>进程可以使用的资源上限（Resource Limit) 。</li>
+</ul>
+<p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230617160559643.png" alt="image-20230617160559643"></p>
+<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230617160559643.png" class title="This is an test image">
+
+<p>如果是fork则另外一个进程，指向的就不一样。我们之前讲没有pcb，其实映射是需要经过pcb的。</p>
+<h2 id="线程共享和非共享"><a href="#线程共享和非共享" class="headerlink" title="线程共享和非共享"></a>线程共享和非共享</h2><p>线程共享资源</p>
+<ul>
+<li>1.文件描述符表</li>
+<li>2.每种信号的处理方式</li>
+<li>3.当前工作目录</li>
+<li>4.用户ID和组ID</li>
+<li>5.内存地址空间(.text&#x2F;.data&#x2F;.bss&#x2F;heap&#x2F;共享库)，就是没有<strong>栈</strong>（栈执行函数和存放局部变量，临时值和形参）</li>
+</ul>
+<p>线程非共享资源</p>
+<ul>
+<li>1.线程id</li>
+<li>2.处理器现场（寄存器计算的数据在处理器保存）和<strong>栈</strong>指针(内核栈)</li>
+<li>3.独立的栈空间(用户空间栈)</li>
+<li>4.errno变量</li>
+<li>5.信号屏蔽字</li>
+<li>6.调度优先级</li>
+</ul>
+<p>线程优、缺点：<br>优点:1.提高程序并发性	2.开销小 	3.数据通信、共享数据方便。（可以共享全局变量，不像父子进程，读时共享、写时复制）<br>缺点:1.库函数，不稳定	2.调试、编写困难、gdb不支持	3.对信号支持不好。</p>
+<p>优点相对突出，缺点均不是硬伤。Linux下由于实现方法导致进程、线程差别不是很大。一般能使用线程就使用线程。</p>
 
       
     </div>
@@ -356,7 +433,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-15 10:34:04" itemprop="dateModified" datetime="2023-06-15T10:34:04+08:00">2023-06-15</time>
+                <time title="修改时间：2023-06-17 15:19:14" itemprop="dateModified" datetime="2023-06-17T15:19:14+08:00">2023-06-17</time>
               </span>
 
           
@@ -546,7 +623,7 @@
 <p><strong>socket套接字也是一种文件格式，和管道文件一样，它是一种伪文件</strong>，存在于内核的缓冲区中，大小不变，一直是0。</p>
 <h2 id="mmap-函数原型"><a href="#mmap-函数原型" class="headerlink" title="mmap 函数原型"></a>mmap 函数原型</h2><p>磁盘访问需要open和read,内存访问用地址，即使用指针访问。</p>
 <p>内核缓冲区是位于内核空间的一块特定内存区域，用于临时存储和处理数据。在 Linux 内核中，访问内核缓冲区通常需要使用相应的系统调用或函数。一种常见的方式是使用 I&#x2F;O 操作函数来读取或写入内核缓冲区的内容。例如，在文件 I&#x2F;O 中，我们可以使用系统调用 <code>read()</code> 和 <code>write()</code> 来分别从内核缓冲区读取数据到用户空间或将数据从用户空间写入到内核缓冲区。</p>
-<p>存储映射 I&#x2F;O(Memory-mapped I&#x2F;O) 使一个磁盘文件与存储空间中的一个缓冲区相映射。于是从缓冲区中取数据，就相当于读文件中的相应字节。与此类似，将数据存入缓冲区，则相应的字节就自<br>动写入文件。这样，就可在不使用 read 和 write 函数的情况下，使地址指针完成 I&#x2F;O 操作。<br>使用这种方法，首先应该通知内核，将一个指定文件映射到存储区域中。这个映射工作可以通过<br>mmap 函数来实现。</p>
+<p>存储映射 I&#x2F;O(Memory-mapped I&#x2F;O) 使一个磁盘文件与存储空间中的一个缓冲区相映射。于是从缓冲区中取数据，就相当于读文件中的相应字节。与此类似，将数据存入缓冲区，则相应的字节就自动写入文件。这样，就可在不使用 read 和 write 函数的情况下，使地址指针完成 I&#x2F;O 操作。<br>使用这种方法，首先应该通知内核，将一个指定文件映射到存储区域中。这个映射工作可以通过mmap 函数来实现。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);</span><br><span class="line">创建共享内存映射</span><br><span class="line">参数：</span><br><span class="line">    addr： 指定映射区的首地址。通常传 NULL，表示让系统自动分配</span><br><span class="line">    length：共享内存映射区的大小。（&lt;= 文件的实际大小）</span><br><span class="line">    prot： 共享内存映射区的读写属性。PROT_READ、PROT_WRITE、PROT_READ|PROT_WRITE</span><br><span class="line">    flags： 标注共享内存的共享属性。MAP_SHARED、MAP_PRIVATE</span><br><span class="line">    fd: 用于创建共享内存映射区的那个文件的 文件描述符。</span><br><span class="line">    offset：默认 0，表示映射文件全部。偏移位置。需是 4k 的整数倍。</span><br><span class="line">返回值：</span><br><span class="line">    成功：映射区的首地址。</span><br><span class="line">    失败：MAP_FAILED (void*(-1))， errno</span><br><span class="line">   flags 里面的 shared 意思是修改会反映到磁盘上</span><br><span class="line">     private 表示修改不反映到磁盘上</span><br><span class="line"> int munmap(void *addr, size_t length); 释放映射区。</span><br><span class="line">    addr：mmap 的返回值</span><br><span class="line">    length：大小</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>出现段错误，gdb然后run停止的地方就是段错误。</p>
