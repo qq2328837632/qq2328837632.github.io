@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://example.com/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165207581.png">
 <meta property="og:image" content="http://example.com/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165207581.png">
 <meta property="article:published_time" content="2023-05-29T03:40:04.000Z">
-<meta property="article:modified_time" content="2023-06-13T09:27:42.681Z">
+<meta property="article:modified_time" content="2023-07-03T02:50:24.094Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230610161658961.png">
@@ -191,7 +191,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-13 17:27:42" itemprop="dateModified" datetime="2023-06-13T17:27:42+08:00">2023-06-13</time>
+                <time title="修改时间：2023-07-03 10:50:24" itemprop="dateModified" datetime="2023-07-03T10:50:24+08:00">2023-07-03</time>
               </span>
 
           
@@ -264,6 +264,15 @@
 <li>保持循环变量表达式简单。</li>
 </ul>
 <p>现代编译器已经能为我们自动做很多优化工作，不过这不代表我们学习手写SIMD代码就没有意义了。在向量、矩阵运算等基础库函数中，每个函数通常代码量不大，复杂度不高，但编译器并不能保证会给你优化好，手撸SIMD还是很有必要的。更重要的是，我们能在学习的过程中去接触更底层的一些东西（指令集，内存架构，汇编等），进而提升对整体的编程实力。</p>
+<h2 id="一些限制因素"><a href="#一些限制因素" class="headerlink" title="一些限制因素"></a>一些限制因素</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">for (i = 0; i &lt; n; i++)&#123;</span><br><span class="line">    if (a[i] &gt; b[i]) &#123;</span><br><span class="line">    	long t = a[i];a[i] = b[i];b[i] = t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在随机数据上测试这个函数，得到的CPE大约为13.50，而对于可预测的数据，CPE为2.5～3.5，其预测错误惩罚约为20个周期。</p>
+<p>用功能式的风格实现这个函数是计算每个位置i的最大值和最小值，然后将这些值分别赋给a[i]和 b[i]:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for (i = 0; i &lt; n; i++)&#123;</span><br><span class="line">    long min = a[i] &lt; b[i] ? a[i] : b[i];</span><br><span class="line">    long max = a[i] &lt;b[i] ? b[i] : a[i];</span><br><span class="line">    a[i] = min;</span><br><span class="line">    b[i] = max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对这个函数的测试表明无论数据是任意的，还是可预测的，CPE都大约为4.0。(我们还检查了产生的汇编代码，确认它确实使用了条件传送。)</p>
+<p>讨论过，不是所有的条件行为都能用条件数据传送来实现，所以无可避免地在某些情况中，程序员不能避免写出会导致条件分支的代码，而对于这些条件分支，处理器用分支预测可能会处理得很糟糕。但是，正如我们讲过的，程序员方面用一点点聪明，有时就能使代码更容易被翻译成条件数据传送。这需要一些试验，写出函数的不同版本，然后检查产生的汇编代码，并测试性能。</p>
+<p>分支预测只对有规律的模式可行。程序中的许多测试是完全不可预测的，依赖于数据的任意特性，例如一个数是负数还是正数。对于这些测试，分支预测逻辑会处理得很糟糕。对于本质上无法预测的情况，如果编译器能够产生使用条件数据传送而不是使用条件控制转移的代码，可以极大地提高程序的性能。这不是C语言程序员可以直接控制的，但是有些表达条件行为的方法能够更直接地被翻译成条件传送，而不是其他操作。</p>
 
     </div>
 
@@ -344,7 +353,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%E4%BC%98%E5%8C%96%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">第五章优化程序性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E8%83%BD%E5%8A%9B%E5%92%8C%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">优化编译器的能力和局限性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0%E6%9B%BF%E6%8D%A2%E4%BC%98%E5%8C%96%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">用内联函数替换优化函数调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E7%8E%B0%E4%BB%A3%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">理解现代处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">整体操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E7%BC%96%E8%AF%91%E5%99%A8%E5%B1%95%E5%BC%80%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.3.</span> <span class="nav-text">让编译器展开循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%B1%95%E5%BC%80%E5%AF%B9%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.3.1.</span> <span class="nav-text">循环展开对程序性能的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SIMD-%E7%94%A8%E5%90%91%E9%87%8F%E6%8C%87%E4%BB%A4%E8%BE%BE%E5%88%B0%E6%9B%B4%E9%AB%98%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%BA%A6"><span class="nav-number">1.4.</span> <span class="nav-text">SIMD:用向量指令达到更高的并行度</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%E4%BC%98%E5%8C%96%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">第五章优化程序性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E8%83%BD%E5%8A%9B%E5%92%8C%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">优化编译器的能力和局限性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0%E6%9B%BF%E6%8D%A2%E4%BC%98%E5%8C%96%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">用内联函数替换优化函数调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E7%8E%B0%E4%BB%A3%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">理解现代处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.1.</span> <span class="nav-text">整体操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E7%BC%96%E8%AF%91%E5%99%A8%E5%B1%95%E5%BC%80%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.3.</span> <span class="nav-text">让编译器展开循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%B1%95%E5%BC%80%E5%AF%B9%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.3.1.</span> <span class="nav-text">循环展开对程序性能的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SIMD-%E7%94%A8%E5%90%91%E9%87%8F%E6%8C%87%E4%BB%A4%E8%BE%BE%E5%88%B0%E6%9B%B4%E9%AB%98%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%BA%A6"><span class="nav-number">1.4.</span> <span class="nav-text">SIMD:用向量指令达到更高的并行度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E9%99%90%E5%88%B6%E5%9B%A0%E7%B4%A0"><span class="nav-number">1.5.</span> <span class="nav-text">一些限制因素</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -358,7 +367,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
