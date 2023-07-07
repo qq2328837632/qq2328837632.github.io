@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网络字节序网络字节序：   小端法：（pc本地存储）  高位存高地址。地位存低地址。  int a &#x3D; 0x12345678   大端法：（网络存储） 高位存低地址。低位存高地址    htonl –&gt; 本地–》网络 （IP）     192.168.1.11 –&gt; string –&gt; atoi –&gt; int –&gt; htonl –&gt; 网络字节序   h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-socket">
+<meta property="og:url" content="http://example.com/2023/07/07/Linux-socket/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="网络字节序网络字节序：   小端法：（pc本地存储）  高位存高地址。地位存低地址。  int a &#x3D; 0x12345678   大端法：（网络存储） 高位存低地址。低位存高地址    htonl –&gt; 本地–》网络 （IP）     192.168.1.11 –&gt; string –&gt; atoi –&gt; int –&gt; htonl –&gt; 网络字节序   h">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/Linux-socket/image-20230707141717803.png">
+<meta property="article:published_time" content="2023-07-07T06:12:22.000Z">
+<meta property="article:modified_time" content="2023-07-07T06:45:43.883Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Linux-socket/image-20230707141717803.png">
+
+<link rel="canonical" href="http://example.com/2023/07/07/Linux-socket/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux-socket | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/07/Linux-socket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux-socket
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-07 14:12:22 / 修改时间：14:45:43" itemprop="dateCreated datePublished" datetime="2023-07-07T14:12:22+08:00">2023-07-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="网络字节序"><a href="#网络字节序" class="headerlink" title="网络字节序"></a>网络字节序</h2><p>网络字节序：</p>
+<p>  小端法：（pc本地存储）  高位存高地址。地位存低地址。  int a &#x3D; 0x12345678</p>
+<p>  大端法：（网络存储） 高位存低地址。低位存高地址 </p>
+<p>  htonl –&gt; 本地–》网络 （IP）     192.168.1.11 –&gt; string –&gt; atoi –&gt; int –&gt; htonl –&gt; 网络字节序</p>
+<p>  htons –&gt; 本地–》网络 (port)</p>
+<p>  ntohl –&gt; 网络–》 本地（IP）</p>
+<p>  ntohs –&gt; 网络–》 本地（Port）</p>
+<p>ntohl函数用于字节顺序转换，将32位整数从网络字节顺序转换为主机字节顺序，对应于网络编程中的网络字节顺序的转换。它接收一个32位整数（网络字节顺序是大端法因为是tcp，早期大型机采用的是大端字节序，而大部分网络协议设计也遵循了这个约定）并返回主机字节顺序(一般是小端法)的整数。</p>
+<h2 id="IP地址转换函数"><a href="#IP地址转换函数" class="headerlink" title="IP地址转换函数"></a>IP地址转换函数</h2><p>IP地址转换函数：</p>
+<p>  <code>int inet_pton(int af, const char *src, void *dst);</code>   本地字节序（string IP） —&gt; 网络字节序</p>
+<p>​    af：AF_INET、AF_INET6</p>
+<p>​    src：传入，IP地址（点分十进制）</p>
+<p>​    dst：传出，转换后的 网络字节序的 IP地址。 </p>
+<p>​    返回值：</p>
+<p>​      成功： 1</p>
+<p>​      异常： 0， 说明src指向的不是一个有效的ip地址。</p>
+<p>​      失败：-1</p>
+<p>​    <code>const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);</code> 网络字节序 —&gt; 本地字节序（string IP）</p>
+<p>​    af：AF_INET、AF_INET6</p>
+<p>​    src: 网络字节序IP地址</p>
+<p>​    dst：本地字节序（string IP）</p>
+<p>​    size： dst 的大小。</p>
+<p>​    返回值： 成功：dst。   </p>
+<p>​      失败：NULL</p>
+<p>inet_ntop函数用于将IP地址从二进制格式转换为可打印的字符串格式。它接收一个指向存储IP地址的结构体（如struct in_addr或struct in6_addr）以及地址族（AF_INET或AF_INET6），将二进制格式的IP地址转换为点分十进制的字符串表示形式。</p>
+<h2 id="sockaddr地址结构"><a href="#sockaddr地址结构" class="headerlink" title="sockaddr地址结构"></a>sockaddr地址结构</h2><p><img src="/Linux-socket/image-20230707141717803.png" alt="image-20230707141717803"></p>
+
+
+<p>sockaddr地址结构：  IP + port –&gt; 在网络环境中唯一标识一个进程。</p>
+<p>  struct sockaddr_in addr;</p>
+<p>  addr.sin_family &#x3D; AF_INET&#x2F;AF_INET6      man 7 ip</p>
+<p>  addr.sin_port &#x3D; htons(9527);</p>
+<p>​    <code>int dst;</code></p>
+<p>​    <code>inet_pton(AF_INET, &quot;192.157.22.45&quot;, (void *)&amp;dst);</code></p>
+<p>  <code>addr.sin_addr.s_addr = dst;</code>相当于addr.sin_addr.s_addr &#x3D; htonl(INADDR_ANY);一般用后者简单</p>
+<p>  <code>【*】addr.sin_addr.s_addr = htonl(INADDR_ANY);</code>    取出系统中有效的任意IP地址。二进制类型。</p>
+<p>  <code>bind(fd, (struct sockaddr *)&amp;addr, size);</code></p>
+<h3 id="socket和bind"><a href="#socket和bind" class="headerlink" title="socket和bind"></a>socket和bind</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">socket函数：</span><br><span class="line"></span><br><span class="line">	#include &lt;sys/socket.h&gt;</span><br><span class="line"></span><br><span class="line">	int socket(int domain, int type, int protocol);		创建一个 套接字</span><br><span class="line"></span><br><span class="line">		domain：AF_INET、AF_INET6、AF_UNIX</span><br><span class="line"></span><br><span class="line">		type：SOCK_STREAM、SOCK_DGRAM</span><br><span class="line"></span><br><span class="line">		protocol: 0 </span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line">	</span><br><span class="line">			成功： 新套接字所对应文件描述符</span><br><span class="line"></span><br><span class="line">			失败: -1 errno</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#include &lt;arpa/inet.h&gt;</span><br><span class="line"></span><br><span class="line">	 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);		给socket绑定一个 地址结构 (IP+port)</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">			struct sockaddr_in addr;</span><br><span class="line"></span><br><span class="line">			addr.sin_family = AF_INET;</span><br><span class="line"></span><br><span class="line">			addr.sin_port = htons(8888);</span><br><span class="line"></span><br><span class="line">			addr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line"></span><br><span class="line">		addr: 传入参数(struct sockaddr *)&amp;addr</span><br><span class="line"></span><br><span class="line">		addrlen: sizeof(addr) 地址结构的大小。</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="listen和accept"><a href="#listen和accept" class="headerlink" title="listen和accept"></a>listen和accept</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">int listen(int sockfd, int backlog);		设置同时与服务器建立连接的上限数。（同时进行3次握手的客户端数量）</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">		backlog：上限数值。最大值 128.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);	阻塞等待客户端建立连接，成功的话，返回一个与客户端成功连接的socket文件描述符。</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">		addr：传出参数。成功与服务器建立连接的那个客户端的地址结构（IP+port）</span><br><span class="line"></span><br><span class="line">			socklen_t clit_addr_len = sizeof(addr);</span><br><span class="line"></span><br><span class="line">		addrlen：传入传出。 &amp;clit_addr_len</span><br><span class="line"></span><br><span class="line">			 入：addr的大小。 出：客户端addr实际大小。</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：能与客户端进行数据通信的 socket 对应的文件描述。</span><br><span class="line"></span><br><span class="line">			失败： -1 ， errno</span><br><span class="line">		</span><br></pre></td></tr></table></figure>
+
+<h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);	  使用现有的 socket 与服务器建立连接</span><br><span class="line"></span><br><span class="line">		sockfd： socket 函数返回值</span><br><span class="line"></span><br><span class="line">			struct sockaddr_in srv_addr;		// 服务器地址结构</span><br><span class="line"></span><br><span class="line">			srv_addr.sin_family = AF_INET;</span><br><span class="line"></span><br><span class="line">			srv_addr.sin_port = 9527 	跟服务器bind时设定的 port 完全一致。</span><br><span class="line"></span><br><span class="line">			inet_pton(AF_INET, &quot;服务器的IP地址&quot;，&amp;srv_adrr.sin_addr.s_addr);</span><br><span class="line"></span><br><span class="line">		addr：传入参数。服务器的地址结构</span><br><span class="line"></span><br><span class="line">			</span><br><span class="line">		addrlen：服务器的地址结构的大小</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno</span><br><span class="line"></span><br><span class="line">		如果不使用bind绑定客户端地址结构, 采用&quot;隐式绑定&quot;.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="CS模型的TCP通信分析"><a href="#CS模型的TCP通信分析" class="headerlink" title="CS模型的TCP通信分析"></a>CS模型的TCP通信分析</h2><p>TCP通信流程分析:</p>
+<p>server:<br>    1. socket()	创建socket</p>
+<ol start="2">
+<li><p>bind()	绑定服务器地址结构</p>
+</li>
+<li><p>listen()	设置监听上限</p>
+</li>
+<li><p>accept()	阻塞监听客户端连接</p>
+</li>
+<li><p>read(fd)	读socket获取客户端数据</p>
+</li>
+<li><p>小–大写	toupper()</p>
+</li>
+<li><p>write(fd)</p>
+</li>
+<li><p>close();</p>
+</li>
+</ol>
+<p>client:</p>
+<ol>
+<li><p>socket()	创建socket</p>
+</li>
+<li><p>connect();	与服务器建立连接</p>
+</li>
+<li><p>write()	写数据到 socket</p>
+</li>
+<li><p>read()	读转换后的数据。</p>
+</li>
+<li><p>显示读取结果</p>
+</li>
+<li><p>close()</p>
+</li>
+</ol>
+<h2 id="server的实现"><a href="#server的实现" class="headerlink" title="server的实现"></a>server的实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include &lt;ctype.h&gt;  </span><br><span class="line">#include &lt;sys/socket.h&gt;  </span><br><span class="line">#include &lt;arpa/inet.h&gt;  </span><br><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;string.h&gt;  </span><br><span class="line">#include &lt;unistd.h&gt;  </span><br><span class="line">#include &lt;errno.h&gt;  </span><br><span class="line">#include &lt;pthread.h&gt;  </span><br><span class="line">#define SERV_PORT 9527  </span><br><span class="line"></span><br><span class="line">void sys_err(const char *str)  </span><br><span class="line">&#123;  </span><br><span class="line">        perror(str);  </span><br><span class="line">        exit(1);  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])  </span><br><span class="line">&#123;  </span><br><span class="line">        int lfd = 0, cfd = 0;  </span><br><span class="line">        int ret, i;  </span><br><span class="line">        char buf[BUFSIZ], client_IP[1024]; //[+d查看系统定义的BUFSIZ的大小 </span><br><span class="line"></span><br><span class="line">        struct sockaddr_in serv_addr, clit_addr;  // 定义服务器地址结构 和 客户端地址结构  </span><br><span class="line">        socklen_t clit_addr_len;                  // 客户端地址结构大小  </span><br><span class="line"></span><br><span class="line">        serv_addr.sin_family = AF_INET;             // IPv4  </span><br><span class="line">        serv_addr.sin_port = htons(SERV_PORT);      // 转为网络字节序的 端口号  </span><br><span class="line">        serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // 获取本机任意有效IP  </span><br><span class="line"></span><br><span class="line">        lfd = socket(AF_INET, SOCK_STREAM, 0);      //创建一个 socket  </span><br><span class="line">        if (lfd == -1) &#123;  </span><br><span class="line">                sys_err(&quot;socket error&quot;);  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">        bind(lfd, (struct sockaddr *)&amp;serv_addr, sizeof(serv_addr));//给服务器socket绑定地址结构（IP+port)  </span><br><span class="line"></span><br><span class="line">        listen(lfd, 128);                   //  设置监听上限  </span><br><span class="line"></span><br><span class="line">        clit_addr_len = sizeof(clit_addr);  //  获取客户端地址结构大小  </span><br><span class="line"></span><br><span class="line">        cfd = accept(lfd, (struct sockaddr *)&amp;clit_addr, &amp;clit_addr_len);   // 阻塞等待客户端连接请求  </span><br><span class="line">        if (cfd == -1)  </span><br><span class="line">                sys_err(&quot;accept error&quot;);  </span><br><span class="line"></span><br><span class="line">        printf(&quot;client ip:%s port:%d\n&quot;,   </span><br><span class="line">                        inet_ntop(AF_INET, &amp;clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)),                        ntohs(clit_addr.sin_port));         // 根据accept传出参数，获取客户端 ip 和 port  </span><br><span class="line"></span><br><span class="line">        while (1) &#123;  </span><br><span class="line">                ret = read(cfd, buf, sizeof(buf));      // 读客户端数据 ssize_t read(int fd, void *buf, size_t count); </span><br><span class="line">                //read函数的返回值是读取到的字节数，将其赋给ret变量。</span><br><span class="line">                write(STDOUT_FILENO, buf, ret);         // 写到屏幕查看  ssize_t write(int fd, const void *buf, size_t count);</span><br><span class="line"></span><br><span class="line">                for (i = 0; i &lt; ret; i++)                // 小写 -- 大写  </span><br><span class="line">                        buf[i] = toupper(buf[i]);  </span><br><span class="line"></span><br><span class="line">                write(cfd, buf, ret);                   // 将大写，写回给客户端。  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">        close(lfd);  </span><br><span class="line">        close(cfd);  </span><br><span class="line"></span><br><span class="line">        return 0;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="获取客户端地址结构"><a href="#获取客户端地址结构" class="headerlink" title="获取客户端地址结构"></a>获取客户端地址结构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cfd = accept(lfd, (struct sockaddr *)&amp;clit_addr, &amp;clit_addr_len);</span><br><span class="line">accept函数中的clit_addr传出的就是客户端地址结构，IP+port</span><br><span class="line"></span><br><span class="line">于是，在代码中增加此段代码，可获取客户端信息：</span><br><span class="line">printf(&quot;client ip:%s port:%d\n&quot;, </span><br><span class="line">            inet_ntop(AF_INET,&amp;clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)), </span><br><span class="line">            ntohs(clit_addr.sin_port));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="client的实现"><a href="#client的实现" class="headerlink" title="client的实现"></a>client的实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;  </span><br><span class="line">#include &lt;sys/socket.h&gt;  </span><br><span class="line">#include &lt;arpa/inet.h&gt;  </span><br><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;string.h&gt;  </span><br><span class="line">#include &lt;unistd.h&gt;  </span><br><span class="line">#include &lt;errno.h&gt;  </span><br><span class="line">#include &lt;pthread.h&gt;  </span><br><span class="line"></span><br><span class="line">#define SERV_PORT 9527  </span><br><span class="line"></span><br><span class="line">void sys_err(const char* str)  </span><br><span class="line">&#123;  </span><br><span class="line">    perror(str);  </span><br><span class="line">    exit(1);  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])  </span><br><span class="line">&#123;  </span><br><span class="line">    int cfd;  </span><br><span class="line">    int conter = 10;  </span><br><span class="line">    char buf[BUFSIZ];  </span><br><span class="line">    </span><br><span class="line">    struct sockaddr_in serv_addr;          //服务器地址结构  </span><br><span class="line"></span><br><span class="line">    serv_addr.sin_family = AF_INET;  </span><br><span class="line">    serv_addr.sin_port = htons(SERV_PORT);  </span><br><span class="line">    //inet_pton(AF_INET, &quot;127.0.0.1&quot;, &amp;serv_addr.sin_addr.s_addr);  </span><br><span class="line">    inet_pton(AF_INET, &quot;127.0.0.1&quot;, &amp;serv_addr.sin_addr);  </span><br><span class="line"></span><br><span class="line">    cfd = socket(AF_INET, SOCK_STREAM, 0);  </span><br><span class="line">    if (cfd == -1)  </span><br><span class="line">        sys_err(&quot;socket error&quot;);  </span><br><span class="line"></span><br><span class="line">    int ret = connect(cfd, (struct sockaddr*)&amp;serv_addr, sizeof(serv_addr));  </span><br><span class="line">    if (ret != 0)  </span><br><span class="line">        sys_err(&quot;connect err&quot;);  </span><br><span class="line"></span><br><span class="line">    while (--conter) &#123;  </span><br><span class="line">        write(cfd, &quot;hello\n&quot;, 6);  </span><br><span class="line">        ret = read(cfd, buf, sizeof(buf));  </span><br><span class="line">        write(STDOUT_FILENO, buf, ret);  </span><br><span class="line">        sleep(1);  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    close(cfd);  </span><br><span class="line"></span><br><span class="line">    return 0;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里遇到过一个问题，如果之前运行server，用Ctrl+z终止进程，ps aux列表里会有服务器进程残留，这个会影响当前服务器。解决方法是kill掉这些服务器进程。不然端口被占用，当前运行的服务器进程接收不到东西，没有回显。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="prev" title="Linux-网络基础">
+      <i class="fa fa-chevron-left"></i> Linux-网络基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%93%BE%E6%8E%A5/" rel="next" title="深入理解计算机系统-第七章-链接">
+      深入理解计算机系统-第七章-链接 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%AD%97%E8%8A%82%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">网络字节序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">IP地址转换函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sockaddr%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">sockaddr地址结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket%E5%92%8Cbind"><span class="nav-number">3.1.</span> <span class="nav-text">socket和bind</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#listen%E5%92%8Caccept"><span class="nav-number">3.2.</span> <span class="nav-text">listen和accept</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#connect"><span class="nav-number">3.3.</span> <span class="nav-text">connect</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CS%E6%A8%A1%E5%9E%8B%E7%9A%84TCP%E9%80%9A%E4%BF%A1%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">CS模型的TCP通信分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">server的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">获取客户端地址结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#client%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.</span> <span class="nav-text">client的实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

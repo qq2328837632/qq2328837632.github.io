@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是协议从应用的角度出发，协议可理解为“规则”，是数据传输和数据的解释的规则。 假设，A、B双方欲传输文件。规定： 第一次，传输文件名，接收方接收到文件名，应答OK给传输方； 第二次，发送文件的尺寸，接收方接收到该数据再次应答一个OK； 第三次，传输文件内容。同样，接收方接收数据完成后应答OK表示文件内容接收成功。 由此，无论A、B之间传递何种文件，都是通过三次数据传输来完成。A、B之间形成了一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-网络基础">
+<meta property="og:url" content="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="什么是协议从应用的角度出发，协议可理解为“规则”，是数据传输和数据的解释的规则。 假设，A、B双方欲传输文件。规定： 第一次，传输文件名，接收方接收到文件名，应答OK给传输方； 第二次，发送文件的尺寸，接收方接收到该数据再次应答一个OK； 第三次，传输文件内容。同样，接收方接收数据完成后应答OK表示文件内容接收成功。 由此，无论A、B之间传递何种文件，都是通过三次数据传输来完成。A、B之间形成了一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png">
+<meta property="og:image" content="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png">
+<meta property="og:image" content="http://example.com/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png">
+<meta property="og:image" content="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png">
+<meta property="og:image" content="http://example.com/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png">
+<meta property="og:image" content="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png">
+<meta property="article:published_time" content="2023-07-06T02:44:33.000Z">
+<meta property="article:modified_time" content="2023-07-07T06:10:03.331Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png">
+
+<link rel="canonical" href="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux-网络基础 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux-网络基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-06 10:44:33" itemprop="dateCreated datePublished" datetime="2023-07-06T10:44:33+08:00">2023-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-07 14:10:03" itemprop="dateModified" datetime="2023-07-07T14:10:03+08:00">2023-07-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是协议"><a href="#什么是协议" class="headerlink" title="什么是协议"></a>什么是协议</h2><p>从应用的角度出发，协议可理解为“规则”，是数据传输和数据的解释的规则。</p>
+<p>假设，A、B双方欲传输文件。规定：</p>
+<p>第一次，传输文件名，接收方接收到文件名，应答OK给传输方；</p>
+<p>第二次，发送文件的尺寸，接收方接收到该数据再次应答一个OK；</p>
+<p>第三次，传输文件内容。同样，接收方接收数据完成后应答OK表示文件内容接收成功。</p>
+<p>由此，无论A、B之间传递何种文件，都是通过三次数据传输来完成。A、B之间形成了一个最简单的数据传输规则。双方都按此规则发送、接收数据。A、B之间达成的这个相互遵守的规则即为协议。</p>
+<p>这种仅在A、B之间被遵守的协议称之为<strong>原始协议</strong>。当此协议被更多的人采用，不断的增加、改进、维护、完善。最终形成一个稳定的、完整的文件传输协议，被广泛应用于各种文件传输过程中。该协议就成为一个<strong>标准协议</strong>。最早的ftp协议就是由此衍生而来。</p>
+<p>TCP协议注重数据的传输。http协议着重于数据的解释。</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" alt="image-20230706104601518"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" class title="This is an test image">
+
+<h2 id="7层模型和4层模型及代表协议"><a href="#7层模型和4层模型及代表协议" class="headerlink" title="7层模型和4层模型及代表协议"></a>7层模型和4层模型及代表协议</h2><p>分层模型结构： </p>
+<p>  OSI七层模型： 物、数、网、传、会、表、应</p>
+<p>  TCP&#x2F;IP 4层模型：网（链路层&#x2F;网络接口层）、网、传、应</p>
+<p>​    应用层：http、ftp、nfs、ssh、telnet。。。</p>
+<p>​    传输层：TCP、UDP</p>
+<p>​    网络层：IP、ICMP、IGMP</p>
+<p>​    链路层：以太网帧协议、ARP</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" alt="image-20230706104711613"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" class title="This is an test image">
+
+<p>网络传输流程： </p>
+<p>  数据没有封装之前，是不能在网络中传递。</p>
+<p>  数据-》应用层-》传输层-》网络层-》链路层 — 网络环境</p>
+<h2 id="以太网帧和ARP请求"><a href="#以太网帧和ARP请求" class="headerlink" title="以太网帧和ARP请求"></a>以太网帧和ARP请求</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" alt="image-20230706104959831"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" class title="This is an test image">
+
+<p>以太网帧协议：</p>
+<p>  ARP协议：根据 Ip 地址获取 mac 地址。</p>
+<p>  以太网帧协议：根据mac地址，完成数据包传输。</p>
+<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP协议：  </p>
+<p>  版本： IPv4、IPv6 – 4位</p>
+<p>  TTL： time to live 。 设置数据包在路由节点中的跳转上限。每经过一个路由节点，该值-1， 减为0的路由，有义务将该数据包丢弃</p>
+<p>  源IP： 32位。— 4字节   192.168.1.108 — 点分十进制 IP地址（string） — 二进制 </p>
+<p>  目的IP：32位。— 4字节</p>
+<h2 id="端口号和UDP协议"><a href="#端口号和UDP协议" class="headerlink" title="端口号和UDP协议"></a>端口号和UDP协议</h2><p>UDP：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>IP地址：可以在网络环境中，唯一标识一台主机。</p>
+<p>端口号：可以网络的一台主机上，唯一标识一个进程。</p>
+<p>ip地址+端口号：可以在网络环境中，唯一标识一个进程。</p>
+<h2 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h2><p>TCP协议：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>  32序号;</p>
+<p>  32确认序号。 </p>
+<p>  6个标志位。</p>
+<p>  16位窗口大小。  2^16 &#x3D; 65536</p>
+<h2 id="BS和CS模型对比"><a href="#BS和CS模型对比" class="headerlink" title="BS和CS模型对比"></a>BS和CS模型对比</h2><p>c&#x2F;s模型： </p>
+<p>  client-server </p>
+<p>b&#x2F;s模型： </p>
+<p>  browser-server </p>
+<p>​      C&#x2F;S        																																				B&#x2F;S</p>
+<p>  优点： 缓存大量数据、协议选择灵活、速度快、迭代快（只需要发布再client就行）    				 安全性、跨平台、开发工作量较小</p>
+<p>  缺点： 安全性、跨平台、开发工作量较大    						 																不能缓存大量数据、严格遵守 http</p>
+<h2 id="套接字"><a href="#套接字" class="headerlink" title="套接字"></a>套接字</h2><p>网络套接字： socket</p>
+<p>  一个文件描述符指向一个套接字（该套接字内部由内核借助两个缓冲区实现。）</p>
+<p>  在通信过程中， 套接字一定是成对出现的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/20/Linux-%E9%94%81/" rel="prev" title="Linux-锁">
+      <i class="fa fa-chevron-left"></i> Linux-锁
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/07/Linux-socket/" rel="next" title="Linux-socket">
+      Linux-socket <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.</span> <span class="nav-text">什么是协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7%E5%B1%82%E6%A8%A1%E5%9E%8B%E5%92%8C4%E5%B1%82%E6%A8%A1%E5%9E%8B%E5%8F%8A%E4%BB%A3%E8%A1%A8%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">7层模型和4层模型及代表协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91%E5%B8%A7%E5%92%8CARP%E8%AF%B7%E6%B1%82"><span class="nav-number">3.</span> <span class="nav-text">以太网帧和ARP请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP%E5%8D%8F%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">IP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E5%8F%B7%E5%92%8CUDP%E5%8D%8F%E8%AE%AE"><span class="nav-number">5.</span> <span class="nav-text">端口号和UDP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP%E5%8D%8F%E8%AE%AE"><span class="nav-number">6.</span> <span class="nav-text">TCP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BS%E5%92%8CCS%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94"><span class="nav-number">7.</span> <span class="nav-text">BS和CS模型对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="nav-number">8.</span> <span class="nav-text">套接字</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

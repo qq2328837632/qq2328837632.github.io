@@ -147,6 +147,821 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/" class="post-title-link" itemprop="url">第七天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-08 20:26:50" itemprop="dateCreated datePublished" datetime="2023-04-08T20:26:50+08:00">2023-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-28 14:32:11" itemprop="dateModified" datetime="2023-04-28T14:32:11+08:00">2023-04-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="容器算法迭代器初识"><a href="#容器算法迭代器初识" class="headerlink" title="容器算法迭代器初识"></a>容器算法迭代器初识</h1><h2 id="vector存放内置数据类型"><a href="#vector存放内置数据类型" class="headerlink" title="vector存放内置数据类型"></a>vector存放内置数据类型</h2><p>容器:<code>vector</code></p>
+<p>算法:<code>for_each</code></p>
+<p>迭代器:<code>vector&lt;int&gt;::iterator</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;algorilhm&gt;</span><br><span class="line">void MyPrint(int val)&#123;</span><br><span class="line">	cout &lt;&lt; val &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test01() &#123;</span><br><span class="line">	//创建vector容器对象，并且通过模板参数指定容器中存放的数据的类型</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//向容器中放数据</span><br><span class="line">	v.push_back(10);</span><br><span class="line">	v.push_back(20);</span><br><span class="line">	v.push_back(30);</span><br><span class="line">	v.push_back(40);</span><br><span class="line">	//每一个容器都有自己的迭代器,迭代器是用来遍历容器中的元素</span><br><span class="line">	//v.begin()返回迭代器，这个迭代器指向容器中第一个数据</span><br><span class="line">	//v.end()返回迭代器，这个迭代器指向容器元素的最后一个元素的下一个位置</span><br><span class="line">	//vector&lt;int&gt;::iterator拿到vector&lt;int&gt;这种容器的迭代器类型</span><br><span class="line">	vector&lt;int&gt; ::iterator pBegin = v.begin();</span><br><span class="line">	vector&lt;int&gt; ::iterator pEnd = v.end();</span><br><span class="line">	//第—种遍历方式:</span><br><span class="line">	while (pBegin ! = pEnd)&#123;</span><br><span class="line">		cout &lt;&lt;*pBegin &lt;&lt; endl;</span><br><span class="line">		pBegin++;</span><br><span class="line">	&#125;</span><br><span class="line">	//第二种遍历方式:</span><br><span class="line">	for (vector&lt;int&gt; : :iterator it = v.begin(); it != v.end( ); it++) &#123;</span><br><span class="line">		cout &lt;&lt;*it &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">	//第三种遍历方式:</span><br><span class="line">	//使用STL提供标准遍历算法头文件algorithm</span><br><span class="line">	for_each(v.begin(), v.end( ), MyPrint);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Vector容器嵌套容器"><a href="#Vector容器嵌套容器" class="headerlink" title="Vector容器嵌套容器"></a>Vector容器嵌套容器</h2><p>学习目标:</p>
+<p>容器中嵌套容器，我们将所有数据进行遍历输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//容器嵌套容器</span><br><span class="line">void test01() &#123;</span><br><span class="line">	vector&lt; vector&lt;int&gt; &gt;v ;</span><br><span class="line">	vector&lt;int&gt; v1;</span><br><span class="line">	vector&lt;int&gt; v2;</span><br><span class="line">	vector&lt;int&gt; v3;</span><br><span class="line">	vector&lt;int&gt; v4;</span><br><span class="line">	for (int i = ; i &lt; 4; i++) &#123;</span><br><span class="line">		v1.push_back(i + 1);</span><br><span class="line">		v2.push_back(i + 2);</span><br><span class="line">		v3.push_back(i + 3);</span><br><span class="line">		v4.push_back(i + 4);</span><br><span class="line">	&#125;</span><br><span class="line">	//将容器元素插入到vector v中</span><br><span class="line">	v.push_back(v1);</span><br><span class="line">	v.push_back(v2);</span><br><span class="line">	v.push_back(v3);</span><br><span class="line">	v.push_back(v4);</span><br><span class="line">	for (vector&lt;vector&lt;int&gt;&gt;::iterator it = v.begin(); it != v.end(); it++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (vector&lt;int&gt;: :iterator vit = (*it).begin(); vit != (*it).end(); vit++) </span><br><span class="line">		&#123;</span><br><span class="line">			cout &lt;&lt;*vit &lt;&lt; &quot; &quot;;</span><br><span class="line">		&#125;</span><br><span class="line">	cout&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="string容器"><a href="#string容器" class="headerlink" title="string容器"></a>string容器</h2><h3 id="string赋值操作"><a href="#string赋值操作" class="headerlink" title="string赋值操作"></a>string赋值操作</h3><p>功能描述:</p>
+<ul>
+<li>给string字符串进行赋值</li>
+</ul>
+<p>赋值的函数原型:</p>
+<ul>
+<li>string&amp; operator&#x3D;(const char* s );&#x2F;&#x2F;char*类型字符串赋值给当前的字符串</li>
+<li>string&amp; operator&#x3D;(const string &amp;s );&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
+<li>string&amp; operator&#x3D;( char c);&#x2F;&#x2F;字符赋值给当前的字符串</li>
+<li>string&amp; assign(const char *s ) ;&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
+<li>string&amp; assign(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符赋给当前的字符串</li>
+<li>string&amp; assign( const sting &amp;s );&#x2F;&#x2F;把字符串s赋给当前字符串</li>
+<li>string&amp; assign(int n, char c);&#x2F;&#x2F;用n个字符c赋给当前字符串</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">void test01()&#123;</span><br><span class="line">	str1 = &quot;hello vorld&quot;;</span><br><span class="line">	cout &lt;&lt; &quot;str1 - &quot; &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str2;</span><br><span class="line">	str2 = str1;</span><br><span class="line">	cout &lt;&lt; &quot;str2 = &quot; &lt;&lt; str2 &lt;&lt; endl;</span><br><span class="line">	string str3;</span><br><span class="line">	str3 = &#x27;a &#x27;;</span><br><span class="line">	cout &lt;&lt; &quot;str3 = &quot; &lt;&lt; str3 &lt;&lt; endl;</span><br><span class="line">	string str4;</span><br><span class="line">	str4.assign( &quot;hello c++&quot;);</span><br><span class="line">	cout &lt;&lt; &quot;str4 = &quot; &lt;&lt;str4 &lt;&lt; endl;</span><br><span class="line">	string str5;</span><br><span class="line">	str5.assign(&quot;hello c++&quot;,5);</span><br><span class="line">	cout &lt;&lt; &quot;str5 =&lt;&lt; str5 &lt;&lt; endl;</span><br><span class="line">	string str6;</span><br><span class="line">	str6.assign(str5);</span><br><span class="line">	cout &lt;&lt; &quot;str6 = &quot; &lt;&lt; str6 &lt;&lt; endl;</span><br><span class="line">	string str7;</span><br><span class="line">	str7 .assign(5，&#x27;x&#x27;);</span><br><span class="line">	cout &lt;&lt; &quot;str7 = &quot; &lt;&lt; str7 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:<br>string的赋值方式很多,operator&#x3D;这种方式是比较实用的</p>
+<h3 id="string字符串拼接"><a href="#string字符串拼接" class="headerlink" title="string字符串拼接"></a>string字符串拼接</h3><p>功能描述:</p>
+<ul>
+<li>实现在字符串末尾拼接字符串</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>string&amp; operator+&#x3D;(const char* str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;( const char c);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;( const string&amp; str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; append(const char *s );&#x2F;&#x2F;把字符串s连接到当前字符串结尾</li>
+<li>string&amp; append(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符连接到当前字符串结尾</li>
+<li>string&amp; append(const string &amp;s );&#x2F;&#x2F;同operator+&#x3D;(const string&amp; str)</li>
+<li>string&amp; append(const string &amp;s，int pos，int n);&#x2F;&#x2F;字符串s中从pos开始的n个字符连接到字符串结尾</li>
+</ul>
+<h3 id="string查找和替换"><a href="#string查找和替换" class="headerlink" title="string查找和替换"></a>string查找和替换</h3><p>函数原型:</p>
+<ul>
+<li>int find(const string&amp; str, int pos &#x3D; 0) const;&#x2F;&#x2F;查找str第一次出现位置,从pos开始查找</li>
+<li>int find( cqhst char* s , int pos &#x3D;0) const;&#x2F;&#x2F;查找s第一次出现位置,从pos开始查找</li>
+<li>int find(const char* s, int pos， int n) const;&#x2F;&#x2F;从pos位置查找s的前n个字符第一次位置</li>
+<li>int find(const char c, int pos &#x3D;0) const;&#x2F;&#x2F;查找字符c第一次出现位置</li>
+<li>int rfind(const string&amp; str, int pos &#x3D; npos) const;&#x2F;&#x2F;查找str最后一次位置,从pos开始查找</li>
+<li>int rfind(const char* s, int pos &#x3D; npos) const;&#x2F;&#x2F;查找s最后一次出现位置,从pos开始查找</li>
+<li>int rfind(const char* s, int pos, int n) const;&#x2F;&#x2F;从pos查找s的前n个字符最后一次位置</li>
+<li>int rfind(const char c, int pos &#x3D; npos) const;&#x2F;&#x2F;查找字符c最后一次出现位置</li>
+<li>string&amp; replace(int pos, int n, const string&amp; str);&#x2F;&#x2F;替换从pos开始n个字符为字符串str</li>
+<li>string&amp; replace(int pos, int n,const char*s );&#x2F;&#x2F;替换从pos开始的n个字符为字符串s</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li><p>. find查找是从左往后，rfind从右往左</p>
+</li>
+<li><p>. find找到字符串后返回查找的第一个字符位置，找不到返回-1</p>
+</li>
+<li><p>. replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串</p>
+<hr>
+</li>
+</ul>
+<p>总结:字符串对比主要是用于比较两个字符串是否相等，判断谁大谁小的意义并不是很大</p>
+<hr>
+<p>string中单个字符存取方式有两种</p>
+<ul>
+<li><p>char&amp; operator[](int n);&#x2F;&#x2F;通过[]方式取字符</p>
+</li>
+<li><p>char&amp; at(int n);&#x2F;&#x2F;通过at方法获取字符</p>
+<hr>
+</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li><p>string&amp; insert(int pos, const char* s );&#x2F;&#x2F;插入字符串</p>
+</li>
+<li><p>string&amp; insert(int pos, const string&amp; str);&#x2F;&#x2F;插入字符串</p>
+</li>
+<li><p>string&amp; insert(int pos, int n, char c);&#x2F;&#x2F;在指定位置插入n个字符c</p>
+</li>
+<li><p>string&amp; erase(int pos, int n &#x3D; npos);&#x2F;&#x2F;删除从Pos开始的n个字符</p>
+<hr>
+</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>string substr(int pos &#x3D; 0,int n &#x3D; npos) const;&#x2F;&#x2F;返回由pos开始的n个字符组成的字符串</li>
+</ul>
+<h2 id="vector容器"><a href="#vector容器" class="headerlink" title="vector容器"></a>vector容器</h2><h3 id="vector构造函数"><a href="#vector构造函数" class="headerlink" title="vector构造函数"></a>vector构造函数</h3><p>功能描述:</p>
+<ul>
+<li>创建vector容器</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>vector<T> v;&#x2F;&#x2F;采用模板实现类实现，默认构造函数</T></li>
+<li>vector(v.begin(), v.end());&#x2F;&#x2F;将v[begin(), end())区间中的元素拷贝给本身。</li>
+<li>vector(n, elem );&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
+<li>vector( const vector &amp;vec);&#x2F;&#x2F;拷贝构造函数。</li>
+</ul>
+<h3 id="vector赋值操作"><a href="#vector赋值操作" class="headerlink" title="vector赋值操作"></a>vector赋值操作</h3><p>函数原型:</p>
+<ul>
+<li>vector&amp; operator&#x3D;(const vector &amp;vec);&#x2F;&#x2F;重载等号操作符</li>
+<li>assign(beg, end);&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
+<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
+</ul>
+<h3 id="vector容量和大小"><a href="#vector容量和大小" class="headerlink" title="vector容量和大小"></a>vector容量和大小</h3><p>函数原型:</p>
+<ul>
+<li>empty();&#x2F;&#x2F;判断容器是否为空</li>
+<li>capacity();&#x2F;&#x2F;容器的容量</li>
+<li>size();&#x2F;&#x2F;返回容器中元素的个数</li>
+<li>resize(int num);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以默认值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
+<li>resize(int num，elem);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以elem值填充新位置。<br>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除</li>
+</ul>
+<h3 id="vector插入和删除"><a href="#vector插入和删除" class="headerlink" title="vector插入和删除"></a>vector插入和删除</h3><p>函数原型:</p>
+<ul>
+<li>push_back(ele);&#x2F;&#x2F;尾部插入元素ele</li>
+<li>pop_back();&#x2F;&#x2F;删除最后一个元素</li>
+<li>insert(const_iterator pos,ele);&#x2F;&#x2F;迭代器指向位置pos插入元素ele</li>
+<li>insert(const_iterator pos, int cunt,ele);&#x2F;&#x2F;迭代器指向位置pos插入count个元素ele</li>
+<li>erase(const_iterator pos);&#x2F;&#x2F;删除迭代器指向的元素</li>
+<li>erase(const_iterator start， const_iterator end);&#x2F;&#x2F;删除迭代器从start到end之间的元素</li>
+<li>clear();&#x2F;&#x2F;删除容器中所有元素</li>
+</ul>
+<h3 id="vector互换容器"><a href="#vector互换容器" class="headerlink" title="vector互换容器"></a>vector互换容器</h3><p>函数原型;</p>
+<ul>
+<li>swap(vec);&#x2F;&#x2F;将vec与本身的元素互换</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void teste2()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	for (int i - e; i &lt;100000; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;&quot;v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;&quot;v的大小为:&quot;&lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">	v.resize(3);</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;“v的大小为: &quot; &lt;&lt; v.size()&lt;&lt; endl;</span><br><span class="line">	//收缩内存</span><br><span class="line">	vector&lt;int&gt;(v).swap(v); //匿名对象vector&lt;int&gt;(v),读完这行自动被系统删除，匿名对象创建与v.size相同大小的cap和size</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;v的大小为:&quot; &lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结: swap可以使两个容器互换，可以达到实用的收缩内存效果.</p>
+<h3 id="vector预留空间"><a href="#vector预留空间" class="headerlink" title="vector预留空间"></a>vector预留空间</h3><p>功能描述:</p>
+<ul>
+<li>减少vector在动态扩展容量时的扩展次数</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>reserve(int len);&#x2F;&#x2F;容器预留len个元素长度，预留位置不初始化，元素不可访问。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void teste1()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//预留空间</span><br><span class="line">	v.reserve ( 100000);</span><br><span class="line">	int num = 0;</span><br><span class="line">	int* p = NULL;</span><br><span class="line">	for (int i = 0; i &lt; 100080; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	if (p != &amp;v[0])&#123;</span><br><span class="line">		p = &amp;v[0];//用来计算开辟了多少次内存,如果没有预留内存，则每次vector容量不够会重新分配，即&amp;v[0]会改变</span><br><span class="line">		num++;</span><br><span class="line">	&#125;</span><br><span class="line">	cout&lt;&lt;&quot;num=&quot;&lt;&lt;num&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:如果数据量较大，可以一开始利用reserve预留空间</p>
+<h2 id="C-中resize和reserve的区别"><a href="#C-中resize和reserve的区别" class="headerlink" title="C++中resize和reserve的区别"></a>C++中resize和reserve的区别</h2><p>reserve是设置了capacity的值，比如reserve(20)，表示该容器最大容量为20，但此时容器内还没有任何对象，也<strong>不能通过下标访问</strong>。会发生问题。<br>resize既分配了空间，也创建了对象，可以通过下标访问。<br>reserve只修改capacity大小，不修改size大小，resize既修改capacity大小，也修改size大小。</p>
+<p>所以以后访问string容器的值不够用什么方法都需要resize来初始化默认值防止出现错误。</p>
+<h2 id="deque容器"><a href="#deque容器" class="headerlink" title="deque容器"></a>deque容器</h2><h3 id="deque容器基本概念"><a href="#deque容器基本概念" class="headerlink" title="deque容器基本概念"></a>deque容器基本概念</h3><p>功能:</p>
+<ul>
+<li>双端数组，可以对头端进行插入删除操作</li>
+</ul>
+<p>deque与vector区别:</p>
+<ul>
+<li>vector对于头部的插入删除效率低，数据量越大，效率越低.</li>
+<li>deque相对而言，对头部的插入删除速度比vector快</li>
+<li>vector访问元素时的速度会比deque快,这和两者内部实现有关</li>
+</ul>
+<p>deque内部工作原理:</p>
+<p>deque内部有个中控器，维护每段缓冲区中的内容，缓冲区中存放真实数据</p>
+<p>中控器维护的是每个缓冲区的地址，使得使用deque时像—片连续的内存空间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void printDeque(const deque&lt;int&gt;&amp; d)&#123;//限制不允许修改，只读，则 const_iterator</span><br><span class="line">	for (deque&lt;int&gt; :: const_iterator it = d.begin(); it != d.end(); it++)&#123;</span><br><span class="line">		cout &lt;&lt;*it&lt;&lt;&quot;&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">// deque构造</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	deque&lt;int&gt; d1;//无参构造函数</span><br><span class="line">	for (int i = e; i &lt; 10; i++)&#123;</span><br><span class="line">		d1.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	printDeque(d1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结: deque容器和vector容器的构造方式几乎一致，灵活使用即可</p>
+<h3 id="deque赋值操作"><a href="#deque赋值操作" class="headerlink" title="deque赋值操作"></a>deque赋值操作</h3><p>函数原型:</p>
+<ul>
+<li>deque&amp; operator&#x3D;(const deque &amp;deq);&#x2F;&#x2F;重载等号操作符</li>
+<li>assign(beg, end) ;&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
+<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li><p>deque.empty();&#x2F;&#x2F;判断容器是否为空</p>
+</li>
+<li><p>deque.size();&#x2F;&#x2F;返回容器中元素的个数,deque没有容量概念（cap）</p>
+</li>
+<li><p>deque.resize(num );&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以默认值0填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
+</li>
+<li><p>deque.resize(num，elem);&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以elem值填充新位置</p>
+<p>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
+</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>deque没有容量的概念</li>
+<li>判断是否为空— empty</li>
+<li>返回元素个数— size</li>
+<li>重新指定个数— resize</li>
+</ul>
+<h3 id="3-3-5-deque插入和删除"><a href="#3-3-5-deque插入和删除" class="headerlink" title="3.3.5 deque插入和删除"></a>3.3.5 deque插入和删除</h3><p>功能描述:</p>
+<ul>
+<li>向deque容器中插入和删除数据</li>
+</ul>
+<p>函数原型:</p>
+<p>​	两端插入操作:</p>
+<ul>
+<li>push_back(elem);&#x2F;&#x2F;在容器尾部添加一个数据</li>
+<li>push_front(elem);&#x2F;&#x2F;在容器头部插入一个数据</li>
+<li>pop_back();&#x2F;&#x2F;删除容器最后一个数据</li>
+<li>pop_front( );&#x2F;&#x2F;删除容器第一个数据</li>
+</ul>
+<p>指定位置操作:</p>
+<ul>
+<li>insert(pos,elem) ;&#x2F;&#x2F;在pos位置插入一个elem元素的拷贝，返回新数据的位置。</li>
+<li>insert( pos,n,elem);&#x2F;&#x2F;在pos位置插入n个elem数据，无返回值。</li>
+<li>insert(pos ,beg,end);&#x2F;&#x2F;在pos位置插入[beg,end)区间的数据，无返回值。</li>
+<li>clear();清空容器的所有数据</li>
+<li>erase(beg,end);&#x2F;&#x2F;删除[beg,end)区间的数据，返回下一个数据的位置。</li>
+<li>erase(pos);&#x2F;&#x2F;删除pos位置的数据，返回下一个数据的位置。</li>
+</ul>
+<p>总结:</p>
+<p>插入和删除提供的位置是迭代器!(如d.begin()),还可以</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">deque&lt;int&gt;::iterator it = d1.begin() ;</span><br><span class="line">it++;</span><br><span class="line">d1.erase(it);</span><br></pre></td></tr></table></figure>
+
+<p>尾插— push_back</p>
+<p>尾删— pop_back</p>
+<p>头插— push_front</p>
+<p>头删— pop_front</p>
+<hr>
+<p>函数原型:</p>
+<ul>
+<li>at(int idx);&#x2F;&#x2F;返回索引idx所指的数据</li>
+<li>operator[]; &#x2F;&#x2F;返回索引idx所指的数据</li>
+<li>front( );&#x2F;&#x2F;返回容器中第一个数据元素</li>
+<li>back();&#x2F;&#x2F;返回容器中最后一个数据元素</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/08/c%E5%92%8Cc++/c-%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/08/c%E5%92%8Cc++/c-%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">c++ 基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-08 13:49:29" itemprop="dateCreated datePublished" datetime="2023-04-08T13:49:29+08:00">2023-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-28 12:09:19" itemprop="dateModified" datetime="2023-04-28T12:09:19+08:00">2023-04-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="处理类型"><a href="#处理类型" class="headerlink" title="处理类型"></a>处理类型</h1><h2 id="类型别名"><a href="#类型别名" class="headerlink" title="类型别名"></a>类型别名</h2><p>有两种方法可用于定义类型别名。传统的方法是使用关键字typedef:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">typedef double wages;//wages是 double的同义词</span><br><span class="line"></span><br><span class="line">typedef wages base,*p;//base是double的同义词,p是double*的同义词</span><br></pre></td></tr></table></figure>
+
+<p>新标准规定了一种新的方法，使用别名声明(alias declaration)来定义类型的别名:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">using SI = Sales_item;/ /SI是sales_item的同义词</span><br></pre></td></tr></table></figure>
+
+<p>这种方法用关键字using 作为别名声明的开始，其后紧跟别名和等号，其作用是把等号左侧的名字规定成等号右侧类型的别名。</p>
+<p>例如以下声明中的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef long double DBL;</span><br><span class="line"></span><br><span class="line">我们引入了一个新的类型名称DBL，它是long double的别名，并且具有：</span><br><span class="line"></span><br><span class="line">typedef：存储类说明符</span><br><span class="line"></span><br><span class="line">long double：类型说明符</span><br><span class="line"></span><br><span class="line">DBL：声明符</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="指针、常量和类型别名"><a href="#指针、常量和类型别名" class="headerlink" title="指针、常量和类型别名"></a>指针、常量和类型别名</h3><p>如果某个类型别名指代的是复合类型或常量，那么把它用到声明语句里就会产生意想不到的后果。</p>
+<p>例如下面的声明语句用到了类型pstring,它实际上是类型char*的别名:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">typedef char *pstring;</span><br><span class="line">const pstring cstr = 0;// cstr是指向char的常量指针</span><br><span class="line">const pstring *ps;// ps是一个指针，它的对象是指向char的常量指针</span><br></pre></td></tr></table></figure>
+
+<p>上述两条声明语句的基本数据类型都是const pstring，和过去一样，const是对给定类型的修饰。pstring 实际上是指向char的指针，因此，const pstring 就是指向char的常量指针，而非指向常量字符的指针。</p>
+<p>遇到一条使用了类型别名的声明语句时，人们往往会错误地尝试把类型别名替换成它本来的样子，以理解该语句的含义:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const char *cstr =0;</span><br><span class="line">//是对const pstring cstr的错误理解</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>再强调一遍:这种理解是错误的。声明语句中用到pstring时，其基本数据类型是指针。可是用 char重写了声明语句后，数据类型就变成了char，* 成为了声明符的一部分。这样改写的结果是，const char成了基本数据类型。前后两种声明含义截然不同，前者声明了一个指向char的常量指针,改写后的形式则声明了一个指向const char的指针。主要是看  * 具体跟谁。这里的区别在于，typedef出来的类型是看做一个单独的类型，而char* 这种直接的写法中，char* 才是单独的类型，*需要看做是和p结合在一起，含义不同。</p>
+<h2 id="类型说明符"><a href="#类型说明符" class="headerlink" title="类型说明符"></a>类型说明符</h2><p>编程时常常需要把表达式的值赋给变量，这就要求在声明变量的时候清楚地知道表达式的类型。然而要做到这一点并非那么容易，有时甚至根本做不到。为了解决这个问题，C++11新标准引入了auto类型说明符，用它就能让编译器替我们去分析表达式所属的类型。和原来那些只对应一种特定类型的说明符（比如double）不同，auto让编译器通过初始值来推算变量的类型。显然，auto定义的变量必须有初始值:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//由val1和val2相加的结果可以推断出item的类型</span><br><span class="line">auto item = val1 + val2;// item初始化为vall和val2相加的结果</span><br></pre></td></tr></table></figure>
+
+<p>此处编译器将根据vall和val2相加的结果来推断item的类型。如果val1和val2是类sales item的对象，则item的类型就是Sales_item;如果这两个变量的类型是double，则item的类型就是double，以此类推。</p>
+<p>使用auto也能在一条语句中声明多个变量。因为一条声明语句只能有一个基本数据类型，所以该语句中所有变量的初始基本数据类型都必须一样:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto i = 0, *p=&amp;i;//正确:i是整数、p是整型指针,auto代表int型</span><br><span class="line">auto sz = 0,pi = 3.14;//错误:sz和pi的类型不一致</span><br></pre></td></tr></table></figure>
+
+<p>还可以将引用的类型设为auto，此时原来的初始化规则仍然适用:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">auto  &amp;g=ci;//g是一个整型常量引用，绑定到ci</span><br><span class="line">auto &amp;h=42;//错误:不能为非常量引用绑定字面值</span><br><span class="line">const auto &amp;j=42; //正确:可以为常量引用绑定字面值</span><br></pre></td></tr></table></figure>
+
+<p>要在一条语句中定义多个变量，切记，符号&amp;和*只从属于某个声明符，而非基本数据类型的一部分，因此初始值必须是同一种类型:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">auto k=ci, &amp;l= i;//k是整数，1是整型引用</span><br><span class="line">auto &amp;m= ci, *p= &amp;ci;// m是对整型常量(const int)的引用，p是指向整型常量(const int)的指针</span><br><span class="line">//错误:i的类型是int而&amp;ci的类型是const int</span><br><span class="line">auto &amp;n= i, *p2= &amp;ci;//使用引用作为初始类型，初始值中的顶层const属性仍然保存,底层 const 的限制却不能被忽视。当执行对象的拷贝操作时，拷入和拷出的对象必须具有相同的底层 const 资格，或者两个对象的数据类型必须能够转换，一般来说，非常量可以转化为常量，反之不行。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="decltype类型指示符"><a href="#decltype类型指示符" class="headerlink" title="decltype类型指示符"></a>decltype类型指示符</h2><p>有时会遇到这种情况:希望从表达式的类型推断出要定义的变量的类型，但是不想用该表达式的值初始化变量。为了满足这一要求，C++11新标准引入了第二种类型说明符dec1type，它的作用是选择并返回操作数的数据类型。在此过程中，编译器分析表达式并得到它的类型，却不实际计算表达式的值:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decltype(f()) sum = x; // sum的类型就是函数f的返回类型</span><br></pre></td></tr></table></figure>
+
+<p>编译器并不实际调用函数f，而是使用当调用发生时f的返回值类型作为sum 的类型。换句话说，编译器为sum 指定的类型是什么呢?就是假如f被调用的话将会返回的那个类型。<br>decltype处理顶层const和引用的方式与auto有些许不同。如果 decltype使用的表达式是一个变量,则decltype返回该变量的类型(包括顶层const和引用在内):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const int ci= 0,&amp;cj=ci;</span><br><span class="line">decltype(ci) x= 0;//x的类型是const int</span><br><span class="line">decltype(cj) y= x;//y的类型是const int&amp;， y绑定到变量x</span><br><span class="line">decltype(cj） z;//错误:z是一个引用，必须初始化</span><br></pre></td></tr></table></figure>
+
+<p>因为cj是一个引用，decltype(cj)的结果就是引用类型，因此作为引用的z必须被初始化。</p>
+<p>需要指出的是，引用从来都作为其所指对象的同义词出现，只有用在decltype处是一个例外,作为返回值类型。</p>
+<h3 id="decltype-和引用"><a href="#decltype-和引用" class="headerlink" title="decltype 和引用"></a>decltype 和引用</h3><p>如果 decltype使用的表达式不是一个变量，则decltype返回表达式结果对应的类型。如4.1.1节（第120页）将要介绍的，有些表达式将向decltype返回一个引用类型。一般来说当这种情况发生时,意味着该表达式的结果对象能作为一条赋值语句的左值:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// decltype的结果可以是引用类型</span><br><span class="line">int i = 42,*p= &amp;i, &amp;r=i;</span><br><span class="line">decltype(r + 0) b;//正确:加法的结果是int，因此b是一个(未初始化的)int</span><br><span class="line">decltype(*p) c;//错误:c是int&amp;，必须初始化</span><br></pre></td></tr></table></figure>
+
+<p>因为r是一个引用，因此 decltype (r)的结果是引用类型。如果想让结果类型是r所指的类型，可以把r作为表达式的一部分，如r+0，显然这个表达式的结果将是一个具体值而非一个引用。</p>
+<p>另一方面，如果表达式的内容是解引用操作，则 decltype 将得到引用类型。正如我们所熟悉的那样，解引用指针可以得到指针所指的对象，而且还能给这个对象赋值。因此，decltype(*p)的结果类型就是int&amp;，而非int。</p>
+<p>如果给变量加上了一层或多层括号，编译器就会把它当成是一个表达式。变量是一种可以作为赋值语句左值的特殊表达式，所以这样的decltype就会得到引用类型，切记:decltype ((variable))（注意是双层括号)的结果永远是引用，而decltype(variable)结果只有当variable本身就是一个引用时才是引用。</p>
+<blockquote>
+<p>赋值是会产生引用的一类典型表达式，<strong>引用的类型就是左值的类型</strong>。也就是说，如果 i 是 int，则表达式 i&#x3D;x 的类型是 int&amp;。根据这一特点，请指出下面的代码中每一个变量的类型和值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a = <span class="number">3</span>, b = <span class="number">4</span>;</span><br><span class="line"><span class="keyword">decltype</span>(a) c = a;</span><br><span class="line"><span class="keyword">decltype</span>(a = b) d = a;</span><br><span class="line">a <span class="type">int</span> <span class="number">3</span>；</span><br><span class="line">b <span class="type">int</span> <span class="number">4</span>；</span><br><span class="line">c <span class="type">int</span> <span class="number">3</span>；</span><br><span class="line">d <span class="type">int</span> &amp; <span class="number">3</span>。</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="自定义数据结构"><a href="#自定义数据结构" class="headerlink" title="自定义数据结构"></a>自定义数据结构</h1><h2 id="编写自己的头文件"><a href="#编写自己的头文件" class="headerlink" title="编写自己的头文件"></a>编写自己的头文件</h2><p>为了确保各个文件中类的定义一致，类通常被定义在头文件中，而且类所在头文件的名字应与类的名字一样。例如，库类型string在名为string的头文件中定义。又如,我们应该把Sales_data类定义在名为Sales_data.h的头文件中。</p>
+<p>注意：头文件一旦改变，相关的源文件必须重新编译以获取更新过的声明。</p>
+<h3 id="预处理器概述"><a href="#预处理器概述" class="headerlink" title="预处理器概述"></a>预处理器概述</h3><p>C++程序还会用到的一项预处理功能是头文件保护符（header guard)，头文件保护符依赖于预处理变量。预处理变量有两种状态:已定义和未定义。#define指令把一个名字设定为预处理变量，另外两个指令则分别检查某个指定的预处理变量是否已经定义:#ifdef当且仅当变量已定义时为真，#ifndef当且仅当变量未定义时为真。一旦检查结果为真，则执行后续操作直至遇到#endif指令为止。<br>使用这些功能就能有效地防止重复包含的发生:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#ifndef SALES_DATA_H</span><br><span class="line">#define SALES_DATA_H</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">struct Sales_data &#123;</span><br><span class="line">	std::string bookNo;</span><br><span class="line">	unsigned units_sold = 0;</span><br><span class="line">	double revenue = 0.0;</span><br><span class="line">&#125;;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<h1 id="字符串、向量和数组"><a href="#字符串、向量和数组" class="headerlink" title="字符串、向量和数组"></a>字符串、向量和数组</h1><h2 id="命名空间的using声明"><a href="#命名空间的using声明" class="headerlink" title="命名空间的using声明"></a>命名空间的using声明</h2><p>头文件不应包含using声明</p>
+<p>位于头文件的代码一般来说不应该使用using声明。这是因为头文件的内容会铂贝到所有引用它的文件中去，如果头文件里有某个using 声明,那么每个使用了该头文件的文件就都会有这个声明。对于某些程序来说，由于不经意间包含了一些名字,反而可能产生始料未及的名字冲突。</p>
+<h3 id="使用getline读取一整行"><a href="#使用getline读取一整行" class="headerlink" title="使用getline读取一整行"></a>使用getline读取一整行</h3><p>有时我们希望能在最终得到的字符串中保留输入时的空白符，这时应该用getline函数代替原来的&gt;&gt;运算符。getline函数的参数是一个输入流和一个string对象，函数从给定的输入流中读入内容，直到遇到换行符为止（注意换行符也被读进来了)，然后把所读的内容存入到那个string对象中去(注意不存换行符)。getline只要一遇到换行符就结束读取操作并返回结果，哪怕输入的一开始就是换行符也是如此。如果输入真的一开始就是换行符，那么所得的结果是个空string。</p>
+<p>和输入运算符一样，getline也会返回它的流参数。因此既然输入运算符能作为判断的条件，我们也能用getline的结果作为条件。例如，可以通过改写之前的程序让它一次输出一整行，而不再是每行输出一个词了:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">while (getline(cin,line))</span><br><span class="line">	cout&lt;&lt; line &lt;&lt;endl;</span><br></pre></td></tr></table></figure>
+
+<p>注意：触发getline函数返回的那个换行符实际上被丢弃掉了,得到的string对象中并不包含该换行符。</p>
+<h3 id="string-size-type类型"><a href="#string-size-type类型" class="headerlink" title="string:size_type类型"></a>string:size_type类型</h3><p>对于size函数来说，返回一个int或者返回一个 unsigned 似乎都是合情合理的。但其实size函数返回的是一个string: :size type类型的值，下面就对这种新的类型稍作解释。</p>
+<p>尽管我们不太清楚string::size_type类型的细节，但有一点是肯定的:它是个<strong>无符号类型</strong>的值,而且能足够存放下任何string对象的大小所有用于存放string类的size函数返回值的变量，都应该是 string::size_type类型的。</p>
+<p>在c++11标准中，允许编译器通过auto或者decltype来推断变量的类型:<br>auto len &#x3D; line.size();&#x2F;&#x2F; len的类型是string: :size_type</p>
+<p>由于size函数返回的是一个无符号整型数，因此切记，如果在表达式中混用了带符号数和无符号数将可能产生意想不到的结果。例如，假设n是一个具有负值的int,则表达式s.size ()&lt;n的判断结果几乎肯定是true。这是因为负值n会自动地转换成一个比较大的无符号值。</p>
+<p>注意：如果一条表达式中已经有了size()函数就不要再使用int了,这样可以避免混用int和unsigned可能带来的问题。</p>
+<p>因为某些历史原因，也为了与C兼容,所以C++语言中的字符串字面值（如“hello”）并不是标准库类型string 的对象。切记，字符串字面值与string是不同的类型。</p>
+<h4 id="建议-使用C-版本的C标准库头文件"><a href="#建议-使用C-版本的C标准库头文件" class="headerlink" title="建议:使用C++版本的C标准库头文件"></a>建议:使用C++版本的C标准库头文件</h4><p>C++标准库中除了定义C++语言特有的功能外，也兼容了C语言的标准库。C语言的头文件形如name.h,C+则将这些文件命名为cname。也就是去掉了.h后缀，而在文件名 name之前添加了字母c，这里的c表示这是一个属于C语言标准库的头文件。</p>
+<p>因此，cctype头文件和ctype.h头文件的内容是一样的，只不过从命名规范上来讲更符合C++语言的要求。特别的,在名为cname的头文件中定义的名字从属于命名空间std，而定义在名为.h的头文件中的则不然。</p>
+<p>一般来说，C++程序应该使用名为cname的头文件而不使用name.h的形式，标准库中的名字总能在命名空间std中找到。如果使用.h形式的头文件，程序员就不得不时刻牢记哪些是从C语言那儿继承过来的，哪些又是C++语言所独有的。</p>
+<hr>
+<p>新的例子不再是统计标点符号的个数了，假设我们想要把字符串改写为大写字母的形式。为了做到这一点可以使用标准库函数 toupper，该函数接收一个字符，然后输出其对应的大写形式。这样，为了把整个string对象转换成大写，只要对其中的每个字符调用toupper函数并将结果再赋给原字符就可以了:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">string s(&quot;Hello World!!!&quot;);</span><br><span class="line">//转换成大写形式。</span><br><span class="line">for (auto &amp;c :s)//对于s中的每个字符（注意:c是引用)</span><br><span class="line">	c= toupper(c);//c是一个引用，因此赋值语句将改变s中字符的值</span><br><span class="line">cout&lt;&lt;s&lt;&lt;endl;</span><br></pre></td></tr></table></figure>
+
+<p>每次迭代时，变量c引用string对象s的下一个字符，赋值给c也就是在改变s中对应字符的值。因此当执行下面的语句时，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c= toupper(c);//c是一个引用，因此赋值语句将改变s中字符的值</span><br></pre></td></tr></table></figure>
+
+<p>实际上改变了c绑定的字符的值。整个循环结束后, str 中的所有字符都变成了大写形式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">另一个例子是把s的第一个词改成大写形式:</span><br><span class="line">//依次处理s中的字符直至我们处理完全部字符或者遇到一个空白</span><br><span class="line">for (decltype(s.size()） index = 0;</span><br><span class="line">index != s.size () &amp;&amp; !isspace(s[index]); ++index)</span><br><span class="line">	s [index] = toupper (s[index]);//将当前字符改成大写形式</span><br></pre></td></tr></table></figure>
+
+<p>使用下标时必须确保其在合理范围之内，也就是说，下标必须大于等于0而小于字符串的 size()的值。一种简便易行的方法是，总是设下标的类型为string::size_type，因为此类型是<strong>无符号数，可以确保下标不会小于0</strong>。此时，代码只需保证下标小于size()的值就可以了。</p>
+<h2 id="标准库类型vector"><a href="#标准库类型vector" class="headerlink" title="标准库类型vector"></a>标准库类型vector</h2><p>vector能容纳绝大多数类型的对象作为其元素，但是因为引用不是对象，所以不存在包含引用的vector。除此之外，其他大多数（非引用）内置类型和类类型都可以构成vector对象，甚至组成vector的元素也可以是vector.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;int&gt; V1 (10);//v1有10个元素，每个的值都是0</span><br><span class="line">vector&lt;int&gt; V2&#123;10&#125;;//v2有1个元素，该元素的值是10</span><br><span class="line">vector&lt;int&gt; V3(10,1); // v3有10个元素，每个的值都是1</span><br><span class="line">vector&lt;int&gt; v4&#123;10，1&#125;; // v4有2个元素，值分别是10和1</span><br></pre></td></tr></table></figure>
+
+<p>另一方面，如果初始化时使用了花括号的形式但是提供的值又不能用来列表初始化，就要考虑用这样的值来构造vector对象了。例如，要想列表初始化一个含有string对象的vector对象，应该提供能赋给string对象的初值。此时不难区分到底是要列表初始化 vector对象的元素还是用给定的容量值来构造vector对象:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;string&gt; v5&#123; &quot;hi&quot;&#125;;//列表初始化:v5有一个元素</span><br><span class="line">vector&lt;string&gt; v6(&quot;hi&quot;);//错误:不能使用字符串字面值构建vector对象</span><br><span class="line">vector&lt;string&gt; v7 &#123;10&#125;;//v7有10个默认初始化的元素</span><br><span class="line">vector&lt;string&gt; v8&#123;10,&quot;hi&quot;&#125;;// v8有10个值为&quot;hi&quot;的元素</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">提示:只能对确知已存在的元素执行下标操作!</span><br><span class="line">关于下标必须明确的一点是:只能对确知已存在的元素执行下标操作。例如，</span><br><span class="line">vector&lt;int&gt; ivec;//空vector对象</span><br><span class="line">cout &lt;&lt; ivec[0];//错误:ivec不包含任何元素</span><br><span class="line">vector&lt;int&gt; ivec2 (10);//含有10个元素的vector对象</span><br><span class="line">cout &lt;&lt; ivec2[10];//错误:ivec2元素的合法索引是从0到9</span><br><span class="line">试图用下标的形式去访问一个不存在的元素将引发错误,不过这种错误不会被编译器发现，而是在运行时产生一个不可预知的值。</span><br><span class="line">不幸的是，这种通过下标访问不存在的元素的行为非常常见，而且会产生很严重的后果。所谓的缓冲区溢出(buffer overflow)指的就是这类错误，这也是导致PC及其他设备上应用程序出现安全问题的一个重要原因。</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键概念-泛型编程"><a href="#关键概念-泛型编程" class="headerlink" title="关键概念:泛型编程"></a>关键概念:泛型编程</h3><p>原来使用C或Java的程序员在转而使用C++语言之后,会对for循环中使用!&#x3D;而非&lt;进行判断有点儿奇怪，C++程序员习惯性地使用!&#x3D;,其原因和他们更愿意使用迭代器而非下标的原因一样:因为这种编程风格在标准库提供的所有容器上都有效。</p>
+<p>之前已经说过,只有string和 vector等一些标准库类型有下标运算符,而并非全都如此。与之类似,所有标准库容器的迭代器都定义了&#x3D;&#x3D;和!&#x3D;，但是它们中的大多数都没有定义&lt;运算符。因此,只要我们养成使用迭代器和!-的习惯,就不用太在意用的到底是哪种容器类型。</p>
+<h3 id="迭代器类型"><a href="#迭代器类型" class="headerlink" title="迭代器类型"></a>迭代器类型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;int&gt; : :iterator it;	// it能读写vector&lt;int&gt;的元素</span><br><span class="line">string::iterator it2;//it2能读写string对象中的字符</span><br><span class="line">vector&lt;int&gt;: :const_iterator it3;// it3只能读元素，不能写元素</span><br><span class="line">string : :const_iterator it4;// it4只能读字符,不能写字符</span><br></pre></td></tr></table></figure>
+
+<p>const_iterator和常量指针（参见2.4.2节，第56页)差不多，能读取但不能修改它所指的元素值。相反，iterator的对象可读可写。如果vector对象或string对象是一个常量，只能使用const_iterator;如果vector对象或string对象不是常量,那么既能使用iterator也能使用const_iterator。</p>
+<h3 id="术语-迭代器和迭代器类型"><a href="#术语-迭代器和迭代器类型" class="headerlink" title="术语:迭代器和迭代器类型"></a>术语:迭代器和迭代器类型</h3><p>迭代器这个名词有三种不同的含义:可能是迭代器概念本身，也可能是指容器定义的迭代器类型,还可能是指某个迭代器对象。</p>
+<p>重点是理解存在一组概念上相关的类型，我们认定某个类型是迭代器<strong>当且仅当它支持一套操作</strong>，这套操作使得我们能访问容器的元素或者从某个元素移动到另外一个元素。</p>
+<p>每个容器类定义了一个名为 iterator 的类型,该类型支持迭代器概念所规定的一套操作。</p>
+<h3 id="结合解引用和成员访问操作"><a href="#结合解引用和成员访问操作" class="headerlink" title="结合解引用和成员访问操作"></a>结合解引用和成员访问操作</h3><p>注意，（*it). empty()中的圆括号必不可少，该表达式的含义是先对it解引用，然后解引用的结果再执行点运算符。如果不加圆括号，点运算符将由it来执行，而非it解引用的结果:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(*it).empty()//解引用it，然后调用结果对象的empty成员</span><br><span class="line">*it.empty ()//错误:试图访问it的名为empty的成员，但it是个迭代器,</span><br><span class="line">			//没有empty成员</span><br></pre></td></tr></table></figure>
+
+<p>为了简化上述表达式，C++语言定义了箭头运算符(-&gt;)。箭头运算符把解引用和成员访问两个操作结合在一起，也就是说，it-&gt;mem和(*it).mem表达的意思相同。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//依次输出text的每一行直至遇到第一个空白行为止</span><br><span class="line">for (auto it = text.cbegin();</span><br><span class="line">	it != text.cend() &amp; &amp; !it-&gt;empty;++it)</span><br><span class="line">	cout&lt;&lt;*it&lt;&lt;endl;</span><br></pre></td></tr></table></figure>
+
+<p>我们首先初始化it令其指向text的第一个元素，循环重复执行直至处理完了text的所有元素或者发现某个元素为空。每次迭代时只要发现还有元素并且尚未遇到空元素，就输出当前正在处理的元素。值得注意的是，因为循环从头到尾只是读取text的元素而未向其中写值，所以使用了<strong>cbegin和 cend</strong>来控制整个迭代过程。</p>
+<p>如果对象只需读操作而无须写操作的话最好使用常量类型(比如const_iterator)。为了便于专门得到const iterator类型的返回值,C++11新标准引入了两个新函数,分别是cbegin和 cend:</p>
+<p><strong>注意</strong>：<strong>谨记，但凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。</strong>（因为每次容量不够时都需要重新创建一个容器，此时迭代器就变了）</p>
+<h1 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h1><h2 id="定义和初始化内置数组"><a href="#定义和初始化内置数组" class="headerlink" title="定义和初始化内置数组"></a>定义和初始化内置数组</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">unsigned cnt =42;//不是常量表达式</span><br><span class="line">constexpr unsigned sz = 42;//常量表达式</span><br><span class="line">int arr[10];//含有10个整数的数组</span><br><span class="line">int *parr[sz];//含有42个整型指针的数组</span><br><span class="line">string bad [cnt];//错误:cnt不是常量表达式</span><br><span class="line">string strs[get_size()];//当get_size是constexpr时正确;否则错误</span><br><span class="line">默认情况下，数组的元素被默认初始化</span><br></pre></td></tr></table></figure>
+
+<p>定义数组的时候必须指定数组的类型，不允许用auto关键字由初始值的列表推断类型。另外和 vector一样，数组的元素应为对象，因此不存在引用的数组。</p>
+<h3 id="字符数组的特殊性"><a href="#字符数组的特殊性" class="headerlink" title="字符数组的特殊性"></a>字符数组的特殊性</h3><p>字符数组有一种额外的初始化形式，我们可以用字符串字面值（参见2.1.3节，第36页）对此类数组初始化。当使用这种方式时，一定要注意<strong>字符串字面值的结尾处还有一个空字符</strong>，这个空字符也会像字符串的其他字符一样被拷贝到字符数组中去:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char al[]=[&#x27;C&#x27;, &#x27;+&#x27;,&#x27;+&#x27;&#125;;//列表初始化,没有空字符</span><br><span class="line">char a2[]=&#123;&#x27;C&#x27; + &#x27;+&#x27;，&#x27;+&#x27; + &#x27;\0&#x27;&#125;;//列表初始化，含有显式的空字符</span><br><span class="line">char a3[]=&quot;C++&quot;;//自动添加表示字符串结束的空字符</span><br><span class="line">const char a4[6]=&quot;Daniel&quot;;//错误:没有空间可存放空字符!</span><br></pre></td></tr></table></figure>
+
+<p>al的维度是3,a2和a3的维度都是4,a4的定义是错误的。尽管字符串字面值”Daniel看起来只有6个字符，但是数组的大小必须至少是7，其中6个位置存放字面值的内容，另外1个存放结尾处的空字符。</p>
+<h3 id="不允许拷贝和赋值"><a href="#不允许拷贝和赋值" class="headerlink" title="不允许拷贝和赋值"></a>不允许拷贝和赋值</h3><p>不能将数组的内容铂贝给其他数组作为其初始值，也不能用数组为其他数组赋值:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int a[]= &#123;0，1，2&#125;;//含有3个整数的数组</span><br><span class="line">int a2[]= a;//错误:不允许使用一个数组初始化另一个数组</span><br><span class="line">a2= a;//错误:不能把一个数组直接赋值给另一个数组</span><br></pre></td></tr></table></figure>
+
+<p>一些编译器支持数组的赋值，这就是所谓的编译器扩展(compiler extension)。但一般来说，最好避免使用非标准特性，因为含有非标准特性的程序很可能在其他编译器上无法正常工作。</p>
+<h3 id="理解复杂的数组声明"><a href="#理解复杂的数组声明" class="headerlink" title="理解复杂的数组声明"></a>理解复杂的数组声明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int *ptrs [10];// ptrs是含有10个整型指针的数组</span><br><span class="line">int &amp;refs[10]=/* ?*/;//错误:不存在引用的数组</span><br><span class="line">int (*Parray)[10] =&amp;arr;// Parray指向一个含有10个整数的数组</span><br><span class="line">int (&amp;arrRef)[10]= arr;// arrRef引用一个含有10个整数的数组</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，类型修饰符从右向左依次绑定。对于ptrs来说，从右向左理解其含义比较简单:首先知道我们定义的是一个大小为10的数组，它的名字是ptrs，然后知道数组中存放的是指向int的指针。</p>
+<p>但是对于Parray来说，从右向左理解就不太合理了。因为数组的维度是紧跟着被声明的名字的，所以就数组而言，由内向外阅读要比从右向左好多了。由内向外的顺序可帮助我们更好地理解Parray的含义:首先是圆括号括起来的部分，*Parray意味着Parray是个指针，接下来观察右边，可知道Parray是个指向大小为10的数组的指针,最后观察左边，知道数组中的元素是int。这样最终的含义就明白无误了，Parray是一个指针，它指向一个int 数组，数组中包含10个元素。同理，(&amp;arrRef)表示 arrRef是一个引用，它引用的对象是一个大小为10的数组，数组中元素的类型是int。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int * (&amp;arry)[10] = ptrs;// arry是数组的引用，该数组含有10个指针</span><br></pre></td></tr></table></figure>
+
+<p>按照由内向外的顺序阅读上述语句,首先知道arry是一个引用,然后观察右边知道,arry引用的对象是一个大小为10的数组，最后观察左边知道，数组的元素类型是指向int的指针。这样，arry就是一个含有10个int型指针的数组的引用。</p>
+<h2 id="访问数组元素"><a href="#访问数组元素" class="headerlink" title="访问数组元素"></a>访问数组元素</h2><p>在使用数组下标的时候，通常将其定义为size_t类型。size_t是一种机器相关的无符号类型，它被设计得足够大以便能表示内存中任意对象的大小。在cstddef头文件中定义了size_t类型，这个文件是C标准库stddef.h头文件的C++语言版本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 以10分为一个分数段统计成绩的数量:0~9,10~19,....90~99,100</span><br><span class="line">unsigned scores[11] = &#123;&#125;; //11个分数段，全部初始化为0</span><br><span class="line">unsigned grade;</span><br><span class="line">while (cin &gt;&gt; grade)&#123;</span><br><span class="line">	if (grade &lt;=100)</span><br><span class="line">		++scores [grade/10]; //将当前分数段的计数值加1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>与vector和string一样，当需要遍历数组的所有元素时，最好的办法也是使用范围for语句。例如，下面的程序输出所有的scores:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (auto i: scores)//对于scores中的每个计数值</span><br><span class="line">	cout &lt;&lt; i&lt;&lt;&quot;&quot;;//输出当前的计数值</span><br><span class="line">cout&lt;&lt;endl;</span><br></pre></td></tr></table></figure>
+
+<p>因为维度是数组类型的一部分，所以系统知道数组 scores中有多少个元素，使用范围for语句可以减轻人为控制遍历过程的负担。</p>
+<h2 id="指针和数组"><a href="#指针和数组" class="headerlink" title="指针和数组"></a>指针和数组</h2><p>在一些情况下数组的操作实际上是指针的操作，这一结论有很多隐含的意思。其中一层意思是当使用数组作为一个auto变量的初始值时，推断得到的类型是指针而非数组:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int ia[] =&#123;0,1,2,3,4,5,6,7,8,9&#125;;// ia是一个含有10个整数的数组</span><br><span class="line">auto ia2(ia);// ia2是一个整型指针，指向ia的第一个元素</span><br><span class="line">ia2 =42;//错误: ia2是一个指针，不能用int值给指针赋值</span><br></pre></td></tr></table></figure>
+
+<p>尽管ia是由10个整数构成的数组，但当使用ia作为初始值时，编译器实际执行的初始化过程类似于下面的形式:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">auto ia2(&amp;ia[0]);//显然ia2的类型是int*</span><br></pre></td></tr></table></figure>
+
+<p>必须指出的是，当使用decltype关键字时上述转换不会发生，decltype(ia)返回的类型是由10个整数构成的数组:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// ia3是一个含有10个整数的数组</span><br><span class="line">decltype(ia) ia3 =&#123;0,1,2,3,4,5,6,7,8,91;</span><br><span class="line">ia3 = p; //错误:不能用整型指针给数组赋值</span><br><span class="line">ia3[4] =i;//正确:把i的值赋给ia3的一个元素</span><br></pre></td></tr></table></figure>
+
+<p>内置的下标运算符可以处理负值，当然，结果地址必须指向原来的指针所指同一数组中的元素(或是同一数组尾元素的下一位置)。</p>
+<p>内置的下标运算符所用的索引值不是无符号类型，这一点与vector和string不一样。</p>
+<hr>
+<p>比较两个C风格字符串的方法和之前学习过的比较标准库string对象的方法大相径庭。比较标准库string对象的时候，用的是普通的关系运算符和相等性运算符;</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">string sl = &quot;A string example&quot;;</span><br><span class="line">string s2 =&quot;Adifferent string&quot; ;</span><br><span class="line">if (s1 &lt; s2） // false: s2小于s1</span><br></pre></td></tr></table></figure>
+
+<p>如果把这些运算符用在两个C风格字符串上，实际比较的将是指针而非字符串本身:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const char cal[]=&quot;A string example&quot;;</span><br><span class="line">const char ca2[]=&quot;A different string&quot;;</span><br><span class="line">if (cal &lt; ca2)//未定义的:试图比较两个无关地址</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：对大多数应用来说,使用标准库string要比使用C风格字符串更安全、更高效。</strong></p>
+<h2 id="与旧代码的接口"><a href="#与旧代码的接口" class="headerlink" title="与旧代码的接口"></a>与旧代码的接口</h2><p>很多C++程序在标准库出现之前就已经写成了，它们肯定没用到string和 vector类型。而且，有一些C++程序实际上是与C语言或其他语言的接口程序，当然也无法使用C++标准库。因此,现代的C++程序不得不与那些充满了数组和&#x2F;或C风格字符串的代码衔接，为了使这一工作简单易行，C++专门提供了一组功能。</p>
+<p>更一般的情况是，任何出现字符串字面值的地方都可以用以空字符结束的字符数组来替代:</p>
+<ul>
+<li>允许使用以空字符结束的字符数组来初始化string对象或为string对象赋值。</li>
+<li>在 string对象的加法运算中允许使用以空字符结束的字符数组作为其中一个运算对象(不能两个运算对象都是);在 string对象的复合赋值运算中允许使用以空字符结束的字符数组作为右侧的运算对象。</li>
+</ul>
+<p>上述性质反过来就不成立了:如果程序的某处需要一个C风格字符串，无法直接用string对象来代替它。例如，不能用string对象直接初始化指向字符的指针。为了完成该功能，string专门提供了一个名为c_str的成员函数:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">char *str = s;//错误:不能用string对象初始化char*</span><br><span class="line">const char *str = s.c_str();//正确</span><br></pre></td></tr></table></figure>
+
+<p>顾名思义，c_ str函数的返回值是一个C风格的字符串。也就是说，函数的返回结果是一个指针，该指针指向一个以<strong>空字符结束的字符数组</strong>，而这个数组所存的数据恰好与那个string对象的一样。结果指针的类型是const char，从而确保我们不会改变字符数组的内容。</p>
+<h3 id="使用数组初始化-vector对象"><a href="#使用数组初始化-vector对象" class="headerlink" title="使用数组初始化 vector对象"></a>使用数组初始化 vector对象</h3><p>介绍过不允许使用一个数组为另一个内置类型的数组赋初值，也不允许使用vector对象初始化数组。相反的，允许使用数组来初始化vector对象。要实现这一目的，只需指明要拷贝区域的首元素地址和尾后地址就可以了:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int int arr[] =&#123;0,1,2,3,4,5);//ivec有6个元素，分别是int_arr中对应元素的副本vector&lt;int&gt; ivec(begin(int_arr) ,end(int_arr));</span><br></pre></td></tr></table></figure>
+
+<h2 id="建议-尽量使用标准库类型而非数组"><a href="#建议-尽量使用标准库类型而非数组" class="headerlink" title="建议:尽量使用标准库类型而非数组"></a>建议:尽量使用标准库类型而非数组</h2><p>使用指针和数组很容易出错。一部分原因是概念上的问题:指针常用于底层操作，因此容易引发一些与烦琐细节有关的错误。其他问题则源于语法错误,特别是声明指针时的语法错误。</p>
+<p>现代的C++程序应当尽量使用vector和迭代器，避免使用内置数组和指针;应该尽量使用string,避免使用C风格的基于数组的字符串。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>string和 vector是两种最重要的标准库类型。string对象是一个可变长的字符序列，vector对象是一组同类型对象的容器。</p>
+<p>迭代器允许对容器中的对象进行间接访问，对于string对象和vector对象来说，可以通过迭代器访问元素或者在元素间移动。</p>
+<p>数组和指向数组元素的指针在一个较低的层次上实现了与标准库类型 string和vector类似的功能。一般来说，应该优先选用标准库提供的类型,之后再考虑C++语言内置的低层的替代品数组或指针。</p>
+<p><strong>缓冲区溢出</strong>（buffer overflow)一种严重的程序故障,主要的原因是试图通过一个越界的索引访问容器内容,容器类型包括string、 vector和数组等。</p>
+<p><strong>C风格字符串</strong>（C-style string)以空字符结束的字符数组。字符串字面值是C风格字符串，C风格字符串容易出错。</p>
+<h1 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h1><p>归纳:当一个对象被用作右值的时候，用的是对象的值（内容);当对象被用作左值的时候，用的是对象的身份（在内存中的位置)。</p>
+<p>使用关键字decltype的时候，左值和右值也有所不同。如果表达式的求值结果是左值，decltype作用于该表达式(不是变量)得到一个引用类型。举个例子,假定p的类型是 int* ，因为解引用运算符生成左值,所以decltype(*p)的结果是int&amp;。另一方面，因为取地址运算符生成右值，所以decltype (&amp;p)的结果是int**，也就是说，结果是一个指向整型指针的指针。</p>
+<p>有4种运算符明确规定了运算对象的求值顺序。第一种是逻辑与（&amp;&amp;）运算符，它规定先求左侧运算对象的值，只有当左侧运算对象的值为真时才继续求右侧运算对象的值。另外三种分别是逻辑或()运算符、条件（?:）运算符和逗号(，)运算符。</p>
+<p>求值顺序、优先级、结合律<br>运算对象的求值顺序与优先级和结合律无关,在一条形如f()+g()*h()+j（)的表达式中:如果f、g、h和j是无关函数，它们既不会改变同一对象的状态也不执行IO任务，那么函数的调用顺序不受限制。反之，如果其中某几个函数影响同一对象，则它是一条错误的表达式，将产生未定义的行为。</p>
+<p><strong>建议:处理复合表达式</strong></p>
+<p>以下两条经验准则对书写复合表达式有益:</p>
+<ul>
+<li>拿不准的时候最好用括号来强制让表达式的组合关系符合程序逻辑的要求。</li>
+<li>如果改变了某个运算对象的值，在表达式的其他地方不要再使用这个运算对象。第2条规则有一个重要例外,当改变运算对象的子表达式本身就是另外一个子表达式的运算对象时该规则无效。例如，在表达式*++iter中，递增运算符改变iter的值，iter(已经改变）的值又是解引用运算符的运算对象。此时(或类似的情况下),求值的顺序不会成为问题，因为递增运算(即改变运算对象的子表达式)必须先求值,然后才轮到解引用运算。显然，这是一种很常见的用法、不会造成什么问题。</li>
+</ul>
+<h2 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bool b= true;</span><br><span class="line">bool b2 =-b;</span><br><span class="line">// b2是true!</span><br></pre></td></tr></table></figure>
+
+<p>对大多数运算符来说，布尔类型的运算对象将被提升为 int类型。如上所示，布尔变量b的值为真，参与运算时将被提升成整数值1，对它求负后的结果是-1.将-1再转换回布尔值并将其作为b2的初始值,显然这个初始值不等于0，转换成布尔值后应该为1。所以，b2的值是真!</p>
+<p>在除法运算中，如果两个运算对象的符号相同则商为正(如果不为0的话)，否则商为负。C++语言的早期版本允许结果为负值的商向上或向下取整，<strong>C++11</strong>新标准则规定商一律向0取整(即直接切除小数部分)。</p>
+<p><strong>建议:除非必须，否则不用递增递减运算符的后置版本</strong></p>
+<p>有C语言背景的读者可能对优先使用前置版本递增运算符有所疑问,其实原因非常简单:前置版本的递增运算符避免了不必要的工作，它把值加1后直接返回改变了的运算对象。与之相比，后置版本需要将原始值存储下来以便于返回这个未修改的内容。如果我们不需要修改前的值,那么后置版本的操作就是一种浪费。<br>对于整数和指针类型来说，编译器可能对这种额外的工作进行一定的优化;但是对于相对复杂的迭代器类型，这种额外的工作就消耗巨大了。建议养成使用前置版本的习惯，这样不仅不需要担心性能的问题,而且更重要的是写出的代码会更符合编程的初衷。</p>
+<p><strong>建议:简洁可以成为一种美德</strong><br>形如*pbeg++的表达式一开始可能不太容易理解，但其实这是一种被广泛使用的、有效的写法。当对这种形式熟悉之后,书写<br>cout&lt;&lt;  *iter++ &lt;endl;<br>要比书写下面的等价语句更简洁、也更少出错<br>cout &lt;&lt; *iter &lt;&lt;endl;<br>++iter;<br>不断研究这样的例子直到对它们的含义一目了然。大多数C+程序追求简洁、摒弃冗长，因此C++程序员应该习惯于这种写法。而且，一旦熟练掌握了这种写法后，程序出错的可能性也会降低。</p>
+<h1 id="sizeof运算符"><a href="#sizeof运算符" class="headerlink" title="sizeof运算符"></a>sizeof运算符</h1><ul>
+<li>sizeof运算符的结果部分地依赖于其作用的类型:</li>
+<li>对char或者类型为char的表达式执行sizeof运算，结果得1。</li>
+<li>对引用类型执行sizeof运算得到被引用对象所占空间的大小。对指针执行sizeof运算得到指针本身所占空间的大小。</li>
+<li>对解引用指针执行sizeof运算得到指针指向的对象所占空间的大小,指针不需有效。</li>
+<li>对数组执行sizeof运算得到整个数组所占空间的大小,等价于对数组中所有的元素各执行一次sizeof运算并将所得结果求和。注意，sizeof运算不会把数组转换成指针来处理。</li>
+<li>对string对象或vector对象执行sizeof运算只返回该类型固定部分的大小，不会计算对象中的元素占用了多少空间。</li>
+</ul>
+<p>因为执行sizeof运算能得到整个数组的大小，所以可以用数组的大小除以单个元素的大小得到数组中元素的个数:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//sizeof(ia)/sizeof(*ia)返回ia的元素数量</span><br><span class="line">constexpr size_t sz =sizeof (ia)/sizeof(*ia);</span><br><span class="line">int arr2[sz];//正确:sizeof返回一个常量表达式</span><br></pre></td></tr></table></figure>
+
+<p>因为sizeof的返回值是一个常量表达式,所以我们可以用sizeof的结果声明数组的维度。</p>
+<h1 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h1><p><strong>何时发生隐式类型转换</strong><br>    在下面这些情况下，编译器会自动地转换运算对象的类型:</p>
+<ul>
+<li>在大多数表达式中，比int类型小的整型值首先提升为较大的整数类型。</li>
+<li>在条件中，非布尔值转换成布尔类型。</li>
+<li>初始化过程中，初始值转换成变量的类型;在赋值语句中，右侧运算对象转换成左侧运算对象的类型。</li>
+<li>如果算术运算或关系运算的运算对象有多种类型，需要转换成同一种类型。</li>
+<li>函数调用时也会发生类型转换。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">string s, t= &quot;a value&quot; ;//字符串字面值转换成string类型</span><br><span class="line">while (cin &gt;&gt;S)// while的条件部分把cin转换成布尔值</span><br></pre></td></tr></table></figure>
+
+<p>条件(cin&gt;&gt;s）读入cin的内容并将cin作为其求值结果。条件部分本来需要一个布尔类型的值，但是这里实际检查的是istream类型的值。幸好，IO库定义了从istream向布尔值转换的规则，根据这一规则，cin自动地转换成布尔值。所得的布尔值到底是什么由输入流的状态决定，如果最后一次读入成功，转换得到的布尔值是true:相反，如果最后一次读入不成功，转换得到的布尔值是false。</p>
+<h3 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h3><p>任何具有明确定义的类型转换，只要不包含底层const（见最下注释），都可以使用static_cast.</p>
+<p>基本语法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 typename value = static_cast&lt;typename&gt;(expression);</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 double x = static_cast&lt;double&gt; (y);//y可以是多种类型</span><br></pre></td></tr></table></figure>
+
+<p>实际上，将大型算术类型转换给小型算术类型时很有用(如double转换为int),使用static_cast告诉编译器，我知道会损失精度但是并不在乎，这样编译器就不会发出警告。</p>
+<p>更让人高兴的是，static_cast对于编译器无法自动执行的类型转换提供了很好的支持。</p>
+<p>static_cast对于编译器无法自动执行的类型转换也非常有用。例如，我们可以使用static_cast 找回存在于 void*指针中的值。</p>
+<p>当我们把指针存放在void*  中，并且使用static_cast将其强制转换回原来的类型时，应该确保指针的值保持不变。也就是说，强制转换的结果将与原始的地址值相等，因此我们必须确保转换后所得的类型就是指针所指的类型。类型一旦不符，将产生未定义的后果。</p>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 double somevalue = 3.14;</span><br><span class="line">2 void *p = &amp;somevalue;//正确:任何非const对象的地址都能存入void*,但是不能通过p修改somevalue,即不包含底层const</span><br><span class="line">3 double *pd = static_cast&lt;double*&gt;(p);//正确</span><br></pre></td></tr></table></figure>
+
+<p>经过测试，*p和 *pd都是指向somevalue的。</p>
+<h3 id="const-cast"><a href="#const-cast" class="headerlink" title="const_cast"></a>const_cast</h3><p>const_cast只能改变运算对象的底层const.<br>语法规则如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 type something = const_cast&lt;type&gt;(expression);</span><br><span class="line">1 const char* pc;</span><br><span class="line">2 char *p = const_cast&lt;char*&gt;(pc);//正确:但是通过p写值是未定义的行为</span><br></pre></td></tr></table></figure>
+
+<p>要注意的是，这种转换只能更改引用或者指针，也就是说下面这种写法是报错的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1 const int a = 100;</span><br><span class="line">2 int b = const_cast&lt;int&gt;(a);//error: invalid use of const_cast with type &#x27;int&#x27;, which is not a pointer, reference, nor a pointer-to-data-member type</span><br></pre></td></tr></table></figure>
+
+<p> 对于将常量对象转换成非常量对象的行为，我们称其为“去掉const性质”(cast away the const)，一旦失去了某个对象的const性质，编译器将不再阻止我们对该对象进行修改但是一定要注意的是：如果对象本身是一个常量，将常量转换为非常量后，使用转换后的非常量修改值是未定义行为（undefined behavior），虽然编译器不会报错也不会waring，但是不同的编译器对这种行为有不同的判断，因此这是一种非常危险的行为。但如果对象本身不是一个常量，在cast away the const 后，修改其内容是合法的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">void f(int* p) &#123;</span><br><span class="line">  cout &lt;&lt; *p &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(void) &#123;</span><br><span class="line">  const int a = 10;</span><br><span class="line">  const int* b = &amp;a;</span><br><span class="line"></span><br><span class="line">  // Function f() expects int*, not const int*</span><br><span class="line">  //   f(b);</span><br><span class="line">  //编译器不允许调用f(b)因为f()的参数为int*不是const int*,此时用const_cast可以去掉const后传递进去</span><br><span class="line">  int* c = const_cast&lt;int*&gt;(b);</span><br><span class="line">  f(c);//c是转换类型得到的，可以调用f(int*)</span><br><span class="line"></span><br><span class="line">  // Lvalue is const</span><br><span class="line">  //  *b = 20;</span><br><span class="line">//不允许*b = 20，这是const_cast规定的，但是实际上不会报错，这是一种未定义行为，不同的编译器有不同的处理结果</span><br><span class="line">  // Undefined behavior</span><br><span class="line">  //  *c = 30;</span><br><span class="line"></span><br><span class="line">  int a1 = 40;</span><br><span class="line">  const int* b1 = &amp;a1;</span><br><span class="line">  int* c1 = const_cast&lt;int*&gt;(b1);//a1 is not a const,so we can use c1 to change the value of al</span><br><span class="line"></span><br><span class="line">  // Integer a1, the object referred to by c1, has</span><br><span class="line">  // not been declared const</span><br><span class="line">  *c1 = 50;</span><br><span class="line">//不过如果原对象本身是非const的，通过c1修改a1是完全安全的</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在早期版本的CH+语言中，显式地进行强制类型转换包含两种形式:</p>
+<p>type (expr);&#x2F;&#x2F;函数形式的强制类型转换<br>(type) expr;&#x2F;&#x2F;C语言风格的强制类型转换</p>
+<p>与命名的强制类型转换相比,旧式的强制类型转换从表现形式上来说不那么清晰明了，容易被看漏，所以一旦转换过程出现问题,追踪起来也更加困难。</p>
+<h1 id="语句"><a href="#语句" class="headerlink" title="语句"></a>语句</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">如果需要为某个 case分支定义并初始化一个变量，我们应该把变量定义在块内，从而确保后面的所有case标签都在变量的作用域之外。</span><br><span class="line">case true:</span><br><span class="line">	&#123;</span><br><span class="line">		//正确:声明语句位于语句块内部</span><br><span class="line">		string file_name = get_file_name ();</span><br><span class="line">		// ...</span><br><span class="line">	&#125;</span><br><span class="line">	break;</span><br><span class="line">case false:</span><br><span class="line">	if (file_name. empty())//错误:file _name不在作用域之内,&#123;&#125;内一个作用域</span><br></pre></td></tr></table></figure>
+
+<h2 id="continue语句"><a href="#continue语句" class="headerlink" title="continue语句"></a>continue语句</h2><p>continue语句（continue statement）终止最近的循环中的当前迭代并立即开始下一次迭代。continue语句只能出现在for、while和 do while循环的内部，或者嵌套在此类循环里的语句或块的内部。和 break语句类似的是，出现在嵌套循环中的continue 语句也仅作用于离它最近的循环。和 break语句不同的是，只有当switch语句嵌套在迭代语句内部时，才能在switch里使用continue。</p>
+<h2 id="goto语句"><a href="#goto语句" class="headerlink" title="goto语句"></a>goto语句</h2><p>和switch 语句类似，goto语句也不能将程序的控制权从变量的作用域之外转移到作用域之内:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">	// ...</span><br><span class="line">	goto end;</span><br><span class="line">	int ix = 10;//错误:goto语句绕过了一个带初始化的变量定义</span><br><span class="line">end:</span><br><span class="line">	//错误:此处的代码需要使用ix，但是goto语句绕过了它的声明</span><br><span class="line">	ix=42;</span><br></pre></td></tr></table></figure>
+
+<p>向后跳过一个已经执行的定义是合法的。跳回到变量定义之前意味着系统将销毁该变量，然后重新创建它:	</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//向后跳过一个带初始化的变量定义是合法的</span><br><span class="line">begin:</span><br><span class="line">	int sz = get_size() ;</span><br><span class="line">	if(sz &lt;=0） &#123;</span><br><span class="line">		goto begin;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，goto语句执行后将销毁sz。因为跳回到 begin的动作跨过了sz的定义语句，所以sz将重新定义并初始化。</p>
+<h2 id="try-语句块和异常处理"><a href="#try-语句块和异常处理" class="headerlink" title="try 语句块和异常处理"></a>try 语句块和异常处理</h2><p>异常是指存在于运行时的反常行为，这些行为超出了函数正常功能的范围。典型的异常包括失去数据库连接以及遇到意外输入等。处理反常行为可能是设计所有系统最难的部分。</p>
+<p>异常处理机制为程序中异常检测和异常处理这两部分的协作提供支持。在C++语言中，异常处理包括:</p>
+<ul>
+<li>throw表达式(throw expression)，异常检测部分使用throw表达式来表示它遇到了无法处理的问题。我们说throw引发（raise）了异常。</li>
+<li>try语句块（try block)，异常处理部分使用try语句块处理异常。try语句块以关键字try开始，并以一个或多个catch子句（catch clause）结束。try语句块中代码抛出的异常通常会被某个catch子句处理。因为catch子句“处理”异常，所以它们也被称作异常处理代码（exception handler)。</li>
+<li>一套异常类（exception class)，用于在throw表达式和相关的catch子句之间传递异常的具体信息。</li>
+</ul>
+<h3 id="函数在寻找处理代码的过程中退出"><a href="#函数在寻找处理代码的过程中退出" class="headerlink" title="函数在寻找处理代码的过程中退出"></a>函数在寻找处理代码的过程中退出</h3><p>在复杂系统中，程序在遇到抛出异常的代码前，其执行路径可能已经经过了多个try语句块。例如，一个try语句块可能调用了包含另一个try语句块的函数，新的try语句块可能调用了包含又一个try语句块的新函数，以此类推。</p>
+<p>寻找处理代码的过程与函数调用链刚好相反。当异常被抛出时，首先搜索抛出该异常的函数。如果没找到匹配的 catch子句，终止该函数，并在调用该函数的函数中继续寻找。如果还是没有找到匹配的catch子句，这个新的函数也被终止，继续搜索调用它的函数。以此类推，沿着程序的执行路径逐层回退，直到找到适当类型的catch子句为止。</p>
+<p>如果最终还是没能找到任何匹配的 catch子句，程序转到名为terminate的标准库函数。该函数的行为与系统有关，一般情况下，执行该函数将导致程序非正常退出。</p>
+<p>对于那些没有任何try语句块定义的异常，也按照类似的方式处理:毕竟,没有try语句块也就意味着没有匹配的catch子句。如果一段程序没有try语句块且发生了异常，系统会调用terminate函数并终止当前程序的执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int i1,i2;</span><br><span class="line">while( std ::cin &gt;&gt; i1 &gt;&gt;i2)&#123;</span><br><span class="line">	try&#123;</span><br><span class="line">		if(i2==0)&#123;</span><br><span class="line">			throw std : : runtime_error ( &quot;divisor can &#x27;t be 0&quot; );</span><br><span class="line">			//将控制权转移到相关的catch子句</span><br><span class="line">		&#125;</span><br><span class="line">		std: : cout &lt;&lt; i1/i2 &lt;&lt; std : : endl;</span><br><span class="line">	&#125;catch(std :: runtime_error err)</span><br><span class="line">	&#123;</span><br><span class="line">		std : : cout &lt;&lt; err.what()</span><br><span class="line">			&lt;&lt;&quot;\ntry again? enter y or n&quot; c&lt; std : :endl;</span><br><span class="line">			char c;</span><br><span class="line">			std: :cin &gt;&gt; c;</span><br><span class="line">		if( !std ::cin ||c == &#x27;n &#x27; ) break;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>try 和 catch,将一段可能抛出异常的语句序列括在花括号里构成try语句块。catch子句负责处理代码抛出的异常。</li>
+<li>throw表达式语句,存在于代码块中,将控制权转移到相关的catch子句。</li>
+</ul>
+<p>异常安全(exception safe）是一个术语，表示的含义是当抛出异常后,程序能执行正确的行为。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/07/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/07/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c/" class="post-title-link" itemprop="url">第六天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-07 16:10:16" itemprop="dateCreated datePublished" datetime="2023-04-07T16:10:16+08:00">2023-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-08 20:01:43" itemprop="dateModified" datetime="2023-04-08T20:01:43+08:00">2023-04-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h1><h2 id="函数模板语法"><a href="#函数模板语法" class="headerlink" title="函数模板语法"></a>函数模板语法</h2><p>函数模板作用:<br>建立一个通用函数，其函数返回值类型和形参类型可以不具体制定，用一个虚拟的类型来代表。<br>语法:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename T&gt;</span><br><span class="line"></span><br><span class="line">函数声明或定义</span><br></pre></td></tr></table></figure>
+
+<p>解释:</p>
+<p>template —声明创建模板Ⅰ</p>
+<p>typename —表面其后面的符号是—种数据类型，可以用class代替T—通用的数据类型，名称可以替换，通常为大写字母</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//利用模板提供通用的交换函数</span><br><span class="line">template&lt;typename T&gt;</span><br><span class="line">void mySwap(T&amp; a，T&amp; b)</span><br><span class="line">&#123;</span><br><span class="line">	T temp = a;</span><br><span class="line">	a = b;</span><br><span class="line">	b = temp;</span><br><span class="line">&#125;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	int a = 10;</span><br><span class="line">	int b = 20;</span><br><span class="line">	// swapInt(a，b);</span><br><span class="line">	//利用模板实现交换</span><br><span class="line">	//1、自动类型推导</span><br><span class="line">	mySwap(a，b);</span><br><span class="line">	//2、显示指定类型</span><br><span class="line">	mySwap&lt;int&gt;(a，b);</span><br><span class="line">	cout &lt;&lt; &quot;a = &quot; &lt;&lt; a &lt;&lt; endl;</span><br><span class="line">	cout&lt;&lt; &quot; b = &quot;&lt;&lt; b &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li>函数模板利用关键字template</li>
+<li>使用函数模板有两种方式:自动类型推导、显示指定类型</li>
+<li>模板的目的是为了提高复用性，将类型参数化</li>
+<li>使用模板时必须确定出通用数据类型T，并且能够推导出一致的类型</li>
+</ul>
+<p>普通函数与函数模板区别:</p>
+<ul>
+<li>普通函数调用时可以发生自动类型转换(隐式类型转换)</li>
+<li>函数模板调用时，如果利用自动类型推导，不会发生隐式类型转换</li>
+<li>如果利用显示指定类型的方式，可以发生隐式类型转换</li>
+</ul>
+<p>总结:建议使用显示指定类型的方式，调用函数模板，因为可以自己确定通用类型T。</p>
+<h2 id="普通函数与函数模板的调用规则"><a href="#普通函数与函数模板的调用规则" class="headerlink" title="普通函数与函数模板的调用规则"></a>普通函数与函数模板的调用规则</h2><p>调用规则如下:</p>
+<p>1.如果函数模板和普通函数都可以实现，优先调用普通函数</p>
+<p>2.可以通过空模板参数列表来强制调用函数模板</p>
+<p>3.函数模板也可以发生重载</p>
+<p>4.如果函数模板可以产生更好的匹配,优先调用函数模板</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">//普通函数与函数模板调用规则</span><br><span class="line">void myPrint(int a, int b)&#123;</span><br><span class="line">	cout &lt;&lt;&quot;调用的普通函数”&quot;&lt;&lt;endl;</span><br><span class="line">template&lt;typename T&gt;</span><br><span class="line">void myPrint(T a， T b)</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt;“调用的模板&quot;&lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">template&lt;typename T&gt;</span><br><span class="line">void myPrint(T a， T b， T c)</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt;&quot;调用重载的模板&quot;&lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">    //1、如果函数模板和普通函数都可以实现，优先调用普通函数</span><br><span class="line">    //注意如果告诉编译器普通函数是有的，但只是声明没有实现，或者不在当前文件内实现，就会报错找不到</span><br><span class="line">    int a = 10;</span><br><span class="line">    int b = 20;</span><br><span class="line">    myPrint(a，b);//调用普通函数</span><br><span class="line">    //2、可以通过空模板参数列表&lt;&gt;来强制调用函数模板</span><br><span class="line">    myPrint&lt;&gt;(a, b);//调用函数模板</span><br><span class="line">    //3、函数模板也可以发生重载</span><br><span class="line">    int c = 30;</span><br><span class="line">    myprint(a,b, c);//调用重载的函数模板</span><br><span class="line">    //4、如果函数模板可以产生更好的匹配,优先调用函数模板</span><br><span class="line">    char c1 = &#x27;a&#x27;;</span><br><span class="line">    char c2 = &#x27;b&#x27;;</span><br><span class="line">    myPrint(c1，c2);//调用函数模板</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<p>既然提供了函数模板，最好就不要提供普通函数，否则容易出现二义性。</p>
+<h2 id="模板的局限性"><a href="#模板的局限性" class="headerlink" title="模板的局限性"></a>模板的局限性</h2><p>局限性:</p>
+<p>模板的通用性并不是万能的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">template&lt;class T&gt;</span><br><span class="line">void f(T a，T b)</span><br><span class="line">&#123;</span><br><span class="line">    if(a &gt; b) </span><br><span class="line">    &#123; .. &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，如果T的数据类型传入的是像Person这样的自定义数据类型，也无法正常运行</p>
+<p>因此C++为了解决这种问题，提供模板的重载，可以为这些特定的类型提供具体化的模板</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">class Person&#123;</span><br><span class="line">public:</span><br><span class="line">	Person( string name，int age)&#123;</span><br><span class="line">	this- &gt;m_Name I name;</span><br><span class="line">	this-&gt;m_Age - age;</span><br><span class="line">	&#125;</span><br><span class="line">string m_Name;</span><br><span class="line">int m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//普通函数模板</span><br><span class="line">template&lt;class T&gt;</span><br><span class="line">bool myCompare(T&amp; a，T&amp; b)&#123;</span><br><span class="line">	if (a == b)&#123;</span><br><span class="line">	return true;</span><br><span class="line">	&#125;</span><br><span class="line">	else&#123;</span><br><span class="line">	return false;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//具体化，显示具体化的原型和定意思以template&lt;&gt;开头，并通过名称来指出类型</span><br><span class="line">//具体化优先于常规模板</span><br><span class="line">template&lt;&gt; bool myCompare(Person &amp;p1，Person &amp;p2)</span><br><span class="line">&#123;</span><br><span class="line">	if ( p1.m_Name == p2.m_Name &amp;&amp; p1.m_Age == p2.m_Age)&#123;</span><br><span class="line">		return true;</span><br><span class="line">	&#125;</span><br><span class="line">	else&#123;</span><br><span class="line">	return false;</span><br><span class="line">	&#125;</span><br><span class="line">&#125; 	</span><br><span class="line">void test01()&#123;</span><br><span class="line">	int a - 10;</span><br><span class="line">	int b = 20;</span><br><span class="line">	//内置数据类型可以直接使用通用的函数模板</span><br><span class="line">	bool ret = myCompare(a， b);</span><br><span class="line">	if (ret)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;a == b &quot; &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	else</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;a != b &quot; &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li>利用具体化的模板，可以解决由定义类型的通用化</li>
+<li>学习模板并不是为了写模板，而是在STL能够运用系统提供的模板</li>
+</ul>
+<h2 id="类模板语法"><a href="#类模板语法" class="headerlink" title="类模板语法"></a>类模板语法</h2><p>类模板作用:<br>    建立一个通用类，类中的成员数据类型可以不具体制定，用一个虚拟的类型来代表。<br>语法:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename T&gt;</span><br><span class="line">类</span><br></pre></td></tr></table></figure>
+
+<p>解释:</p>
+<p>template —声明创建模板</p>
+<p>typename —表面其后面的符号是一种数据类型，可以用class代替</p>
+<p>T —通用的数据类型，名称可以替换，通常为大写字母</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">template&lt;class NameType,class AgeType&gt;</span><br><span class="line">class Person</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	Person(NameType name，AgeType age)</span><br><span class="line">	&#123;</span><br><span class="line">	this- &gt;mName = name;</span><br><span class="line">	this-&gt;mAge = age;</span><br><span class="line">	&#125;</span><br><span class="line">	void showPerson()&#123;</span><br><span class="line">	cout &lt;&lt; &quot;name: &quot; &lt;&lt; this-&gt;mName &lt;&lt; &quot; age: &quot; &lt;&lt; this-&gt;mAge &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	NameType mName;</span><br><span class="line">	AgeType mAge;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	//指定NameType 为string类型，AgeType 为int类型</span><br><span class="line">	Person&lt;string, int&gt;P1(&quot;孙悟空&quot;,999);</span><br><span class="line">	p1.showPerson( );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类模板与函数模板区别"><a href="#类模板与函数模板区别" class="headerlink" title="类模板与函数模板区别"></a>类模板与函数模板区别</h2><p>类模板与函数模板区别主要有两点:</p>
+<p>1.类模板没有自动类型推导的使用方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//1、类模板没有自动类型推导的使用方式</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	// Person p(&quot;孙悟空&quot;,1000); //错误类模板使用时候，不可以用自动类型推导</span><br><span class="line">	Person &lt;string ,int&gt;p(&quot;孙悟空&quot;，1000);//必须使用显示指定类型的方式，使用类模板</span><br><span class="line">	p.showPerson();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>⒉类模板在模板参数列表中可以有默认参数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//2、类模板在模板参数列表中可以有默认参数</span><br><span class="line">void test02()&#123;</span><br><span class="line">    Person &lt;string&gt; p(&quot;猪八戒&quot;, 999);//类模板中的模板参数列表可以指定默认参数template&lt;class //NameType,class AgeType=int&gt;</span><br><span class="line">    p.showPerson( ) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li>类模板使用只能用显示指定类型方式</li>
+<li>类模板中的模板参数列表可以有默认参数</li>
+</ul>
+<h2 id="类模板对象做函数参数"><a href="#类模板对象做函数参数" class="headerlink" title="类模板对象做函数参数"></a>类模板对象做函数参数</h2><p>学习目标:</p>
+<p>类模板实例化出的对象，向函数传参的方式</p>
+<p>—共有三种传入方式:</p>
+<p>​	1.指定传入的类型	—直接显示对象的数据类型</p>
+<p>​	2.参数模板化	—将对象中的参数变为模板进行传递</p>
+<p>​	3.整个类模板化	—将这个对象类型模板化进行传递</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">template&lt;class NameType,class AgeType=int&gt;</span><br><span class="line">class Person</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	Person(NameType name，AgeType age)</span><br><span class="line">	&#123;</span><br><span class="line">	this- &gt;mName = name;</span><br><span class="line">	this-&gt;mAge = age;</span><br><span class="line">	&#125;</span><br><span class="line">	void showPerson()&#123;</span><br><span class="line">	cout &lt;&lt; &quot;name: &quot; &lt;&lt; this-&gt;mName &lt;&lt; &quot; age: &quot; &lt;&lt; this-&gt;mAge &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	NameType mName;</span><br><span class="line">	AgeType mAge;</span><br><span class="line">&#125;;</span><br><span class="line">//1、指定传入的类型</span><br><span class="line">void PrintPerson1( Person&lt;string， int&gt; &amp;p)</span><br><span class="line">&#123;</span><br><span class="line">	p.showPerson();</span><br><span class="line">&#125;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	person &lt;string， int &gt;p(&quot;孙悟空&quot;，100);</span><br><span class="line">	printPerson1(p);</span><br><span class="line">&#125;</span><br><span class="line">//2、参数模板化</span><br><span class="line">template &lt;class T1，class T2&gt;</span><br><span class="line">void printPerson2(Person&lt;T1，T2&gt;&amp;p)</span><br><span class="line">&#123;</span><br><span class="line">	p.showPerson();</span><br><span class="line">	cout &lt;&lt;&quot;T1的类型为:“ &lt;&lt; typeid(T1).name() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;&quot;T2的类型为:“ &lt;&lt; typeid(T2).name() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test02()</span><br><span class="line">&#123;</span><br><span class="line">	Person &lt;string, int &gt;p(&quot;猪八戒&quot;，90);</span><br><span class="line">	printPerson2(p);</span><br><span class="line">&#125;</span><br><span class="line">//3、整个类模板化</span><br><span class="line">template&lt;class T&gt;</span><br><span class="line">void printPerson3(T &amp; p)(</span><br><span class="line">	cout &lt;&lt;&quot;T的类型为:“ &lt;&lt; typeid(T).name() &lt;&lt; endl;</span><br><span class="line">	p.showPerson();</span><br><span class="line">&#125;</span><br><span class="line">void test03()&#123;</span><br><span class="line">	Person &lt;string, int &gt;p(“唐借&quot;，30);</span><br><span class="line">	printPerson3(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li>通过类模板创建的对象，可以有三种方式向函数中进行传参</li>
+<li>使用比较广泛是第一种:指定传入的类型</li>
+</ul>
+<h2 id="类模板与继承"><a href="#类模板与继承" class="headerlink" title="类模板与继承"></a>类模板与继承</h2><p>当类模板碰到继承时，需要注意一下几点:</p>
+<ul>
+<li>当子类继承的父类是一个类模板时，子类在声明的时候，要指定出父类中T的类型</li>
+<li>如果不指定，编译器无法给子类分配内存</li>
+<li>如果想灵活指定出父类中T的类型，子类也需变为类模板</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">template&lt;class T&gt;</span><br><span class="line">class Base</span><br><span class="line">&#123;</span><br><span class="line">	T m;</span><br><span class="line">&#125;;</span><br><span class="line">//class Son: public Base//错误，c++编译需要给子类分配内存，必须知道父类中T的类型才可以向下继承</span><br><span class="line">class Son :public Base&lt;int&gt;//必须指定一个类型</span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	son c;</span><br><span class="line">&#125;</span><br><span class="line">//类模板继承类模板,可以用T2指定父类中的T类型</span><br><span class="line">template&lt;class T1, class T2&gt;</span><br><span class="line">class Son2 :public Base&lt;T2&gt;</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	Son2()&#123;</span><br><span class="line">	cout &lt;&lt; typeid(T1).name() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; typeid(T2).name() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test02()&#123;</span><br><span class="line">	Son2&lt;int, char&gt; child1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:如果父类是类模板，子类需要指定出父类中T的数据类型</p>
+<h2 id="类模板成员函数类外实现"><a href="#类模板成员函数类外实现" class="headerlink" title="类模板成员函数类外实现"></a>类模板成员函数类外实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">//类模板中成员函数类外实现</span><br><span class="line">template&lt;class T1，class T2&gt;</span><br><span class="line">class Person &#123;</span><br><span class="line">public:</span><br><span class="line">	//成员函数类内声明</span><br><span class="line">	Person(T1 name，T2 age);</span><br><span class="line">	void showPerson();</span><br><span class="line">public:</span><br><span class="line">	T1 m_Name;</span><br><span class="line">	T2 m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//构造函数类外实现</span><br><span class="line">template&lt;class T1,class T2&gt;</span><br><span class="line">Person&lt;T1，T2&gt; : : Person(T1 name，T2 age) &#123;</span><br><span class="line">	this-&gt;m_Name = name;</span><br><span class="line">	this-&gt;m_Age = age;</span><br><span class="line">&#125;</span><br><span class="line">//成员函数类外实现</span><br><span class="line">template&lt;class T1，class T2&gt;</span><br><span class="line">void Person&lt;T1，T2&gt; : : showPerson( ) &#123;</span><br><span class="line">	cout &lt;&lt;“姓名:&quot;&lt;&lt; this-&gt;m_Name &lt;&lt;”年龄:&quot; &lt;&lt; this-&gt;m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	Person&lt;string, int&gt; p(&quot;Tom&quot;,20);</span><br><span class="line">	p.showPerson();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类模板分文件编写"><a href="#类模板分文件编写" class="headerlink" title="类模板分文件编写"></a>类模板分文件编写</h2><p>问题:</p>
+<ul>
+<li>类模板中成员函数创建时机是在调用阶段，导致分文件编写时链接不到</li>
+</ul>
+<p>解决:</p>
+<ul>
+<li>解决方式1:直接包含.cpp源文件</li>
+<li>解决方式2∶将声明和实现写到同一个文件中，并更改后缀名为.hpp，hpp是约定的名称，并不是强制</li>
+</ul>
+<p>person.hpp中代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#pragma once</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">template&lt;class T1,class T2&gt;</span><br><span class="line">class Person&#123;</span><br><span class="line">public:</span><br><span class="line">	Person(T1 name，T2 age);</span><br><span class="line">	void showPerson();</span><br><span class="line">public:</span><br><span class="line">	T1 m_Name;</span><br><span class="line">	T2 m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//构造函数类外实现</span><br><span class="line">template&lt;class T1, class T2&gt;</span><br><span class="line">Person&lt;T1，T2&gt; : :Person(T1 name，T2 age) &#123;</span><br><span class="line">	this-&gt;m_Name = name;</span><br><span class="line">	this-&gt;m_Age = age;</span><br><span class="line">&#125;</span><br><span class="line">//成员函数类外实现</span><br><span class="line">template&lt;class T1,class T2&gt;</span><br><span class="line">void Person&lt;T1，T2&gt; : : showPerson() &#123;</span><br><span class="line">	cout &lt;&lt;“姓名;&quot;&lt;&lt; this-&gt;m_Name &lt;&lt;”年龄:&quot;&lt;&lt; this-&gt;m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类模板分文件编写.cpp中代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;iosiream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">//#include &quot;person.h&quot;</span><br><span class="line">#include &quot;person.cpp”//解决方式1，包含cpp源文件</span><br><span class="line">//解决方式2，将声明和实现写到一起，文件后缀名改为.hpp</span><br><span class="line">#include &quot;person.hpp&quot;</span><br><span class="line">void teste1()</span><br><span class="line">&#123;</span><br><span class="line">	Person&lt;string, int&gt; p( Tom&quot;，10);</span><br><span class="line">	p.showPerson( );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:主流的解决方式是第二种，将类模板成员函数写到一起，并将后缀名改为.hpp</p>
+<h2 id="类模板与友元"><a href="#类模板与友元" class="headerlink" title="类模板与友元"></a>类模板与友元</h2><p>学习目标:</p>
+<ul>
+<li>掌握类模板配合友元函数的类内和类外实现</li>
+<li>全局函数类内实现-直接在类内声明友元即可</li>
+<li>全局函数类外实现–需要提前让编译器知道全局函数的存在</li>
+</ul>
+<p>成员函数加friend变为全局函数,可在全局作用于该类对象.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">//2、全局函数配合友元类外实现–先做函数模板声明，下方在做函数模板定义，在做友元</span><br><span class="line">template&lt;class T1,class T2&gt; </span><br><span class="line">class Person;</span><br><span class="line">//如果声明了函数模板，可以将实现写到后面，否则需要将实现体写到类的前面让编译器提前看到</span><br><span class="line">//template&lt;class T1，class T2&gt; void printPerson2(Person&lt;T1，T2&gt;&amp; p);</span><br><span class="line">template&lt;class T1, class T2&gt;</span><br><span class="line">void printPerson2( Person&lt;T1，T2&gt;&amp; p)&#123;</span><br><span class="line">	cout &lt;&lt;&quot;类外实现----姓名: &quot; &lt;&lt; p.m_Name &lt;&lt;”年龄:&quot;&lt;&lt; p.m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">template&lt;class T1, class T2&gt;</span><br><span class="line">class person</span><br><span class="line">&#123;</span><br><span class="line">	//1、全局函数配合友元类内实现</span><br><span class="line">	friend void printPerson(Person&lt;T1，T2&gt; &amp;p)</span><br><span class="line">		cout &lt;&lt;&quot;姓名:&quot;&lt;&lt; p.m_Name &lt;&lt;”年龄:”&lt;&lt; p.m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">	//全局函数配合友元类外实现</span><br><span class="line">	friend void printPerson2&lt;&gt;(Person&lt;T1，T2&gt; &amp; p);</span><br><span class="line">public:</span><br><span class="line">	Person( T1 name，T2 age)&#123;</span><br><span class="line">		this-&gt;m_Name = name;</span><br><span class="line">		this-&gt;m_Age -l age;</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	T1 m_Name;</span><br><span class="line">	T2 m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//1、全局函数在类内实现</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	Person &lt;string， int &gt;p( &quot;Tom&quot;，20);</span><br><span class="line">	printPerson(p);</span><br><span class="line">&#125;</span><br><span class="line">//2、全局函数在类外实现</span><br><span class="line">void test02()</span><br><span class="line">&#123;</span><br><span class="line">	Person &lt;string, int &gt;p(&quot;Jerry&quot; , 30);</span><br><span class="line">	printPerson2(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:建议全局函数做类内实现，用法简单，而且编译器可以直接识别</p>
+<h2 id="类模板案例"><a href="#类模板案例" class="headerlink" title="类模板案例"></a>类模板案例</h2><p>案例描述:实现一个通用的数组类，要求如下:</p>
+<ul>
+<li>可以对内置数据类型以及自定义数据类型的数据进行存储</li>
+<li>将数组中的数据存储到堆区</li>
+<li>构造函数中可以传入数组的容量</li>
+<li>提供对应的拷贝构造函数以及operator&#x3D;防止浅拷贝问题</li>
+<li>提供尾插法和尾删法对数组中的数据进行增加和删除</li>
+<li>可以通过下标的方式访问数组中的元素</li>
+<li>可以获取数组中当前元素个数和数组的容量</li>
+</ul>
+<p>myArray.hpp中代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">pragma once</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">template&lt;class T&gt;</span><br><span class="line">class MyArray&#123;</span><br><span class="line">public:</span><br><span class="line">	//构造函数</span><br><span class="line">	MyArray(int capacity)&#123;</span><br><span class="line">		this-&gt;m_Capacity = capacity;</span><br><span class="line">		this-&gt;m_size = 0;</span><br><span class="line">		pAddress = new T[this-&gt;m_Capacity];</span><br><span class="line">	&#125;</span><br><span class="line">	//拷贝构造</span><br><span class="line">	MyArray(const MyArray &amp; arr)&#123;</span><br><span class="line">		this-&gt;m_Capacity = arr.m_capacity;</span><br><span class="line">		this-&gt;m_Size = arr.m_Size;</span><br><span class="line">		this-&gt;pAddress = new T[this-&gt;m_capacity];</span><br><span class="line">		for (int i =0; i &lt; this-&gt;m_size; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			//如果T为对象，而且还包含指针，必须需要重载=操作符，因为这个等号不是构造而是赋值</span><br><span class="line">			//普通类型可以直接=但是指针类型需要深拷贝</span><br><span class="line">			this-&gt;pAddress[i] = arr. pAddress[i];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	//重载=操作符  防止浅拷贝问题</span><br><span class="line">	MyArray&amp; operator=( const MyArray&amp; myarray) &#123;</span><br><span class="line">		if(this-&gt;pAddress != NULL) &#123;</span><br><span class="line">			delete[] this-&gt;pAddress;</span><br><span class="line">			this-&gt;m_Capacity = 0;</span><br><span class="line">			this-&gt;m_size = 0;</span><br><span class="line">		&#125;</span><br><span class="line">		this-&gt;m_Capacity = myarray.m_capacity;</span><br><span class="line">		this-&gt;m_Size = myarray.m_size;</span><br><span class="line">		this-&gt;pAddress = new T[this-&gt;m_capacity];</span><br><span class="line">		for (int i = 0; i &lt; this-&gt;m_size; i++) &#123;</span><br><span class="line">				this-&gt;pAddress[i] = myarray[i];</span><br><span class="line">		&#125;</span><br><span class="line">		return *this;</span><br><span class="line">	&#125;</span><br><span class="line">	//重载[]操作符 arr[0]</span><br><span class="line">	T&amp; operator [](int index)</span><br><span class="line">	&#123;</span><br><span class="line">		return this-&gt;pAddress[index]; //不考虑越界，用户自己去处理</span><br><span class="line">	&#125;</span><br><span class="line">	//尾插法</span><br><span class="line">	void Push_back( const T &amp; val)</span><br><span class="line">	&#123;</span><br><span class="line">		if (this-&gt;m_Capacity == this-&gt;m_size)&#123;</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		this-&gt;pAddress[this-&gt;m_size] = val;</span><br><span class="line">		this-&gt;m_size++;</span><br><span class="line">	&#125;</span><br><span class="line">	//尾删法</span><br><span class="line">	void Pop_back()&#123;</span><br><span class="line">		if (this-&gt;m_size == e)&#123;</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		this-&gt;m_size--;</span><br><span class="line">	&#125;</span><br><span class="line">	//获取数组容量</span><br><span class="line">	int getCapacity()&#123;</span><br><span class="line">		return this-&gt;m_capacity;</span><br><span class="line">	&#125;</span><br><span class="line">	//获取数组大小</span><br><span class="line">	int getsize()</span><br><span class="line">	&#123;</span><br><span class="line">		return this-&gt;m_size;</span><br><span class="line">	&#125;</span><br><span class="line">	//析构</span><br><span class="line">	~MyArray()&#123;</span><br><span class="line">		if (this-&gt;pAddress != NULL)&#123;</span><br><span class="line">			delete[] this-&gt;pAddress;</span><br><span class="line">			this-&gt;pAddress = NULL;</span><br><span class="line">			this-&gt;m_Capacity = 0;</span><br><span class="line">			this-&gt;m_Size = 0;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	T *pAddress;//指向一个堆空间，这个空间存储真正的数据</span><br><span class="line">	int m_Capacity;//容量</span><br><span class="line">	int m_Size;//大小</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>类模板案例―数组类封装.cpp中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;myArray.hpp&quot;</span><br><span class="line">include &lt;string&gt;</span><br><span class="line">void printIntArray(MyArray&lt;int&gt;&amp; arr) &#123;</span><br><span class="line">	for (int i =0; i &lt; arr.getsize(); i++) &#123;</span><br><span class="line">	cout &lt;&lt; arr[i] &lt;&lt;&quot; &quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">//测试内置数据类型</span><br><span class="line">void test01()&#123;</span><br><span class="line">	MyArray&lt;int&gt; artay1(10);</span><br><span class="line">	for (int i = 0; i &lt; 10; i++)&#123;</span><br><span class="line">		array1.Push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt; &quot;array1打印输出:” &lt;&lt; endl;</span><br><span class="line">	printIntArray( array1);</span><br><span class="line">	cout &lt;&lt; &quot;array1的大小:&quot; &lt;&lt;array1.getsize() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;array1的容量:&quot;&lt;&lt; array1.getCapacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;-------------------&quot;&lt;&lt;endl;</span><br><span class="line">	MyArray&lt;int&gt; array2( array1);//拷贝</span><br><span class="line">	array2.pop_back( );</span><br><span class="line">	cout &lt;&lt; &quot;array2打印输出:” &lt;&lt; endl;printIntArray( array2) ;</span><br><span class="line">	cout &lt;&lt; &quot;array2的大小:&quot; &lt;&lt;array2.getsize() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;array2的容量:&quot;&lt;&lt; array2.getCapacity() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">//测试自定义数据类型</span><br><span class="line">class Person &#123;</span><br><span class="line">public:</span><br><span class="line">	Person()&#123;&#125;</span><br><span class="line">	Person(string name,int age) </span><br><span class="line">	&#123;</span><br><span class="line">		this-&gt;m_Name = name;</span><br><span class="line">		this-&gt;m_Age = age;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	string m_Name;</span><br><span class="line">	int m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">void printPersonArray(MyArray&lt;Person&gt;&amp; personArr)</span><br><span class="line">&#123;</span><br><span class="line">	for (int i = 0; i &lt; personArr.getsize(); i++) &#123;</span><br><span class="line">		cout &lt;&lt;&quot;姓名:&quot; &lt;&lt;personArr[i].m_Name &lt;&lt;”年龄: &quot;&lt;&lt; personArr[i].m_Age &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">void test02()</span><br><span class="line">	&#123;</span><br><span class="line">	//创建数组</span><br><span class="line">		MyArray&lt;Person&gt; pArray (10);</span><br><span class="line">		Person p1(”孙悟空&quot;，30);</span><br><span class="line">		person p2(“韩信&quot;，20);</span><br><span class="line">		Person p3(&quot;妲己&quot;，18) ;</span><br><span class="line">		Person p4(“王昭君&quot;，15);</span><br><span class="line">		person p5(&quot;赵云&quot;，24);</span><br><span class="line">		//插入数据</span><br><span class="line">		pArray. push_back(p1);</span><br><span class="line">		pArray. Push_back(p2);</span><br><span class="line">		printPersonArray(pArray);</span><br><span class="line">		cout &lt;&lt; &quot;pArray的大小:&quot; &lt;&lt;pArray.getsize() &lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt; &quot;pArray的容量:&quot;&lt;&lt;pArray.getcapacity() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/03/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1157,441 +1972,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/23/c%E5%92%8Cc++/%E7%AC%AC%E4%B9%9D%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/23/c%E5%92%8Cc++/%E7%AC%AC%E4%B9%9D%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第九天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-03-23 14:43:06 / 修改时间：21:07:01" itemprop="dateCreated datePublished" datetime="2023-03-23T14:43:06+08:00">2023-03-23</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-内存管理"><a href="#C-内存管理" class="headerlink" title="C 内存管理"></a>C 内存管理</h1><p>C 语言为内存的分配和管理提供了几个函数。这些函数可以在 <strong>&lt;stdlib.h&gt;</strong> 头文件中找到。</p>
-<p>1.stdlib.h中的几个函数操作内存；calloc(）分配指定个数指定大小的连续内存块，返回值是这些连续内存块组成的大内存块地址；malloc()分配指定大小的一块内存，返回值是内存的地址；realloc()通过已分配的内存块的地址扩展或者减小内存的大小；free()释放指定地址对应的内存块，无返回值；alloc是allocate 分配的缩写；malloc mess+allocate 整块的分配</p>
-<p>2.stdlib中几个内存管理的函数返回值是 void *,表示任意类型的指针，或者说它可以转化成任意类型；</p>
-<p>3.内存管理的意义：数组、基本数据类型、结构体、共用体都是固定的为数据分配内存空间，而内存管理却可以直接申请一块内存，然后给其指定存储的数据类型，之后就可以存储数据了，且还可以根据数据的大小来扩展内存空间；</p>
-<hr>
-<p>malloc与calloc没有本质区别，malloc之后的未初始化内存可以使用memset进行初始化。</p>
-<p>主要的不同是malloc不初始化分配的内存，calloc初始化已分配的内存为0。</p>
-<p>次要的不同是calloc返回的是一个数组，而malloc返回的是一个对象。</p>
-<p>calloc等于malloc后再memset，所以malloc比calloc更高效。</p>
-<p>分配内存空间函数malloc 调用形式: (类型说明符*) malloc (size) 。</p>
-<p>分配内存空间函数 calloc calloc 也用于分配内存空间。</p>
-<p>为什么多用malloc而很少用calloc？</p>
-<p>因为calloc虽然对内存进行了初始化（全部初始化为0），</p>
-<p>calloc相当于</p>
-<p>p &#x3D; malloc();</p>
-<p>memset(p, 0,size);(C 库函数 <strong>void *memset(void *str, int c, size_t n)</strong> 复制字符 <strong>c</strong>（一个无符号字符）到参数 <strong>str</strong> 所指向的字符串的前 <strong>n</strong> 个字符。)</p>
-<p>相对于malloc多了对内存的写零操作，而写零这个操作我们有时候需要，而大部分时间不需要。</p>
-<hr>
-<table>
-<thead>
-<tr>
-<th align="left">序号</th>
-<th align="left">函数和描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">1</td>
-<td align="left"><strong>void *calloc(int num, int size);</strong> 在内存中动态地分配 num 个长度为 size 的连续空间，并将每一个字节都初始化为 0。所以它的结果是分配了 num*size 个字节长度的内存空间，并且每个字节的值都是 0。</td>
-</tr>
-<tr>
-<td align="left">2</td>
-<td align="left"><strong>void free(void *address);</strong> 该函数释放 address 所指向的内存块,释放的是动态分配的内存空间。</td>
-</tr>
-<tr>
-<td align="left">3</td>
-<td align="left"><strong>void *malloc(int num);</strong> 在堆区分配一块指定大小的内存空间，用来存放数据。这块内存空间在函数执行完成后不会被初始化，它们的值是未知的。</td>
-</tr>
-<tr>
-<td align="left">4</td>
-<td align="left"><strong>void *realloc(void *address, int newsize);</strong> 该函数重新分配内存，把内存扩展到 <strong>newsize</strong>。</td>
-</tr>
-</tbody></table>
-<p>直接使用原来的指针变量接收 <strong>realloc</strong> 的返回值是可能存在内存泄漏的。例如以下语句：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = (char *) realloc( description, 100 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>若 realloc 函数执行失败，description 原先所指向的空间不变，realloc 函数返回 NULL。</p>
-<p>此时 description 的值被赋为 NULL, 但原先指向的空间未被释放，造成了内存泄漏。（内存泄漏 （Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存 。 内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，导致在释放该段内存之前就失去了对该段内存的控制，从而造成了内存的浪费。 内存泄漏通常情况下只能由获得程序源代码的程序员才能分析出来。）</p>
-<hr>
-<p><strong>注意：</strong>void * 类型表示未确定类型的指针。C、C++ 规定 void * 类型可以通过类型转换强制转换为任何其它类型的指针。</p>
-<p><strong>注：</strong>void 指针可以任意类型的数据，可以在程序中给我们带来一些好处，函数中形为指针类型时，我们可以将其定义为 void 指针，这样函数就可以接受任意类型的指针。</p>
-<p>void 指针可以指向任意类型的数据，就是说可以用任意类型的指针对 void 指针对 void 指针赋值。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int *a；</span><br><span class="line">void *p；</span><br><span class="line">p=a；</span><br></pre></td></tr></table></figure>
-
-<p>如果要将 void 指针 p 赋给其他类型的指针，则需要强制类型转换，就本例而言：<strong>a&#x3D;（int *）p</strong>。</p>
-<p>对于 void 指针，GNU 认为 <strong>void *</strong> 和 <strong>char *</strong> 一样，所以以下写法是正确的:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = malloc( 200 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>但按照 ANSI(American National Standards Institute) 标准，需要对 void 指针进行强制转换，如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = (char *)malloc( 200 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>同时，按照 ANSI(American National Standards Institute) 标准，不能对 void 指针进行算法操作:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void * pvoid;</span><br><span class="line">pvoid++; //ANSI：错误</span><br><span class="line">pvoid += 1; //ANSI：错误</span><br><span class="line">// ANSI标准之所以这样认定，是因为它坚持：进行算法操作的指针必须是确定知道其指向数据类型大小的。</span><br><span class="line"></span><br><span class="line">int *pint;</span><br><span class="line">pint++; //ANSI：正确</span><br></pre></td></tr></table></figure>
-
-<p>在实际的程序设计中，为迎合 ANSI 标准，并提高程序的可移植性，我们可以这样编写实现同样功能的代码：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void * pvoid;</span><br><span class="line">((char *)pvoid)++; //ANSI：错误；GNU：正确</span><br><span class="line">(char *)pvoid += 1; //ANSI：错误；GNU：正确</span><br></pre></td></tr></table></figure>
-
-<h2 id="动态分配内存"><a href="#动态分配内存" class="headerlink" title="动态分配内存"></a>动态分配内存</h2><p>预先不知道需要存储的文本长度，例如您想存储有关一个主题的详细描述。在这里，我们需要定义一个指针，该指针指向未定义所需内存大小的字符，后续再根据需求来分配内存，如下所示：</p>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   char name[100];</span><br><span class="line">   char *description;</span><br><span class="line"> </span><br><span class="line">   strcpy(name, &quot;Zara Ali&quot;);</span><br><span class="line"> </span><br><span class="line">   /* 动态分配内存 */</span><br><span class="line">   description = (char *)malloc( 200 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcpy( description, &quot;Zara ali a DPS student in class 10th&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   printf(&quot;Name = %s\n&quot;, name );</span><br><span class="line">   printf(&quot;Description: %s\n&quot;, description );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的程序也可以使用 <strong>calloc()</strong> 来编写，只需要把 malloc 替换为 calloc 即可，如下所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">calloc(200, sizeof(char));</span><br></pre></td></tr></table></figure>
-
-<p>当动态分配内存时，您有完全控制权，可以传递任何大小的值。而那些预先定义了大小的数组，一旦定义则无法改变大小。</p>
-<h2 id="重新调整内存的大小和释放内存"><a href="#重新调整内存的大小和释放内存" class="headerlink" title="重新调整内存的大小和释放内存"></a>重新调整内存的大小和释放内存</h2><p>当程序退出时，操作系统会自动释放所有分配给程序的内存，但是，建议您在不需要内存时，都应该调用函数 <strong>free()</strong> 来释放内存。</p>
-<p>或者，您可以通过调用函数 <strong>realloc()</strong> 来增加或减少已分配的内存块的大小。让我们使用 realloc() 和 free() 函数，再次查看上面的实例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   char name[100];</span><br><span class="line">   char *description;</span><br><span class="line"> </span><br><span class="line">   strcpy(name, &quot;Zara Ali&quot;);</span><br><span class="line"> </span><br><span class="line">   /* 动态分配内存 */</span><br><span class="line">   description = (char *)malloc( 30 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcpy( description, &quot;Zara ali a DPS student.&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   /* 假设您想要存储更大的描述信息 */</span><br><span class="line">   description = (char *) realloc( description, 100 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcat( description, &quot;She is in class 10th&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   printf(&quot;Name = %s\n&quot;, name );</span><br><span class="line">   printf(&quot;Description: %s\n&quot;, description );</span><br><span class="line"> </span><br><span class="line">   /* 使用 free() 函数释放内存 */</span><br><span class="line">   free(description);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>尝试一下不重新分配额外的内存，strcat() 函数会生成一个错误，因为存储 description 时可用的内存不足。</p>
-<hr>
-<p>动态可变长的结构体：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef struct</span><br><span class="line">&#123;</span><br><span class="line">  int id;</span><br><span class="line">  char name[0];</span><br><span class="line">&#125;stu_t;</span><br></pre></td></tr></table></figure>
-
-<p>定义该结构体，只占用4字节的内存，name不占用内存。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">stu_t *s = NULL;    //定义一个结构体指针</span><br><span class="line">s = malloc(sizeof(*s) + 100);//sizeof(*s)获取的是4，但加上了100，4字节给id成员使用，100字节是属于name成员的</span><br><span class="line">s-&gt;id = 1010;</span><br><span class="line">strcpy(s-&gt;name,&quot;hello&quot;);</span><br></pre></td></tr></table></figure>
-
-<p>注意：一个结构体中只能有一个可变长的成员，并且该成员必须是最后一个成员。</p>
-<h3 id="C-语言中常用的内存管理函数和运算符"><a href="#C-语言中常用的内存管理函数和运算符" class="headerlink" title="C 语言中常用的内存管理函数和运算符"></a>C 语言中常用的内存管理函数和运算符</h3><ul>
-<li>malloc() 函数：用于动态分配内存。它接受一个参数，即需要分配的内存大小（以字节为单位），并返回一个指向分配内存的指针。</li>
-<li>free() 函数：用于释放先前分配的内存。它接受一个指向要释放内存的指针作为参数，并将该内存标记为未使用状态。</li>
-<li>calloc() 函数：用于动态分配内存，并将其初始化为零。它接受两个参数，即需要分配的内存块数和每个内存块的大小（以字节为单位），并返回一个指向分配内存的指针。</li>
-<li>realloc() 函数：用于重新分配内存。它接受两个参数，即一个先前分配的指针和一个新的内存大小，然后尝试重新调整先前分配的内存块的大小。如果调整成功，它将返回一个指向重新分配内存的指针，否则返回一个空指针。</li>
-<li>sizeof 运算符：用于获取数据类型或变量的大小（以字节为单位）。</li>
-<li>指针运算符：用于获取指针所指向的内存地址或变量的值。</li>
-<li>&amp; 运算符：用于获取变量的内存地址。</li>
-<li>***** 运算符：用于获取指针所指向的变量的值。</li>
-<li><strong>-&gt;</strong> 运算符：用于指针访问结构体成员，语法为 <strong>pointer-&gt;member</strong>，等价于 <strong>(*pointer).member</strong>。</li>
-<li>memcpy() 函数：用于从源内存区域复制数据到目标内存区域。它接受三个参数，即目标内存区域的指针、源内存区域的指针和要复制的数据大小（以字节为单位）。<strong>void *memcpy(void *str1, const void *str2, size_t n)</strong> 从存储区 <strong>str2</strong> 复制 <strong>n</strong> 个字节到存储区 <strong>str1</strong>。该函数返回一个指向目标存储区 str1 的指针。</li>
-<li>memmove() 函数：类似于 memcpy() 函数，但它可以处理重叠的内存区域。它接受三个参数，即目标内存区域的指针、源内存区域的指针和要复制的数据大小（以字节为单位）。<strong>void *memmove(void *str1, const void *str2, size_t n)</strong> 从 <strong>str2</strong> 复制 <strong>n</strong> 个字符到 <strong>str1</strong>，但是在重叠内存块这方面，memmove() 是比 memcpy() 更安全的方法。如果目标区域和源区域有重叠的话，memmove() 能够保证源串在被覆盖之前将重叠区域的字节拷贝到目标区域中，复制后源区域的内容会被更改。如果目标区域与源区域没有重叠，则和 memcpy() 函数功能相同。</li>
-</ul>
-<p>任何类型的指针都可以传入 memcpy 和 memset 中</p>
-<hr>
-<p>对于我们手动分配的内存，在 C 语言中是不用强制转换类型的。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">description = malloc( 200 * sizeof(char) ); // C 语言正确。</span><br><span class="line">description = malloc( 200 * sizeof(char) ); // C++ 错误</span><br></pre></td></tr></table></figure>
-
-<p>但是 C++ 是强制要求的，不然会报错。</p>
-<hr>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/22/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/22/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第八天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-03-22 16:14:02" itemprop="dateCreated datePublished" datetime="2023-03-22T16:14:02+08:00">2023-03-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-17 16:33:02" itemprop="dateModified" datetime="2023-06-17T16:33:02+08:00">2023-06-17</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C递归"><a href="#C递归" class="headerlink" title="C递归"></a>C递归</h1><p>递归是一个简洁的概念，同时也是一种很有用的手段。但是，使用递归是要付出代价的。与直接的语句(如while循环)相比，递归函数会<strong>耗费更多的运行时间，并且要占用大量的栈空间</strong>。递归函数每次调用自身时，都需要把它的状态存到栈中，以便在它调用完自身后，程序可以返回到它原来的状态。未经精心设计的递归函数总是会带来麻烦。</p>
-<p>电脑空间大致分<strong>Heap（堆）</strong>和<strong>Stack（栈）</strong>两种。</p>
-<p><strong>栈</strong>是用于<strong>函数</strong>的空间。</p>
-<p>电脑调用一个函数，就会使用一层栈；</p>
-<p>相反，电脑中一个函数结束（return），就会释放这一层栈，<strong>连同在这层栈（这个函数）中定义的所有东西</strong>。</p>
-<p>不在栈中的，应该就在堆中。<strong>（这就是定义全区变量与局部变量的用处）</strong></p>
-<p>如果调用太多层栈（太多个函数），电脑就会暴空间！</p>
-<p>所以说，调用递归函数，就会<strong>一层一层地压栈</strong>，<strong>电脑就会暴空间！</strong>（<strong>并不代表不建议用递归，只是作提示而已</strong>）</p>
-<p><strong>栈：</strong></p>
-<p>在函数中定义的变量存放的内存区域。常见的int、float、char等变量均存放于栈区中，它的特点是由系统自动分配与释放，不需要程序员考虑资源回收的问题，方便简洁。ps：<strong>栈区的地址分配是从内存的高地址开始向低地址分配；</strong></p>
-<p><strong>堆：</strong></p>
-<p>通过指令自主向系统申请的内存区域，大小由自己决定，它在使用完后同样需要自己通过指令去释放该区域内存，否则将有可能出现内存的浪费与溢出。</p>
-<p>C语言中申请堆区指令为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *p = (<span class="type">int</span> *) <span class="built_in">malloc</span>( N * <span class="keyword">sizeof</span>(<span class="type">int</span>) );  <span class="comment">//分配N个int型(4字节)的内存，即 4 * N 个字节</span></span><br></pre></td></tr></table></figure>
-
-<p>ps：<strong>但指针p存放于栈区，指向堆</strong>。</p>
-<p>C语言中释放堆区指令为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">free</span>( p ); <span class="comment">//注意此处参数为指针</span></span><br></pre></td></tr></table></figure>
-
-<p>使用中应该注意，尽量不要去修改p指针对应的地址值，否则在内存释放时将出现错误。(编译可通过，运行出现问题)</p>
-<p><strong>bss区：</strong></p>
-<p>通常是指用来存放程序中未初始化的全局变量的一块内存区域，由static修饰，BSS是英文Block Started by Symbol的简称，BSS段属于静态内存分配。ps：静态变量仅在第一次创建时初始化一次，之后自动跳过初始化语句。全局变量与静态变量均由系统分配和释放内存，若未对它们进行初始化操作，系统将自动将其值设置为0。(堆区与栈区则不会)</p>
-<p><strong>代码段：</strong></p>
-<p>代码段(code segment&#x2F;text segment)通常是指用来存放程序执行代码的一块内存区域。这部分区域的大小在程序运行前就已经确定，并且内存区域通常属于只读, 某些架构也允许代码段为可写，即允许修改程序。在代码段中，也有可能包含一些只读的常数变量，例如字符串常量等。常见的使用：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *s = <span class="string">&quot;HelloWorld&quot;</span>;<span class="comment">//该字符串 HelloWorld 即存放于文字常量区，不可修改。</span></span><br></pre></td></tr></table></figure>
-
-<p>ps：但指针s存放于栈区。</p>
-<p>pps：若在程序中尝试对其修改（例如尝试修改第一个字符 *s &#x3D; ‘h’;），将出现编译可通过，运行报错的情况。</p>
-<p>同时因注意它与const修饰的变量之间的区别：char aa &#x3D; ‘A’;&#x2F;&#x2F;aa存放于栈区；const char bb &#x3D; ‘B’; &#x2F;&#x2F;bb同样存放于栈区，const修饰的变量仅仅用于告诉编译器bb是一个常量，如果后续的程序中有出现尝试修改bb的操作时，编译将报错。这种写法主要是为了防止程序员在后续的代码中误操作bb变量而添加的一个约束条件，并不会影响它存放的位置。</p>
-<h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">int</span> val1 = <span class="number">1</span>;        <span class="comment">//val1存放在.data段</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> val2 = <span class="number">1</span>;               <span class="comment">//初始化的全局变量存放在.data段</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> val3 ;                  <span class="comment">//未初始化的全局变量存放在.bss段</span></span><br><span class="line"><span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span> val4 = <span class="number">1</span>;         <span class="comment">//val4存放在.rodata（只读数据段）</span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> <span class="title function_">Demo</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> num)</span> <span class="comment">//num 存放在栈区</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">char</span> var = <span class="string">&quot;123456&quot;</span>;               <span class="comment">//var存放在栈区，&quot;123456&quot;存放在常量区</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> num1 = <span class="number">1</span> ;            <span class="comment">//num1存放在栈区</span></span><br><span class="line">  <span class="type">static</span> <span class="type">unsigned</span> <span class="type">int</span> num2 = <span class="number">0</span>;      <span class="comment">//num2存放在.data段</span></span><br><span class="line">  <span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span> num3 = <span class="number">7</span>;       <span class="comment">//num3存放在栈区</span></span><br><span class="line">  <span class="type">void</span> *p;</span><br><span class="line">  p = <span class="built_in">malloc</span>(<span class="number">8</span>);                     <span class="comment">//p存放在堆区，但指针p存放于栈区，指向堆</span></span><br><span class="line">  <span class="built_in">free</span>(p);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> num = <span class="number">0</span> ;</span><br><span class="line">  num = Demo(num);                   <span class="comment">//Demo()函数的返回值存放在栈区。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>DATA 段（全局初始化区）存放初始化的全局变量和静态变量；BSS 段（全局未初始化区）存放未初始化的全局变量和静态变量。</p>
-<p>静态局部变量时在编译时被赋值的，即自始至终<strong>只赋值一次</strong>，在程序运行时它已经有初值。以后每次调用函数时不再重新赋初值而只是保留上次函数调用结束时的值。而自动变量赋初值，不是在编译时进行的，而是在<strong>运行时进行</strong>，所以<strong>每调用一次函数就赋一次初值</strong>。</p>
-<h1 id="C-可变参数"><a href="#C-可变参数" class="headerlink" title="C 可变参数"></a>C 可变参数</h1><p>有时，您可能会碰到这样的情况，您希望函数带有可变数量的参数，而不是预定义数量的参数。</p>
-<p>C 语言为这种情况提供了一个解决方案，它允许您定义一个函数，能根据具体的需求接受可变数量的参数。</p>
-<p>声明方式为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int func_name(int arg1, ...);</span><br></pre></td></tr></table></figure>
-
-<p>其中，省略号 <strong>…</strong> 表示可变参数列表。</p>
-<p>下面的实例演示了这种函数的使用：</p>
-<p>int func(int, … )  {   .   .   . }  int main() {   func(2, 2, 3);   func(3, 2, 3, 4); }</p>
-<p>请注意，函数 <strong>func()</strong> 最后一个参数写成省略号，即三个点号（**…**），省略号之前的那个参数是 <strong>int</strong>，代表了要传递的可变参数的总数。为了使用这个功能，您需要使用 <strong>stdarg.h</strong> 头文件，该文件提供了实现可变参数功能的函数和宏。具体步骤如下：</p>
-<ul>
-<li>定义一个函数，最后一个参数为省略号，省略号前面可以设置自定义参数。</li>
-<li>在函数定义中创建一个 <strong>va_list</strong> 类型变量，该类型是在 stdarg.h 头文件中定义的。</li>
-<li>使用 <strong>int</strong> 参数和 <strong>va_start()</strong> 宏来初始化 <strong>va_list</strong> 变量为一个参数列表。宏 <strong>va_start()</strong> 是在 stdarg.h 头文件中定义的。</li>
-<li>使用 <strong>va_arg()</strong> 宏和 <strong>va_list</strong> 变量来访问参数列表中的每个项。</li>
-<li>使用宏 <strong>va_end()</strong> 来清理赋予 <strong>va_list</strong> 变量的内存。</li>
-</ul>
-<p>常用的宏有：</p>
-<ul>
-<li><code>**va_start(ap, last_arg)**</code>：初始化可变参数列表。<code>ap</code> 是一个 <code>va_list</code> 类型的变量，<code>last_arg</code> 是最后一个固定参数的名称（也就是可变参数列表之前的参数）。该宏将 <code>ap</code> 指向可变参数列表中的第一个参数。</li>
-<li><code>**va_arg(ap, type)**</code>：获取可变参数列表中的下一个参数。<code>ap</code> 是一个 <code>va_list</code> 类型的变量，<code>type</code> 是下一个参数的类型。该宏返回类型为 <code>type</code> 的值，并将 <code>ap</code> 指向下一个参数。</li>
-<li>va_copy(va_list dest, va_list src) 宏：用于将src指向的参数复制到dest中。</li>
-<li><code>**va_end(ap)**</code>：结束可变参数列表的访问。<code>ap</code> 是一个 <code>va_list</code> 类型的变量。该宏将 <code>ap</code> 置为 <code>NULL</code>。</li>
-</ul>
-<p>现在让我们按照上面的步骤，来编写一个带有可变数量参数的函数，并返回它们的平均值：</p>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdarg.h&gt;</span><br><span class="line"> </span><br><span class="line">double average(int num,...)</span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">    va_list valist;</span><br><span class="line">    double sum = 0.0;</span><br><span class="line">    int i;</span><br><span class="line"> </span><br><span class="line">    /* 为 num 个参数初始化 valist */</span><br><span class="line">    va_start(valist, num);</span><br><span class="line"> </span><br><span class="line">    /* 访问所有赋给 valist 的参数 */</span><br><span class="line">    for (i = 0; i &lt; num; i++)</span><br><span class="line">    &#123;</span><br><span class="line">       sum += va_arg(valist, int); // 获取当前参数，并将指针移动到下一个参数</span><br><span class="line">    &#125;</span><br><span class="line">    /* 清理为 valist 保留的内存 */</span><br><span class="line">    va_end(valist);</span><br><span class="line"> </span><br><span class="line">    return sum/num;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;Average of 2, 3, 4, 5 = %f\n&quot;, average(4,2,3,4,5));</span><br><span class="line">   printf(&quot;Average of 5, 10, 15 = %f\n&quot;, average(3,5,10,15));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在上面的例子中，average() 函数接受一个整数 num 和任意数量的整数参数。函数内部使用 va_list 类型的变量 va_list 来访问可变参数列表。在循环中，每次使用 va_arg() 宏获取下一个整数参数，并输出。最后，在函数结束时使用 va_end() 宏结束可变参数列表的访问。</p>
-<p>当上面的代码被编译和执行时，它会产生下列结果。应该指出的是，函数 <strong>average()</strong> 被调用两次，每次第一个参数都是表示被传的可变参数的总数。省略号被用来传递可变数量的参数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Average of 2, 3, 4, 5 = 3.500000</span><br><span class="line">Average of 5, 10, 15 = 10.000000</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 本质上，va_list 类型，就是「char指针」类型，指向 1B 大小的内存地址</span><br><span class="line">typedef char* va_list;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/21/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/21/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第七天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-03-21 16:25:11 / 修改时间：21:12:34" itemprop="dateCreated datePublished" datetime="2023-03-21T16:25:11+08:00">2023-03-21</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-强制类型转换"><a href="#C-强制类型转换" class="headerlink" title="C 强制类型转换"></a>C 强制类型转换</h1><p>强制类型转换是把变量从一种类型转换为另一种数据类型。例如，如果您想存储一个 long 类型的值到一个简单的整型中，您需要把 long 类型强制转换为 int 类型。您可以使用<strong>强制类型转换运算符</strong>来把值显式地从一种类型转换为另一种类型，如下所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(type_name) expression</span><br></pre></td></tr></table></figure>
-
-<p>请看下面的实例，使用强制类型转换运算符把一个整数变量除以另一个整数变量，得到一个浮点数：</p>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   int sum = 17, count = 5;</span><br><span class="line">   double mean;</span><br><span class="line"> </span><br><span class="line">   mean = (double) sum / count;</span><br><span class="line">   printf(&quot;Value of mean : %f\n&quot;, mean );</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Value of mean : 3.400000</span><br></pre></td></tr></table></figure>
-
-<p>这里要注意的是强制类型转换运算符的<strong>优先级大于除法</strong>，因此 <strong>sum</strong> 的值首先被转换为 <strong>double</strong> 型，然后除以 count，得到一个类型为 double 的值。</p>
-<h2 id="整数提升"><a href="#整数提升" class="headerlink" title="整数提升"></a>整数提升</h2><p>整数提升是指把小于 <strong>int</strong> 或 <strong>unsigned int</strong> 的整数类型转换为 <strong>int</strong> 或 <strong>unsigned int</strong> 的过程：比如将char类型的字符转化成ascii码再与int型计算得到int型。</p>
-<h2 id="常用的算术转换"><a href="#常用的算术转换" class="headerlink" title="常用的算术转换"></a>常用的算术转换</h2><p><strong>常用的算术转换</strong>是<strong>隐式地</strong>把值强制转换为相同的类型。编译器首先执行<strong>整数提升</strong>，如果操作数类型不同，则它们会被转换为下列层次中出现的最高层次的类型：</p>
-<p>char,short–&gt;int–&gt;unsigned int–&gt;long–&gt;unsigned long–&gt;long long–&gt;unsigned long long–&gt;float–&gt;double–&gt;long double</p>
-<p>float、double、long double 类型赋值给整数类型：直接截断小数.</p>
-<hr>
-<p>为了提高效率，C 语言对于不同的两个类型将直接转换成较高类型计算。</p>
-<p>举个例子：对于已经分别被定义且被赋值，类型为 <strong>double</strong> 和 <strong>int</strong> 的 <strong>a</strong> 和 <strong>b</strong>：</p>
-<p>假设如果进行 <strong>a + b</strong> 运算，那么b将直接被隐式转换为 <strong>double</strong> 类型，然后再进行运算，不能理解为逐层转换（即不能理解为b先转换为unsigned int类型，再转换为 <strong>long &#x3D;&gt; unsigned long &#x3D;&gt; long long &#x3D;&gt; unsigned long long &#x3D;&gt; float &#x3D;&gt; double</strong>类型，最后再进行运算）。</p>
-<p><strong>p.s:</strong> 说到运算，对于 <strong>char</strong> 和 <strong>short</strong> 类型，进行运算时将会被隐式转换为 <strong>int</strong></p>
-<hr>
-<p>常用的算术转换不适用于赋值运算符、逻辑运算符 &amp;&amp; 和 ||。</p>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>C 语言中 printf 输出 double 和 float 都可以用 <strong>%f</strong> 占位符 可以混用，而 double 可以额外用 <strong>%lf</strong>。</p>
-<p>而 scanf 输入情况下 double 必须用 <strong>%lf</strong>，float 必须用 <strong>%f</strong> 不能混用。</p>
-<hr>
-<p><strong>强制类型转换只是临时类型转换，并不影响变量本身储存的值</strong>，看如下代码：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main() &#123;</span><br><span class="line">  float a = 6.9;</span><br><span class="line">  printf(&quot;%.3f&quot;, a);</span><br><span class="line">  putchar(&#x27;\n&#x27;);</span><br><span class="line">  ((int)a);</span><br><span class="line">  printf(&quot;%.3f&quot;, a);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">6.900</span><br><span class="line">6.900</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补-0"><a href="#存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补-0" class="headerlink" title="存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补 0"></a>存储长度较短的类型赋值给存储长度较长的类型：补足有效位，其它位补 0</h3><p>假设有如下定义：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char c = 56;//1个字节,8位二进制</span><br><span class="line">short num = 67;//2个字节,16位二进制</span><br><span class="line">int m;//4个字节,32位二进制</span><br><span class="line">long long int n;//8个字节,64位二进制</span><br></pre></td></tr></table></figure>
-
-<p>如果执行以下操作：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m = ((int)c);</span><br><span class="line">n = ((long long)num);</span><br></pre></td></tr></table></figure>
-
-<p>那么它们在内存以 2 进制格式分别存储为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">                                                               00111000  //Binary of &#x27;c&#x27;</span><br><span class="line">                                                      00000000 01000011  //Binary of&#x27;num&#x27;</span><br><span class="line">                                    00000000 00000000 00000000 00111000  //Binary of &#x27;m&#x27;</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000011  //Binary of &#x27;n&#x27;</span><br></pre></td></tr></table></figure>
-
-<h3 id="存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型"><a href="#存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型" class="headerlink" title="存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型"></a>存储长度较长的类型赋值给存储长度较短的类型：舍弃高位（但保留符号），截断低字节给存储长度较短的类型</h3><p>假设定义：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">long long int l = 223372036854775807;</span><br></pre></td></tr></table></figure>
-
-<p>进行赋值：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int i = (int)l;</span><br></pre></td></tr></table></figure>
-
-<p>它们在内存以2进制格式分别存储为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">00000011 00011001 10010011 10101111 00011101 01111011 11111111 11111111  //Binary of &#x27;l&#x27;</span><br><span class="line">                                    00011101 01111011 11111111 11111111  //Binary of &#x27;v&#x27;</span><br></pre></td></tr></table></figure>
-
-<p><strong>p.s:</strong> 此时的 v&#x3D;494665727。</p>
-<p>顺带说明一下，如果变量 “l” 的后 32 个字节都为 1，那么 v 将等于 -1。因为负数在计算机都以补码形式存在，即</p>
-<p>后 32 个字节都为 1的是补码变为原码就为-1.</p>
-<h3 id="unsigned类型赋值给非unsigned类型：直接传递数值"><a href="#unsigned类型赋值给非unsigned类型：直接传递数值" class="headerlink" title="unsigned类型赋值给非unsigned类型：直接传递数值"></a>unsigned类型赋值给非unsigned类型：直接传递数值</h3><p><strong>注意：</strong>如果 unsigned 类型储存的量太大，强制类型转换后可能会出现非 unsigned 类型的值的绝对值不等于 unsigned 类型的值的绝对值的情况。</p>
-<p>说到 “unsigned 类型储存的量太大”，顺带说一下，虽然 printf 输出 int 和 unsigned int 时可以混用 %d（或%i）和 %u（或%ui），但还是建议输出 int 类型的时候用 %d（或%i），输出 unsigned int 类型时用 %u（或%ui）（其它类型同理&lt;如%ul等&gt;）</p>
-<h3 id="非-unsigned-类型赋值给-unsigned-类型：直接传递数值"><a href="#非-unsigned-类型赋值给-unsigned-类型：直接传递数值" class="headerlink" title="非 unsigned 类型赋值给 unsigned 类型：直接传递数值"></a>非 unsigned 类型赋值给 unsigned 类型：直接传递数值</h3><p>给个小技巧：如果你想“临时”给一个不知道正负的非 unsigned 类型的变量加上绝对值，可以使用abs函数，但利用(unsigned)(非unsigned类型变量名)可以节省一点内存开销</p>
-<p>但是也有弊端：可能会出现 unsigned-unsigned 永远大于 0 的情况（不确定）</p>
-<h1 id="C-错误处理"><a href="#C-错误处理" class="headerlink" title="C 错误处理"></a>C 错误处理</h1><p>C 语言不提供对错误处理的直接支持，但是作为一种系统编程语言，它以返回值的形式允许您访问底层数据。在发生错误时，大多数的 C 或 UNIX 函数调用返回 1 或 NULL，同时会设置一个错误代码 <strong>errno</strong>，该错误代码是全局变量，表示在函数调用期间发生了错误。您可以在 errno.h 头文件中找到各种各样的错误代码。</p>
-<p>所以，C 程序员可以通过检查返回值，然后根据返回值决定采取哪种适当的动作。开发人员应该在程序初始化时，把 errno 设置为 0，这是一种良好的编程习惯。0 值表示程序中没有错误。</p>
-<h2 id="errno、perror-和-strerror"><a href="#errno、perror-和-strerror" class="headerlink" title="errno、perror() 和 strerror()"></a>errno、perror() 和 strerror()</h2><p>C 语言提供了 <strong>perror()</strong> 和 <strong>strerror()</strong> 函数来显示与 <strong>errno</strong> 相关的文本消息。</p>
-<ul>
-<li><strong>perror()</strong> 函数显示您传给它的字符串，后跟一个冒号、一个空格和当前 errno 值的文本表示形式。</li>
-<li><strong>strerror()</strong> 函数，返回一个指针，指针指向当前 errno 值的文本表示形式。</li>
-</ul>
-<p>让我们来模拟一种错误情况，尝试打开一个不存在的文件。您可以使用多种方式来输出错误消息，在这里我们使用函数来演示用法。另外有一点需要注意，您应该使用 <strong>stderr 文件流</strong>来输出所有的错误。</p>
-<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">extern int errno ;</span><br><span class="line"> </span><br><span class="line">int main ()</span><br><span class="line">&#123;</span><br><span class="line">   FILE * pf;</span><br><span class="line">   int errnum;</span><br><span class="line">   pf = fopen (&quot;unexist.txt&quot;, &quot;rb&quot;);</span><br><span class="line">   if (pf == NULL)</span><br><span class="line">   &#123;</span><br><span class="line">      errnum = errno;</span><br><span class="line">      fprintf(stderr, &quot;错误号: %d\n&quot;, errno);</span><br><span class="line">      perror(&quot;通过 perror 输出错误&quot;);</span><br><span class="line">      fprintf(stderr, &quot;打开文件错误: %s\n&quot;, strerror( errnum ));</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      fclose (pf);</span><br><span class="line">   &#125;</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>fprintf是C&#x2F;C++中的一个格式化库函数，位于头文件中，其作用是格式化输出到一个流文件中；</p>
-<p>函数原型为int fprintf( FILE <em>stream, const char <em>format, [ argument ]…)，fprintf()函数根据指定的格式(format)，向输出流(stream)写入数据(argument)。将内容输出到指定.txt中FILE</em> fp &#x3D; NULL;<br>fp &#x3D; fopen(“e:\gz.txt”,”w+”);fprintf(fp,”%d,%x,%o”,10,10,10);将内容输出到屏幕,使用stdout或者stderr:fprintf(stdout,”%d,%x,%o”,10,10,10);stdout和stderr，stdout是标准的输出流，而stderr是标准的错误输出流。stdout和stderr的类型都是FILE</em>，在stdio.h中定义。默认情况下，stdout和stderr中的数据都会被打印到屏幕上。</p>
-<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">错误号: 2</span><br><span class="line">通过 perror 输出错误: No such file or directory</span><br><span class="line">打开文件错误: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<p>windows上述代码里 errno 的值从而得出不同的错误类型，从 43 之后就一直是 Unknown error 错误类型。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">Value of errno: 0</span><br><span class="line">Error opening file: No error</span><br><span class="line"></span><br><span class="line">Value of errno: 1</span><br><span class="line">Error opening file: Operation not permitted</span><br><span class="line"></span><br><span class="line">Value of errno: 2</span><br><span class="line">Error opening file: No such file or directory</span><br><span class="line"></span><br><span class="line">Value of errno: 3</span><br><span class="line">Error opening file: No such process</span><br><span class="line"></span><br><span class="line">Value of errno: 4</span><br><span class="line">Error opening file: Interrupted function call</span><br><span class="line"></span><br><span class="line">Value of errno: 5</span><br><span class="line">Error opening file: Input/output error</span><br><span class="line"></span><br><span class="line">Value of errno: 6</span><br><span class="line">Error opening file: No such device or address</span><br><span class="line"></span><br><span class="line">Value of errno: 7</span><br><span class="line">Error opening file: Arg list too long</span><br><span class="line"></span><br><span class="line">Value of errno: 8</span><br><span class="line">Error opening file: Exec format error</span><br><span class="line"></span><br><span class="line">Value of errno: 9</span><br><span class="line">Error opening file: Bad file descriptor</span><br><span class="line"></span><br><span class="line">Value of errno: 10</span><br><span class="line">Error opening file: No child processes</span><br><span class="line"></span><br><span class="line">Value of errno: 11</span><br><span class="line">Error opening file: Resource temporarily unavailable</span><br><span class="line"></span><br><span class="line">Value of errno: 12</span><br><span class="line">Error opening file: Not enough space</span><br><span class="line"></span><br><span class="line">Value of errno: 13</span><br><span class="line">Error opening file: Permission denied</span><br><span class="line"></span><br><span class="line">Value of errno: 14</span><br><span class="line">Error opening file: Bad address</span><br><span class="line"></span><br><span class="line">Value of errno: 15</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 16</span><br><span class="line">Error opening file: Resource device</span><br><span class="line"></span><br><span class="line">Value of errno: 17</span><br><span class="line">Error opening file: File exists</span><br><span class="line"></span><br><span class="line">Value of errno: 18</span><br><span class="line">Error opening file: Improper link</span><br><span class="line"></span><br><span class="line">Value of errno: 19</span><br><span class="line">Error opening file: No such device</span><br><span class="line"></span><br><span class="line">Value of errno: 20</span><br><span class="line">Error opening file: Not a directory</span><br><span class="line"></span><br><span class="line">Value of errno: 21</span><br><span class="line">Error opening file: Is a directory</span><br><span class="line"></span><br><span class="line">Value of errno: 22</span><br><span class="line">Error opening file: Invalid argument</span><br><span class="line"></span><br><span class="line">Value of errno: 23</span><br><span class="line">Error opening file: Too many open files in system</span><br><span class="line"></span><br><span class="line">Value of errno: 24</span><br><span class="line">Error opening file: Too many open files</span><br><span class="line"></span><br><span class="line">Value of errno: 25</span><br><span class="line">Error opening file: Inappropriate I/O control operation</span><br><span class="line"></span><br><span class="line">Value of errno: 26</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 27</span><br><span class="line">Error opening file: File too large</span><br><span class="line"></span><br><span class="line">Value of errno: 28</span><br><span class="line">Error opening file: No space left on device</span><br><span class="line"></span><br><span class="line">Value of errno: 29</span><br><span class="line">Error opening file: Invalid seek</span><br><span class="line"></span><br><span class="line">Value of errno: 30</span><br><span class="line">Error opening file: Read-only file system</span><br><span class="line"></span><br><span class="line">Value of errno: 31</span><br><span class="line">Error opening file: Too many links</span><br><span class="line"></span><br><span class="line">Value of errno: 32</span><br><span class="line">Error opening file: Broken pipe</span><br><span class="line"></span><br><span class="line">Value of errno: 33</span><br><span class="line">Error opening file: Domain error</span><br><span class="line"></span><br><span class="line">Value of errno: 34</span><br><span class="line">Error opening file: Result too large</span><br><span class="line"></span><br><span class="line">Value of errno: 35</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 36</span><br><span class="line">Error opening file: Resource deadlock avoided</span><br><span class="line"></span><br><span class="line">Value of errno: 37</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 38</span><br><span class="line">Error opening file: Filename too long</span><br><span class="line"></span><br><span class="line">Value of errno: 39</span><br><span class="line">Error opening file: No locks available</span><br><span class="line"></span><br><span class="line">Value of errno: 40</span><br><span class="line">Error opening file: Function not implemented</span><br><span class="line"></span><br><span class="line">Value of errno: 41</span><br><span class="line">Error opening file: Directory not empty</span><br><span class="line"></span><br><span class="line">Value of errno: 42</span><br><span class="line">Error opening file: Illegal byte sequence</span><br><span class="line"></span><br><span class="line">Value of errno: 43</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 44</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 45</span><br><span class="line">Error opening file: Unknown error</span><br><span class="line"></span><br><span class="line">Value of errno: 46</span><br><span class="line">Error opening file: Unknown error</span><br></pre></td></tr></table></figure>
-
-<h2 id="程序退出状态"><a href="#程序退出状态" class="headerlink" title="程序退出状态"></a>程序退出状态</h2><p>通常情况下，程序成功执行完一个操作正常退出的时候会带有值 EXIT_SUCCESS。在这里，EXIT_SUCCESS 是宏，它被定义为 0。</p>
-<p>如果程序中存在一种错误情况，当您退出程序时，会带有状态值 EXIT_FAILURE，被定义为 -1。</p>
-<p>exit（）函数关闭了所有打开的文件并终止程序，exit()函数的参数会被传递给一些操作系统，通常的约定是正常终止的程序传递值0,非正常终止的程序传递非0值。</p>
-<p>exit（!0）； &#x2F;&#x2F;表示异常退出<br>exit（0）； &#x2F;&#x2F;表示正常退出</p>
-<p>return 0；<br>exit（0）；<br>这两者之间表达的效果是相同的。<br>但是：不同的是，main（） 函数在一个递归程序中，exit（）会终止程序，但是return将控制权交给递归上一级直至到最初的一级。</p>
-<p>exit() 的参数，是给自己的父进程使用的。通常一个程序的父进程可能是任何进程，因此我们无法预期我们的父进程是否规定必须要有这个<strong>返回值</strong>，那么我们应当提供这个返回值，以保证不同的父进程的需求得到满足。</p>
-<p>虽然现在大多数平台下，直接在 main() 函数里面 return 可以退出程序。但是在某些平台下，在 main() 函数里面 return 会导致程序永远不退出（因为代码已经执行完毕，程序却还没有收到要退出的指令）。换句话说，为了兼容性考虑，在特定的平台下，程序最后一行必须使用 exit() 才能正常退出，这是 exit() 存在的重要价值。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1657,7 +2041,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">41</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

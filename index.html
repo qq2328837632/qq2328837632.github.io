@@ -147,6 +147,352 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%93%BE%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%93%BE%E6%8E%A5/" class="post-title-link" itemprop="url">深入理解计算机系统-第七章-链接</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-07 16:48:11 / 修改时间：16:55:50" itemprop="dateCreated datePublished" datetime="2023-07-07T16:48:11+08:00">2023-07-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="编译器驱动程序"><a href="#编译器驱动程序" class="headerlink" title="编译器驱动程序"></a>编译器驱动程序</h2><p>考虑图7-1中的C语言程序。它将作为贯穿本章的一个小的运行示例，帮助我们说明关于链接是如何工作的一些重要知识点。</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%93%BE%E6%8E%A5/image-20230707164930218.png" alt="image-20230707164930218"></p>
+
+
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%93%BE%E6%8E%A5/image-20230707165006374.png" alt="image-20230707165006374"></p>
+
+
+<p>驱动程序经过相同的过程生成sum.o。最后，它运行链接器程序ld，将main.o和sum.o以及一些必要的系统目标文件组合起来，创建一个可执行目标文件(executable ob-ject file)prog:<br><code>ld -o prog [system object files and args]  /tmp/main.o /tmp/sum.o</code><br>要运行可执行文件 prog，我们在Linux shell的命令行上输入它的名字:</p>
+<p>linux&gt; .&#x2F;prog</p>
+<p>shell调用操作系统中一个叫做加载器(loader)的函数，它将可执行文件prog中的代码和数据复制到内存，然后将控制转移到这个程序的开头。</p>
+<h2 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h2><p>像Linux LD程序这样的静态链接器(static linker)以一组可重定位目标文件和命令行参数作为输入，生成一个完全链接的、可以加载和运行的可执行目标文件作为输出。输入的可重定位目标文件由各种不同的代码和数据节(section)组成，每一节都是一个连续的字节序列。指令在一节中，初始化了的全局变量在另一节中，而未初始化的变量又在另外一节中。</p>
+<p>为了构造可执行文件，链接器必须完成两个主要任务:</p>
+<ul>
+<li>符号解析(symbol resolution)。目标文件定义和引用符号，每个符号对应于一个函数、一个全局变量或一个静态变量(即C语言中任何以static属性声明的变量)。符号解析的目的是将每个符号引用正好和一个符号定义关联起来。</li>
+<li>重定位(relocation)。编译器和汇编器生成从地址0开始的代码和数据节。链接器通过把每个符号定义与一个内存位置关联起来，从而重定位这些节，然后修改所有对这些符号的引用，使得它们指向这个内存位置。链接器使用汇编器产生的重定位条目(relocation entry)的详细指令，不加甄别地执行这样的重定位。</li>
+</ul>
+<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>目标文件有三种形式:</p>
+<ul>
+<li>可重定位目标文件。包含二进制代码和数据，其形式可以在编译时与其他可重定位目标文件合并起来，创建一个可执行目标文件。</li>
+<li>可执行目标文件。包含二进制代码和数据，其形式可以被直接复制到内存并执行。</li>
+<li>共享目标文件。一种特殊类型的可重定位目标文件，可以在加载或者运行时被动态地加载进内存并链接。</li>
+</ul>
+<p>编译器和汇编器生成可重定位目标文件(包括共享目标文件)。链接器生成可执行目标文件。从技术上来说，一个目标模块(object module)就是一个字节序列，而一个目标文件(ob-ject file)就是一个以文件形式存放在磁盘中的目标模块。不过，我们会互换地使用这些术语。</p>
+<p>目标文件是按照特定的目标文件格式来组织的，各个系统的目标文件格式都不相同。</p>
+<p>从贝尔实验室诞生的第一个Unix系统使用的是 a.out格式(直到今天，可执行文件仍然称为a.out 文件)。Windows使用可移植可执行(Portable Executable，PE)格式。MacOS-X使用Mach-O格式。现代x86-64 Linux和Unix系统使用可执行可链接格式(Execut-able and Linkable Format，ELF)。尽管我们的讨论集中在ELF上，但是不管是哪种格式，基本的概念是相似的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/07/Linux-socket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/07/Linux-socket/" class="post-title-link" itemprop="url">Linux-socket</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-07 14:12:22 / 修改时间：14:45:43" itemprop="dateCreated datePublished" datetime="2023-07-07T14:12:22+08:00">2023-07-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="网络字节序"><a href="#网络字节序" class="headerlink" title="网络字节序"></a>网络字节序</h2><p>网络字节序：</p>
+<p>  小端法：（pc本地存储）  高位存高地址。地位存低地址。  int a &#x3D; 0x12345678</p>
+<p>  大端法：（网络存储） 高位存低地址。低位存高地址 </p>
+<p>  htonl –&gt; 本地–》网络 （IP）     192.168.1.11 –&gt; string –&gt; atoi –&gt; int –&gt; htonl –&gt; 网络字节序</p>
+<p>  htons –&gt; 本地–》网络 (port)</p>
+<p>  ntohl –&gt; 网络–》 本地（IP）</p>
+<p>  ntohs –&gt; 网络–》 本地（Port）</p>
+<p>ntohl函数用于字节顺序转换，将32位整数从网络字节顺序转换为主机字节顺序，对应于网络编程中的网络字节顺序的转换。它接收一个32位整数（网络字节顺序是大端法因为是tcp，早期大型机采用的是大端字节序，而大部分网络协议设计也遵循了这个约定）并返回主机字节顺序(一般是小端法)的整数。</p>
+<h2 id="IP地址转换函数"><a href="#IP地址转换函数" class="headerlink" title="IP地址转换函数"></a>IP地址转换函数</h2><p>IP地址转换函数：</p>
+<p>  <code>int inet_pton(int af, const char *src, void *dst);</code>   本地字节序（string IP） —&gt; 网络字节序</p>
+<p>​    af：AF_INET、AF_INET6</p>
+<p>​    src：传入，IP地址（点分十进制）</p>
+<p>​    dst：传出，转换后的 网络字节序的 IP地址。 </p>
+<p>​    返回值：</p>
+<p>​      成功： 1</p>
+<p>​      异常： 0， 说明src指向的不是一个有效的ip地址。</p>
+<p>​      失败：-1</p>
+<p>​    <code>const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);</code> 网络字节序 —&gt; 本地字节序（string IP）</p>
+<p>​    af：AF_INET、AF_INET6</p>
+<p>​    src: 网络字节序IP地址</p>
+<p>​    dst：本地字节序（string IP）</p>
+<p>​    size： dst 的大小。</p>
+<p>​    返回值： 成功：dst。   </p>
+<p>​      失败：NULL</p>
+<p>inet_ntop函数用于将IP地址从二进制格式转换为可打印的字符串格式。它接收一个指向存储IP地址的结构体（如struct in_addr或struct in6_addr）以及地址族（AF_INET或AF_INET6），将二进制格式的IP地址转换为点分十进制的字符串表示形式。</p>
+<h2 id="sockaddr地址结构"><a href="#sockaddr地址结构" class="headerlink" title="sockaddr地址结构"></a>sockaddr地址结构</h2><p><img src="/Linux-socket/image-20230707141717803.png" alt="image-20230707141717803"></p>
+
+
+<p>sockaddr地址结构：  IP + port –&gt; 在网络环境中唯一标识一个进程。</p>
+<p>  struct sockaddr_in addr;</p>
+<p>  addr.sin_family &#x3D; AF_INET&#x2F;AF_INET6      man 7 ip</p>
+<p>  addr.sin_port &#x3D; htons(9527);</p>
+<p>​    <code>int dst;</code></p>
+<p>​    <code>inet_pton(AF_INET, &quot;192.157.22.45&quot;, (void *)&amp;dst);</code></p>
+<p>  <code>addr.sin_addr.s_addr = dst;</code>相当于addr.sin_addr.s_addr &#x3D; htonl(INADDR_ANY);一般用后者简单</p>
+<p>  <code>【*】addr.sin_addr.s_addr = htonl(INADDR_ANY);</code>    取出系统中有效的任意IP地址。二进制类型。</p>
+<p>  <code>bind(fd, (struct sockaddr *)&amp;addr, size);</code></p>
+<h3 id="socket和bind"><a href="#socket和bind" class="headerlink" title="socket和bind"></a>socket和bind</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">socket函数：</span><br><span class="line"></span><br><span class="line">	#include &lt;sys/socket.h&gt;</span><br><span class="line"></span><br><span class="line">	int socket(int domain, int type, int protocol);		创建一个 套接字</span><br><span class="line"></span><br><span class="line">		domain：AF_INET、AF_INET6、AF_UNIX</span><br><span class="line"></span><br><span class="line">		type：SOCK_STREAM、SOCK_DGRAM</span><br><span class="line"></span><br><span class="line">		protocol: 0 </span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line">	</span><br><span class="line">			成功： 新套接字所对应文件描述符</span><br><span class="line"></span><br><span class="line">			失败: -1 errno</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#include &lt;arpa/inet.h&gt;</span><br><span class="line"></span><br><span class="line">	 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);		给socket绑定一个 地址结构 (IP+port)</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">			struct sockaddr_in addr;</span><br><span class="line"></span><br><span class="line">			addr.sin_family = AF_INET;</span><br><span class="line"></span><br><span class="line">			addr.sin_port = htons(8888);</span><br><span class="line"></span><br><span class="line">			addr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line"></span><br><span class="line">		addr: 传入参数(struct sockaddr *)&amp;addr</span><br><span class="line"></span><br><span class="line">		addrlen: sizeof(addr) 地址结构的大小。</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="listen和accept"><a href="#listen和accept" class="headerlink" title="listen和accept"></a>listen和accept</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">int listen(int sockfd, int backlog);		设置同时与服务器建立连接的上限数。（同时进行3次握手的客户端数量）</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">		backlog：上限数值。最大值 128.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);	阻塞等待客户端建立连接，成功的话，返回一个与客户端成功连接的socket文件描述符。</span><br><span class="line"></span><br><span class="line">		sockfd: socket 函数返回值</span><br><span class="line"></span><br><span class="line">		addr：传出参数。成功与服务器建立连接的那个客户端的地址结构（IP+port）</span><br><span class="line"></span><br><span class="line">			socklen_t clit_addr_len = sizeof(addr);</span><br><span class="line"></span><br><span class="line">		addrlen：传入传出。 &amp;clit_addr_len</span><br><span class="line"></span><br><span class="line">			 入：addr的大小。 出：客户端addr实际大小。</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：能与客户端进行数据通信的 socket 对应的文件描述。</span><br><span class="line"></span><br><span class="line">			失败： -1 ， errno</span><br><span class="line">		</span><br></pre></td></tr></table></figure>
+
+<h3 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);	  使用现有的 socket 与服务器建立连接</span><br><span class="line"></span><br><span class="line">		sockfd： socket 函数返回值</span><br><span class="line"></span><br><span class="line">			struct sockaddr_in srv_addr;		// 服务器地址结构</span><br><span class="line"></span><br><span class="line">			srv_addr.sin_family = AF_INET;</span><br><span class="line"></span><br><span class="line">			srv_addr.sin_port = 9527 	跟服务器bind时设定的 port 完全一致。</span><br><span class="line"></span><br><span class="line">			inet_pton(AF_INET, &quot;服务器的IP地址&quot;，&amp;srv_adrr.sin_addr.s_addr);</span><br><span class="line"></span><br><span class="line">		addr：传入参数。服务器的地址结构</span><br><span class="line"></span><br><span class="line">			</span><br><span class="line">		addrlen：服务器的地址结构的大小</span><br><span class="line"></span><br><span class="line">		返回值：</span><br><span class="line"></span><br><span class="line">			成功：0</span><br><span class="line"></span><br><span class="line">			失败：-1 errno</span><br><span class="line"></span><br><span class="line">		如果不使用bind绑定客户端地址结构, 采用&quot;隐式绑定&quot;.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="CS模型的TCP通信分析"><a href="#CS模型的TCP通信分析" class="headerlink" title="CS模型的TCP通信分析"></a>CS模型的TCP通信分析</h2><p>TCP通信流程分析:</p>
+<p>server:<br>    1. socket()	创建socket</p>
+<ol start="2">
+<li><p>bind()	绑定服务器地址结构</p>
+</li>
+<li><p>listen()	设置监听上限</p>
+</li>
+<li><p>accept()	阻塞监听客户端连接</p>
+</li>
+<li><p>read(fd)	读socket获取客户端数据</p>
+</li>
+<li><p>小–大写	toupper()</p>
+</li>
+<li><p>write(fd)</p>
+</li>
+<li><p>close();</p>
+</li>
+</ol>
+<p>client:</p>
+<ol>
+<li><p>socket()	创建socket</p>
+</li>
+<li><p>connect();	与服务器建立连接</p>
+</li>
+<li><p>write()	写数据到 socket</p>
+</li>
+<li><p>read()	读转换后的数据。</p>
+</li>
+<li><p>显示读取结果</p>
+</li>
+<li><p>close()</p>
+</li>
+</ol>
+<h2 id="server的实现"><a href="#server的实现" class="headerlink" title="server的实现"></a>server的实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include &lt;ctype.h&gt;  </span><br><span class="line">#include &lt;sys/socket.h&gt;  </span><br><span class="line">#include &lt;arpa/inet.h&gt;  </span><br><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;string.h&gt;  </span><br><span class="line">#include &lt;unistd.h&gt;  </span><br><span class="line">#include &lt;errno.h&gt;  </span><br><span class="line">#include &lt;pthread.h&gt;  </span><br><span class="line">#define SERV_PORT 9527  </span><br><span class="line"></span><br><span class="line">void sys_err(const char *str)  </span><br><span class="line">&#123;  </span><br><span class="line">        perror(str);  </span><br><span class="line">        exit(1);  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])  </span><br><span class="line">&#123;  </span><br><span class="line">        int lfd = 0, cfd = 0;  </span><br><span class="line">        int ret, i;  </span><br><span class="line">        char buf[BUFSIZ], client_IP[1024]; //[+d查看系统定义的BUFSIZ的大小 </span><br><span class="line"></span><br><span class="line">        struct sockaddr_in serv_addr, clit_addr;  // 定义服务器地址结构 和 客户端地址结构  </span><br><span class="line">        socklen_t clit_addr_len;                  // 客户端地址结构大小  </span><br><span class="line"></span><br><span class="line">        serv_addr.sin_family = AF_INET;             // IPv4  </span><br><span class="line">        serv_addr.sin_port = htons(SERV_PORT);      // 转为网络字节序的 端口号  </span><br><span class="line">        serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // 获取本机任意有效IP  </span><br><span class="line"></span><br><span class="line">        lfd = socket(AF_INET, SOCK_STREAM, 0);      //创建一个 socket  </span><br><span class="line">        if (lfd == -1) &#123;  </span><br><span class="line">                sys_err(&quot;socket error&quot;);  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">        bind(lfd, (struct sockaddr *)&amp;serv_addr, sizeof(serv_addr));//给服务器socket绑定地址结构（IP+port)  </span><br><span class="line"></span><br><span class="line">        listen(lfd, 128);                   //  设置监听上限  </span><br><span class="line"></span><br><span class="line">        clit_addr_len = sizeof(clit_addr);  //  获取客户端地址结构大小  </span><br><span class="line"></span><br><span class="line">        cfd = accept(lfd, (struct sockaddr *)&amp;clit_addr, &amp;clit_addr_len);   // 阻塞等待客户端连接请求  </span><br><span class="line">        if (cfd == -1)  </span><br><span class="line">                sys_err(&quot;accept error&quot;);  </span><br><span class="line"></span><br><span class="line">        printf(&quot;client ip:%s port:%d\n&quot;,   </span><br><span class="line">                        inet_ntop(AF_INET, &amp;clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)),                        ntohs(clit_addr.sin_port));         // 根据accept传出参数，获取客户端 ip 和 port  </span><br><span class="line"></span><br><span class="line">        while (1) &#123;  </span><br><span class="line">                ret = read(cfd, buf, sizeof(buf));      // 读客户端数据 ssize_t read(int fd, void *buf, size_t count); </span><br><span class="line">                //read函数的返回值是读取到的字节数，将其赋给ret变量。</span><br><span class="line">                write(STDOUT_FILENO, buf, ret);         // 写到屏幕查看  ssize_t write(int fd, const void *buf, size_t count);</span><br><span class="line"></span><br><span class="line">                for (i = 0; i &lt; ret; i++)                // 小写 -- 大写  </span><br><span class="line">                        buf[i] = toupper(buf[i]);  </span><br><span class="line"></span><br><span class="line">                write(cfd, buf, ret);                   // 将大写，写回给客户端。  </span><br><span class="line">        &#125;  </span><br><span class="line"></span><br><span class="line">        close(lfd);  </span><br><span class="line">        close(cfd);  </span><br><span class="line"></span><br><span class="line">        return 0;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="获取客户端地址结构"><a href="#获取客户端地址结构" class="headerlink" title="获取客户端地址结构"></a>获取客户端地址结构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cfd = accept(lfd, (struct sockaddr *)&amp;clit_addr, &amp;clit_addr_len);</span><br><span class="line">accept函数中的clit_addr传出的就是客户端地址结构，IP+port</span><br><span class="line"></span><br><span class="line">于是，在代码中增加此段代码，可获取客户端信息：</span><br><span class="line">printf(&quot;client ip:%s port:%d\n&quot;, </span><br><span class="line">            inet_ntop(AF_INET,&amp;clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)), </span><br><span class="line">            ntohs(clit_addr.sin_port));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="client的实现"><a href="#client的实现" class="headerlink" title="client的实现"></a>client的实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;  </span><br><span class="line">#include &lt;sys/socket.h&gt;  </span><br><span class="line">#include &lt;arpa/inet.h&gt;  </span><br><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;string.h&gt;  </span><br><span class="line">#include &lt;unistd.h&gt;  </span><br><span class="line">#include &lt;errno.h&gt;  </span><br><span class="line">#include &lt;pthread.h&gt;  </span><br><span class="line"></span><br><span class="line">#define SERV_PORT 9527  </span><br><span class="line"></span><br><span class="line">void sys_err(const char* str)  </span><br><span class="line">&#123;  </span><br><span class="line">    perror(str);  </span><br><span class="line">    exit(1);  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])  </span><br><span class="line">&#123;  </span><br><span class="line">    int cfd;  </span><br><span class="line">    int conter = 10;  </span><br><span class="line">    char buf[BUFSIZ];  </span><br><span class="line">    </span><br><span class="line">    struct sockaddr_in serv_addr;          //服务器地址结构  </span><br><span class="line"></span><br><span class="line">    serv_addr.sin_family = AF_INET;  </span><br><span class="line">    serv_addr.sin_port = htons(SERV_PORT);  </span><br><span class="line">    //inet_pton(AF_INET, &quot;127.0.0.1&quot;, &amp;serv_addr.sin_addr.s_addr);  </span><br><span class="line">    inet_pton(AF_INET, &quot;127.0.0.1&quot;, &amp;serv_addr.sin_addr);  </span><br><span class="line"></span><br><span class="line">    cfd = socket(AF_INET, SOCK_STREAM, 0);  </span><br><span class="line">    if (cfd == -1)  </span><br><span class="line">        sys_err(&quot;socket error&quot;);  </span><br><span class="line"></span><br><span class="line">    int ret = connect(cfd, (struct sockaddr*)&amp;serv_addr, sizeof(serv_addr));  </span><br><span class="line">    if (ret != 0)  </span><br><span class="line">        sys_err(&quot;connect err&quot;);  </span><br><span class="line"></span><br><span class="line">    while (--conter) &#123;  </span><br><span class="line">        write(cfd, &quot;hello\n&quot;, 6);  </span><br><span class="line">        ret = read(cfd, buf, sizeof(buf));  </span><br><span class="line">        write(STDOUT_FILENO, buf, ret);  </span><br><span class="line">        sleep(1);  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    close(cfd);  </span><br><span class="line"></span><br><span class="line">    return 0;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里遇到过一个问题，如果之前运行server，用Ctrl+z终止进程，ps aux列表里会有服务器进程残留，这个会影响当前服务器。解决方法是kill掉这些服务器进程。不然端口被占用，当前运行的服务器进程接收不到东西，没有回显。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">Linux-网络基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-06 10:44:33" itemprop="dateCreated datePublished" datetime="2023-07-06T10:44:33+08:00">2023-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-07 14:10:03" itemprop="dateModified" datetime="2023-07-07T14:10:03+08:00">2023-07-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什么是协议"><a href="#什么是协议" class="headerlink" title="什么是协议"></a>什么是协议</h2><p>从应用的角度出发，协议可理解为“规则”，是数据传输和数据的解释的规则。</p>
+<p>假设，A、B双方欲传输文件。规定：</p>
+<p>第一次，传输文件名，接收方接收到文件名，应答OK给传输方；</p>
+<p>第二次，发送文件的尺寸，接收方接收到该数据再次应答一个OK；</p>
+<p>第三次，传输文件内容。同样，接收方接收数据完成后应答OK表示文件内容接收成功。</p>
+<p>由此，无论A、B之间传递何种文件，都是通过三次数据传输来完成。A、B之间形成了一个最简单的数据传输规则。双方都按此规则发送、接收数据。A、B之间达成的这个相互遵守的规则即为协议。</p>
+<p>这种仅在A、B之间被遵守的协议称之为<strong>原始协议</strong>。当此协议被更多的人采用，不断的增加、改进、维护、完善。最终形成一个稳定的、完整的文件传输协议，被广泛应用于各种文件传输过程中。该协议就成为一个<strong>标准协议</strong>。最早的ftp协议就是由此衍生而来。</p>
+<p>TCP协议注重数据的传输。http协议着重于数据的解释。</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" alt="image-20230706104601518"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" class title="This is an test image">
+
+<h2 id="7层模型和4层模型及代表协议"><a href="#7层模型和4层模型及代表协议" class="headerlink" title="7层模型和4层模型及代表协议"></a>7层模型和4层模型及代表协议</h2><p>分层模型结构： </p>
+<p>  OSI七层模型： 物、数、网、传、会、表、应</p>
+<p>  TCP&#x2F;IP 4层模型：网（链路层&#x2F;网络接口层）、网、传、应</p>
+<p>​    应用层：http、ftp、nfs、ssh、telnet。。。</p>
+<p>​    传输层：TCP、UDP</p>
+<p>​    网络层：IP、ICMP、IGMP</p>
+<p>​    链路层：以太网帧协议、ARP</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" alt="image-20230706104711613"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" class title="This is an test image">
+
+<p>网络传输流程： </p>
+<p>  数据没有封装之前，是不能在网络中传递。</p>
+<p>  数据-》应用层-》传输层-》网络层-》链路层 — 网络环境</p>
+<h2 id="以太网帧和ARP请求"><a href="#以太网帧和ARP请求" class="headerlink" title="以太网帧和ARP请求"></a>以太网帧和ARP请求</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" alt="image-20230706104959831"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" class title="This is an test image">
+
+<p>以太网帧协议：</p>
+<p>  ARP协议：根据 Ip 地址获取 mac 地址。</p>
+<p>  以太网帧协议：根据mac地址，完成数据包传输。</p>
+<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP协议：  </p>
+<p>  版本： IPv4、IPv6 – 4位</p>
+<p>  TTL： time to live 。 设置数据包在路由节点中的跳转上限。每经过一个路由节点，该值-1， 减为0的路由，有义务将该数据包丢弃</p>
+<p>  源IP： 32位。— 4字节   192.168.1.108 — 点分十进制 IP地址（string） — 二进制 </p>
+<p>  目的IP：32位。— 4字节</p>
+<h2 id="端口号和UDP协议"><a href="#端口号和UDP协议" class="headerlink" title="端口号和UDP协议"></a>端口号和UDP协议</h2><p>UDP：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>IP地址：可以在网络环境中，唯一标识一台主机。</p>
+<p>端口号：可以网络的一台主机上，唯一标识一个进程。</p>
+<p>ip地址+端口号：可以在网络环境中，唯一标识一个进程。</p>
+<h2 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h2><p>TCP协议：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>  32序号;</p>
+<p>  32确认序号。 </p>
+<p>  6个标志位。</p>
+<p>  16位窗口大小。  2^16 &#x3D; 65536</p>
+<h2 id="BS和CS模型对比"><a href="#BS和CS模型对比" class="headerlink" title="BS和CS模型对比"></a>BS和CS模型对比</h2><p>c&#x2F;s模型： </p>
+<p>  client-server </p>
+<p>b&#x2F;s模型： </p>
+<p>  browser-server </p>
+<p>​      C&#x2F;S        																																				B&#x2F;S</p>
+<p>  优点： 缓存大量数据、协议选择灵活、速度快、迭代快（只需要发布再client就行）    				 安全性、跨平台、开发工作量较小</p>
+<p>  缺点： 安全性、跨平台、开发工作量较大    						 																不能缓存大量数据、严格遵守 http</p>
+<h2 id="套接字"><a href="#套接字" class="headerlink" title="套接字"></a>套接字</h2><p>网络套接字： socket</p>
+<p>  一个文件描述符指向一个套接字（该套接字内部由内核借助两个缓冲区实现。）</p>
+<p>  在通信过程中， 套接字一定是成对出现的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/20/Linux-%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -295,7 +641,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-04 11:07:21" itemprop="dateModified" datetime="2023-07-04T11:07:21+08:00">2023-07-04</time>
+                <time title="修改时间：2023-07-07 09:54:11" itemprop="dateModified" datetime="2023-07-07T09:54:11+08:00">2023-07-07</time>
               </span>
 
           
@@ -370,7 +716,7 @@
 <p>可以看到，子线程的打印信息并未出现。原因在于，主线程执行完之后，就销毁了整个进程的地址空间，于是子线程就无法打印。简单粗暴的方法就是让主线程睡 1 秒，等子线程执行。</p>
 <h2 id="循环创建多个子线程"><a href="#循环创建多个子线程" class="headerlink" title="循环创建多个子线程"></a>循环创建多个子线程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. void sys_err(const char *str)&#123;</span><br><span class="line">9. perror(str);</span><br><span class="line">10. exit(1);</span><br><span class="line">11. &#125;</span><br><span class="line">12.</span><br><span class="line">13. void *tfn(void *arg)&#123;</span><br><span class="line">14. int i = (int)arg;//int i = *((int *)arg)和(void *)&amp;i，子线程如果用地址传递 i，会去读取主线程里的 i 值，而主线程里的 i 是动态变化的，不固定。所以，应该采用值传递，不用指针传递。</span><br><span class="line"></span><br><span class="line">15. sleep(i);</span><br><span class="line">16. printf(&quot;--I&#x27;m %dth thread: pid = %d, tid = %lu\n&quot;,i+1, getpid(), pthread_self());</span><br><span class="line">17.</span><br><span class="line">18. return NULL;</span><br><span class="line">19. &#125;</span><br><span class="line">20.</span><br><span class="line">21. int main(int argc, char *argv[])&#123;</span><br><span class="line">22. int i;</span><br><span class="line">23. int ret;</span><br><span class="line">24. pthread_t tid;</span><br><span class="line">25.</span><br><span class="line">26. for(i=0;i&lt;5;i++)&#123;</span><br><span class="line">27. ret = pthread_create(&amp;tid, NULL, tfn, (void *)i);//(void *)&amp;i</span><br><span class="line">28. if (ret != 0) &#123;</span><br><span class="line">29. sys_err(&quot;pthread_create error&quot;);</span><br><span class="line">30. &#125;</span><br><span class="line">31. &#125;</span><br><span class="line">32. sleep(i);</span><br><span class="line">33. printf(&quot;I&#x27;m main, pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">34.</span><br><span class="line">35. return 0;</span><br><span class="line">36. &#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="pthread-exit-退出"><a href="#pthread-exit-退出" class="headerlink" title="pthread_exit 退出"></a>pthread_exit 退出</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line">如果在回调函数里加一段代码：</span><br><span class="line">if(i == 2)</span><br><span class="line">	exit(0);</span><br><span class="line">看起来好像是退出了第三个子线程，然而运行时，发现后续的 4,5 也没了。这是因为，exit 是退</span><br><span class="line">出进程。</span><br><span class="line">一、修改一下，换成：</span><br><span class="line">if(i == 2)</span><br><span class="line">	return NULL;</span><br><span class="line">这样运行一下，发现后续线程不会凉凉，说明 return 是可以达到退出线程的目的。然而真正意义上，return 是返回到函数调用者那里去，线程并没有退出。</span><br><span class="line">二、再修改一下，再定义一个函数 func，直接返回那种</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">运行，发现 1,2,3,4,5 线程都还在，说明没有达到退出目的。</span><br><span class="line">三、再次修改：</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	pthread_exit(NULL);</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">编译运行，发现 3 没了，看起来很科学的样子。pthread_exit 表示将当前线程退出。放在函数里，还</span><br><span class="line">是直接调用，都可以。</span><br><span class="line">回到之前说的一个问题，由于主线程可能先于子线程结束，所以子线程的输出可能不会打印出来，当时是用主线程 sleep 等待子线程结束来解决的。现在就可以使用 pthread_exit 来解决了。方法就是将 return 0 替换为 pthread_exit，只退出当前线程，不会对其他线程造成影响。</span><br><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="pthread-exit-退出"><a href="#pthread-exit-退出" class="headerlink" title="pthread_exit 退出"></a>pthread_exit 退出</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line">如果在回调函数里加一段代码：</span><br><span class="line">if(i == 2)</span><br><span class="line">	exit(0);</span><br><span class="line">看起来好像是退出了第三个子线程，然而运行时，发现后续的 4,5 也没了。这是因为，exit 是退</span><br><span class="line">出进程。</span><br><span class="line">一、修改一下，换成：</span><br><span class="line">if(i == 2)</span><br><span class="line">	return NULL;</span><br><span class="line">这样运行一下，发现后续线程不会凉凉，说明 return 是可以达到退出线程的目的。然而真正意义上，return 是返回到函数调用者那里去，线程并没有退出。</span><br><span class="line">二、再修改一下，再定义一个函数 func，直接返回那种</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">运行，发现 1,2,3,4,5 线程都还在，说明没有达到退出目的。</span><br><span class="line">三、再次修改：</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	pthread_exit(NULL);</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">编译运行，发现 3 没了，看起来很科学的样子。pthread_exit 表示将当前线程退出。放在函数里，还是直接调用，都可以。</span><br><span class="line">回到之前说的一个问题，由于主线程可能先于子线程结束，所以子线程的输出可能不会打印出来，当时是用主线程 sleep 等待子线程结束来解决的。现在就可以使用 pthread_exit 来解决了。方法就是将 return 0 替换为 pthread_exit，只退出当前线程，不会对其他线程造成影响。</span><br><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="pthread-join"><a href="#pthread-join" class="headerlink" title="pthread_join"></a>pthread_join</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int pthread_join(pthread_t thread, void **retval); 阻塞 回收线程。</span><br><span class="line">	thread: 待回收的线程 id</span><br><span class="line">	retval：传出参数。 回收的那个线程的退出值。return</span><br><span class="line">线程异常解除，值为 -1。成功被 pthread_cancel() 杀死的线程，返回 -1.使用 pthead_join 回收。</span><br><span class="line">	返回值：成功：0</span><br><span class="line">	失败：errno</span><br></pre></td></tr></table></figure>
 
@@ -379,8 +725,6 @@
 
 <p>还可以改为</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">void *tfn(void *arg)</span><br><span class="line">&#123;</span><br><span class="line">    struct thrd *tval = (struct thrd *)arg;</span><br><span class="line">    tval-&gt;var = 100;</span><br><span class="line">    strcpy(tval-&gt;str,&quot;hello thread&quot;);</span><br><span class="line">    return (void *)tvai;//返回的是arg地址所以可以用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc,char *argv[])</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    pthread_t tid;</span><br><span class="line">    struct thrd arg;</span><br><span class="line">    struct thrd *retval;</span><br><span class="line">    int ret = pthread_create(&amp;tid，NULL, tfn，(void *)&amp;arg);</span><br><span class="line">    if (ret != 0)</span><br><span class="line">        sys_err( &quot;pthread_create error&quot;);</span><br><span class="line">    //int pthread_join(pthread_t thread, void **retval);</span><br><span class="line">    ret = pthread_join(tid,(void **)&amp;retval);</span><br><span class="line">    if (ret != 0)</span><br><span class="line">        sys_err( &quot;pthread_join error&quot;);</span><br><span class="line">    printf( &quot; child thread exit with var= %d，str= %s\n&quot;,retval-&gt;var,retval-&gt;str);</span><br><span class="line">    pthreadexit(NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
 
 <h2 id="pthread-cancel-函数"><a href="#pthread-cancel-函数" class="headerlink" title="pthread_cancel 函数"></a>pthread_cancel 函数</h2><p><code>int pthread_cancel(pthread_t thread);</code> 杀死一个线程。 需要到达取消点（保存点），即需要调动系统内核<br>    thread: 待杀死的线程 id<br>    返回值：成功：0<br>    失败：errno<br>如果，子线程没有到达取消点， 那么 pthread_cancel 无效。<br>我们可以在程序中，手动添加一个取消点。使用 pthread_testcancel();<br>成功被 pthread_cancel() 杀死的线程，返回 -1.使用 pthead_join 回收。</p>
 <p>小例子，主线程调用 pthread_cancel 杀死子线程</p>
@@ -409,12 +753,8 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8.</span><br><span class="line">9. void *tfn(void *arg)</span><br><span class="line">10. &#123;</span><br><span class="line">11. printf(&quot;thread: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">12.</span><br><span class="line">13. return NULL;</span><br><span class="line">14. &#125;</span><br><span class="line">15.</span><br><span class="line">16. int main(int argc, char *argv[])</span><br><span class="line">17. &#123;</span><br><span class="line">18. pthread_t tid;</span><br><span class="line">19.</span><br><span class="line">20. pthread_attr_t attr;</span><br><span class="line">21.</span><br><span class="line">22. int ret = pthread_attr_init(&amp;attr);</span><br><span class="line">23. if (ret != 0) &#123;</span><br><span class="line">24. fprintf(stderr, &quot;attr_init error:%s\n&quot;, strerror(ret));</span><br><span class="line">25. exit(1);</span><br><span class="line">26. &#125;</span><br><span class="line">27.</span><br><span class="line">28. ret = pthread_attr_setdetachstate(&amp;attr, PTHREAD_CREATE_DETACHED); // 设置线程属性为 分离属性</span><br><span class="line">29. if (ret != 0) &#123;</span><br><span class="line">30. fprintf(stderr, &quot;attr_setdetachstate error:%s\n&quot;, strerror(ret));</span><br><span class="line">31. exit(1);</span><br><span class="line">32. &#125;</span><br><span class="line">33.</span><br><span class="line">34. ret = pthread_create(&amp;tid, &amp;attr, tfn, NULL);</span><br><span class="line">35. if (ret != 0) &#123;</span><br><span class="line">36. perror(&quot;pthread_create error&quot;);</span><br><span class="line">37. &#125;</span><br><span class="line">38.</span><br><span class="line">39. ret = pthread_attr_destroy(&amp;attr);</span><br><span class="line">40. if (ret != 0) &#123;</span><br><span class="line">41. fprintf(stderr, &quot;attr_destroy error:%s\n&quot;, strerror(ret));</span><br><span class="line">42. exit(1);</span><br><span class="line">43. &#125;</span><br><span class="line">44.</span><br><span class="line">45. ret = pthread_join(tid, NULL);</span><br><span class="line">46. if (ret != 0) &#123;</span><br><span class="line">47. fprintf(stderr, &quot;pthread_join error:%s\n&quot;, strerror(ret));</span><br><span class="line">48. exit(1);</span><br><span class="line">49. &#125;</span><br><span class="line">50.</span><br><span class="line">51. printf(&quot;main: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">52.</span><br><span class="line">53. pthread_exit((void *)0);</span><br><span class="line">54. &#125;</span><br></pre></td></tr></table></figure>
 
 <p>pthread_join 报错，说明线程已经自动回收，设置分离成功</p>
-<h2 id="线程使用注意事项"><a href="#线程使用注意事项" class="headerlink" title="线程使用注意事项"></a>线程使用注意事项</h2><p>1.主线程退出其他线程不退出，主线程应调用<code>pthread_exit</code></p>
-<p>2.避免僵尸线程。<br><code>pthread_joine</code></p>
-<p><code>pthread_detach</code><br><code>pthread_create</code>	指定分离属性<br>join线程可能在join函数返回前就释放完自己的所有内存资源，所以不应当返回被回收线程楼中的值;</p>
-<ol start="3">
-<li>malloc和mmap申请的内存可以被其他线程释放<br>4.应避免在多线程模型中调用fork，除非马上exec，子进程中只有调用fork 的线程存在，其他线程在子进程中均pthread_exit<br>5.信号的复杂语义很难和多线程共存，应避免在多线程引入信号机制,因为信号处理是同概率的，每一个的mask是不同的，但是未决信号集是一样的，所有才能在信号来时都会主动处理。</li>
-</ol>
+<h2 id="线程使用注意事项"><a href="#线程使用注意事项" class="headerlink" title="线程使用注意事项"></a>线程使用注意事项</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1.主线程退出其他线程不退出，主线程应调用`pthread_exit`</span><br><span class="line">2.避免僵尸线程。</span><br><span class="line">`pthread_joine`</span><br><span class="line">`pthread_detach`</span><br><span class="line">`pthread_create`	指定分离属性</span><br><span class="line">join线程可能在join函数返回前就释放完自己的所有内存资源，所以不应当返回被回收线程楼中的值;</span><br><span class="line">3. malloc和mmap申请的内存可以被其他线程释放</span><br><span class="line">4.应避免在多线程模型中调用fork，除非马上exec，子进程中只有调用fork 的线程存在，其他线程在子进程中均pthread_exit</span><br><span class="line">5.信号的复杂语义很难和多线程共存，应避免在多线程引入信号机制,因为信号处理是同概率的，每一个的mask是不同的，但是未决信号集是一样的，所有才能在信号来时都会主动处理。</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -1045,7 +1385,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-03 10:50:24" itemprop="dateModified" datetime="2023-07-03T10:50:24+08:00">2023-07-03</time>
+                <time title="修改时间：2023-07-06 14:36:01" itemprop="dateModified" datetime="2023-07-06T14:36:01+08:00">2023-07-06</time>
               </span>
 
           
@@ -1127,6 +1467,49 @@
 <p>对这个函数的测试表明无论数据是任意的，还是可预测的，CPE都大约为4.0。(我们还检查了产生的汇编代码，确认它确实使用了条件传送。)</p>
 <p>讨论过，不是所有的条件行为都能用条件数据传送来实现，所以无可避免地在某些情况中，程序员不能避免写出会导致条件分支的代码，而对于这些条件分支，处理器用分支预测可能会处理得很糟糕。但是，正如我们讲过的，程序员方面用一点点聪明，有时就能使代码更容易被翻译成条件数据传送。这需要一些试验，写出函数的不同版本，然后检查产生的汇编代码，并测试性能。</p>
 <p>分支预测只对有规律的模式可行。程序中的许多测试是完全不可预测的，依赖于数据的任意特性，例如一个数是负数还是正数。对于这些测试，分支预测逻辑会处理得很糟糕。对于本质上无法预测的情况，如果编译器能够产生使用条件数据传送而不是使用条件控制转移的代码，可以极大地提高程序的性能。这不是C语言程序员可以直接控制的，但是有些表达条件行为的方法能够更直接地被翻译成条件传送，而不是其他操作。</p>
+<h2 id="理解内存性能"><a href="#理解内存性能" class="headerlink" title="理解内存性能"></a>理解内存性能</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114807883.png" alt="image-20230705114807883"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114807883.png" class title="This is an test image">
+
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114829177.png" alt="image-20230705114829177"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114829177.png" class title="This is an test image">
+
+<p>原代码</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114934148.png" alt="image-20230705114934148"></p>
+<p>后者vmovss有内存读取，即有了写读相关，导致数据相关。每次需要pi就得先写再读取，导致CPE高，如果是上面就没有。</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115802949.png" alt="image-20230705115802949"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115802949.png" class title="This is an test image">
+
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115942271.png" alt="image-20230705115942271"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115942271.png" class title="This is an test image">
+
+<h2 id="确认和消除性能瓶颈"><a href="#确认和消除性能瓶颈" class="headerlink" title="确认和消除性能瓶颈"></a>确认和消除性能瓶颈</h2><p>至此，我们只考虑了优化小的程序，在这样的小程序中有一些很明显限制性能的地方，因此应该是集中注意力对它们进行优化。在处理大程序时，连知道应该优化什么地方都是很难的。本节会描述如何使用代码剖析程序(code profiler)，这是在程序执行时收集性能数据的分析工具。我们还展示了一个系统优化的通用原则，称为Amdahl定律。</p>
+<h3 id="程序剖析"><a href="#程序剖析" class="headerlink" title="程序剖析"></a>程序剖析</h3><p>程序剖析(profiling)运行程序的一个版本，其中插人了工具代码，以确定程序的各个部分需要多少时间。这对于确认程序中我们需要集中注意力优化的部分是很有用的。剖析的一个有力之处在于可以在现实的基准数据(benchmark data)上运行实际程序的同时，进行剖析。</p>
+<p>Unix系统提供了一个剖析程序GPROF。这个程序产生两种形式的信息。首先，它确定程序中每个函数花费了多少CPU时间。其次，它计算每个函数被调用的次数，以执行调用的函数来分类。这两种形式的信息都非常有用。这些计时给出了不同函数在确定整体运行时间中的相对重要性。调用信息使得我们能理解程序的动态行为。</p>
+<p>用GPROF进行剖析需要3个步骤，就像C程序prog.c所示，它运行时命令行参数为file.txt:</p>
+<p>1）程序必须为剖析而编译和链接。使用GCC(以及其他C编译器)，就是在命令行上简单地包括运行时标志“-pg”。确保编译器不通过内联替换来尝试执行任何优化是很重要的，否则就可能无法正确刻画函数调用。我们使用优化标志-Og，以保证能正确跟踪函数调用<br><code>linux&gt; gcc -Og -pg prog.c -o prog</code></p>
+<p>2）然后程序像往常一样执行:</p>
+<p><code>linux&gt; ./prog file.txt</code><br>它运行得会比正常时稍微慢一点(大约慢2倍)，不过除此之外唯一的区别就是它产生了一个文件 gmon.out。<br>3）调用GPROF来分析gmon. out中的数据。</p>
+<p><code>linux&gt; gprof prog</code></p>
+<p>剖析报告的第一部分列出了执行各个函数花费的时间，按照降序排列。作为一个示例，下面列出了报告的一部分，是关于程序中最耗费时间的三个函数的:</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706112821635.png" alt="image-20230706112821635"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706112821635.png" class title="This is an test image">
+
+<p>每一行代表对某个函数的所有调用所花费的时间。第一列表明花费在这个函数上的时间占整个时间的百分比。第二列显示的是直到这一行并包括这一行的函数所花费的累计时间。第三列显示的是花费在这个函数上的时间，而第四列显示的是它被调用的次数(递归调用不计算在内)。在例子中，函数sort_words只被调用了一次，但就是这一次调用需要203.66秒，而函数find ele_rec被调用了965 027次(递归调用不计算在内)，总共需要4.85秒。函数 strlen通过调用库函数strlen来计算字符串的长度。GPROF的结果中通常不显示库函数调用。库函数耗费的时间通常计算在调用它们的函数内。通过创建这个“包装函数( wrapper function)”strlen，我们可以可靠地跟踪对strlen的调用，表明它被调用了12511 031次，但是一共只需要0.30秒。</p>
+<p>剖析报告的第二部分是函数的调用历史。下面是一个递归函数find ele rec的历史:</p>
+<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706113048681.png" alt="image-20230706113048681"></p>
+<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706113048681.png" class title="This is an test image">
+
+<p>这个历史既显示了调用find_ele_rec的函数，也显示了它调用的函数。头两行显示的是对这个函数的调用:被它自身递归地调用了158655725次，被函数insert_string调用了965 027次(它本身被调用了965027次)。函数find_ele_rec也调用了另外两个函数save_string和 new_ele，每个函数总共被调用了363039次。<br>根据这个调用信息，我们通常可以推断出关于程序行为的有用信息。例如，函数find_ele_rec是一个递归过程，它扫描一个哈希桶(hash bucket)的链表，查找一个特殊的字符串。对于这个函数，比较递归调用的数量和顶层调用的数量，提供了关于遍历这些链表的长度的统计信息。这里递归与顶层调用的比率是164.4，我们可以推断出程序每次平均大约扫描164个元素。</p>
+<h2 id="使用剖析程序来指导优化"><a href="#使用剖析程序来指导优化" class="headerlink" title="使用剖析程序来指导优化"></a>使用剖析程序来指导优化</h2><p>迭代和递归是两种常见的函数调用方式，它们在实现方式和执行过程上有一些区别。</p>
+<p>迭代（Iteration）是通过循环结构来重复执行一段代码，达到需要的结果。迭代通常使用循环变量作为计数器或条件判断，每次循环都更新循环变量，并基于该变量进行操作。迭代函数通常使用较少的系统资源，对于处理大规模数据集和性能要求较高的场景，迭代通常是更有效的选择。</p>
+<p>递归（Recursion）是一种函数自身调用自身的方法。递归函数包含两部分：基准情况（Base Case）和递归调用（Recursive Call）。基准情况定义了递归结束的条件，当满足基准情况时，递归停止并开始回溯。递归调用是函数在自身调用期间的执行过程，每次递归调用会解决一个更小或更简单的子问题。递归函数通常比较简洁，但可能会占用较多的系统资源，并且在处理大规模数据集时可能导致堆栈溢出的问题。</p>
+<p>总结区别：</p>
+<ul>
+<li>迭代是通过循环来完成重复执行，而递归是函数自身调用自身的方式。</li>
+<li>迭代函数使用循环变量进行迭代和操作，而递归函数通过不断调用自身来解决子问题。</li>
+<li>迭代通常使用较少的系统资源，适用于处理大规模数据集和性能要求较高的场景；递归通常较简洁但可能会占用较多系统资源，并且在处理大规模数据时有堆栈溢出的风险。</li>
+</ul>
+<p>在选择使用迭代还是递归时，需要考虑问题的特点、性能需求、代码可读性等因素。有些问题更适合使用迭代，而有些问题则可以利用递归的特性更好地表达和解决。</p>
 
       
     </div>
@@ -1391,598 +1774,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/" class="post-title-link" itemprop="url">Linux上gcc编译</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-14 10:41:46" itemprop="dateCreated datePublished" datetime="2023-05-14T10:41:46+08:00">2023-05-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-21 10:34:55" itemprop="dateModified" datetime="2023-05-21T10:34:55+08:00">2023-05-21</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="gcc-编译-4-步骤"><a href="#gcc-编译-4-步骤" class="headerlink" title="gcc 编译 4 步骤"></a>gcc 编译 4 步骤</h1><p>GCC（GNU Compiler Collection）是由 GNU 开发的编程语言编译器。 GCC最初代表“GNU C Compiler”，当时只支持C语言。 后来又扩展能够支持更多编程语言，包括 C++、Fortran 和 Java 等。</p>
-<p>GCC 编译工具链在编译一个C源文件时需要经过以下 4 步：</p>
-<ul>
-<li>预处理：为把头文件的代码、宏之类的内容转换成生成的.i文件，还是C代码。</li>
-<li>编译：把预处理后的.i文件通过编译成.s文件，汇编语言。</li>
-<li>汇编：将汇编语言文件生成目标文件.o文件，机器码。</li>
-<li>链接：将每个源文件对应的.o文件链接起来，就生成一个可执行程序文件</li>
-</ul>
-<p><strong>（1）预处理阶段</strong></p>
-<p>预处理过程中，对源代码文件中的文件包含 (include)、 预编译语句 (如宏定义define等)进行展开，生成 .i 文件。 可理解为把头文件的代码、宏之类的内容转换成更纯粹的C代码，不过生成的文件以.i为后缀。</p>
-<p>使用GCC的参数 “-E”，可以让编译器生成 .i 文件，参数 “-o”，可以指定输出文件的名字。</p>
-<p>具体命令如下：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 预处理，可理解为把头文件的代码汇总成C代码，把*.c转换得到*.i文件</span><br><span class="line">gcc –E hello.c –o hello.i</span><br></pre></td></tr></table></figure>
-
-<p><strong>（2）编译阶段</strong>（消耗时间、系统资源最多）</p>
-<p>把预处理后的.i文件通过编译成为汇编语言，生成.s文件，即把代码从C语言转换成汇编语言，这是GCC编译器完成的工作。在这个过程，GCC会检查各个源文件的语法，即使我们调用了一个没有定义的函数，也不会报错。</p>
-<p>GCC可以使用-S选项，让编译程序生成汇编语言的代码文件（.s后缀）。</p>
-<p>warning时如果有行号，说明是编译阶段出错。</p>
-<p>具体命令如下:</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译，可理解为把C代码转换为汇编代码，把*.i转换得到*.s文件</span></span><br><span class="line">gcc –S hello.i –o hello.s</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接以C文件作为输入进行编译，与上面的命令是等价的</span></span><br><span class="line">gcc –S hello.c –o hello.s</span><br></pre></td></tr></table></figure>
-
-<p><strong>（3）汇编阶段</strong></p>
-<p>将汇编语言文件经过汇编，生成目标文件.o文件，每一个源文件都对应一个目标文件。即把汇编语言的代码转换成机器码，这是as汇编器完成的工作。</p>
-<p>GCC的参数“c”表示只编译(compile)源文件但不链接，会将源程序编译成目标文件（.o后缀）。计算机只认识0或者1，不懂得C语言，也不懂得汇编语言，经过编译汇编之后，生成的目标文件包含着机器代码，这部分代码就可以直接被计算机执行。一般情况下，可以直接使用参数“c”，跳过上述的两个过程，具体命令 如下：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 汇编，可理解为把汇编代码转换为机器码，把*.s转换得到*.o，即目标文件</span></span><br><span class="line">gcc –c hello.s –o hello.o</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接以C文件作为输入进行汇编，与上面的命令是等价的</span></span><br><span class="line">gcc –c hello.c –o hello.o</span><br></pre></td></tr></table></figure>
-
-<p>Linux下生成的 <em>.o目标文件、</em>so动态库文件以及下一小节链接阶段生成最终的可执行文件都是elf格式的， 可以使用“readelf”工具来查看它们的内容。</p>
-<p><strong>（4）链接阶段</strong></p>
-<p>最后将每个源文件对应的目标.o文件链接起来，就生成一个可执行程序文件，这是链接器ld完成的工作。</p>
-<p>例如一个工程里包含了A和B两个代码文件，在链接阶段， 链接过程需要把A和B之间的函数调用关系理顺，也就是说要告诉A在哪里能够调用到fun函数， 建立映射关系，所以称之为链接。若链接过程中找不到fun函数的具体定义，则会链接报错。</p>
-<p>虽然本示例只有一个hello.c文件，但它调用了C标准代码库的printf函数， 所以链接器会把它和printf函数链接起来，生成最终的可执行文件。</p>
-<p>链接分为两种：</p>
-<ul>
-<li>动态链接：GCC编译时的默认选项。动态是指在应用程序运行时才去加载外部的代码库，不同的程序可以共用代码库。 所以动态链接生成的程序比较小，占用较少的内存。</li>
-<li>静态链接：链接时使用选项 “–static”，它在编译阶段就会把所有用到的库打包到自己的可执行程序中。 所以静态链接的优点是具有较好的兼容性，不依赖外部环境，但是生成的程序比较大。</li>
-</ul>
-<p>执行如下命令体验静态链接与动态链接的区别：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在hello.o所在的目录执行如下命令</span></span><br><span class="line"><span class="comment"># 动态链接，生成名为hello的可执行文件</span></span><br><span class="line">//<span class="literal">-o</span>是用来指定生成文件的名字</span><br><span class="line">gcc hello.o –o hello</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接使用C文件一步生成，与上面的命令等价</span></span><br><span class="line">gcc hello.c <span class="literal">-o</span> hello</span><br><span class="line"></span><br><span class="line"><span class="comment"># 静态链接，使用--static参数，生成名为hello_static的可执行文件</span></span><br><span class="line">gcc hello.o –o hello_static <span class="literal">--static</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接使用C文件一步生成，与上面的命令等价</span></span><br><span class="line">gcc hello.c <span class="literal">-o</span> hello_static <span class="literal">--static</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="当头文件和源码不在一个目录下时，需要指定头文件"><a href="#当头文件和源码不在一个目录下时，需要指定头文件" class="headerlink" title="当头文件和源码不在一个目录下时，需要指定头文件"></a>当头文件和源码不在一个目录下时，需要指定头文件</h2><p>gcc -I .&#x2F;hellodir hello.c -o hello 其中-I 参数指定头文件所在位置，位置可以在编译文件前，也可以在后面</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-I 指定头文件所在目录位置</span><br><span class="line">-c 只做预处理，编译，汇编。得到二进制文件</span><br><span class="line">-g 编译时添加调试文件，用于 gdb 调试</span><br><span class="line">-Wall 显示所有警告信息</span><br><span class="line">-D 向程序中“动态”注册宏定义，一般可以用在调试，制作一个开关，比如ifdef,发布的时候就可以不用删除调试信息</span><br><span class="line">-l 指定动态库库名</span><br><span class="line">-L 指定动态库路径</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="动态库和静态库理论对比"><a href="#动态库和静态库理论对比" class="headerlink" title="动态库和静态库理论对比"></a>动态库和静态库理论对比</h2><p>静态库在文件中静态展开，所以有多少文件就展开多少次，非常吃内存，100M 展开 100 次，就是 1G， 但是这样的好处就是静态加载的速度快 </p>
-<p>使用动态库会将动态库加载到内存，10 个文件也只需要加载一次，然后这些文件用到库的时候临时去加载，速度慢一些，但是很省内存 </p>
-<p>动态库和静态库各有优劣，根据实际情况合理选用即可。</p>
-<ul>
-<li>1.动态库是否加载到内存,取决于程序是否运行</li>
-<li>2.动态库每次加载的位置不固定</li>
-<li>3.动、静态库共存时,编译器默认使用动态库</li>
-</ul>
-<h3 id="静态库制作"><a href="#静态库制作" class="headerlink" title="静态库制作"></a>静态库制作</h3><p>静态库名字以 lib 开头，以.a 结尾 ，.a是ELF文件，可重定位目标文件。</p>
-<p>例如：<code>libmylib.a</code> </p>
-<p>静态库生成指令 <code>ar rcs libmylib.a file1.o</code></p>
-<p>步骤一： 写好源代码</p>
-<p>步骤二： 编译源代码生成.o 文件</p>
-<p>步骤三： 制作静态库 ar rcs libname.a file1.o file2.o …</p>
-<p>静态库的使用： gcc test.c lib 库名.a -o a.out</p>
-<h3 id="动态库制作-生成与位置无关代码"><a href="#动态库制作-生成与位置无关代码" class="headerlink" title="动态库制作-生成与位置无关代码"></a>动态库制作-生成与位置无关代码</h3><p>写在源代码里的函数，相对 main 函数偏移是一定的，链接时，回填 main 函数地址之后，其他源代码里的函数也就得到了地址。 </p>
-<p>动态库里的函数会用一个@plt 来标识，当动态库加载到内存时，再用加载进去的地址将@plt 替换掉。</p>
-<p>制作动态库的步骤 </p>
-<ol>
-<li>生成位置无关的.o 文件 <code>gcc -c add.c -o add.o -fPIC</code> 使用这个参数过后，生成的函数就和位置无关，挂上@plt 标识，等待动态绑定 </li>
-<li>使用 gcc -shared 制作动态库 <code>gcc -shared -o lib 库名.so add.o sub.o div.o</code> </li>
-<li>编译可执行程序时指定所使用的动态库。-l:指定库名 -L:指定库路径 <code>gcc test.c -o a.out -l mymath -L ./lib</code> </li>
-<li>运行可执行程序.&#x2F;a.out</li>
-</ol>
-<h4 id="动态库加载错误原因及解决方式"><a href="#动态库加载错误原因及解决方式" class="headerlink" title="动态库加载错误原因及解决方式"></a>动态库加载错误原因及解决方式</h4><p>出错原因分析： </p>
-<p>连接器： 工作于链接阶段，工作时需要 -l 和 -L </p>
-<p>动态链接器： 工作于程序运行阶段，工作时需要提供动态库所在目录位置 </p>
-<p>指定动态库路径并使其生效，然后再执行文件 </p>
-<p>通过环境变量指定动态库所在位置：<code>export LD_LIBRARY_PATH=动态库路径</code></p>
-<p>当关闭终端，再次执行 a.out 时，又报错。 </p>
-<p>这是因为，环境变量是进程的概念，关闭终端之后再打开，是两个进程，环境变量发生了变化。 </p>
-<p>要想永久生效，需要修改 bash 的配置文件：<code>vi ~./bashrc</code> </p>
-<p>修改后要使配置文件立即生效：<code>. .bashrc</code> 或者 <code>source .bashrc</code> 或者重开终端让其自己加载 这下再执行 a.out 就不会报错</p>
-<h4 id="动态库加载错误原因及解决方式-2"><a href="#动态库加载错误原因及解决方式-2" class="headerlink" title="动态库加载错误原因及解决方式 2"></a>动态库加载错误原因及解决方式 2</h4><p>解决方式： </p>
-<p>【1】 通过环境变量： <code>export LD_LIBRARY_PATH=动态库路径</code></p>
-<p> .&#x2F;a.out 成功！！！ （临时生效， 终端重启环境变量失效） </p>
-<p>【2】 永久生效： 写入 终端配置文件。 .bashrc 建议使用绝对路径。 </p>
-<pre><code>1) vi ~/.bashrc
-2) 写入 export LD_LIBRARY_PATH=动态库路径 保存 
-3) ..bashrc/ source .bashrc / 重启 终端 (三种方法都可以)---&gt; 让修改后的.bashrc 生效 
-4) ./a.out 成功！！！ 
-</code></pre>
-<p>【3】 拷贝自定义动态库 到 &#x2F;lib (标准 C 库所在目录位置) </p>
-<p>【4】 配置文件法 </p>
-<ul>
-<li>sudo vi &#x2F;etc&#x2F;ld.so.conf</li>
-<li>写入 动态库绝对路径 保存 </li>
-<li>sudo ldconfig -v 使配置文件生效。 </li>
-<li>.&#x2F;a.out 成功！！！— 使用 ldd a.out 查看</li>
-</ul>
-<h3 id="数据段合并"><a href="#数据段合并" class="headerlink" title="数据段合并"></a>数据段合并</h3><p>在链接阶段完成，节省空间，将同样工作（例如只读）的数据段合并。</p>
-<h2 id="头文件守卫："><a href="#头文件守卫：" class="headerlink" title="头文件守卫："></a>头文件守卫：</h2><p>防止头文件被重复包含 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#ifndef _HEAD_H_ </span><br><span class="line">#define _HEAD_H_ </span><br><span class="line">...... </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-
-<h2 id="gdb-调试基础指令"><a href="#gdb-调试基础指令" class="headerlink" title="gdb 调试基础指令"></a>gdb 调试基础指令</h2><p>使用 gdb 之前，要求对文件进行编译时增加-g 参数，加了这个参数过后生成的编译文件会大一些， 这是因为增加了 gdb 调试内容 </p>
-<p>gdb 调试工具： 大前提：程序是你自己写的。 —逻辑错误 </p>
-<p>基础指令： </p>
-<p>​	-g：使用该参数编译可以执行文件，得到调试表。 </p>
-<p>​	gdb .&#x2F;a.out </p>
-<p>​	list： list 1 列出源码。根据源码指定 行号设置断点。 断点那一行不会执行</p>
-<p>​	b： b 20 在 20 行位置设置断点。 </p>
-<p>​	run&#x2F;r: 运行程序 </p>
-<p>​	n&#x2F;next: 下一条指令（会越过函数） </p>
-<p>​	next&#x2F;n :下一个，调用函数就跑 </p>
-<p>​	step&#x2F;s :单步，会进入调用的函数 </p>
-<p>​	要注意的是，如果是系统函数，按 s 就出不来了，这时用 until+行号直接执行到行号处</p>
-<p>​	s&#x2F;step: 下一条指令（会进入函数） </p>
-<p>​	p&#x2F;print：p i 查看变量的值。 </p>
-<p>​	continue：继续执行断点后续指令。 </p>
-<p>​	finish：结束当前函数调用。 </p>
-<p>​	quit：退出 gdb 当前调试。 </p>
-<p>其他指令： </p>
-<p>​	run：使用 run 查找段错误出现位置。 </p>
-<p>​	set args： 设置 main 函数命令行参数 （在 start、run 之前） </p>
-<p>​	run 字串 1 字串 2 …: 设置 main 函数命令行参数 </p>
-<p>​	info b: 查看断点信息表 </p>
-<p>​	b 20 if i &#x3D; 5： 设置条件断点。 </p>
-<p>​	ptype：查看变量类型。 </p>
-<p>​	bt：列出当前程序正存活着的栈帧。 </p>
-<p>​	frame： 根据栈帧编号，切换栈帧。 </p>
-<p>​	display：设置跟踪变量 </p>
-<p>​	undisplay：取消设置跟踪变量。 使用跟踪变量的编号。</p>
-<p>没有符号被读取—编译时没加-g 参数 </p>
-<p>file 后面加使用-g 编译的文件，可以不用退出，gdb 直接读取后进行调试。</p>
-<h2 id="makefile-基础规则"><a href="#makefile-基础规则" class="headerlink" title="makefile 基础规则"></a>makefile 基础规则</h2><p>makefile： 管理项目。 </p>
-<p>命名：makefile 	Makefile — make 命令 </p>
-<p>1 个规则： </p>
-<p>目标：依赖条件 </p>
-<p>​	（一个 tab 缩进）命令 </p>
-<ol>
-<li>目标的时间必须晚于依赖条件的时间，否则，更新目标 </li>
-<li>依赖条件如果不存在，找寻新的规则去产生依赖条件。</li>
-</ol>
-<p>ALL：指定 makefile 的终极目标（第一行）。</p>
-<p>2 个函数：</p>
-<p>​    src &#x3D; $(wildcard .&#x2F;*.c): 匹配当前工作目录下的所有.c 文件。将文件名组成列表，赋值给变量 src。 src &#x3D; add.c sub.c div1.c </p>
-<p>​    obj &#x3D; $(patsubst %.c, %.o, $(src)): 将参数3中，包含参数1的部分，替换为参数2。 obj &#x3D; add.o sub.o div1.o</p>
-<p>  clean: (没有依赖)</p>
-<p>​    -rm -rf $(obj) a.out “-”：作用是，删除不存在文件时，不报错。顺序执行结束。</p>
-<p>  3 个自动变量：</p>
-<p>​    $@: 在规则的命令中，表示规则中的目标。</p>
-<p>​    $^: 在规则的命令中，表示所有依赖条件。</p>
-<p>​    $&lt;: 在规则的命令中，表示第一个依赖条件。如果将该变量应用在模式规则中，它可将依赖条件列表中的依赖依次取出，套用模式规则。</p>
-<p>  模式规则：</p>
-<p>​    %.o:%.c</p>
-<p>​      gcc -c $&lt; -o %@</p>
-<p>  静态模式规则：</p>
-<p>​    $(obj):%.o:%.c</p>
-<p>​      gcc -c $&lt; -o %@  </p>
-<p>  伪目标：</p>
-<p>​    .PHONY: clean ALL</p>
-<p>  参数：</p>
-<p>​    -n：模拟执行make、make clean 命令。</p>
-<p>​    -f：指定文件执行 make 命令。       xxxx.mk</p>
-<p> makefile检测原理：</p>
-<p>修改文件后，文件的修改时间发生变化，会出现目标文件的时间早于作为依赖材料的时间，出现这种情况的文件会重新编译。</p>
-<p>修改sub.c后，sub.o的时间就早于sub.c ，a.out的时间也早于sub.o的时间了，于是重新编译这俩文件了。</p>
-<h2 id="makefile两个函数和clean"><a href="#makefile两个函数和clean" class="headerlink" title="makefile两个函数和clean"></a>makefile两个函数和clean</h2><p>src &#x3D; $(wildcard *.c)</p>
-<p>找到当前目录下所有后缀为.c的文件，赋值给src</p>
-<p>obj &#x3D; $(patsubset %.c,%.o, $(src))</p>
-<p>把src变量里所有后缀为.c的文件替换成.o</p>
-<p>rm前面的-，代表出错依然执行。比如，待删除文件集合是5个，已经手动删除了1个，就只剩下4个，然而删除命令里面还是5个的集合，就会有删除不存在文件的问题，不加这-，就会报错，告诉你有一个文件找不到。加了-就不会因为这个报错。</p>
-<h2 id="makefile3个自动变量和模式规则"><a href="#makefile3个自动变量和模式规则" class="headerlink" title="makefile3个自动变量和模式规则"></a>makefile3个自动变量和模式规则</h2><p>3个自动变量</p>
-<p>$@ ：在规则命令中，表示规则中的目标</p>
-<p>$&lt; ：在规则命令中，表示规则中的第一个条件，如果将该变量用在模式规则中，它可以将依赖条件列表中的依赖依次取出，套用模式规则</p>
-<p>$^ ：在规则命令中，表示规则中的所有条件，组成一个列表，以空格隔开，如果这个列表中有重复项，则去重</p>
-<p>模式规则：</p>
-<p>%.o:%.c</p>
-<p>  gcc -c $&lt; -o $@</p>
-<h2 id="静态模式规则"><a href="#静态模式规则" class="headerlink" title="静态模式规则"></a>静态模式规则</h2><p>继续优化makefile，使用静态模式规则，就是指定模式规则给谁用，这里指定模式规则给obj用，以后文件多了，文件集合会有很多个，就需要指定哪个文件集合用什么规则</p>
-<p>$(obj):%.o:%.c</p>
-<p>gcc -c $&lt; -o $@</p>
-<p>再来一个扩展</p>
-<p>当前文件夹下有ALL文件或者clean文件时，会导致makefile瘫痪，如下所示，make clean没有工作</p>
-<p>用伪目标来解决，添加一行  .PHONY: clean ALL</p>
-<p>还有一个扩展就是，编译时的参数，-g,-Wall这些，可以放在makefile里面</p>
-<p>主要是注意%的匹配理解，只匹配文件名，目录位置要手动添加</p>
-<p>如果makefile的名字变化一下，比如，叫m6</p>
-<p>用m6执行makefile，   make -f m6</p>
-<p>用m6执行clean      make -f m6 clean</p>
-<p>源码 add.c,sub.c 这些在 src 目录下，.o 文件要放在 obj 目录下，头文件 head.h 在 inc 目录下。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">src = $(wildcard ./src/*.c)	# ./src/add.c ./src/ sub.c...</span><br><span class="line">obj = $(patsubst ./src/%.c, ./obj/%.o，$(src))</span><br><span class="line">inc_path = ./inc</span><br><span class="line">myArgs = -Wall -g</span><br><span class="line">ALL:a.out</span><br><span class="line">$(obj):./obj/%.o:./src/%.c</span><br><span class="line">	gcc -c $&lt; -o $@ $(myArgs) -I $(inc_path)</span><br><span class="line">a.out: $(obj)</span><br><span class="line">	gcc $^ -o $@ $(myArgs)</span><br><span class="line">clean:</span><br><span class="line">	-rm -rf $(obj) a.out</span><br><span class="line">.PHONY: clean ALL</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/" class="post-title-link" itemprop="url">深入理解计算机系统 第三章</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-13 11:28:04" itemprop="dateCreated datePublished" datetime="2023-05-13T11:28:04+08:00">2023-05-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-28 11:04:18" itemprop="dateModified" datetime="2023-05-28T11:04:18+08:00">2023-05-28</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="第3章程序的机器级表示"><a href="#第3章程序的机器级表示" class="headerlink" title="第3章程序的机器级表示"></a>第3章程序的机器级表示</h1><h2 id="程序编码"><a href="#程序编码" class="headerlink" title="程序编码"></a>程序编码</h2><p>其中一些关于机器代码和它的反汇编表示的特性值得注意:</p>
-<ul>
-<li>x86-64的指令长度从1到15个字节不等。常用的指令以及操作数较少的指令所需的字节数少，而那些不太常用或操作数较多的指令所需字节数较多。</li>
-<li>设计指令格式的方式是，从某个给定位置开始，可以将字节唯一地解码成机器指令。例如，只有指令pushq %rbx是以字节值53开头的。</li>
-<li>反汇编器只是基于机器代码文件中的字节序列来确定汇编代码。它不需要访问该程序的源代码或汇编代码。</li>
-<li>反汇编器使用的指令命名规则与GCC生成的汇编代码使用的有些细微的差别。在我们的示例中，它省略了很多指令结尾的‘q’。这些后缀是大小指示符，在大多数情况中可以省略。相反，反汇编器给call和ret 指令添加了‘q’后缀，同样，省略这些后缀也没有问题。</li>
-</ul>
-<p>虽然C编译器在把程序中表达的计算转换到机器代码方面表现出色，但是仍然有一些机器特性是C程序访问不到的。例如，每次 x86-64处理器执行算术或逻辑运算时，如果得到的运算结果的低8位中有偶数个1，那么就会把一个名为PF的1位条件码(condition code)标志设置为1，否则就设置为0。这里的PF表示“parity flag(奇偶标志)”。在C语言中计算这个信息需要至少7次移位、掩码和异或运算。即使作为每次算术或逻辑运算的一部分，硬件都完成了这项计算，而C程序却无法知道PF条件码标志的值。在程序中插入几条汇编代码指令就能很容易地完成这项任务。</p>
-<p>在C程序中插入汇编代码有两种方法。第一种是，我们可以编写完整的函数，放进一个独立的汇编代码文件中，让汇编器和链接器把它和用C语言书写的代码合并起来。第二种方法是，我们可以使用GCC的内联汇编(inline assembly)特性，用asm伪指令可以在C程序中包含简短的汇编代码。这种方法的好处是减少了与机器相关的代码量。</p>
-<p>当然，在C程序中包含汇编代码使得这些代码与某类特殊的机器相关(例如x86-64)，所以只应该在想要的特性只能以此种方式才能访问到时才使用它。</p>
-<h2 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h2><p>由于是从16位体系结构扩展成32位的，Intel用术语“字(word)”表示16位数据类型。因此，称32位数为“双字(double words)”，称64位数为“四字(quad words)”。C语言基本数据类型对应的x86-64表示。标准int值存储为双字(32位)。指针(在此用char *表示)存储为8字节的四字，64位机器本来就预期如此。</p>
-<table>
-<thead>
-<tr>
-<th>C声明</th>
-<th>Intel数据类型</th>
-<th>汇编代码后缀</th>
-<th>大小(字节)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>char</td>
-<td>字节</td>
-<td>b</td>
-<td>1</td>
-</tr>
-<tr>
-<td>short</td>
-<td>字</td>
-<td>w</td>
-<td>2</td>
-</tr>
-<tr>
-<td>int</td>
-<td>双字</td>
-<td>l</td>
-<td>4</td>
-</tr>
-<tr>
-<td>long</td>
-<td>四字</td>
-<td>q</td>
-<td>8</td>
-</tr>
-<tr>
-<td>char*</td>
-<td>四字</td>
-<td>q</td>
-<td>8</td>
-</tr>
-<tr>
-<td>float</td>
-<td>单精度</td>
-<td>s</td>
-<td>4</td>
-</tr>
-<tr>
-<td>double</td>
-<td>双精度</td>
-<td>l</td>
-<td>8</td>
-</tr>
-</tbody></table>
-<h2 id="访问信息"><a href="#访问信息" class="headerlink" title="访问信息"></a>访问信息</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" alt="image-20230515185054534"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" class title="This is an test image">
-
-<h3 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h3><p>MOV指令源和目的类型的组合。记住，<strong>第一个是源操作数，第二个是目的操作数。</strong></p>
-<p>源操作数指定的值是一个立即数，存储在寄存器中或者内存中。目的操作数指定一个位置，要么是一个寄存器或者，要么是一个内存地址。</p>
-<p>寄存器部分的大小必须与指令最后一个字符(‘b’，‘w’，‘1’或‘q’)指定的大小匹配。大多数情况中，MOV指令只会更新目的操作数指定的那些寄存器字节或内存位置。唯一的例外是movl指令以寄存器作为目的时，它会把该寄存器的高位4字节设置为0。造成这个例外的原因是x86-64采用的惯例，即任何为寄存器生成32位值的指令都会把该寄存器的高位部分置成0。</p>
-<p>常规的movq指令只能以表示为32位补码数字的立即数作为源操作数，然后把这个值符号扩展得到64位的值，放到目的位置。movabsq指令能够以任意64位立即数值作为源操作数，并且只能以寄存器作为目的。</p>
-<p>所有这些指令都把数据从源(在寄存器或内存中)复制到目的寄存器。MOVZ类中的指令把目的中剩余的字节填充为0，而MOVS类中的指令通过符号扩展来填充，把源操作的最高位进行复制。可以观察到，每条指令名字的最后两个字符都是大小指示符:第一个字符指定源的大小，而第二个指明目的的大小。</p>
-<p><strong>局部变量通常是保存在寄存器中</strong>，而不是内存中。访问寄存器比访问内存要快得多。</p>
-<h2 id="算术和逻辑操作"><a href="#算术和逻辑操作" class="headerlink" title="算术和逻辑操作"></a>算术和逻辑操作</h2><h3 id="加载有效地址"><a href="#加载有效地址" class="headerlink" title="加载有效地址"></a>加载有效地址</h3><p>加载有效地址(load effective address)指令leaq实际上是movq指令的变形。它的指令形式是从内存读数据到寄存器，但实际上它根本就没有引用内存。它的第一个操作数看上去是一个内存引用，但该指令并不是从指定的位置读人数据，而是将有效地址写入到目的操作数。</p>
-<h3 id="二元操作"><a href="#二元操作" class="headerlink" title="二元操作"></a>二元操作</h3><p>二元操作，其中，第二个操作数既是源又是目的。这种语法让人想起C语言中的赋值运算符，例如x-&#x3D;y。不过，要注意，源操作数是第一-个，目的操作数是第二个,对于不可交换操作来说，这看上去很奇特。例如，指令<code>subq %rax,%rdx</code>使寄存器%rdx的值减去%rax中的值。(将指令解读成“从%rdx中减去%rax”会有所帮助。)第一个操作数可以是立即数、寄存器或是内存位置。第二个操作数可以是<strong>寄存器或是内存位置</strong>。注意,当第二个操作数为内存地址(如果是寄存器地址加操作数格式则表示内存位置)时，处理器必须从内存读出值，执行操作，再把结果写回内存。</p>
-<p>通常，编译器产生的代码中，会用一个寄存器存放多个程序值，还会在寄存器之间传送程序值。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xorq %rdx, %rdx</span><br></pre></td></tr></table></figure>
-
-<p>但是在产生这段汇编代码的 C 代码中，并没有出现 EXCLUSIVE-OR 操作。</p>
-<p>A. 解释这条特殊的 EXCLUSIVE-OR 指令的效果，它实现了什么有用的操作。</p>
-<p>B. 更直接地表达这个操作的汇编代码是什么？</p>
-<p>C. 比较同样一个操作的两种不同实现的编码字节长度。</p>
-<blockquote>
-<p>A. 这个指令用来将寄存器 % rdx 设置为 0，运用了对任意 x，x^x&#x3D;0 这一属性。它对应于 C 语句 x&#x3D;0 。</p>
-<p>B. 将寄存器 % rdx 设置为 0 的更直接的方法是用指令 movq $0, % rdx 。</p>
-<p>C. 汇编和反汇编这段代码，我们发现使用 xorq 的版本只需要 3 个字节，而使用 movq 的版本需要 7 个字节。其他将 % rdx 设置为 0 的方法都依赖于这样一个属性，即任何更新低位 4 字节的指令都会把高位字节设置为 0 。因此，我们可以使用 xorl % edx, % edx（2 字节）或 movl $0, % edx（5 字节）。</p>
-</blockquote>
-<h3 id="特殊的算术操作"><a href="#特殊的算术操作" class="headerlink" title="特殊的算术操作"></a>特殊的算术操作</h3><p>此外，x86-64 指令集还提供了两条不同的“单操作数”乘法指令，以计算两个64位值的全128位乘积——一个是无符号数乘法(mulq)，而另一个是补码乘法(imulq)。这两条指令都要求一个参数必须在寄存器%rax中，而另一个作为指令的源操作数给出。然后乘积存放在寄存器%rdx(高64位)和%rax(低64位)中。虽然imulq这个名字可以用于两个不同的乘法操作，但是汇编器能够通过计算操作数的数目，分辨出想用哪条指令。</p>
-<p>有符号除法指令idivl将寄存器%rdx(高64位)和%rax(低64位)中的128位数作为被除数，而除数作为指令的操作数给出。指令将商存储在寄存器%rax中，将余数存储在寄存器%rdx中。</p>
-<p>对于大多数64位除法应用来说，除数也常常是一个64位的值。这个值应该存放在%rax中，%rdx的位应该设置为全0(无符号运算)或者%rax的符号位(有符号运算)。后面这个操作可以用指令cqto来完成。这条指令不需要操作数—它隐含读出%rax的符号位，并将它复制到%rdx的所有位。即汇编代码中除法前一行就是cqto.</p>
-<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>为了提高空间和时间效率，x86-64过程只分配自己所需要的栈帧部分。例如，许多过程有6个或者更少的参数，那么所有的参数都可以通过寄存器传递。因此，某些栈帧部分可以省略。实际上，许多函数甚至根本不需要栈帧。当所有的局部变量都可以保存在寄存器中，而且该函数不会调用任何其他函数(有时称之为叶子过程，此时把过程调用看做树结构)时，就可以这样处理。</p>
-<p>x86-64 中，可以通过寄存器最多传递6个整型(例如整数和指针)参数。寄存器的使用是有特殊顺序的，寄存器使用的名字取决于要传递的数据类型的大小，如果一个函数有大于6个整型参数，超出6个的部分就要通过栈来传递。</p>
-<p>T2（callq）是子程序调用指令，这条指令会：</p>
-<ol>
-<li>调整栈寄存器 (%rsp-8 -&gt; %rsp）</li>
-<li>把下一条指令的地址放到栈里（0x40054e-&gt;*%rsp)</li>
-<li>以上两步简单来说就是把下一条指令的地址入栈（push）</li>
-<li>然后子程序的地址（0x400540）加载至rip</li>
-</ol>
-<p>然后子程序开始执行。子程序以retq结束会执行出栈（pop）操作：</p>
-<ol>
-<li>当前的栈内容放入%rip</li>
-<li>调整栈寄存器（%rsp+8 -&gt; %rsp）</li>
-</ol>
-<p>程序从0x40054e继续执行（之前入栈的地址）<strong>栈区的地址分配是从内存的高地址开始向低地址分配；</strong></p>
-<h3 id="栈上的局部存储"><a href="#栈上的局部存储" class="headerlink" title="栈上的局部存储"></a>栈上的局部存储</h3><p>到目前为止我们看到的大多数过程示例都不需要超出寄存器大小的本地存储区域。不过有些时候，局部数据必须存放在内存中，常见的情况包括:</p>
-<ul>
-<li>寄存器不足够存放所有的本地数据。</li>
-<li>对一个局部变量使用地址运算符‘&amp;’，因此必须能够为它产生一个地址（用leaq指令生成到这些位置的指针）。</li>
-<li>某些局部变量是数组或结构，因此必须能够通过数组或结构引用被访问到。在描述数组和结构分配时，我们会讨论这个问题。</li>
-</ul>
-<p>一般来说，过程通过减小栈指针在栈上分配空间。分配的结果作为栈帧的一部分，标号为“局部变量”。</p>
-<h3 id="寄存器的局部存储空间"><a href="#寄存器的局部存储空间" class="headerlink" title="寄存器的局部存储空间"></a>寄存器的局部存储空间</h3><p>根据惯例，寄存器rbx、%rbp和%r12～%r15被划分为被调用者保存寄存器。当过程P调用过程Q时，Q必须保存这些寄存器的值，保证它们的值在Q返回到P时与Q被调用时是一样的。过程Q保存一个寄存器的值不变，要么就是根本不去改变它，要么就是把原始值压入栈中，改变寄存器的值，然后在返回前从栈中弹出旧值。压人寄存器的值会在栈帧中创建标号为“保存的寄存器”的一部分。有了这条惯例，P的代码就能安全地把值存在被调用者保存寄存器中(当然，要先把之前的值保存到栈上)，调用Q,然后继续使用寄存器中的值,不用担心值被破坏。</p>
-<h2 id="异数的数据结构"><a href="#异数的数据结构" class="headerlink" title="异数的数据结构"></a>异数的数据结构</h2><h3 id="联合"><a href="#联合" class="headerlink" title="联合"></a>联合</h3><p>还可以观察到，一个联合的总的大小等于它最大字段的大小。<br>在一些下上文中，联合十分有用。但是，它也能引起一些讨厌的错误，因为它们绕过了C语言类型系统提供的安全措施。一种应用情况是，我们事先知道对一个数据结构中的两个不同字段的使用是互斥的，那么将这两个字段声明为联合的一部分，而不是结构的一部分，会减小分配空间的总量。</p>
-<p>开始的跳转表的汇编代码声明在第2行包含下面这样的命令:<br>.align 8<br>这就保证了它后面的数据(在此，是跳转表的开始)的起始地址是8的倍数。因为每个表项长8个字节，后面的元素都会遵守8字节对齐的限制。</p>
-<h2 id="在机器级程序中将控制与数据结合起来"><a href="#在机器级程序中将控制与数据结合起来" class="headerlink" title="在机器级程序中将控制与数据结合起来"></a>在机器级程序中将控制与数据结合起来</h2><h3 id="理解指针"><a href="#理解指针" class="headerlink" title="理解指针"></a>理解指针</h3><p>leaq指令是设计用来计算内存引用的地址的，&amp;运算符的机器代码实现常常用这条指令来计算表达式的值。</p>
-<h3 id="GDB命令"><a href="#GDB命令" class="headerlink" title="GDB命令"></a>GDB命令</h3><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" alt="image-20230524151520753"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" class title="This is an test image">
-
-<p>GDB的命令语法有点晦涩，但是在线帮助信息(用GDB的 help命令调用)能克服这些毛病。相对于使用命令行接口来访问GDB，许多程序员更愿意使用DDD，它是 GDB的一个扩展，提供了图形用户界面。</p>
-<h3 id="内存越界引用和缓冲区溢出"><a href="#内存越界引用和缓冲区溢出" class="headerlink" title="内存越界引用和缓冲区溢出"></a>内存越界引用和缓冲区溢出</h3><p>更好一点的版本是使用fgets函数，它包括一个参数，限制<strong>待读入的最大字节数</strong>。通常，使用gets或其他任何能导致存储溢出的函数，都是不好的编程习惯。不幸的是，很多常用的库函数，包括strcpy、strcat和 sprintf都有一个属性——不需要告诉它们目标缓冲区的大小，就产生一个字节序列[97]。超过待读入最大字节数就可能发生错误，这样的情况就会导致缓冲区溢出漏洞。</p>
-<p>如在栈上分配了24个字节，待读入最大字节为8</p>
-<p>echo执行时栈的组织。该程序把栈指针减去了24，在栈上分配了24个字节。字符数组buf位于栈顶，可以看到,%rsp被复制到%rdi作为调用gets和puts 的参数。这个调用的参数和存储的返回指针之间的16字节是未被使用的。只要用户输人不超过7个字符，gets返回的字符串(包括结尾的null)就能够放进为buf分配的空间里。不过，长一些的字符串就会导致gets覆盖栈上存储的某些信息。随着字符串变长，下面的信息会被破坏:</p>
-<p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" alt="image-20230525102612348"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" class title="This is an test image">
-
-<h2 id="浮点代码"><a href="#浮点代码" class="headerlink" title="浮点代码"></a>浮点代码</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230527153556717.png" alt="image-20230527153556717"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230527153556717.png" class title="This is an test image">
-
-<p>在x86-64 中，XMM寄存器用来向函数传递浮点参数，以及从函数返回浮点值。如图3-45所示，可以看到如下规则:</p>
-<ul>
-<li>XMM寄存器%xmm0～%xmm7最多可以传递8个浮点参数。按照参数列出的顺序使用这些寄存器。可以通过栈传递额外的浮点参数。</li>
-<li>函数使用寄存器%xmm0来返回浮点值。</li>
-<li>所有的XMM寄存器都是调用者保存的。被调用者可以不用保存就覆盖这些寄存器中任意一个。</li>
-</ul>
-<p>当函数包含指针、整数和浮点数混合的参数时，指针和整数通过通用寄存器传递，而浮点值通过XMM寄存器传递。也就是说，参数到寄存器的映射取决于它们的类型和排列的顺序。下面是一些例子:<br><code>double f1(int x,double y, long z);</code><br>这个函数会把x存放在% edi中，y放在%xmm0中，而z放在%rsi中。<br><code>double f2(double y, int x，long z);</code><br>这个函数的寄存器分配与函数f1相同。<br><code>double f1(float x, double *y，long*z);</code><br>这个函数会将x放在%xmm0中，y放在%rdi中，而z放在%rsi中。</p>
-<h3 id="定义和使用浮点常数"><a href="#定义和使用浮点常数" class="headerlink" title="定义和使用浮点常数"></a>定义和使用浮点常数</h3><p>和整数运算操作不同，AVX浮点操作不能以立即数值作为操作数。相反，编译器必须为所有的常量值分配和初始化存储空间。然后代码在把这些值从内存读人。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解计算机系统</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-05 16:12:22" itemprop="dateCreated datePublished" datetime="2023-05-05T16:12:22+08:00">2023-05-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-11 17:40:00" itemprop="dateModified" datetime="2023-05-11T17:40:00+08:00">2023-05-11</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="第2章-信息的表示和处理"><a href="#第2章-信息的表示和处理" class="headerlink" title="第2章 信息的表示和处理"></a>第2章 信息的表示和处理</h1><h4 id="文字编码的Unicode标准"><a href="#文字编码的Unicode标准" class="headerlink" title="文字编码的Unicode标准"></a>文字编码的Unicode标准</h4><p>基本编码，称为Unicode的“统一字符集”，使用32位来表示字符。这好像要求文本串中每个字符要占用4个字节。不过，可以有一些替代编码，常见的字符只需要1个或2个字节，而不太常用的字符需要多一些的字节数。特别地，UTF-8表示将每个字符编码为一个字节序列，<strong>这样标准ASCII字符还是使用和它们在ASCII 中一样的单字节编码</strong>，这也就意味着所有的ASCII字节序列用ASCII码表示和用UTF-8表示是一样的。</p>
-<p>Java编程语言使用Unicode来表示字符串。对于C语言也有支持 Unicode的程序库。</p>
-<p>在使用ASCII码作为字符码的任何系统上都将得到相同的结果，与字节顺序和字大小规则无关。因而，<strong>文本数据比二进制数据具有更强的平台独立性</strong>。</p>
-<p>不同的机器类型使用不同的且不兼容的指令和编码方式。即使是完全一样的进程，运行在不同的操作系统上也会有不同的编码规则，因此二进制代码是不兼容的。二进制代码很少能在不同机器和操作系统组合之间移植。</p>
-<h2 id="c语言的移位运算"><a href="#c语言的移位运算" class="headerlink" title="c语言的移位运算"></a>c语言的移位运算</h2><p>C语言标准并没有明确定义对于有符号数应该使用哪种类型的右移–算术右移或者<strong>逻辑右移</strong>（不管符号均补0）都可以。不幸地，这就意味着任何假设一种或者另一种右移形式的代码都可能会遇到可移植性问题。然而，实际上，几乎所有的编译器&#x2F;机器组合都对有符号数使用<strong>算术右移</strong>（有符号时最高位是1补1），且许多程序员也都假设机器会使用这种右移。另一方面，对于无符号数，右移必须是逻辑的。<br>与C相比，Java对于如何进行右移有明确的定义。表达是x&gt;&gt;k会将x算术右移k个位置，而x&gt;&gt;&gt;k会对x做逻辑右移。</p>
-<h3 id="移动k-位，这里k-很大"><a href="#移动k-位，这里k-很大" class="headerlink" title="移动k 位，这里k 很大"></a>移动k 位，这里k 很大</h3><p>对于一个由w位组成的数据类型，如果要移动k≥w位会得到什么结果呢?例如，计算下面的表达式会得到什么结果，假设数据类型int为w&#x3D;32:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">intlval =OxFEDCBA98&lt;&lt; 32;</span><br><span class="line">intaval =OxFEDCBA98&gt;&gt;36;</span><br><span class="line">unsigned uval =OxFEDCBA98u &gt;&gt;40;</span><br></pre></td></tr></table></figure>
-
-<p>C语言标准很小心地规避了说明在这种情况下该如何做。在许多机器上，当移动一个w位的值时，移位指令只考虑位移量的低 log2 w位，因此实际上位移量就是通过计算k mod w得到的。例如，当w&#x3D;32时，上面三个移位运算分别是移动0、4和8位，得到结果:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lval 0xFEDCBA98</span><br><span class="line">aval 0xFFEDCBA9</span><br><span class="line">uval 0x00FEDCBA</span><br></pre></td></tr></table></figure>
-
-<p>不过这种行为对于C程序来说是没有保证的，所以应该保持位移量小于待移位值的位数。另一方面，Java 特别要求位移数量应该按照我们前面所讲的求模的方法来计算。</p>
-<h2 id="补码编码"><a href="#补码编码" class="headerlink" title="补码编码"></a>补码编码</h2><p>采用补码表示的32位大端法机器（符合习惯，先输出低地址的高位）上输出打印16进制时：是看补码来转换。</p>
-<p>原理:补码编码的定义<br><img src="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
-<p>例如1001（-1）的补码是1111可以根据上面计算-8+7&#x3D;-1</p>
-<p><strong>负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码</strong>。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的</p>
-<p>对于大多数C语言的实现，处理同样字长的有符号数和无符号数之间相互转换的一般规则是:数值可能会改变，但是<strong>位模式不变</strong>。</p>
-<p>无符号表示中的UMax竟有着和补码表示的-1相同的位模式。我们在这两个数之间也能看到这种关系<br>$$<br>:1+UMax_w&#x3D;2^w<br>$$<br>原理:补码转换为无符号数<br>对满足TMin_x≤x≤TMax_w的x有:<br>$$<br>T2U_w(x)&#x3D;\begin{cases} x+2^w,x&lt;0\ x,x&gt;&#x3D;0\end{cases}<br>$$<br>一个无符号数u和与之对应的有符号数U2T_w(u)之间的关系:</p>
-<p>原理:无符号数转换为补码</p>
-<p>对满足0≤u≤UMax _w的u有:<br>$$<br>U2T_w(u)&#x3D;\begin{cases} u-2^w,u&gt;TMax_w\ u,x&lt;&#x3D;TMax_w\end{cases}<br>$$<br>总结一下，我们考虑无符号与补码表示之间互相转换的结果。对于在范围0≤T&lt;TMax_w之内的值x而言，我们得到T2U_w(x)&#x3D;x和U2T_w(x)&#x3D;x。也就是说，在这个范围内的数字有相同的无符号和补码表示。对于这个范围以外的数值，转换需要加上或者减去2^w。例如，我们有<br>$$<br>T2U_w(-1)&#x3D;-1+2^w&#x3D;UMax_w<br>$$<br>—-最靠近0的负数映射为最大的无符号数</p>
-<h2 id="c语言里面TMin不能写成-2147483648的原因"><a href="#c语言里面TMin不能写成-2147483648的原因" class="headerlink" title="c语言里面TMin不能写成-2147483648的原因"></a>c语言里面TMin不能写成-2147483648的原因</h2><p>C语言中，将TMin（32位有符号整数的最小值）写成 <strong>-2147483647-1</strong>，而不是简单地写成 -2147483648 或 0x80000000 。</p>
-<p>可见如果不发生溢出，整型常量的值总是非负数。如果前面<strong>出现符号</strong>，则是对整型常量使用的一元运算符，而不是整型常量的一部分。</p>
-<p>如果将TMin32写成-2147483648并且将代码在一个32位的机器上面编译，当编译器遇到**-X<strong>形式的数值，它首先会确定</strong>X<strong>的数据类型和值，然后取</strong>X**的。</p>
-<p>由于-2147483648超过了int所能够表示的范围，编译器就会再次选择一种可以正确的表示此值的类型。然后它就会按照第一个表格（十进制）的顺序往下继续尝试类型，再假设编译器采用的标准是ISO C90，int-&gt;long-&gt;unsigned，然后就发现unsigned是第一个合适的数据类型。正如我们知道的，2147483648和-2147483648在32位数值上拥有同样的位表示，使得此常量的最终数据类型是unsigned且值为2147483648。这对于16进制的0x80000000也是相同的结果。</p>
-<p>用一句话来解释C语言中TMin32的古怪写法的原因：虽然-2147483648 这个数值能够用int类型(4字节)来表示，但在C语言中却没法写出对应这个数值的int类型常量。</p>
-<h2 id="补码的非"><a href="#补码的非" class="headerlink" title="补码的非"></a>补码的非</h2><p>原理:补码的非<br>对满足TMin_w≤x≤TMax_w 的x，其补码的非-^t_wx由下式给出<br>$$<br>-^t_wx&#x3D;\begin{cases}TMin_w,x&#x3D;TMin_w\-x,x&gt;TMin_w\end{cases}<br>$$<br>此处设w&#x3D;4，用补码可表示的范围就是[-8,7]，对于-8，它的“补码的非”还是-8,而[-7,7]补码的非就是原数的负数，比如说-4的“补码的非”是-4取负，即：4，而3的“补码的非”是3取负，即：-3。这是“补码的非”的定义；注意：“补码的非”并不是把“一个数的补码按位取非”</p>
-<p>TMin_w&#x3D;-2^w-1</p>
-<p>执行位级补码非的第一种方法是对每一位求反，再对结果加1。在C语言中，我们可以说，对于任意整数值x，计算表达式-x和~x+1得到的结果完全一样。</p>
-<h2 id="对TMin-w-x3D-2-w-1的解释"><a href="#对TMin-w-x3D-2-w-1的解释" class="headerlink" title="对TMin_w&#x3D;-2^w-1的解释"></a>对TMin_w&#x3D;-2^w-1的解释</h2><p>如w&#x3D;4的-8&#x3D;1000，可以参考-2为例</p>
-<p>[-2]原 &#x3D; 1 0010    [-2]补 &#x3D; 11110</p>
-<p>如我所说，没有符号位，那么11110就是30，也就是说 -2的补码是30（%2^5）</p>
-<h2 id="补码移位"><a href="#补码移位" class="headerlink" title="补码移位"></a>补码移位</h2><p>移位也是运算，需要将负数的原码变成补码移位</p>
-<p>对无符号运算使用移位是非常简单的，部分原因是由于无符号数的右移一定是逻辑右移（不管最高位符号）。对于x大于等于0的有符号一样逻辑右移。</p>
-<p>负数在执行算术右移之前加上一个适当的偏置量是可以导致结果正确舍入的。</p>
-<p>补码除以2的幂(<strong>右移之前加上一个偏量</strong>，结果就向零舍入了).</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int optarith(int x, int y)</span><br><span class="line">&#123;</span><br><span class="line">    int t = x;</span><br><span class="line">    x &lt;&lt;= 5;</span><br><span class="line">    x -= t;</span><br><span class="line">    if (y &lt; 0)</span><br><span class="line">        y += 7;//加上一个适当的偏置量111,是为了正确右移3位，若右移4位，则加15（1111）</span><br><span class="line">    y &gt;&gt;= 3; /* Arithmetic shift */</span><br><span class="line">    return x + y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="IEEE浮点标准"><a href="#IEEE浮点标准" class="headerlink" title="IEEE浮点标准"></a>IEEE浮点标准</h2><p>IEEE浮点标准用<br>$$<br>V&#x3D;（-1）^s<em>M</em>2^E<br>$$<br> 的形式来表示一个数，符号s，尾数M，阶码E</p>
-<p>C语言中，单精度（float）的s为1b，E为8b，M为23b，双精度（double）的s为1b，E为11b，M为52b。</p>
-<p>阶码的值<strong>E&#x3D;e-Bias</strong>，e是无符号数，Bias为偏置值，等于 2^(k-1)−1 (float为127，double为1023)</p>
-<h3 id="计算-IEEE-754-标准浮点数的真值"><a href="#计算-IEEE-754-标准浮点数的真值" class="headerlink" title="计算 IEEE 754 标准浮点数的真值"></a>计算 IEEE 754 标准浮点数的真值</h3><p>在上述内容的分析之后，再通过观察分析以下这个 IEEE 754 单精度浮点数格式表示的数，系统性了解如何计算出 IEEE 754 标准浮点数的真值：</p>
-<p>1 100 0000 1010 0000 0000 0000 0000 0000<br>上数分别对应图1-1的中 S（符号码，0 正，1 负），E (阶码) ，M (尾数数值)为：</p>
-<p>S (红色部分) ：1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1，表示这个浮点数是个负数；</span><br></pre></td></tr></table></figure>
-
-<p>E (蓝色部分) ：100 0000 1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">100 0000 1，阶码，其真值为 ：移码 - 偏置值 =&gt; 1000 0001 - 0111 1111 = 0000 0010 = 2D；（对应下面的2^2D）</span><br></pre></td></tr></table></figure>
-
-<p>M (黑色部分) ：010 0000 0000 0000 0000 0000</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">010 0000 0000 0000 0000 0000 表示这个浮点数的尾数部分，其真值为：被隐含的最高位1 + 0.尾数部分 =&gt; 1 + 0.01 = 1.01B;</span><br></pre></td></tr></table></figure>
-
-<p>通过对 S，E，M 的分析，我们可以计算出该浮点数的真值，即：</p>
-<p>-1.01B * 2^10B &#x3D; 1.25D （-1.01B）* 2^2D &#x3D; -5.0D</p>
-<hr>
-<p>十进制数12345具有二进制[0011 0000 0011 1001]（0x3039），通过将二进制小数点左移13位，得到这个数的一个规格化表示 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">12345=1.1000000111001_2×2^13 </span><br></pre></td></tr></table></figure>
-
-<p>，为了使用IEEE单精度（float）形式来编码，我们丢弃开头的1，并且在末尾增加10个0（单精度的尾数位23位，13+10&#x3D;23），来构造小数字段，得到二进制[1000000111001<em>0000000000</em>]，为了得到阶码字段，将13加上偏置量127，得到140，二进制表示为[10001100]，加上符号位0，得到12345.0的二进制浮点数[0100 0110 0100 0000 1110 0100 0000 0000]（0x4640E400），比较整数12345（0x3039）和浮点数12345.0（0x4640E400）的位级表示：</p>
-<p>（0x00003039）0000000000000000001<em><strong>1000000111001</strong></em></p>
-<p>（0x4640E400）010001100<em><strong>1000000111001</strong></em>0000000000</p>
-<p>阶码的值E&#x3D;e-Bias,产生指数的取值范围，对于单精度是一126～＋127，而对于双精度是一1022~+1023。</p>
-<h3 id="十进制数转为-IEEE-754-浮点数格式"><a href="#十进制数转为-IEEE-754-浮点数格式" class="headerlink" title="十进制数转为 IEEE 754 浮点数格式"></a>十进制数转为 IEEE 754 浮点数格式</h3><p>同样地再用一个例子 十进制数转为 IEEE 754 浮点数的例子，加深对 十进制数 与 IEEE 754 浮点数之间的转换的理解。</p>
-<p> 例如：将十进制数 -0.75 转为 IEEE 754 的单精度浮点数格式表示，分析过程如下：</p>
-<p>过程A： -0.75D &#x3D; -0.11B &#x3D; -1.1B * 2^(-1B)<br>S：1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-0.75 为负数，故 S 符号码为 1</span><br></pre></td></tr></table></figure>
-
-<p>E：0111 1110</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由 过程A 得，阶码的真值为 -0000 0001(因为是2^(-1B)，与上面例子一致) ，其移码为：-0000 0001 + 0111 1111 = 0111 1110</span><br></pre></td></tr></table></figure>
-
-<p>M：100 0000 0000 0000 0000 0000</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由 过程A 得，尾数码真值为：-1.1，隐含最高位 1 ，取小数部分，得100 0000 0000 0000 0000 0000</span><br></pre></td></tr></table></figure>
-
-<p>最终结果为：</p>
-<p>1 011 1111 0100 0000 0000 0000 0000 0000</p>
-<h2 id="向偶数舍人在大多数现实情况中避免了这种统计偏差。"><a href="#向偶数舍人在大多数现实情况中避免了这种统计偏差。" class="headerlink" title="向偶数舍人在大多数现实情况中避免了这种统计偏差。"></a><strong>向偶数舍人在大多数现实情况中避免了这种统计偏差</strong>。</h2><p>在50%的时间里，它将向上舍人，而在50%的时间里，它将向下舍入。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2048,7 +1843,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">41</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
