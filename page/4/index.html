@@ -147,6 +147,198 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/03/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/03/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c/" class="post-title-link" itemprop="url">第五天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-03 09:24:35" itemprop="dateCreated datePublished" datetime="2023-04-03T09:24:35+08:00">2023-04-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-23 14:50:14" itemprop="dateModified" datetime="2023-07-23T14:50:14+08:00">2023-07-23</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><h3 id="多态的基本概念"><a href="#多态的基本概念" class="headerlink" title="多态的基本概念"></a>多态的基本概念</h3><p>多态是C++面向对象三大特性之一</p>
+<p>多态分为两类:</p>
+<ul>
+<li>静态多态:函数重载和运算符重载属于静态多态，复用函数名</li>
+<li>动态多态:派生类和虚函数实现运行时多态</li>
+</ul>
+<p>静态多态和动态多态区别:</p>
+<ul>
+<li>静态多态的函数地址早绑定–编译阶段确定函数地址</li>
+<li>动态多态的函数地址晚绑定–运行阶段确定函数地址</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;iostream&gt;</span><br><span class="line">#include &lt;windows.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">class Animal</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	// Speak函数就是虚函数</span><br><span class="line">	//函数前面加上virtual关键字，变成虚函数，那么编译器在编译的时候就不能确定函数调用了。</span><br><span class="line">	//vfptr-虚函教（表）指针</span><br><span class="line">	//v- virtual</span><br><span class="line">	//f - function</span><br><span class="line">	//ptr - pointer</span><br><span class="line">	virtual void speak()&#123;</span><br><span class="line">		cout &lt;&lt; &quot;动物在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">class Cat :public Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	void speak()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;小猫在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;	</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line">class Dog :public Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	void speak( )&#123;</span><br><span class="line">		cout &lt;&lt;&quot;小狗在说话&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//我们希望传入什么对象，那么就调用什么对象的函数</span><br><span class="line">//如果函数地址在编译阶段就能确定，那么静态联编</span><br><span class="line">//如果函数地址在运行阶段才能确定，就是动态联编</span><br><span class="line"></span><br><span class="line">void DoSpeak( Animal &amp; animal)&#123;//Animal &amp; animal=cat;引用指向子类对象,如果没有virtual，则编译阶段就确定函数调用Animal了，则不能实现动态调用了</span><br><span class="line">	animal.speak( );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//多态满足条件:</span><br><span class="line">//1、有继承关系</span><br><span class="line">//2、子类重写父类中的虚函数，这里就是speak函数</span><br><span class="line">//多态使用:</span><br><span class="line">//父类指针或引用指向子类对象</span><br><span class="line">void test01()&#123;</span><br><span class="line">	Cat cat;</span><br><span class="line">	DoSpeak(cat);//用引用也可以。引用不用手动释放内存。指针不用实例化对象。各有优劣,即引用时不能写成	//DoSpeak(new Cat);</span><br><span class="line">	Dog dog;</span><br><span class="line">	DoSpeak( dog);</span><br><span class="line">&#125;</span><br><span class="line">int main() &#123;</span><br><span class="line">    SetConsoleOutputCP(65001);</span><br><span class="line">	test01();</span><br><span class="line">	//test02();</span><br><span class="line">	system( &quot;pause&quot; );</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<p>多态满足条件</p>
+<ul>
+<li>有继承关系</li>
+<li>子类<strong>重写</strong>父类中的虚函数</li>
+</ul>
+<p>多态信用条件</p>
+<ul>
+<li>父类指针或引用指向子类对象</li>
+</ul>
+<p>重写:函数返回值类型	函数名	参数列表	完全—致称为重写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//重写	函数返回值类型	函数名参	数列表完全相同</span><br><span class="line">virtual void speak ()</span><br><span class="line">&#123;</span><br><span class="line">	cout&lt;&lt;”小猫在说话”&lt;&lt; endl:</span><br><span class="line">&#125;</span><br><span class="line">当子类重写父类的虚函数</span><br><span class="line">这里不是子类中的虚函数表内部会替换成子类的虚函数地址，而是添加，因为替换的话，子类的虚函数就会丢失父类的虚函数地址，但实际上子类的虚函数表中同时有父类的虚函数地址和它自己的虚函数地址，通过使用方式不同，如利用父类指针或引用指向子类这种方式，来区分到底是使用子类虚数表里两个虚数表中的哪一个</span><br></pre></td></tr></table></figure>
+
+<h3 id="多态案例一-计算器类"><a href="#多态案例一-计算器类" class="headerlink" title="多态案例一-计算器类"></a>多态案例一-计算器类</h3><p>案例描述:</p>
+<p>分别利用普通写法和多态技术，设计实现两个操作数进行运算的计算器类</p>
+<p>多态的优点:</p>
+<ul>
+<li>代码组织结构清晰。可读性强</li>
+<li>利于前期和后期的扩展以及维护</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">//普通实现</span><br><span class="line">class calculator &#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult( string oper)&#123;</span><br><span class="line">		if (oper == &quot;+&quot;) &#123;</span><br><span class="line">			return m_Num1 + m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (oper == &quot;-&quot;) &#123;</span><br><span class="line">			return m_Num1 - m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (oper ==“*&quot;)&#123;</span><br><span class="line">			return m_Num1 *m_Num2;</span><br><span class="line">		&#125;</span><br><span class="line">	//如果要提供新的运算，需要修改源码</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_Num1;</span><br><span class="line">	int m_Num2;</span><br><span class="line">&#125;;</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	//普通实现测试</span><br><span class="line">	Calculator c;</span><br><span class="line">	c.m_Num1 = 10;</span><br><span class="line">	c.m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; c.m_Num1 &lt;&lt; &quot; + &quot; &lt;&lt; c.m_Num2&lt;&lt; &quot; - &quot; &lt;&lt; c.getResult(&quot;+&quot;) &lt;&lt; endl;</span><br><span class="line">	cout &lt; c.m_Num1 &lt;&lt; &quot; . &quot; &lt;&lt; c.m_Num2&lt;&lt; &quot; = &quot; &lt;&lt; c.getResult(&quot;-&quot;) &lt;&lt; endl;</span><br><span class="line">	cout &lt; c.m_Num1 &lt;&lt;”*&quot; &lt;&lt; c.m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; c.getResult(&quot;*&quot;) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">//多态实现</span><br><span class="line">//抽象计算器类</span><br><span class="line">//多态优点:代码组织结构清晰，可读性强，利于前期和后期的扩展以及维护</span><br><span class="line">class Abstractcalculator</span><br><span class="line">&#123;</span><br><span class="line">public :</span><br><span class="line">	virtual int getResult()&#123;</span><br><span class="line">		return 0;</span><br><span class="line">	&#125;</span><br><span class="line">		int m_Num1;</span><br><span class="line">		int m_Num2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//加法计算器</span><br><span class="line">class Addcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 + m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//减法计算器</span><br><span class="line">class Subcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 - m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//乘法计算器</span><br><span class="line">class Mulcalculator :public Abstractcalculator&#123;</span><br><span class="line">public:</span><br><span class="line">	int getResult()&#123;</span><br><span class="line">		return m_Num1 * m_Num2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void teste2()&#123;</span><br><span class="line">	//创建加法计算器</span><br><span class="line">	Abstractcalculator *abc = new Addcalculator;//多态使用:</span><br><span class="line">	//父类指针或引用指向子类对象,这里是父类指针指向子类对象</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt; abc-&gt;m_Num1 &lt;&lt; &quot; + &quot; &lt;&lt; abc-&gt;m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;//用完了记得销毁</span><br><span class="line">	//创建减法计算器</span><br><span class="line">	abc = new Subcalculator;</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; abc-&gt;m_Num1 &lt;&lt; &quot; -&quot; &lt;&lt; abc-&gt;m_Num2 &lt;&lt; &quot; = &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;</span><br><span class="line">	//创建乘法计算器</span><br><span class="line">	abc = new MulCalculator;</span><br><span class="line">	abc-&gt;m_Num1 = 10;</span><br><span class="line">	abc-&gt;m_Num2 = 10;</span><br><span class="line">	cout &lt;&lt; abc-&gt;m_Num1 &lt;&lt;&quot; * &quot; &lt;&lt; abc-&gt;m_Num2 〈&lt; &quot; - &quot; &lt;&lt; abc-&gt;getResult() &lt;&lt; endl;</span><br><span class="line">	delete abc;</span><br><span class="line">	&#125; </span><br></pre></td></tr></table></figure>
+
+<p>总结:C++开发提倡利用多态设计程序架构，因为多态优点很多</p>
+<h3 id="纯虚函数和抽象类"><a href="#纯虚函数和抽象类" class="headerlink" title="纯虚函数和抽象类"></a>纯虚函数和抽象类</h3><p>在多态中，通常父类中虚函数的实现是毫无意义的，主要都是调用子类重写的内容</p>
+<p>因此可以将虚函数改为纯虚函数</p>
+<p>纯虚函数语法:virtual 	返回值类型	函数名	(参数列表)&#x3D; 0;</p>
+<p>当类中有了纯虚函数，这个类也称为<strong>抽象类</strong></p>
+<p>抽象类特点:</p>
+<ul>
+<li>无法实例化对象</li>
+<li>子类必须重写抽象类中的纯虚函数，否则也属于抽象类</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class Base&#123;</span><br><span class="line">public:</span><br><span class="line">	//纯虚函数</span><br><span class="line">	//类中只要有一个纯虚函数就称为抽象类</span><br><span class="line">	//抽象类无法实例化对象,但是能定义一个指向该类的指针</span><br><span class="line">	//子类必须重写父类中的纯虚函数，否则也属于抽象类</span><br><span class="line">	virtual void func() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">class Son :public Base&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void func()&#123;</span><br><span class="line">		cout &lt;&lt; &quot;func调用&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	Base * base = NULL;</span><br><span class="line">	// base = new Base; </span><br><span class="line">	//错误，抽象类无法实例化对象</span><br><span class="line">	base = new Son;</span><br><span class="line">	base-&gt;func( );</span><br><span class="line">	delete base; //记得销毁</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="虚析构和纯虚析构"><a href="#虚析构和纯虚析构" class="headerlink" title="虚析构和纯虚析构"></a>虚析构和纯虚析构</h3><p>多态使用时，如果子类中有属性开辟到堆区，那么父类指针在释放时无法调用到子类的析构代码</p>
+<p>解决方式:将父类中的析构函数改为<strong>虚析构</strong>或者纯虚析构</p>
+<p>虚析构和纯虚析构共性:</p>
+<ul>
+<li>可以解决父类指针释放子类对象</li>
+<li>都需要有具体的函数实现</li>
+</ul>
+<p>虚析构和纯虚析构区别:</p>
+<ul>
+<li>如果是纯虚析构，该类属于抽象类，无法实例化对象</li>
+</ul>
+<p>在基类析构函数声明为virtual的时候，delete基类指针，会先调用派生类的析构函数，再调用基类的析构函数。在基类析构函数没有声明为virtual的时候，delete基类指针，只会调用基类的析构函数，而不会调用派生类的析构函数，这样会造成销毁对象的不完全。</p>
+<p>虚析构语法:</p>
+<p><code>virtual ~类名( )&#123;&#125;</code></p>
+<p>纯虚析构语法:</p>
+<p><code>virtual	~类名()= 0;</code></p>
+<p><code>类名::~类名()&#123;&#125;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">class Animal &#123;</span><br><span class="line">public:</span><br><span class="line">	Animal()&#123;</span><br><span class="line">	cout &lt;&lt; &quot;Animal构造函数调用!&quot; &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Speak() = 0;</span><br><span class="line">	//析构函数加上virtual关键字，变成虚析构函数</span><br><span class="line">	//virtual ~Animal()</span><br><span class="line">	//&#123;</span><br><span class="line">	//cout &lt;&lt; &quot;Animal虚析构函数调用! &quot;&lt;&lt;endl;</span><br><span class="line">    //&#125;</span><br><span class="line">	virtual ~Animal() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">Animal : :~Animal()&#123;</span><br><span class="line">	cout &lt;&lt;&quot;Animal纯虚析构函数调用!&quot; &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">//和包含普通纯虚函数的类一样，包含了纯虚析构函数的类也是一个抽象类。不能够被实例化。</span><br><span class="line">class Cat : public Animal &#123;</span><br><span class="line">public:</span><br><span class="line">	Cat(string name)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;cat构造函数调用!&quot; &lt;&lt;endl;</span><br><span class="line">		m_Name = new string( name);</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Speak()&#123;</span><br><span class="line">		cout &lt;&lt; *m_Name &lt;&lt;&quot;小猫在说话!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	~Cat()</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;cat析构函数调用!&quot;&lt;&lt; endl;</span><br><span class="line">		if (this-&gt;m_Name != NULL)&#123;</span><br><span class="line">		delete m_Name;</span><br><span class="line">		m_Name = NULL;//置空是为了防止出现野指针</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	string *m_Name;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	Animal *animal = new Cat( &quot;Tom&quot; ) ;</span><br><span class="line">	animal-&gt;Speak();</span><br><span class="line">	//通过父类指针去释放，会导致子类对象可能清理不干净，造成内存泄漏</span><br><span class="line">	//怎么解决?给基类增加一个虚析构函数</span><br><span class="line">	//虚析构函数就是用来解决通过父类指针释放子类对象</span><br><span class="line">	delete animal;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结：</p>
+<p>1.虚析构或纯虚析构就是用来解决通过父类指针释放子类对象</p>
+<p>2.如果子类中没有堆区数据，可以不写为虚析构或纯虚析构</p>
+<p>3.拥有纯虚析构函数的类也属于抽象类</p>
+<p>抽象类不能实例化,但是能定义一个指向该类的指针</p>
+<h1 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h1><p>程序运行时产生的数据都属于临时数据，程序—旦运行结束都会被释放通过文件可以将数据持久化</p>
+<p>C++中对文件操作需要包含头文件&lt; fstream &gt;</p>
+<p>文件类型分为两种:</p>
+<p>1.文本文件-文件以文本的ASCII码形式存储在计算机中</p>
+<p>2.二进制文件-文件以文本的二进制形式存储在计算机中，用户一般不能直接读懂它们</p>
+<p>操作文件的三大类:</p>
+<ul>
+<li>ofstream:写操作</li>
+<li>ifstream:读操作</li>
+<li>fstream :读写操作</li>
+</ul>
+<h3 id="写文件步骤如下"><a href="#写文件步骤如下" class="headerlink" title="写文件步骤如下:"></a>写文件步骤如下:</h3><p>1.包含头文件</p>
+<p>#include <fstream></fstream></p>
+<p>2.创建流对象<br>ofstream ofs;&#x2F;&#x2F;读文件则为ifstream ofs</p>
+<p>3.打开文件<br>ofs.open(“文件路径”,打开方式);&#x2F;&#x2F;读文件则为ifs.open(“文件路径”,打开方式)</p>
+<p>4.写数据</p>
+<p>ofs &lt;&lt;”写入的数据”;</p>
+<p>5.关闭文件</p>
+<p>ofs.close();&#x2F;&#x2F;读文件则为ifs.close()</p>
+<p>文件打开方式:</p>
+<table>
+<thead>
+<tr>
+<th>打开方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ios:in</td>
+<td>为读文件而打开文件</td>
+</tr>
+<tr>
+<td>ios::out</td>
+<td>为写文件而打开文件</td>
+</tr>
+<tr>
+<td>ios:.ate</td>
+<td>初始位置:文件尾</td>
+</tr>
+<tr>
+<td>ios:.app</td>
+<td>追加方式写文件</td>
+</tr>
+<tr>
+<td>ios:trunc</td>
+<td>如果文件存在先删除，再创建</td>
+</tr>
+<tr>
+<td>ios:binary</td>
+<td>二进制方式</td>
+</tr>
+</tbody></table>
+<p>注意:文件打开方式可以配合使用，利用|操作符</p>
+<p>例如:用二进制方式写文件<code>ios ::binary | ios:: out</code></p>
+<h3 id="读文件步骤如下"><a href="#读文件步骤如下" class="headerlink" title="读文件步骤如下:"></a>读文件步骤如下:</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">ifs.open(&quot;test.txt&quot;, ios ::in);</span><br><span class="line">if ( !ifs.is_open())</span><br><span class="line">&#123;</span><br><span class="line">	cout &lt;&lt;&quot;文件打开失败”&lt;&lt; endl;</span><br><span class="line">	return;</span><br><span class="line">&#125;</span><br><span class="line">//第—种方式</span><br><span class="line">//char buf[1024] =&#123; 0 &#125;;</span><br><span class="line">// while (ifs &gt;&gt; buf)</span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;</span><br><span class="line">	//&#125;</span><br><span class="line">//第二种</span><br><span class="line">//char buf[ 1024] - &#123; 0 &#125;;</span><br><span class="line">// while (ifs.getline(buf,sizeof( buf) )); </span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;	</span><br><span class="line">//&#125;</span><br><span class="line">//第三种</span><br><span class="line">//string buf;</span><br><span class="line">// while (getline(ifs, buf )) </span><br><span class="line">//&#123;</span><br><span class="line">	//cout &lt;&lt; buf &lt;&lt; endl;</span><br><span class="line">// &#125;</span><br><span class="line">char c;</span><br><span class="line">while ((c = ifs.get()) !=EOF)&#123;//EOF end of file</span><br><span class="line">	cout &lt;&lt; c;</span><br><span class="line">&#125;</span><br><span class="line">ifs.close();</span><br></pre></td></tr></table></figure>
+
+<p>在 C++ 中，ifstream 是用于从文件中读取数据的输入流对象。它通过空格字符（空格符、制表符、换行符等）来分隔输入数据。在默认情况下，每次读取一定数量的字符（通常是一个单词或一行），直到遇到空格字符或换行为止。如果需要，可以使用 getline 函数来读取整行数据，而不是只读取到第一个空格字符。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/02/c%E5%92%8Cc++/%E7%AC%AC%E5%9B%9B%E5%A4%A9-c/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -178,7 +370,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-14 18:01:56" itemprop="dateModified" datetime="2023-07-14T18:01:56+08:00">2023-07-14</time>
+                <time title="修改时间：2023-07-25 22:36:57" itemprop="dateModified" datetime="2023-07-25T22:36:57+08:00">2023-07-25</time>
               </span>
 
           
@@ -242,6 +434,13 @@
 <h3 id="加号运算符重载"><a href="#加号运算符重载" class="headerlink" title="加号运算符重载"></a>加号运算符重载</h3><p>作用:实现两个自定义数据类型相加的运算</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">class Person &#123;</span><br><span class="line">public:</span><br><span class="line">	person()&#123;&#125;;</span><br><span class="line">	person(int a, int b)</span><br><span class="line">	&#123;</span><br><span class="line">		this-&gt;m_A = a;</span><br><span class="line">		this-&gt;m_B = b;</span><br><span class="line">	&#125;</span><br><span class="line">	//成员函数实现＋号运算符重载</span><br><span class="line">	Person operator+( const Person&amp; p)&#123;</span><br><span class="line">		Person temp;</span><br><span class="line">		temp.m_A = this-&gt;m_A + p.m_A;</span><br><span class="line">		temp.m_B = this-&gt;m_B + p.m_B;</span><br><span class="line">		return temp;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_A;</span><br><span class="line">	int m_B;</span><br><span class="line">&#125;</span><br><span class="line">//全局函数实现+号运算符重载 </span><br><span class="line">//Person operator+( const Person &amp;p1, const Person &amp;p2)&#123;</span><br><span class="line">//	Person temp(0，0);</span><br><span class="line">//	temp.m_A = p1.m_A + p2.m_A;</span><br><span class="line">//	temp.m_B = p1.m_B +p2.m_B;</span><br><span class="line">//&#125;</span><br><span class="line">//运算符重载可以发生函数重载</span><br><span class="line">Person operator+(const Person&amp; p2， int val)</span><br><span class="line">&#123;</span><br><span class="line">	Person temp;</span><br><span class="line">	temp.m_A = p2.m_A + val;</span><br><span class="line">	temp.m_B = p2.m_B + val;</span><br><span class="line">	return temp;</span><br><span class="line">&#125;</span><br><span class="line">void test()</span><br><span class="line">&#123;</span><br><span class="line">	Person p1(10，10);</span><br><span class="line">	Person p2(20，20);</span><br><span class="line">	//成员函数方式</span><br><span class="line">	Person p3 = p2 +p1;//相当于p2.operaor+(p1)</span><br><span class="line">	cout &lt;&lt; &quot;mA: &quot; &lt;&lt;p3.m_A &lt;&lt; &quot; mB: &quot; &lt;&lt; p3.m_B &lt;&lt; endl;</span><br><span class="line">	Person p4 = p3 +10;//相当于operator+(p3,10)</span><br><span class="line">	cout &lt;&lt;“mA: &quot; &lt;&lt;p4.m_A &lt;&lt; &quot; mB : &quot;&lt;&lt; p4.m_B &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<ul>
+<li>创建了两个 <code>Person</code> 对象 <code>p1</code> 和 <code>p2</code>，分别初始化 <code>m_A</code> 和 <code>m_B</code> 的值。</li>
+<li>使用成员函数方式重载的 <code>+</code> 运算符，将 <code>p1</code> 加到 <code>p2</code> 上，得到结果 <code>p3</code>，其中 <code>p3.m_A = p2.m_A + p1.m_A = 20 + 10 = 30</code>，<code>p3.m_B = p2.m_B + p1.m_B = 20 + 10 = 30</code>。</li>
+<li>输出 <code>p3</code> 的结果，即 <code>mA: 30 mB: 30</code>。</li>
+<li>使用全局函数方式重载的 <code>+</code> 运算符，将 <code>p3</code> 加上整数 <code>10</code>，得到结果 <code>p4</code>，其中 <code>p4.m_A = p3.m_A + 10 = 30 + 10 = 40</code>，<code>p4.m_B = p3.m_B + 10 = 30 + 10 = 40</code>。</li>
+<li>输出 <code>p4</code> 的结果，即 <code>mA: 40 mB : 40</code>。</li>
+</ul>
 <p>总结1:对于内置的数据类型的表达式的的运算符是不可能改变的</p>
 <p>总结2:不要滥用运算符重载</p>
 <h3 id="左移运算符重载"><a href="#左移运算符重载" class="headerlink" title="左移运算符重载"></a>左移运算符重载</h3><p>作用:可以输出自定义数据类型</p>
@@ -285,10 +484,10 @@
 <h3 id="继承中的对象模型"><a href="#继承中的对象模型" class="headerlink" title="继承中的对象模型"></a>继承中的对象模型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class Base&#123;</span><br><span class="line">public:</span><br><span class="line">	int m_A;</span><br><span class="line">protected:</span><br><span class="line">	int m_B;</span><br><span class="line">private:</span><br><span class="line">	int m_c; //私有成员只是被隐藏了，但是还是会继承下去</span><br><span class="line">&#125;;</span><br><span class="line">//公共继承</span><br><span class="line">class Son :public Base&#123;</span><br><span class="line">public:</span><br><span class="line">	int m_D;</span><br><span class="line">&#125;;</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	cout &lt;&lt; &quot;sizeof Son = &quot; &lt;&lt; sizeof(Son)&lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>结论:父类中私有成员也是被子类继承下去了，只是由编译器给隐藏后访问不到</p>
-<h3 id="继承中构造和析构顺序"><a href="#继承中构造和析构顺序" class="headerlink" title="继承中构造和析构顺序"></a>继承中构造和析构顺序</h3><p>子拳继承父类后，当创建子类对象，也会调用父类的构造函数</p>
+<h3 id="继承中构造和析构顺序"><a href="#继承中构造和析构顺序" class="headerlink" title="继承中构造和析构顺序"></a>继承中构造和析构顺序</h3><p>子类继承父类后，当创建子类对象，也会调用父类的构造函数</p>
 <p>问题:父类和子类的构造和析构顺序是谁先谁后?</p>
 <p>总结:继承中先调用父类构造函数，再调用子类构造函数，析构顺序与构造相反</p>
-<h3 id="4-6-5继承同名成员处理方式"><a href="#4-6-5继承同名成员处理方式" class="headerlink" title="4.6.5继承同名成员处理方式"></a>4.6.5继承同名成员处理方式</h3><p>问题:当子类与父类出现同名的成员，如何通过子类对象，访问到子类或父类中同名的数据呢?</p>
+<h3 id="继承同名成员处理方式"><a href="#继承同名成员处理方式" class="headerlink" title="继承同名成员处理方式"></a>继承同名成员处理方式</h3><p>问题:当子类与父类出现同名的成员，如何通过子类对象，访问到子类或父类中同名的数据呢?</p>
 <p>访问子类同名成员直接访问即可</p>
 <p>访问父类同名成员需要加作用域</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">class Base &#123;</span><br><span class="line">public:</span><br><span class="line">	Base()&#123;</span><br><span class="line">		m_A = 100;</span><br><span class="line">	&#125;</span><br><span class="line">	void func()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;Base - func()调用”&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	void func(int a)&#123;</span><br><span class="line">		cout &lt;&lt; &quot;Base - func ( int a)调用&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_A;</span><br><span class="line">&#125;;</span><br><span class="line">class son : public Base &#123;</span><br><span class="line">public:</span><br><span class="line">	son()</span><br><span class="line">	&#123;</span><br><span class="line">		m_A= 200;</span><br><span class="line">	&#125;</span><br><span class="line">//当子类与父类拥有同名的成员函数，子类会隐藏父类中所有版本的同名成员函数</span><br><span class="line">//如果想访问父类中被隐藏的同名成员函数，需要加父类的作用域</span><br><span class="line">	void func()</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; &quot;Son - func()调用&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	int m_A;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	Son s;</span><br><span class="line">	cout &lt;&lt; &quot;Son下的m_A = &quot; &lt;&lt; s.m_A &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;Base下的m_A = &quot; &lt;&lt; s.Base::m_A&lt;&lt; endl;</span><br><span class="line">	s.func();</span><br><span class="line">	s.Base::func();</span><br><span class="line">	s.Base::func(10);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -308,6 +507,15 @@
 <p>多继承可能会引发父类中有同名成员出现，需要加作用域区分</p>
 <p>C++实际开发中不建议用多继承</p>
 <p>总结:多继承中如果父类中出现了同名情况，子类使用时候要加作用域</p>
+<p>在多继承中，派生类对于每个基类的访问级别（即继承方式）会影响成员的可访问性。C++ 中有三种基本的继承方式：<code>public</code>、<code>protected</code> 和 <code>private</code>。</p>
+<ol>
+<li><p><code>public</code> 继承：当派生类以 <code>public</code> 方式继承基类时，基类的公有成员仍然保持公有性，基类的保护成员仍然保持保护性，但对于外部代码来说，它们都通过派生类对象可直接访问。继承方式对于派生类内部和派生类外部的代码是一样的。基类的私有成员无法访问</p>
+</li>
+<li><p><code>protected</code> 继承：当派生类以 <code>protected</code> 方式继承基类时，基类的公有成员将变为派生类的受保护成员，无法通过派生类对象直接访问。而基类的保护成员仍然保持保护性，只能在派生类内部访问。这意味着，派生类的成员函数可以访问基类的保护成员，但派生类对象不能。基类的私有成员无法访问</p>
+</li>
+<li><p><code>private</code> 继承：当派生类以 <code>private</code> 方式继承基类时，基类的公有和保护成员都将变为派生类的私有成员，基类的私有成员无法访问，无法通过派生类对象直接访问。这意味着，派生类的成员函数可以访问基类的成员，但派生类对象不能。</p>
+</li>
+</ol>
 <h3 id="菱形继承"><a href="#菱形继承" class="headerlink" title="菱形继承"></a>菱形继承</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	int m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//继承前加virtual关键字后，变为虚继承//此时公共的父类Animal称为虚基类</span><br><span class="line">class sheep : virtual public Animal&#123;&#125;;</span><br><span class="line">class Tuo: virtual public Animal &#123;&#125;;</span><br><span class="line">class SheepTuo : public Sheep，public Tuo &#123;&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	sheepTuo st;</span><br><span class="line">	st.Sheep::m_Age = 100;</span><br><span class="line">	st.Tuo::m_Age = 200;//指向的是一样的地址，第二个是后改变的，用后面的数据</span><br><span class="line">	cout &lt;&lt; &quot;st.Sheep::m_Age = &quot;&lt;&lt; st.sheep:: m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.Tuo : :m_Age = &quot;&lt;&lt;st.Tuo::m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.m_Age =&quot; &lt;&lt; st.m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>总结:<br>菱形继承带来的主要问题是子类继承两份相同的数据，导致资源浪费以及毫无意义</p>
@@ -1521,221 +1729,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/19/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/19/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第五天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-03-19 14:49:49 / 修改时间：21:38:08" itemprop="dateCreated datePublished" datetime="2023-03-19T14:49:49+08:00">2023-03-19</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-共用体"><a href="#C-共用体" class="headerlink" title="C 共用体"></a>C 共用体</h1><h2 id="共用体类型数据的特点"><a href="#共用体类型数据的特点" class="headerlink" title="共用体类型数据的特点"></a>共用体类型数据的特点</h2><ol>
-<li>系统采用覆盖技术，共用体变量中起作用的成员是最后一次存放的成员，在存入一个新的成员后原有的成员就失去作用</li>
-<li>共用体变量的地址和它的各成员的地址都是同一地址</li>
-<li>不能引用变量名来得到一个值，不能对共用体变量名赋值，不能在定义共用体变量时对它整体初始化</li>
-<li>共用体类型的变量可作为函数实参进行传递</li>
-<li>共用体类型可出现在结构体类型中，结构体类型也可存在于共用体类型中</li>
-</ol>
-<h2 id="结构体与共用体"><a href="#结构体与共用体" class="headerlink" title="结构体与共用体"></a><strong>结构体与共用体</strong></h2><p>结构体变量所占内存长度是其中最大字段大小的整数倍。</p>
-<p>共用体变量所占的内存长度等于最长的成员变量的长度。例如，教程中定义的共用体Data各占20个字节（因为char str[20]变量占20个字节）,而不是各占4+4+20&#x3D;28个字节。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">union Data</span><br><span class="line">&#123;</span><br><span class="line">   int i;</span><br><span class="line">   float f;</span><br><span class="line">   char  str[20];</span><br><span class="line">&#125; data;  </span><br></pre></td></tr></table></figure>
-
-<h2 id="共用体作用"><a href="#共用体作用" class="headerlink" title="共用体作用"></a>共用体作用</h2><p>节省内存，有两个很长的数据结构，不会同时使用，比如一个表示老师，一个表示学生，如果要统计教师和学生的情况用结构体的话就有点浪费了！用共用体的话，只占用最长的那个数据结构所占用的空间，就足够了！</p>
-<h2 id="共用体应用场景"><a href="#共用体应用场景" class="headerlink" title="共用体应用场景"></a>共用体应用场景</h2><p>通信中的数据包会用到共用体:因为不知道对方会发一个什么包过来，用共用体的话就很简单了，定义几种格式的包，收到包之后就可以直接根据包的格式取出数据。</p>
-<p>编程时经常会需要判断机器是大端机还是小端机，此时使用union就非常方便：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">union</span><br><span class="line">&#123;</span><br><span class="line">    char str;</span><br><span class="line">    int data;</span><br><span class="line">&#125;;</span><br><span class="line">data=0x01020304;//最后赋给变量的值占用了内存位置，str是低地址，机器是从低地址到高地址读取数据，无论大小端机读取数据的时候，肯定是全部读取完后再判断数值</span><br><span class="line">if(str==0x01)//str读取一个字节数据，只有两位</span><br><span class="line">&#123;</span><br><span class="line">    cout&lt;&lt; &quot;此机器是大端！&quot;&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">else if(str==0x04)&#123;</span><br><span class="line">    cout&lt;&lt;&quot;此机器是小端！&quot;&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    cout &lt;&lt;&quot; 暂无法判断此机器类型！&quot;&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注：大端机高位存在低位，小端机反之</p>
-<hr>
-<h1 id="下面给出部分概念："><a href="#下面给出部分概念：" class="headerlink" title="下面给出部分概念："></a>下面给出部分概念：</h1><ul>
-<li><p><strong>位：</strong>“位(bit)”是电子计算机中最小的数据单位。每一位的状态只能是0或1。</p>
-</li>
-<li><p><strong>字节：</strong>8个二进制位构成1个”字节(Byte)”，它是存储空间的基本计量单位。1个字节可以储存1个英文字母或者半个汉字，换句话说，1个汉字占据2个字节的存储空间。</p>
-</li>
-<li><p><strong>字：</strong>“字”由若干个字节构成，字的位数叫做字长，不同档次的机器有不同的字长。例如一台8位机，它的1个字就等于1个字节，字长为8位。如果是一台16位机，那么，它的1个字就由2个字节构成，字长为16位。字是计算机进行数据处理和运算的单位。</p>
-</li>
-<li><p>一般的计算机都已经到了64位机 也就是说 一个基本单位就是64位，也就是8字节了。这样再综合上面的分析就不难看出，结构体，共用体，位域的定义中，按顺序分配内存，下一个字段所占大小如果超出了上一个字段占的内存单元剩余部分，那么它会重新申请下一个内存单元，而上一个多出部分将空着。</p>
-</li>
-</ul>
-<h1 id="typedef-vs-define"><a href="#typedef-vs-define" class="headerlink" title="typedef vs #define"></a>typedef vs #define</h1><p><strong>#define</strong> 是 C 指令，用于为各种数据类型定义别名，与 <strong>typedef</strong> 类似，但是它们有以下几点不同：</p>
-<ul>
-<li><strong>typedef</strong> 仅限于为类型定义符号名称，**#define** 不仅可以为类型定义别名，也能为数值定义别名，比如您可以定义 1 为 ONE。</li>
-<li><strong>typedef</strong> 是由编译器执行解释的，**#define** 语句是由预编译器进行处理的。</li>
-</ul>
-<h2 id="typedef-与-define-的区别"><a href="#typedef-与-define-的区别" class="headerlink" title="typedef 与 #define 的区别"></a><strong>typedef 与 #define 的区别</strong></h2><p>（1）#define可以使用其他类型说明符对宏类型名进行扩展，但对 typedef 所定义的类型名却不能这样做。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#define INTERGE int;</span><br><span class="line">unsigned INTERGE n;  //没问题</span><br><span class="line">typedef int INTERGE;</span><br><span class="line">unsigned INTERGE n;  //错误，不能在 INTERGE 前面添加 unsigned</span><br></pre></td></tr></table></figure>
-
-<p>（2） 在连续定义几个变量的时候，typedef 能够保证定义的所有变量均为同一类型，而 #define 则无法保证。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#define PTR_INT int *</span><br><span class="line">PTR_INT p1, p2;        //p1、p2 类型不相同，宏展开后变为int *p1, p2;</span><br><span class="line">typedef int * PTR_INT</span><br><span class="line">PTR_INT p1, p2;        //p1、p2 类型相同，它们都是指向 int 类型的指针。</span><br></pre></td></tr></table></figure>
-
-<p>简而言之，**#define** 只是字面上的替换，由预处理器执行，**#define A B** 相当于打开编辑器的替换功能，把所有的 B 替换成 A。</p>
-<p>与 #define 不同，typedef 具有以下三个特点：</p>
-<ul>
-<li><p>1.typedef 给出的符号名称仅限于对类型，而不是对值。</p>
-</li>
-<li><p>2.typedef 的解释由编译器，而不是预处理器执行。并不是简单的文本替换。</p>
-</li>
-<li><p>3.虽然范围有限，但是在其受限范围内 typedef 比 #define 灵活。</p>
-</li>
-</ul>
-<hr>
-<p>用 <strong>typedef</strong> 为数组去别名：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef int A[6];</span><br></pre></td></tr></table></figure>
-
-<p>表示用 <strong>A</strong> 代替 **int [6]**。</p>
-<p>即：<strong>A a;</strong> 等于 <strong>int a[6];</strong></p>
-<hr>
-<p><strong>typedef 还有一个作用，就是为复杂的声明定义一个新的简单的别名。用在回调函数中特别好用：</strong></p>
-<ol>
-<li>原声明：<strong>int *(*a[5])(int, char*);</strong></li>
-</ol>
-<p>在这里，变量名为 <strong>a</strong>，直接用一个新别名 <strong>pFun</strong> 替换 <strong>a</strong> 就可以了：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef int *(*pFun)(int, char*);</span><br></pre></td></tr></table></figure>
-
-<p>于是，原声明的最简化版：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFun a[5];</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>原声明：<strong>void (*b[10]) (void (*)());</strong></li>
-</ol>
-<p>这里，变量名为 b，先替换右边部分括号里的，pFunParam 为别名一：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef void (*pFunParam)();</span><br></pre></td></tr></table></figure>
-
-<p>再替换左边的变量 <strong>b</strong>，<strong>pFunx</strong> 为别名二：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef void (*pFunx)(pFunParam);</span><br></pre></td></tr></table></figure>
-
-<p>于是，原声明的最简化版：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFunx b[10];</span><br></pre></td></tr></table></figure>
-
-<p>其实，可以这样理解:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef int *(*pFun)(int, char*); </span><br></pre></td></tr></table></figure>
-
-<p>由 <strong>typedef</strong> 定义的函数 <strong>pFun</strong>，为一个新的类型，所以这个新的类型可以像 <strong>int</strong> 一样定义变量，于是，<strong>pFun a[5];</strong> 就定义了 <strong>int *(*a[5])(int, char*);</strong></p>
-<p>所以我们可以用来定义回调函数，特别好用。</p>
-<p>另外，也要注意，typedef 在语法上是一个存储类的关键字（如 auto、extern、mutable、static、register 等一样），虽然它并不真正影响对象的存储特性，如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef static int INT2; // 不可行</span><br></pre></td></tr></table></figure>
-
-<p>编译将失败，会提示“指定了一个以上的存储类”。</p>
-<p>关于回调函数的例子，沿用前面回调函数的代码改动：</p>
-<p><strong>原代码</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">void populate_array(int *array, size_t arraySize, int (*getNextValue)(void))</span><br><span class="line">&#123;  /*有关于 size_t:size_t 是一种数据类型，近似于无符号整型，但容量范围一般大于 int 和 unsigned。这里使用 size_t 是为了保证 arraysize 变量能够有足够大的容量来储存可能大的数组。*/</span><br><span class="line">    for (size_t i=0; i&lt;arraySize; i++)</span><br><span class="line">        array[i] = getNextValue();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">// 获取随机值</span><br><span class="line">int getNextRandomValue(void)</span><br><span class="line">&#123;</span><br><span class="line">    return rand();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">    int myarray[10];</span><br><span class="line">    /* getNextRandomValue 不能加括号，否则无法编译，因为加上括号之后相当于传入此参数时传入了 int , 而不是函数指针*/</span><br><span class="line">    populate_array(myarray, 10, getNextRandomValue);</span><br><span class="line">    for(int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">        printf(&quot;%d &quot;, myarray[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>改动之后</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdlib.h&gt;  </span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int getNextRandomValue(void);</span><br><span class="line">void populate_array(int *array, size_t arraySize, int (*getNextValue)(void));</span><br><span class="line">typedef int parm(void);</span><br><span class="line">typedef void p(int *array, size_t arraySize,parm);</span><br><span class="line"></span><br><span class="line">void populate_array(int *array, size_t arraySize, int (*getNextValue)(void))</span><br><span class="line">&#123;  /*有关于 size_t:size_t 是一种数据类型，近似于无符号整型，但容量范围一般大于 int 和 unsigned。这里使用 size_t 是为了保证 arraysize 变量能够有足够大的容量来储存可能大的数组。*/</span><br><span class="line">    for (size_t i=0; i&lt;arraySize; i++)</span><br><span class="line">        array[i] = getNextValue();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">// 获取随机值</span><br><span class="line">int getNextRandomValue(void)</span><br><span class="line">&#123;</span><br><span class="line">    return rand();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">    int myarray[10];</span><br><span class="line">    </span><br><span class="line">    /* getNextRandomValue 不能加括号，否则无法编译，因为加上括号之后相当于传入此参数时传入了 int , 而不是函数指针*/</span><br><span class="line">    p *p1;//注意typedef void（.）p...的时候如果没加*，则添加新的p1需要加*（不然会报错p1不是左值，lvaues本质“就是指一些对象、或者是表达式。这些对象、表达式必须代表一块内存区域”）</span><br><span class="line">    p1=populate_array;</span><br><span class="line">    p1(myarray, 10, getNextRandomValue);</span><br><span class="line">    for(int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">        printf(&quot;%d &quot;, myarray[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="c输入输出"><a href="#c输入输出" class="headerlink" title="c输入输出"></a>c输入输出</h1><h2 id="getchar-amp-putchar-函数"><a href="#getchar-amp-putchar-函数" class="headerlink" title="getchar() &amp; putchar() 函数"></a>getchar() &amp; putchar() 函数</h2><p><strong>int getchar(void)</strong> 函数从屏幕读取下一个可用的字符，并把它返回为一个整数。这个函数在同一个时间内只会读取一个单一的字符。您可以在循环内使用这个方法，以便从屏幕上读取多个字符。</p>
-<p><strong>int putchar(int c)</strong> 函数把字符输出到屏幕上，并返回相同的字符。这个函数在同一个时间内只会输出一个单一的字符。您可以在循环内使用这个方法，以便在屏幕上输出多个字符。</p>
-<h2 id="gets-与fgets"><a href="#gets-与fgets" class="headerlink" title="gets()与fgets()"></a>gets()与fgets()</h2><h3 id="gets"><a href="#gets" class="headerlink" title="gets()"></a>gets()</h3><p>gets函数原型：char<em>gets(char</em>buffer);&#x2F;&#x2F;读取字符到数组：gets(str);str为数组名。</p>
-<p>gets函数功能：从键盘上输入字符，直至接受到换行符或EOF时停止，并将读取的结果存放在buffer指针所指向的字符数组中。</p>
-<p>读取的换行符被转换为null值，做为字符数组的最后一个字符，来结束字符串。</p>
-<p><strong>注意：</strong>gets函数由于没有指定输入字符大小，所以会无限读取，一旦输入的字符大于数组长度，就会发生内存越界，</p>
-<p>从而造成程序崩溃或其他数据的错误。</p>
-<h3 id="fgets"><a href="#fgets" class="headerlink" title="fgets()"></a>fgets()</h3><p>fgets函数原型：char *fgets(char *s, int n, FILE *stream);&#x2F;&#x2F;我们平时可以这么使用：fgets(str, sizeof(str), stdin);</p>
-<p>其中str为数组首地址，sizeof(str)为数组大小，stdin表示我们从键盘输入数据。</p>
-<p>fgets函数功能：从文件指针stream中读取字符，存到以s为起始地址的空间里，直到读完N-1个字符，或者读完一行。</p>
-<p><strong>注意：</strong>调用fgets函数时，最多只能读入n-1个字符。读入结束后，系统将自动在最后加’\0’，并以str作为函数值返回。</p>
-<p>借用教程实例，我把char str[100] 改为 char str[5]</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main( )</span><br><span class="line">&#123;</span><br><span class="line">    char str[5];</span><br><span class="line"></span><br><span class="line">    printf( &quot;Enter a value :&quot;);</span><br><span class="line">    gets( str );</span><br><span class="line"></span><br><span class="line">    printf( &quot;\nYou entered: &quot;);</span><br><span class="line">    puts( str );</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果输入123(长度小于5)结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Enter a value :123</span><br><span class="line"></span><br><span class="line">You entered: 123</span><br></pre></td></tr></table></figure>
-
-<p>如果输入123456789(长度大于5)结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Enter a value :123456789</span><br><span class="line"></span><br><span class="line">You entered: 123456789</span><br></pre></td></tr></table></figure>
-
-<p>虽然正常显示了，但是系统提示程序崩溃了</p>
-<p>如果不能正确使用gets()函数，带来的危害是很大的，就如上面我们看到的，输入字符串的长度大于缓冲区长度时，并没有截断，原样输出了读入的字符串，造成程序崩溃。</p>
-<p>考虑到程序安全性和健壮性，建议用fgets()来代替gets()。如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main( )</span><br><span class="line">&#123;</span><br><span class="line">    char str[5];</span><br><span class="line"></span><br><span class="line">    printf( &quot;Enter a value :&quot;);</span><br><span class="line">    fgets( str,5,stdin );      //fgets()函数;</span><br><span class="line"></span><br><span class="line">    printf( &quot;\nYou entered: &quot;);</span><br><span class="line">    puts( str );</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="其他："><a href="#其他：" class="headerlink" title="其他："></a>其他：</h2><p>在进行输出时，若要用到用来输出实数的 <strong>f</strong> 格式符（以小数形式输出），有以下几种用法：</p>
-<p><strong>1、基本型，用 *<em>%f*</em></strong></p>
-<p>不指定输出类型的长度，用系统根据情况决定，一般是实数中的整数部分全部输出，小数部分输出六位。例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    double a=1.0;</span><br><span class="line">    printf(&quot;%f\n&quot;,a/3);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果：<strong>0.333333</strong></p>
-<p><strong>2、指定数据宽度和小数位数，用 *<em>%m.nf*</em></strong></p>
-<p>例：将上个程序的双精度变量 a 输出 15 位小数，用 <strong>%20.15f</strong> 的格式声明，指定输出的数据占 20 列，其中包括 15 位小数。改动上面程序如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    double a=1.0;</span><br><span class="line">    printf(&quot;%20.15f\n&quot;,a/3);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果：  <strong>0.333333333333333</strong></p>
-<p>注意在 0 的前面有 3 个空格，且双精度数只保证 15 位有效数字的准确性。</p>
-<p><strong>3、输出的数据相左对齐，用 *<em>%-m.nf*</em></strong></p>
-<p>在 <strong>m.n</strong> 前加一个负号，其作用与 <strong>%m.nf</strong> 形式作用基本相同，但当数据长度不长过 <strong>m</strong> 时，数据向左靠，右端补空格。</p>
-<hr>
-<p>putchar()将一个字符赋给字符变量和将字符的 ASCII 代码(int型)赋给字符变量作用是完全相同的，但要注意其值必须在字符的 ASCII 代码范围内。</p>
-<hr>
-<ul>
-<li>1、scanf() 函数有返回值且类型 int 型，当发生错误时立刻返回 EOF。</li>
-<li>2、scanf() 函数返回的值为：正确按指定格式输入变量的个数；也即能正确接收到值的变量个数。</li>
-</ul>
-<hr>
-<p>c 语言中每种数据类型的输出都有各自的占位符，下面是各种数据类型的输出占位符：</p>
-<p><strong>short（2字节）&#x2F;int（4字节） :</strong> <strong>%d</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int a = 1;</span><br><span class="line">printf(&quot;这个整数是：%d&quot;, a);</span><br></pre></td></tr></table></figure>
-
-<p><strong>long:</strong> <strong>%ld</strong> (long 是 int 得修饰，不能算是一种单独的数据类型，对长整型的定义也是long int应该至少和int一样长，而不是long int 一定要比int占用存储字节长。所以，正确的关系应该是——<em>long</em>≥<em>int</em>≥<em>short</em>)</p>
-<p><strong>long long（8字节） :</strong> <strong>%lld</strong></p>
-<p><strong>char :</strong> <strong>%c</strong></p>
-<p><strong>float&#x2F;double :</strong> <strong>%f</strong> float 默认是 6 位小数输出；可以在 %f 中控制；例如：%.2f：输出两位小数。</p>
-<p><strong>char *s(字符串) ：</strong><strong>%s</strong></p>
-<p><strong>unsigned:</strong> <strong>%u</strong> (signed:有符号类型， unsigned：无符号类型；默认都是有符号的)</p>
-<p>八进制：**%o** 以 <strong>0</strong> 开头</p>
-<p>十六进制：**%x** 以 <strong>0x</strong> 开头</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int a = 10;</span><br><span class="line">printf(&quot;a的八进制输出是：%o \n&quot;, a);//输出是12</span><br><span class="line">printf(&quot;a的十六进制输出：%x \n&quot;, a);//输出是a</span><br></pre></td></tr></table></figure>
-
-<p>地址值&#x2F;指针值：**%p<strong>，</strong>*** 取指针里地址指向的地方的值，**&amp;** 取改值存储位置的地址值。</p>
-<p>二进制的输出没有占位符，只能通过其他方法。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1805,7 +1798,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

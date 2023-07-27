@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="UMLUML中的关系UML中的关系主要包括4种:关联关系(association)依赖关系(dependency)泛化关系(generalization)实现关系(realization) 用例图(1)用例图(Use Case Diagram):也称为用户模型图，是从软件需求分析到最终实现的第一步，它是从客户的角度来描述系统功能.(2）用例图包含3个基本组件:参与者(Actor):与系统打交道的人">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式">
+<meta property="og:url" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="UMLUML中的关系UML中的关系主要包括4种:关联关系(association)依赖关系(dependency)泛化关系(generalization)实现关系(realization) 用例图(1)用例图(Use Case Diagram):也称为用户模型图，是从软件需求分析到最终实现的第一步，它是从客户的角度来描述系统功能.(2）用例图包含3个基本组件:参与者(Actor):与系统打交道的人">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103502809.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103502809.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103808831.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103808831.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104109089.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104109089.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104823806.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104823806.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104838478.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104838478.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104917159.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104917159.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104931305.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104931305.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104944466.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104944466.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104954560.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104954560.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105230007.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105230007.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105243049.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105243049.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105255149.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105255149.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105310548.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105310548.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105326170.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105326170.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726155959005.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726155959005.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161204568.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161204568.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161226477.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161226477.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726162010494.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726162010494.png">
+<meta property="og:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726165422048.png">
+<meta property="og:image" content="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726165422048.png">
+<meta property="article:published_time" content="2023-07-26T02:19:17.000Z">
+<meta property="article:modified_time" content="2023-07-26T12:30:06.917Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103502809.png">
+
+<link rel="canonical" href="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>设计模式 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-26 10:19:17 / 修改时间：20:30:06" itemprop="dateCreated datePublished" datetime="2023-07-26T10:19:17+08:00">2023-07-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h1><h2 id="UML中的关系"><a href="#UML中的关系" class="headerlink" title="UML中的关系"></a>UML中的关系</h2><p>UML中的关系主要包括4种:<br>关联关系(association)<br>依赖关系(dependency)<br>泛化关系(generalization)<br>实现关系(realization)</p>
+<h2 id="用例图"><a href="#用例图" class="headerlink" title="用例图"></a>用例图</h2><p>(1)用例图(Use Case Diagram):也称为用户模型图，是从软件需求分析到最终实现的第一步，它是从客户的角度来描述系统功能.<br>(2）用例图包含3个基本组件:<br>参与者(Actor):与系统打交道的人或其他系统即使用该系统的人或事物.在UML中参与者用人形图标表示<br>用例(Use Case):代表系统的某项完整的功能.在UML中使用一个椭圆来表示<br>关系:定义用例之间的关系——泛化关系,扩展关系，包含关系</p>
+<p>这是一个泛化关系</p>
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103502809.png" alt="image-20230726103502809"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103502809.png" class title="This is an test image">
+
+<h2 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h2><p>类图是面向对象系统建模中最常用的图.是定义其他图的基础.<br>类图主要是用来显示系统中的类,接口以及它们之间的关系.<br>类图包含的主要元素有类，接口和关系.其中关系有泛化关系,关联关系，依赖关系和实现关系.在类图中也可以包含注释和约束.</p>
+<h3 id="类的表示法"><a href="#类的表示法" class="headerlink" title="类的表示法"></a>类的表示法</h3><p>1.类是类图的主要组件，由3部分组成:类名，属性和方法.在UML中，类用矩形来表示，顶端部分存放类的名称，中间部分存放类的属性，属性的类型及值,底部部分存放类的方法,方法的参数和返回类型.<br>2.在UML中可以根据实际情况有选择的隐藏属性部分或方法部分或两者<br>都隐藏</p>
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103808831.png" alt="image-20230726103808831"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726103808831.png" class title="This is an test image">
+
+<h3 id="类之间的关系-泛化关系"><a href="#类之间的关系-泛化关系" class="headerlink" title="类之间的关系-泛化关系"></a>类之间的关系-泛化关系</h3><p>1.在UML中，泛化关系用来表示类与类，接口与接口之间的继承关系.泛化关系有时也称为” is a kind of“关系.<br>2.在UML中泛化关系用一条实线空心箭头有子类指向父类.</p>
+<h3 id="类之间的关系-实现关系"><a href="#类之间的关系-实现关系" class="headerlink" title="类之间的关系-实现关系"></a>类之间的关系-实现关系</h3><p>在UML中，实现关系用来表示类与接口之间的实现关系.</p>
+<p>在UML中实现关系用一条虚线空心箭头由子类指向父类</p>
+<h3 id="类之间的关系-依赖关系"><a href="#类之间的关系-依赖关系" class="headerlink" title="类之间的关系-依赖关系"></a>类之间的关系-依赖关系</h3><p>对于两个相对独立的系统，当一个系统负责构造另一个系统的实例，或者依赖另一个系统的服务时，这两个系统之间体现为依赖关系.</p>
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104109089.png" alt="image-20230726104109089"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104109089.png" class title="This is an test image">
+
+<h3 id="类之间的关系-关联关系"><a href="#类之间的关系-关联关系" class="headerlink" title="类之间的关系-关联关系"></a>类之间的关系-关联关系</h3><p>对于两个相对独立的系统，当一个系统的实例与另一个系统的一些特定实例存在固定的对应关系时，这两个系统之间为关联关系。</p>
+<h1 id="软件设计模式的种类"><a href="#软件设计模式的种类" class="headerlink" title="软件设计模式的种类"></a>软件设计模式的种类</h1><p>GoF提出的设计模式有23个包括︰<br>创建型(Creational)模式:如何创建对象﹔<br>结构型(Structural )模式:如何实现类或对象的组合﹔<br>行为型(Behavioral)模式︰类或对象怎样交互以及怎样分配职责。</p>
+<p>有一个“简单工厂模式”不属于GoF 23种设计模式，但大部分的设计模式<br>书籍都会对它进行专门的介绍。</p>
+<p>设计模式目前种类:GoF的23种+“简单工厂模式”&#x3D;24种。</p>
+<p>设计模式的基础是<strong>多态</strong></p>
+<h2 id="设计模式总览图"><a href="#设计模式总览图" class="headerlink" title="设计模式总览图"></a>设计模式总览图</h2><p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104823806.png" alt="image-20230726104823806"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104823806.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104838478.png" alt="image-20230726104838478"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104838478.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104917159.png" alt="image-20230726104917159"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104917159.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104931305.png" alt="image-20230726104931305"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104931305.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104944466.png" alt="image-20230726104944466"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104944466.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104954560.png" alt="image-20230726104954560"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726104954560.png" class title="This is an test image">
+
+<h2 id="面向对象设计原则"><a href="#面向对象设计原则" class="headerlink" title="面向对象设计原则"></a>面向对象设计原则</h2><p>对于面向对象软件系统的设计而言，在支持可维护性的同时，提高系统的可复用性是一个至关重要的问题,如何同时提高一个软件系统的可维护性和可复用性是面向对象设计需要解决的核心问题之一。在面向对象设计中，可维护性的复用是以设计原则为基础的。每一个原则都蕴含一些面向对象设计的思想，可以从不同的角度提升一个软件结构的设计水平。</p>
+<p>面向对象设计原则为支持可维护性复用而诞生，这些原则蕴含在很多设计模式中，它们是从许多设计方案中总结出的指导性原则。面向对象设计原则也是我们用于评价一个设计模式的使用效果的重要指标之一。</p>
+<p>原则的目的:高内聚，低耦合</p>
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105230007.png" alt="image-20230726105230007"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105230007.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105243049.png" alt="image-20230726105243049"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105243049.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105255149.png" alt="image-20230726105255149"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105255149.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105310548.png" alt="image-20230726105310548"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105310548.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105326170.png" alt="image-20230726105326170"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726105326170.png" class title="This is an test image">
+
+<h2 id="开闭原则"><a href="#开闭原则" class="headerlink" title="开闭原则"></a>开闭原则</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class Caculaor&#123;</span><br><span class="line">public:</span><br><span class="line">    Caculaor(int a，int b，string moperator)&#123;</span><br><span class="line">        this-&gt;m_a = a;</span><br><span class="line">        this-&gt;m_b = b;</span><br><span class="line">        this-&gt;m_operator = moperator;</span><br><span class="line">    &#125;</span><br><span class="line">int getResult() &#123;</span><br><span class="line">    if (m_operator.compare(&quot;+&quot;) == 0)&#123;</span><br><span class="line">        return m_a + m_b;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m_operator.compare(&quot;-&quot;) == 0)&#123;</span><br><span class="line">    	return m_a - m_b;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m_operator.compare(&quot;*&quot;&quot;) == 0)&#123;</span><br><span class="line">    	return m_a * m_b;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m_operator.compare(&quot;/&quot;) =0)&#123;</span><br><span class="line">    	return m_a / m_b;</span><br><span class="line">    &#125;</span><br><span class="line">private:</span><br><span class="line">	int m_a;</span><br><span class="line">	int m_b;</span><br><span class="line">	string m_operator;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>缺点:如果增加取模的运算需要修改getResult 成员方法，如果增加新功能的情况下要修改源代码，那么就会有修改出错的可能性。我们应该在增加新的功能时候，不能影响其他已经完成的功能。这就是对修改关闭，对扩展开放，叫做开闭原则</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">//开闭原则﹑对扩展开放，对修改关闭，增加功能是通过增加代码来实现，而不是去修改源代码</span><br><span class="line">//写一个抽象类</span><br><span class="line">class AbstractCaculator &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void setOperatorNumber(int,int)=0;</span><br><span class="line">	virtual int getResult() =0;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line">//加法计算器类</span><br><span class="line">class PlusCaculator :public AbstractCaculator&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void setOperatorNumber(int a,int b)&#123;</span><br><span class="line">		this-&gt;mA = a;</span><br><span class="line">		this-&gt;mB = b;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual int getResult()&#123;</span><br><span class="line">		return mA + mB;</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	int mA;</span><br><span class="line">	int mB;</span><br><span class="line">&#125;;</span><br><span class="line">void test()&#123;</span><br><span class="line">	AbstractCaculator* pca=new PlusCaculator;</span><br><span class="line">	pca-&gt;setOperatorNumber(1,2);</span><br><span class="line">	int a=pca-&gt;getResult();</span><br><span class="line">	cout&lt;&lt;a&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">int main ()&#123;</span><br><span class="line">	test();</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用这个代码，扩展新功能就很方便，不用修改原有代码。</p>
+<p>本质就是利用了多态，父类作为通用接口，扩展需要的子类。</p>
+<h2 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">//迪米特法则又叫最少知识原则</span><br><span class="line">c1ass AbstractBuilding &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void sale() = 0;</span><br><span class="line">	virtual string getQuality() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">//楼盘A</span><br><span class="line">class BuildingA : public AbstractBuilding&#123;</span><br><span class="line">public:</span><br><span class="line">	BuildingA() &#123;</span><br><span class="line">		mQulity =&quot;高品质&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void sale() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;楼盘A&quot;&lt;&lt; mQulity &lt;&lt;&quot;被售卖!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	string mQulity;</span><br><span class="line">&#125; ;</span><br><span class="line">//楼盘B</span><br><span class="line">class BuildingB : public AbstractBuilding&#123;</span><br><span class="line">public:</span><br><span class="line">	BuildingB() &#123;</span><br><span class="line">		mQulity =&quot;低品质&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void sale() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;楼盘B&quot;&lt;&lt; mQulity &lt;&lt;&quot;被售卖!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	string mQulity;</span><br><span class="line">&#125; ;</span><br></pre></td></tr></table></figure>
+
+<p>如上图，楼盘AB里应该再添加一个getQuality方法，截图费劲，没截进去了。这样是直接打交道的，客户端直接接触到了楼层类。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">//中介类</span><br><span class="line">class Mediator&#123;</span><br><span class="line">public:</span><br><span class="line">	Mediator()&#123;</span><br><span class="line">		AbstractBuilding* building = new BuildingA;</span><br><span class="line">		vBuilding. push_back(building) ;</span><br><span class="line">		building = new BuildingB;</span><br><span class="line">		vBuilding.push_back(building);</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">//对外提供接口</span><br><span class="line">	AbstractBui1ding* findMyBuilding(string quality) &#123;</span><br><span class="line">		for (vector&lt;AbstractBuilding*&gt; : :iterator it = vBuilding.begin();it!=vBuilding.endl;it++)&#123;</span><br><span class="line">			if ((*it)-&gt;getQuality() == quality)&#123;</span><br><span class="line">				return *it;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	return NULL;</span><br><span class="line">	&#125;</span><br><span class="line">	~Mediator() &#123;</span><br><span class="line">		for (vector&lt;AbstractBuilding*&gt; :: iterator it = vBuilding.begin();it!=vBuilding.endl;it++)</span><br><span class="line">			if (*it != NULL) &#123;</span><br><span class="line">				delete *it;//放指针指向的内存,析构函数的目的是确保释放 vBuilding 向量中的内存资源</span><br><span class="line">			&#125;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	vector&lt;AbstractBuilding*&gt; vBui1ding;</span><br><span class="line">&#125;</span><br><span class="line">//现在，客户只需要和中介打交道：</span><br><span class="line">//客户端</span><br><span class="line">void test02()&#123;</span><br><span class="line">	Mediator* mediator = new Mediator;</span><br><span class="line">	AbstractBuilding* building =mediator-&gt;findMyBuilding(&quot;高品质&quot;);</span><br><span class="line">	if (building !=NULL)&#123;</span><br><span class="line">		bui1ding-&gt;sale();</span><br><span class="line">	else &#123;</span><br><span class="line">		cout &lt;&lt;&quot;没有符合您条件的楼盘!&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="合成复用原则"><a href="#合成复用原则" class="headerlink" title="合成复用原则"></a>合成复用原则</h2><p>就一句话，能用组合就别用继承</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">//抽象车</span><br><span class="line">class AbstractCar &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void run() = 0;</span><br><span class="line">&#125;</span><br><span class="line">//大众车</span><br><span class="line">class Dazhong :public AbstractCar&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;大众车启动...&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;; </span><br><span class="line">//拖拉机</span><br><span class="line">class Tuolaji :public AbstractCar&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;拖拉机启动...&quot;&lt;&lt;end1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//像上面这种写法，就非常不科学，如果有很多开不同类型车的人，就需要写很多类。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//可以使用组合</span><br><span class="line">class Person &#123;</span><br><span class="line">public:</span><br><span class="line">	void setCar(AbstractCar* car)&#123;</span><br><span class="line">		this-&gt;car = car;</span><br><span class="line">	&#125;</span><br><span class="line">	void Doufeng ()&#123;</span><br><span class="line">		this-&gt;car-&gt;run() ;</span><br><span class="line">	&#125;</span><br><span class="line">	~person()&#123;</span><br><span class="line">		if(this-&gt;car!=NULL)</span><br><span class="line">			delete this-&gt;car;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">	AbstractCar* car;</span><br><span class="line">&#125;;</span><br><span class="line">void test02()&#123;</span><br><span class="line">	Person* p = new Person;</span><br><span class="line">	p-&gt;setCar(new Dazhong);</span><br><span class="line">	p-&gt;Doufeng() ;</span><br><span class="line">	delete p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="依赖倒转原则"><a href="#依赖倒转原则" class="headerlink" title="依赖倒转原则"></a>依赖倒转原则</h2><p>传统的过程式设计倾向于使高层次的模块依赖于低层次的模块，抽象层依赖于具体的层次。</p>
+<p>传统的设计过程，高层依赖于中层，中层依赖于底层</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//银行工作人员</span><br><span class="line">class BankWorker &#123;</span><br><span class="line">public:</span><br><span class="line">	void saveService() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;办理存款业务...&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	void payService()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;办理支付业务..&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	void tranferService() &#123;</span><br><span class="line">		cout&lt;&lt;&quot;办理转账业务..&quot;&lt;&lt;endl;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//中层模块</span><br><span class="line">void doSaveBussiness (BankWorker* worker)&#123;</span><br><span class="line">	worker-&gt;saveService() ;</span><br><span class="line">&#125;</span><br><span class="line">void doPayBussiness(BankWorker* worker)&#123;</span><br><span class="line">	worker-&gt;payService();</span><br><span class="line">&#125;</span><br><span class="line">void doTransferBussiness(BankWorker* worker) &#123;</span><br><span class="line">	worker-&gt;tranferService();</span><br><span class="line"> &#125;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	BankWorker* worker = new BankWorker ;</span><br><span class="line">	doSaveBussiness(worker);//办理存款业务</span><br><span class="line">	doPayBussiness(worker);//办理支付业务</span><br><span class="line">	doTransferBussiness(worker) ; //办理转账业务</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面用依赖倒转原则改写上面的业务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">//银行工作人员</span><br><span class="line">class AbstractWorker&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void doBusfness() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//专门负责办理存款业务的工作人员</span><br><span class="line">class SaveBankWorer :public AbstractWorker&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void doBusiness() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;办理存款业务...”&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//专门办理支付业务的工作人员</span><br><span class="line">class PayBankWorker : public AbstractWorker&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void doBusiness() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;办理支付业务...&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br><span class="line">//专门办理转账业务的工作人员</span><br><span class="line">class TransferBankWorker : public AbstractWorker&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void doBusiness() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;办理转账业务...&quot; &lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br><span class="line">//中层业务</span><br><span class="line">void doNewBusiness(AbstractWorker* worker)&#123;</span><br><span class="line">	worker-&gt;doBusiness() ;</span><br><span class="line">&#125;</span><br><span class="line">void tesat02()&#123;</span><br><span class="line">	AbstractWorker* transfer = new TransferBankWorker;</span><br><span class="line">	doNewBusiness(transfer) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实就是利用多态，将底层抽象出来，这样顶层就只依赖于抽象层，底层有改动时，也不会改变中层，就不会影响到上层。</p>
+<h2 id="简单工厂模式-代码实现"><a href="#简单工厂模式-代码实现" class="headerlink" title="简单工厂模式-代码实现"></a>简单工厂模式-代码实现</h2><p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726155959005.png" alt="image-20230726155959005"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726155959005.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">//抽象水果</span><br><span class="line">class AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//苹果</span><br><span class="line">class Apple : public AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;我是苹果!&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//香蕉</span><br><span class="line">class Banana : public AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () &#123;</span><br><span class="line">		cout &lt;&lt;&quot;我是香蕉!&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//鸭梨</span><br><span class="line">class Pear : public AbstractFruit &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;我是鸭梨!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//水果工厂</span><br><span class="line">class FruitFactory &#123;</span><br><span class="line">public:</span><br><span class="line">	static AbstractFruit* CreateFruit(string flag)&#123;</span><br><span class="line">		if (f1ag == &quot;apple&quot;)&#123;</span><br><span class="line">		return new Apple;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (flag == &quot;banana&quot;)&#123;</span><br><span class="line">			return new Banana;</span><br><span class="line">		&#125;</span><br><span class="line">		else if (flag == &quot;pear&quot;) &#123;</span><br><span class="line">			return new Pear;</span><br><span class="line">		&#125; </span><br><span class="line">		else&#123;</span><br><span class="line">			return NULL;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	FruitFactory* factory = new FruitFactory;</span><br><span class="line">	AbstractFruit* fruit = factory-&gt;CreateFruit(&quot;apple&quot;) ;</span><br><span class="line">	fruit-&gt;ShowName () ;</span><br><span class="line">	delete fruit;</span><br><span class="line">	fruit = factory-&gt;CreateFruit(&quot;banana&quot;);</span><br><span class="line">	fruit-&gt;ShowName() ;</span><br><span class="line">	delete fruit;</span><br><span class="line">	fruit = factory-&gt;CreateFruit(&quot;pear&quot;);</span><br><span class="line">	fruit-&gt;ShowName () ;</span><br><span class="line">	delele fruit;</span><br><span class="line">	delete factory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="工厂方法模式"><a href="#工厂方法模式" class="headerlink" title="工厂方法模式"></a>工厂方法模式</h2><p>简单工厂中，工厂不符合开闭原则。这里，再将工厂抽象出来，让工厂也符合开闭原则。</p>
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161204568.png" alt="image-20230726161204568"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161204568.png" class title="This is an test image">
+
+<p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161226477.png" alt="image-20230726161226477"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726161226477.png" class title="This is an test image">
+
+<p>优点:<br>(1)不需要记住具体类名，甚至连具体参数都不用记忆。<br>(2)实现了对象创建和使用的分离。<br>心<br>(3)系统的可扩展性也就变得非常好，无需修改接口和原类。<br>缺点:<br>(1)增加系统中类的个数，复杂度和理解度增加。<br>(2)增加了系统的抽象性和理解难度。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">//抽象水果</span><br><span class="line">class AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//苹果</span><br><span class="line">class Apple : public AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName ()&#123;</span><br><span class="line">		cout &lt;&lt;”我是苹果!&quot;”&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//香蕉</span><br><span class="line">class Banana : public AbstractFruit&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () &#123;</span><br><span class="line">		cout &lt;&lt;&quot;我是香蕉!”&lt;&lt;endl;</span><br><span class="line">		&#125;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br><span class="line">//抽象工厂</span><br><span class="line">class AbstractFruitFactory&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual AbstractFruit* CreateFruit()= 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//苹果工厂</span><br><span class="line">class AppleFactory : public AbstractFruitFactory&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual AbstractFruit* CreateFruit() &#123;</span><br><span class="line">		return new Apple;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void test01() &#123;</span><br><span class="line">	AbstractFruitFactory* factory = NULL;</span><br><span class="line">	AbstractFruit* fruit = NULL;</span><br><span class="line">	//创建一个苹果工厂</span><br><span class="line">	factory = new AppleFactory;</span><br><span class="line">	fruit = factory-&gt;CreateFruit() ;</span><br><span class="line">	fruit-&gt;ShowName() ;</span><br><span class="line">	delete fruit;</span><br><span class="line">	delete factory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="简单工厂和工厂方法模式适用场景"><a href="#简单工厂和工厂方法模式适用场景" class="headerlink" title="简单工厂和工厂方法模式适用场景"></a>简单工厂和工厂方法模式适用场景</h3><p>1.客户端不知道它所需要的对象的类。<br>2.抽象工厂类通过其子类来指定创建哪个对象。<br>3.工厂类负责创建的对象比较少，由于创建的对象较少，不会造成工厂方法中的业务逻辑太过复杂。<br>4.客户端只知道传入工厂类的参数，对于如何创建对象并不关心。</p>
+<h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726162010494.png" alt="image-20230726162010494"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726162010494.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">//抽象苹果</span><br><span class="line">class AbstractApple&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//中国苹果</span><br><span class="line">class ChinaApple : public AbstractApple &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () &#123;</span><br><span class="line">		cout &lt;&lt;&quot;中国苹果!&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//美国苹果</span><br><span class="line">class USAApple : public AbstractApple &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;美国苹果!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//抽象香蕉</span><br><span class="line">class AbsrtactBanana&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//抽象鸭梨</span><br><span class="line">class AbstractPear &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowName () = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//抽象工厂针对产品族</span><br><span class="line">class AbstracFactory&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual AbstractApple* CreateApple() = 0;</span><br><span class="line">	virtual AbsrtactBanana* CreateBanana() = 0;</span><br><span class="line">	virtual AbstractPear* CreatePear() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//中国工厂</span><br><span class="line">class ChinaFactory : public AbstracFactory &#123;</span><br><span class="line">public:</span><br><span class="line">	virtual AbstractApple* CreateApple()&#123;</span><br><span class="line">		return new ChinaApple;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual AbsrtactBanana* CreateBanana() &#123;</span><br><span class="line">		return new ChinaBanana;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual AbstractPear* CreatePear ()&#123;</span><br><span class="line">		return new ChinaPear;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void test01()&#123;</span><br><span class="line">	AbstracFactory* factory = NULL;</span><br><span class="line">	AbstractApple* apple = NULL;</span><br><span class="line">	AbsrtactBanana* banana = NULL;</span><br><span class="line">	AbstractPear* pear = NULL;</span><br><span class="line">	factory = new ChinaFactory;</span><br><span class="line">	apple = factory-&gt;CreateApple();</span><br><span class="line">	banana = factory-&gt;CreateBanana() ;</span><br><span class="line">	pear = factory-&gt;CreatePear();</span><br><span class="line">	apple-&gt;ShowName();</span><br><span class="line">	delete factory;</span><br><span class="line">	delete apple;</span><br><span class="line">	delete banana;</span><br><span class="line">	delete pear;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="单例模式-饿汉式和懒汉式创建"><a href="#单例模式-饿汉式和懒汉式创建" class="headerlink" title="单例模式_饿汉式和懒汉式创建"></a>单例模式_饿汉式和懒汉式创建</h2><p>单例模式是一种常用的软件设计模式。在它的核心结构中只包含一个被称为单例的特殊类。通过单例模式可以保证系统中一个类只有一个实例而且该实例易于外界访问，从而方便对实例个数的控制并节约系统资源。如果希望在系统中某个类的对象只能存在一个，单例模式是最好的解决方案。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class A&#123;</span><br><span class="line">private:</span><br><span class="line">	A()&#123;</span><br><span class="line">		a=new A;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">	static A* getInstace() &#123;//静态成员函数只能访问类的静态成员变量和其他静态成员函数，不能直接访问类的非静态成员变量和非静态成员函数，静态成员函数也没有访问权限限定符（public、private、protected）的限制。</span><br><span class="line">		return a;</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	static A* a;</span><br><span class="line">&#125;;</span><br><span class="line">int main(void)&#123;</span><br><span class="line">	//A* a = new A;</span><br><span class="line">	A::getInstace();</span><br><span class="line">&#125;</span><br><span class="line">//实现单例步骤</span><br><span class="line">//1.构造函数私有化</span><br><span class="line">//2．增加静态私有的当前类的指针变量</span><br><span class="line">//3．提供静态对外接口，可以让用户获得单例对象</span><br></pre></td></tr></table></figure>
+
+<p>懒汉式，调用getinstance的时候才会去new一个对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//单例分为懒汉式</span><br><span class="line">class Singleton_lazy&#123;</span><br><span class="line">private:</span><br><span class="line">	Singleton_lazy()&#123;&#125;</span><br><span class="line">public:</span><br><span class="line">	static sing1eton_1azy* getInstance() &#123;</span><br><span class="line">			if (pSingleton == NULL)&#123;</span><br><span class="line">				pSing1eton = new Singleton_1azy;</span><br><span class="line">			&#125;</span><br><span class="line">			return pSing1eton;</span><br><span class="line">		&#125;</span><br><span class="line">private:</span><br><span class="line">	static Singleton_lazy* pSingleton;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//类外初始化</span><br><span class="line">Singleton_lazy* Singleton_lazy::pSingleton = NULL;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 饿汉式</span><br><span class="line">class Sing1eton_hungry &#123;</span><br><span class="line">private:</span><br><span class="line">	sing1eton_hungry () &#123;&#125;</span><br><span class="line">public:</span><br><span class="line">	static Singleton_hungry* getInstance()&#123;</span><br><span class="line">		return pSing1eton;</span><br><span class="line">private:</span><br><span class="line">	static Singleton_hungry* pSingleton;</span><br><span class="line">&#125;;</span><br><span class="line">Singleton_hungry* Singleton_hungry::pSingleton = new Singleton_hungry;</span><br></pre></td></tr></table></figure>
+
+<p>其实单例模式的核心就是构造函数私有化，让用户不能自己new一个对象。饿汉式是直接类内new一个对象，懒汉式是在需要访问对象时才实例化。完事儿通过static来保证大家访问的都是同一个实例</p>
+<p>单例不需要考虑释放问题</p>
+<p>单例模式不需要考虑释放问题的原因是，单例模式中的实例对象是在程序的整个生命周期中存在的，直到程序结束才会被销毁。因此，不需要手动释放单例对象。</p>
+<p>单例模式通过将构造函数私有化，并提供一个静态方法来获取唯一实例，确保了只有一个实例存在。实例一旦创建，就会一直存在于内存中，直到程序结束。因为单例对象是全局唯一的，可以在程序的任何地方访问，所以不需要手动释放实例。</p>
+<p>如果强制要求释放单例对象，可能会导致程序在继续执行时无法再次获取该实例，从而违背了单例模式的初衷。</p>
+<h3 id="单例碰到多线程"><a href="#单例碰到多线程" class="headerlink" title="单例碰到多线程"></a>单例碰到多线程</h3><p><img src="/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726165422048.png" alt="image-20230726165422048"></p>
+<img src="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/image-20230726165422048.png" class title="This is an test image">
+
+<p>在单例模式的懒汉式实现中，实例对象在首次被请求时才会被创建。这种延迟加载的方式会在多线程环境下引发线程安全性问题。</p>
+<p>当多个线程同时调用单例模式的懒汉式实现的获取实例的方法时，可能会导致多个线程同时判断实例为空，从而同时创建多个实例。这会破坏单例的唯一性。</p>
+<p>在多线程的情况下，假设有两个线程 A 和 B 同时调用 <code>Singleton::getInstance()</code> 方法且此时 <code>instance</code> 为空。线程 A 执行到 <code>instance = new Singleton()</code> 时，它可能会被切换出去，而线程 B 此时也执行到了 <code>instance == nullptr</code> 的判断，于是线程 B 也会创建一个新的实例。这样就在多线程中产生了多个实例。</p>
+<p>为了解决这个线程安全性问题，可以考虑使用加锁机制来保证只有一个线程可以同时访问创建实例的代码块。例如，可以使用互斥锁（<code>std::mutex</code>）来实现互斥访问。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;mutex&gt;</span><br><span class="line"></span><br><span class="line">class Singleton &#123;</span><br><span class="line">private:</span><br><span class="line">    static Singleton* instance;</span><br><span class="line">    static std::mutex mtx;</span><br><span class="line">    </span><br><span class="line">    Singleton() &#123;&#125;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    static Singleton* getInstance() &#123;</span><br><span class="line">        if (instance == nullptr) &#123;</span><br><span class="line">            std::lock_guard&lt;std::mutex&gt; lock(mtx);  // 加锁</span><br><span class="line">            if (instance == nullptr) &#123;  // 再次判断是否为空</span><br><span class="line">                instance = new Singleton();</span><br><span class="line">            &#125;</span><br><span class="line">            //解锁</span><br><span class="line">        &#125;</span><br><span class="line">        return instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton* Singleton::instance = nullptr;</span><br><span class="line">std::mutex Singleton::mtx;</span><br></pre></td></tr></table></figure>
+
+<h2 id="代理概念理解案例"><a href="#代理概念理解案例" class="headerlink" title="代理概念理解案例"></a>代理概念理解案例</h2><p>代理模式的定义∶为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">//提供一种代理来控制对其他对象的访问</span><br><span class="line">c1ass AbstractCommonInterface&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void run() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//我已经写好的系统</span><br><span class="line">class MySystem : public AbstractCommonInterface&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;系统启动...&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//必须有要权限验证，不是所有人都能来启动我的启动，提供用户名和密码</span><br><span class="line">class MySystemProxy : public AbstractCommonInterface &#123;</span><br><span class="line">public:</span><br><span class="line">	MySystemProxy (string username,string password)&#123;</span><br><span class="line">		this-&gt;mUsername = username;</span><br><span class="line">		this-&gt;mPassword = password;</span><br><span class="line">		pSystem = new MySystem;</span><br><span class="line">	&#125;</span><br><span class="line">	bool checkUsernameAndPassoword() &#123;</span><br><span class="line">		if (mUsername == &quot; admin&quot; &amp;&amp; mPassword == &quot;admin&quot;)&#123;</span><br><span class="line">			return true;</span><br><span class="line">		&#125;else</span><br><span class="line">			return false;</span><br><span class="line"></span><br><span class="line">	virtual void run () &#123;</span><br><span class="line">		if (checkUsernameAndPassoword ())</span><br><span class="line">			cout &lt;&lt;&quot;用户名和密码正确，验证通过...&lt;&lt;this-&gt;pSystem-&gt;run();</span><br><span class="line">		else&#123;</span><br><span class="line">			cout &lt;&lt;用户名或者密码错误,权限不足...&quot;&lt;&lt; endl;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test()&#123;</span><br><span class="line">	MySystemProxy* mys=new MySystemProxy(&quot;admin&quot;,&quot;admin&quot;);</span><br><span class="line">	mys-&gt;run;</span><br><span class="line">	delete mys;</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>web服务器在验证用户连接信息时，使用代理服务器，不然既要验证信息，又要数据传输，服务器压力会过大。</p>
+<h2 id="外观模式-概念"><a href="#外观模式-概念" class="headerlink" title="外观模式_概念"></a>外观模式_概念</h2><p>根据迪米特法则，如果两个类不必彼此直接通信，那么这两个类就不应当发生直接的相互作用。<br>Facade模式也叫外观模式，是由GoF提出的23种设计模式中的一种。Facade模式为一组具有类似功能的类群，比如类库，子系统等等，提供一个一致的简单的界面。这个一致的简单的界面被称作facade。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">外观模式就是将复杂的子类系统抽象到同一个的接口进行管理</span><br><span class="line">，外界只需要通过此接口与子类系统进行交互，而不必要直接与复杂的子类系统进行交互</span><br><span class="line">*/</span><br><span class="line">//子系统1</span><br><span class="line">class SubSysteml &#123;</span><br><span class="line">public:</span><br><span class="line">	void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;子系统一运行...&quot; &lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125; ;</span><br><span class="line">//子系统2</span><br><span class="line">class SubSystem2&#123;</span><br><span class="line">public:</span><br><span class="line">	void run()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;子系统二运行...&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//子系统3</span><br><span class="line">class SubSystem3&#123;</span><br><span class="line">public:</span><br><span class="line">	void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;子系统三运行...&quot;&lt;&lt; endl ;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//子系统4</span><br><span class="line">class SubSystem4&#123;</span><br><span class="line">public:</span><br><span class="line">	void run() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;子系统四运行...&quot; &lt;&lt; endl ;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//外观类</span><br><span class="line">class Facede&#123;</span><br><span class="line">public:</span><br><span class="line">	Facede() &#123;</span><br><span class="line">		pSysteml = new SubSysteml;</span><br><span class="line">		pSystem2 = new SubSystem2;</span><br><span class="line">		pSystem3 = new SubSystem3;</span><br><span class="line">		pSystem4 = new SubSystem4;</span><br><span class="line">	&#125;</span><br><span class="line">	~Facede() &#123;</span><br><span class="line">	//销毁</span><br><span class="line">	&#125;</span><br><span class="line">	void runSystem() &#123;</span><br><span class="line">		pSysteml-&gt;run();</span><br><span class="line">		pSystem2-&gt;run();</span><br><span class="line">		pSystem3-&gt;run();</span><br><span class="line">		pSystem4-&gt;run();</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	SubSysteml* pSysteml ;</span><br><span class="line">	SubSystem2* pSystem2;</span><br><span class="line">	SubSystem3* pSystem3;</span><br><span class="line">	SubSystem4* pSystem4;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	Facede* facede = new Facede;</span><br><span class="line">	facede-&gt;runSystem() ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在不同情况下，可能分不同模式的外观，即系统的不同状态需要重新定义外观类。</p>
+<h2 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h2><p>将一个类的接口转换成客户希望的另外一个接口。使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">//这函数我已经写好</span><br><span class="line">struct MyPrint &#123;</span><br><span class="line">	void operator() (int vl,int v2)&#123;</span><br><span class="line">		cout &lt;&lt; vl + v2 &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//定义目标接口我要是配偶适配成什么样的</span><br><span class="line">class Target&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void operator () (int v) = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//写适配器</span><br><span class="line">class Adapter : public Target &#123;</span><br><span class="line">public:</span><br><span class="line">	Adapter(int pram)&#123;</span><br><span class="line">		this-&gt;pram=pram;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void operator() (int v)&#123;</span><br><span class="line">		print(v,pram) ;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	MyPrint print;</span><br><span class="line">	int pram;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main(void)&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	for (int i = 0; i &lt; 10;i++)</span><br><span class="line">		v.push_back(i) ;</span><br><span class="line">	for_each(v.begin(),v.end(),Adapter(10));//Adapter(10)是可以调用构造函数的</span><br><span class="line">	</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="模板方法模式"><a href="#模板方法模式" class="headerlink" title="模板方法模式"></a>模板方法模式</h2><p>定义一个操作中算法的框架，而将一些步骤延迟到子类中。模板方法模式使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。	</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">//抽象模板</span><br><span class="line">class DrinkTemplate&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void BoilWater() = 0;//煮开水</span><br><span class="line">	virtual void Brew() = 0;//冲泡</span><br><span class="line">	virtual void PourInCup() = 0;//倒入杯中</span><br><span class="line">	virtual void AddSonmething() = 0;//加料</span><br><span class="line">&#125;;</span><br><span class="line">//模板方法</span><br><span class="line">void Make() &#123;</span><br><span class="line">	this-&gt;BoilWater();</span><br><span class="line">	this-&gt;Brew() ;</span><br><span class="line">	this-&gt;PourInCup() ;</span><br><span class="line">	this-&gt;AddSonmething();</span><br><span class="line">&#125;</span><br><span class="line">//制作茶水</span><br><span class="line">class Tea : public DrinkTemplate&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void BoilWater()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;煮开水!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Brew()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;冲泡茶叶!&quot;&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void PourInCup()&#123;</span><br><span class="line">		cout &lt;&lt;&quot;茶水倒入杯中!&quot;&lt;&lt; endl ;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void AddSonmething()&#123;</span><br><span class="line">		cout &lt;&lt;“加入柠檬!&quot;”&lt;&lt;endl ;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line">(1)在父类中形式化地定义一个算法，而由它的子类来实现细节的处理，在子类实现详细的处理算法时并不会改变算法中步骤的执行次序。</span><br><span class="line">(2)模板方法模式是一种代码复用技术，它在类库设计中尤为重要，它提取了类库中的公共行为，将公共行为放在父类中,而通过其子类来实现不同的行为，它鼓励我们恰当使用继承来实现代码复用。</span><br><span class="line">(3)可实现一种反向控制结构，通过子类覆盖父类的钩子方法来决定某一特定步骤是否要执行。</span><br><span class="line">(4)在模板方法模式中可以通过子类来覆盖父类的基本方法，不同的子类可以提供基本方法的不同实现，更换和增加新的子类很方便，符合单一职责原则和开闭原则。</span><br></pre></td></tr></table></figure>
+
+<h2 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h2><p>策略模式定义了一系列的算法，并将每一个算法封装起来而且使它们还可以相互替换。策略模式让算法独立于使用它的客户而独立变化。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">//武器策略</span><br><span class="line">class WeaponStrategy&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void UseWeapon() =0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//匕首策略</span><br><span class="line">class KnifeStrategy : public WeaponStrategy&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void UseWeapon() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;使用匕首!&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">class Character &#123;</span><br><span class="line">public:</span><br><span class="line">	//设置武器策略</span><br><span class="line">	void setWeaponStrategy(WeaponStrategy* weaponStrategy) &#123;</span><br><span class="line">		pWeaponStrategy = weaponStrategy;</span><br><span class="line">	&#125;</span><br><span class="line">	void UseWeapon() &#123;</span><br><span class="line">		WeaponStrategy-&gt;UseWeapon() ;</span><br><span class="line">	&#125;</span><br><span class="line">private:</span><br><span class="line">	WeaponStrategy* pWeaponStrategy;</span><br><span class="line">&#125;;</span><br><span class="line">void test02()&#123;</span><br><span class="line">	Character* character = new Character;//创建角色</span><br><span class="line">	WeaponStrategy* strategy = NULL;//武器策略</span><br><span class="line">	cout &lt;&lt; &quot;---------------使用匕首策略--——-----------&quot; &lt;&lt; endl;</span><br><span class="line">	strategy = new KnifeStrategy;//创建匕首策略</span><br><span class="line">	character-&gt;setWeaponStrategy(strategy); //设置武器策略为匕首策略</span><br><span class="line">	character-&gt;UseWeapon() ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h2><p>将一个请求封装为一个对象，从而让我们可用不同的请求对客户进行参数化;对请求排队或者记录请求日志，以及支持可撤销的操作。命令模式是一种对象行为型模式，其别名为动作(Action)模式或事务(Transaction)模式。<br>命令模式可以将请求发送者和接收者完全解耦，发送者与接收者之间没有直接引用关系，发送请求的对象只需要知道如何发送请求，而不必知道如何完成请求。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">//协议处理类</span><br><span class="line">class HandleClientProtocol&#123;</span><br><span class="line">public:</span><br><span class="line">	//处理增加金币</span><br><span class="line">	void AddMoney() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;给玩家增加金币!&quot; &lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	//处理增加钻石</span><br><span class="line">	void AddDiamond() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;给玩家增加钻石!&quot;&lt;&lt;end1;</span><br><span class="line">	&#125;</span><br><span class="line">	//处理玩家装备</span><br><span class="line">	void AddEquipment () &#123;</span><br><span class="line">		cout &lt;&lt;&quot;给玩家穿装备! &quot; &lt;&lt;end1;</span><br><span class="line">	&#125;</span><br><span class="line">	//处理玩家升级</span><br><span class="line">	void addLeve1() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;给玩家升级!&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//命令接口</span><br><span class="line">class AbstractCommand&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void handle() = 0;//处理客户端请求的接口</span><br><span class="line">&#125;</span><br><span class="line">//处理增加金币请求</span><br><span class="line">c1ass AddMoneyCommand :public AbstractCommand &#123;</span><br><span class="line">public:</span><br><span class="line">	AddMoneyCommand(HandleClientProtocol* protocol)&#123;</span><br><span class="line">		this-&gt;pProtocol = protocol;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void handle() &#123;</span><br><span class="line">		this-&gt;pProtoco1-&gt;AddMoney() ;</span><br><span class="line">public:</span><br><span class="line">	HandleClientProtocol* pProtoco1;</span><br><span class="line">&#125;;</span><br><span class="line">//处理增加钻石的请求</span><br><span class="line">class AddDiamondCommand :public AbstractCommand &#123;</span><br><span class="line">public:</span><br><span class="line">	AddDiamondCommand(HandleClientProtocol* protoco1)&#123;</span><br><span class="line">		this-&gt;pProtocol = protocol;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void handle() &#123;</span><br><span class="line">		this-&gt;pProtoco1-&gt;AddDiamond () ;</span><br><span class="line">	&#125;</span><br><span class="line">public:</span><br><span class="line">	HandleClientProtocol* pProtocol;</span><br><span class="line">&#125;;</span><br><span class="line">//服务器程序</span><br><span class="line">class Serser&#123;</span><br><span class="line">public:</span><br><span class="line">	void addRequest(AbstractCommand* command)&#123;</span><br><span class="line">		mCommands. push(command) ;</span><br><span class="line">	&#125;</span><br><span class="line">	void startHandle() &#123;</span><br><span class="line">		while (!mCommands.empty())&#123;</span><br><span class="line">			AbstractCommand* command =mCommands.front() ;</span><br><span class="line">			command-&gt;handle();</span><br><span class="line">			mCommands.pop();</span><br><span class="line">		&#125;</span><br><span class="line">public:</span><br><span class="line">	queue&lt;AbstractCommand*&gt; mCommands;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	HandleClientProtocol* protocol = new HandleClientProtocol;</span><br><span class="line">	//客户端增加金币的请求</span><br><span class="line">	AbstractCommand* addmoney = new AddMoneyCommand(protocol);</span><br><span class="line">	//客户端增加钻石的请求</span><br><span class="line">	AbstractCommand* adddiamond = new AddDiamondCommand(protocol);</span><br><span class="line">	addmoney-&gt;handle();</span><br><span class="line">	adddiamond-&gt;handle();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h2><p>随着交通信号灯的变化，汽车的行为也将随之而变化，一盏交通信号灯可以指挥多辆汽车。<br>观察者模式是用于建立一种对象与对象之间的依赖关系，一个对象发生改变时将自动通知其他对象,其他对象将相应作出反应。在观察者模式中，发生改变的对象称为观察目标，而被通知的对象称为观察者，一个观察目标可以对应多个</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">class AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void Update()= 0;</span><br><span class="line">&#125;;</span><br><span class="line">class HeroA : public AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	HeroA() &#123;</span><br><span class="line">		cout &lt;&lt;“英雄A正在措BOSs ...&quot;&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Update() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;英雄A停止打,待机状态...&quot; &lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">class HeroB :public AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	HeroB() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;英雄B正在打BOSs ...&quot; &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void Update() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;英雄B停止打,待机状态...&quot;&lt;&lt; end1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//观察目标抽象</span><br><span class="line">class AbstractBoss&#123;</span><br><span class="line">public:</span><br><span class="line">//添加观察者</span><br><span class="line">	virtual void addHero(AbstractHero* hero)= 0;//删除观察者</span><br><span class="line">	virtual void deleteHero(AbstractHero* hero) = 0;//通知所有观察者</span><br><span class="line">	virtual void notify() = 0;</span><br><span class="line">&#125;;</span><br><span class="line">//具体的观察者BOSSA</span><br><span class="line">class BOSSA : public AbstractBoss&#123; </span><br><span class="line">public:</span><br><span class="line">	virtual void addHero(AbstractHero* hero)&#123;</span><br><span class="line">		pHeroList.push_back(hero);</span><br><span class="line">	&#125;</span><br><span class="line">//删除观察者</span><br><span class="line">	virtual void deleteHero(AbstractHero* hero)&#123;</span><br><span class="line">		pHeroList.remove(hero) ;</span><br><span class="line">	&#125;</span><br><span class="line">//通知所有观察者</span><br><span class="line">	virtual void notify() &#123;</span><br><span class="line">		for (list&lt;AbstractHero*&gt; ::iterator it = pHeroList.begin(); it != pHeroList.end();it++)</span><br><span class="line">			(*it)-&gt;Update();</span><br><span class="line">public:</span><br><span class="line">	list&lt;AbstractHero*&gt; pHeroList;</span><br><span class="line">&#125;;</span><br><span class="line">void test01()&#123;</span><br><span class="line">	//创建观察者</span><br><span class="line">	AbstractHero* heroA = new HeroA;</span><br><span class="line">	AbstractHero* heroB = new HeroB;</span><br><span class="line">	AbstractHero* heroC= new HeroC;</span><br><span class="line">	AbstractHero* heroD= new HeroD;</span><br><span class="line">	AbstractHero* heroE = new HeroE; </span><br><span class="line">	//创建观察目标</span><br><span class="line">	AbstractBoss* bossA = new BOSSA;</span><br><span class="line">	bossA-&gt;addHero(heroA);</span><br><span class="line">	bossA-&gt;addHero(heroB);</span><br><span class="line">	bossA-&gt;addHero(heroC);</span><br><span class="line">	bossA-&gt;addHero(heroD);</span><br><span class="line">	bossA-&gt;addHero(heroE);</span><br><span class="line">	cout &lt;&lt; &quot;heroC阵亡...&quot; &lt;&lt;endl;</span><br><span class="line">	bossA-&gt;deleteHero(heroC);</span><br><span class="line">	cout &lt;&lt; &quot;Boss死了...通知其他英雄停止攻击，抢装备...&quot;&lt;&lt; end1;</span><br><span class="line">	bossA-&gt;notify();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="装饰器模式"><a href="#装饰器模式" class="headerlink" title="装饰器模式"></a>装饰器模式</h2><p>装饰模式又叫包装模式，通过一种对客户端透明的方式来扩展对象功能，是继承关系的一种替代。<br>装饰模式就是把要附加的功能努别放在单独的类中，并让这个类包含它要装饰的对象，当需要执行时，客户端就可以有选择的、按顺序的使用装饰功能包装对象。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">//一般情况下用继承实现类的功能拓展/装饰模式可以动态给一个类增加功能</span><br><span class="line">//抽象英雄</span><br><span class="line">class AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	virtual void ShowStatus() = 0;</span><br><span class="line">public:</span><br><span class="line">	int mHp;</span><br><span class="line">	int mMp;</span><br><span class="line">	int mAt;</span><br><span class="line">	int mDf ;</span><br><span class="line">&#125;;</span><br><span class="line">//具体英雄</span><br><span class="line">class HeroA : public AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	HeroA()&#123;</span><br><span class="line">		mHp= 0 ;</span><br><span class="line">		mMp= 0 ;</span><br><span class="line">		mAt= 0 ;</span><br><span class="line">		mDf= 0 ;</span><br><span class="line">	&#125;</span><br><span class="line"> </span><br><span class="line">	virtual void ShowStatus() &#123;</span><br><span class="line">		cout&lt;&quot;血量:&quot;&lt;&lt; mHp &lt;&lt; end1;</span><br><span class="line">		cout &lt;&lt;&quot;魔法:&quot;&lt;&lt; mMp &lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt;&quot;攻击:&quot;&lt;&lt; mAt&lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt;&quot;防御:&quot;&lt;&lt; mDf&lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">//英雄穿上某个装饰物那么他还是个英雄</span><br><span class="line">class AbstractEquipment : public AbstractHero&#123;</span><br><span class="line">public:</span><br><span class="line">	AbstractEquipment(AbstractHero* hero)&#123;</span><br><span class="line">		this-&gt;pHero = hero;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void ShowStatus() &#123;&#125;</span><br><span class="line">public:</span><br><span class="line">	AbstractHero* pHero;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//狂徒</span><br><span class="line">class KuangtuEquipment : public AbstractEquipment &#123;</span><br><span class="line">public:</span><br><span class="line">	KuangtuEquipment(AbstractHero* hero) :AbstractEquipment(hero)&#123;&#125;//依赖基类的构造函数来完成部分数据成员的初始化</span><br><span class="line">	//增加额外功能</span><br><span class="line">	void AddKuangtu() &#123;</span><br><span class="line">		cout &lt;&lt;&quot;英雄穿上狂徒之后...&quot;&lt;&lt;endl;</span><br><span class="line">		this-&gt;mHp = this-&gt;pHero-&gt;mHp ;</span><br><span class="line">		this-&gt;mMpI= this-&gt;pHero-&gt;mMp ;</span><br><span class="line">		this-&gt;mAt = this-&gt;pHero-&gt;mAt ;</span><br><span class="line">		this-&gt;mDf = this-&gt;pHero-&gt;mDf + 30;</span><br><span class="line">		delete this-&gt;pHero;</span><br><span class="line">	&#125;</span><br><span class="line">	virtual void ShowStatus() &#123;</span><br><span class="line">		AddKuangtu();//额外增加功能</span><br><span class="line">		cout &lt;&lt;&quot;血量:&quot;&lt;&lt; mHp &lt;&lt; endl;</span><br><span class="line">		cout&lt;&lt;&quot;魔法:&quot;&lt;&lt; mMp &lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt;&quot;攻击:&quot;&lt;&lt; mAt &lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt;&quot;&quot;防御:&quot;&lt;&lt; mDf &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test01 ()&#123;</span><br><span class="line">	AbstractHero* hero = new HeroA;</span><br><span class="line">	hero-&gt;ShowStatus() ;</span><br><span class="line">	cout &lt;&lt; &quot;—------―----&quot; &lt;&lt; endl;</span><br><span class="line">	//给裸奔的英雄穿上衣服</span><br><span class="line">	hero = new KuangtuEquipment (hero);</span><br><span class="line">	hero-&gt;ShowStatus () ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/18/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B-web%E5%A4%A7%E7%BB%83%E4%B9%A0-B-S/" rel="prev" title="Linux网络编程-web大练习-B/S">
+      <i class="fa fa-chevron-left"></i> Linux网络编程-web大练习-B/S
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#UML"><span class="nav-number">1.</span> <span class="nav-text">UML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UML%E4%B8%AD%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.1.</span> <span class="nav-text">UML中的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BE%8B%E5%9B%BE"><span class="nav-number">1.2.</span> <span class="nav-text">用例图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%9B%BE"><span class="nav-number">1.3.</span> <span class="nav-text">类图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">类的表示法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB-%E6%B3%9B%E5%8C%96%E5%85%B3%E7%B3%BB"><span class="nav-number">1.3.2.</span> <span class="nav-text">类之间的关系-泛化关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB-%E5%AE%9E%E7%8E%B0%E5%85%B3%E7%B3%BB"><span class="nav-number">1.3.3.</span> <span class="nav-text">类之间的关系-实现关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB-%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB"><span class="nav-number">1.3.4.</span> <span class="nav-text">类之间的关系-依赖关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB-%E5%85%B3%E8%81%94%E5%85%B3%E7%B3%BB"><span class="nav-number">1.3.5.</span> <span class="nav-text">类之间的关系-关联关系</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">软件设计模式的种类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%80%BB%E8%A7%88%E5%9B%BE"><span class="nav-number">2.1.</span> <span class="nav-text">设计模式总览图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="nav-number">2.2.</span> <span class="nav-text">面向对象设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99"><span class="nav-number">2.3.</span> <span class="nav-text">开闭原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%AA%E7%B1%B3%E7%89%B9%E6%B3%95%E5%88%99"><span class="nav-number">2.4.</span> <span class="nav-text">迪米特法则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E6%88%90%E5%A4%8D%E7%94%A8%E5%8E%9F%E5%88%99"><span class="nav-number">2.5.</span> <span class="nav-text">合成复用原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E5%80%92%E8%BD%AC%E5%8E%9F%E5%88%99"><span class="nav-number">2.6.</span> <span class="nav-text">依赖倒转原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.7.</span> <span class="nav-text">简单工厂模式-代码实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.8.</span> <span class="nav-text">工厂方法模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E5%92%8C%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.8.1.</span> <span class="nav-text">简单工厂和工厂方法模式适用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.9.</span> <span class="nav-text">抽象工厂模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F-%E9%A5%BF%E6%B1%89%E5%BC%8F%E5%92%8C%E6%87%92%E6%B1%89%E5%BC%8F%E5%88%9B%E5%BB%BA"><span class="nav-number">2.10.</span> <span class="nav-text">单例模式_饿汉式和懒汉式创建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E7%A2%B0%E5%88%B0%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.10.1.</span> <span class="nav-text">单例碰到多线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A6%82%E5%BF%B5%E7%90%86%E8%A7%A3%E6%A1%88%E4%BE%8B"><span class="nav-number">2.11.</span> <span class="nav-text">代理概念理解案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F-%E6%A6%82%E5%BF%B5"><span class="nav-number">2.12.</span> <span class="nav-text">外观模式_概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.13.</span> <span class="nav-text">适配器模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.14.</span> <span class="nav-text">模板方法模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.15.</span> <span class="nav-text">策略模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.16.</span> <span class="nav-text">命令模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.17.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.18.</span> <span class="nav-text">装饰器模式</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

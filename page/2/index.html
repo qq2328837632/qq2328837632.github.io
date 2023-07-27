@@ -147,6 +147,170 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/18/Linux-%E7%BA%BF%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/06/18/Linux-%E7%BA%BF%E7%A8%8B/" class="post-title-link" itemprop="url">Linux-线程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-06-18 11:40:33" itemprop="dateCreated datePublished" datetime="2023-06-18T11:40:33+08:00">2023-06-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-16 10:12:27" itemprop="dateModified" datetime="2023-07-16T10:12:27+08:00">2023-07-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="线程概念"><a href="#线程概念" class="headerlink" title="线程概念"></a>线程概念</h2><p>线程概念：<br>进程：有独立的 进程地址空间。有独立的 pcb。 分配资源的最小单位。<br>线程：有独立的 pcb。没有独立的进程地址空间。 最小单位的执行。<br>ps -Lf 进程 id —&gt; 线程号。LWP –》cpu 执行的最小单位（线程）。</p>
+<p>ps -Lf 进程号 查看进程的线程</p>
+<p><img src="/Linux-%E7%BA%BF%E7%A8%8B/image-20230617155342436.png" alt="image-20230617155342436"></p>
+<img src="/2023/06/18/Linux-%E7%BA%BF%E7%A8%8B/image-20230617155342436.png" class title="This is an test image">
+
+<p>一个进程的线程越多，争取cpu的概率越大，但是会有峰值，然后降低</p>
+<h2 id="三级映射"><a href="#三级映射" class="headerlink" title="三级映射"></a>三级映射</h2><h3 id="Linux内核线程实现原理"><a href="#Linux内核线程实现原理" class="headerlink" title="Linux内核线程实现原理"></a>Linux内核线程实现原理</h3><p>类Unix系统中，早期是没有“线程”概念的，80年代才引入，借助进程机制实现出了线程的概念。因此在这类系统中，进程和线程关系密切。</p>
+<p>1.轻量级进程(light-weight process)，也有 PCB，创建线程使用的底层函数和进程一样，都是clone</p>
+<p>2.从内核里看进程和线程是一样的，都有各自不同的PCB，但是PCB 中指向内存资源的三级页表是相同的</p>
+<p>3.进程可以蜕变成线程。</p>
+<p>4.线程可看做寄存器和栈的集合（寄存器在cpu上用来计算，栈帧开辟在栈上，目的是执行函数和存放局部变量，临时值和形参）</p>
+<p>5.在 linux 下，线程是最小的执行单位;进程是最小的分配资源单位。</p>
+<p>查看Lwp号:<code>ps -lf pid</code>查看指定线程的 lwp号。</p>
+<h3 id="进程控制块PCB"><a href="#进程控制块PCB" class="headerlink" title="进程控制块PCB."></a>进程控制块PCB.</h3><p>我们知道,每个进程在内核中都有一个进程控制块(PCB)来维护进程相关的信息，Linux内核的进程控制块是task_struct结构体。</p>
+<p><code>/usr/src/linux-headers-3.16.0-30/include/linux/sched.h</code>.文件中可以查看struct task_struct结构体定义。其内部成员有很多，我们重点掌握以下部分即可:</p>
+<ul>
+<li>进程id。系统中每个进程有唯一的id，在c语言中用pid_t类型表示，其实就是一个非负整数。</li>
+<li>进程的状态，有就绪、运行、挂起、停止等状态。</li>
+<li>进程切换时需要保存和恢复的一些cPu寄存器。</li>
+<li>描述虚拟地址空间的信息</li>
+<li>描述控制终端的信息。</li>
+<li>当前工作目录(Current Working Directory)。</li>
+<li>umask掩码。</li>
+<li>文件描述符表，包含很多指向file结构体的指针。</li>
+<li>和信号相关的信息。</li>
+<li>用户id和组id。</li>
+<li>会话(Session）和进程组。</li>
+<li>进程可以使用的资源上限（Resource Limit) 。</li>
+</ul>
+<p><img src="/Linux-%E7%BA%BF%E7%A8%8B/image-20230617160559643.png" alt="image-20230617160559643"></p>
+<img src="/2023/06/18/Linux-%E7%BA%BF%E7%A8%8B/image-20230617160559643.png" class title="This is an test image">
+
+<p>如果是fork则另外一个进程，指向的就不一样。我们之前讲没有pcb，其实映射是需要经过pcb的。</p>
+<h2 id="线程共享和非共享"><a href="#线程共享和非共享" class="headerlink" title="线程共享和非共享"></a>线程共享和非共享</h2><p>线程共享资源</p>
+<ul>
+<li>1.文件描述符表</li>
+<li>2.每种信号的处理方式</li>
+<li>3.当前工作目录</li>
+<li>4.用户ID和组ID</li>
+<li>5.内存地址空间(.text&#x2F;.data&#x2F;.bss&#x2F;heap&#x2F;共享库)，就是没有<strong>栈</strong>（栈执行函数和存放局部变量，临时值和形参）</li>
+</ul>
+<p>线程非共享资源</p>
+<ul>
+<li>1.线程id</li>
+<li>2.处理器现场（寄存器计算的数据在处理器保存）和<strong>栈</strong>指针(内核栈)</li>
+<li>3.独立的栈空间(用户空间栈)</li>
+<li>4.errno变量</li>
+<li>5.信号屏蔽字</li>
+<li>6.调度优先级</li>
+</ul>
+<p>线程优、缺点：<br>优点:1.提高程序并发性	2.开销小 	3.数据通信、共享数据方便。（可以共享全局变量，不像父子进程，读时共享、写时复制）<br>缺点:1.库函数，不稳定	2.调试、编写困难、gdb不支持	3.对信号支持不好。</p>
+<p>优点相对突出，缺点均不是硬伤。Linux下由于实现方法导致进程、线程差别不是很大。一般能使用线程就使用线程。</p>
+<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pthread_t *tid是传出参数</span><br><span class="line">C++ 中的参数，既可以当做传入参数，也可以当做传出参数，具体要看参数的数据类型。</span><br><span class="line"></span><br><span class="line">非指针，非引用类型：一定是当做传入参数；</span><br><span class="line">指针，引用类型：既可以当做传入参数；也可以当做传出参数；甚至可以同时是传入参数，也是传出参数。</span><br><span class="line">其次要看对参数进行的操作：</span><br><span class="line"></span><br><span class="line">如果是只有读取，没有修改的，那就是传入参数，这时可以加上 const 限定符，以防不小心修改了参数。</span><br><span class="line">如果只有对参数进行写入，没有读取的，那就是当做传出参数的。</span><br><span class="line">如果对参数先进行了读取操作，然后又进行了写入操作，那么就是既当传入参数也当传出参数了。</span><br></pre></td></tr></table></figure>
+
+<p><code>pthread_t pthread_self(void)</code>; 获取线程 id。 线程 id 是在进程地址空间内部，用来标识线程身份的 id 号。<br>    返回值：本线程 id<br>检查出错返回： 线程中。<br>    fprintf(stderr, “xxx error: %s\n”, strerror(ret));<br><code>int pthread_create(pthread_t *tid, const pthread_attr_t *attr, void *(*start_rountn)(void *), void *arg);</code> 创建子线程。<br>    参 1：传出参数，表新创建的子线程 id<br>    参 2：线程属性。传 NULL 表使用默认属性。<br>    参 3：子线程回调函数。创建成功，ptherad_create 函数返回时，该函数会被自动调用。<br>    参 4：参 3 的参数。没有的话，传 NULL<br>    返回值：成功：0<br>        失败：errno</p>
+<p>下面这个例子，创建一个子线程去执行其他任务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. void sys_err(const char *str)&#123;</span><br><span class="line">9. perror(str);</span><br><span class="line">10. exit(1);</span><br><span class="line">11. &#125;</span><br><span class="line">12.</span><br><span class="line">13. void *tfn(void *arg)&#123;</span><br><span class="line">14. printf(&quot;thread: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">15.</span><br><span class="line">16. return NULL;</span><br><span class="line">17. &#125;</span><br><span class="line">18.</span><br><span class="line">19. int main(int argc, char *argv[])&#123;</span><br><span class="line">20. pthread_t tid;</span><br><span class="line">21.</span><br><span class="line">22. printf(&quot;main: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">23.</span><br><span class="line">24. int ret = pthread_create(&amp;tid, NULL, tfn, NULL);</span><br><span class="line">25. if (ret != 0) &#123;</span><br><span class="line">26. perror(&quot;pthread_create error&quot;);</span><br><span class="line">27. &#125;</span><br><span class="line">28.</span><br><span class="line">29. return 0;</span><br><span class="line">30. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，子线程的打印信息并未出现。原因在于，主线程执行完之后，就销毁了整个进程的地址空间，于是子线程就无法打印。简单粗暴的方法就是让主线程睡 1 秒，等子线程执行。</p>
+<h2 id="循环创建多个子线程"><a href="#循环创建多个子线程" class="headerlink" title="循环创建多个子线程"></a>循环创建多个子线程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. void sys_err(const char *str)&#123;</span><br><span class="line">9. perror(str);</span><br><span class="line">10. exit(1);</span><br><span class="line">11. &#125;</span><br><span class="line">12.</span><br><span class="line">13. void *tfn(void *arg)&#123;</span><br><span class="line">14. int i = (int)arg;//int i = *((int *)arg)和(void *)&amp;i，子线程如果用地址传递 i，会去读取主线程里的 i 值，而主线程里的 i 是动态变化的，不固定。所以，应该采用值传递，不用指针传递。</span><br><span class="line"></span><br><span class="line">15. sleep(i);</span><br><span class="line">16. printf(&quot;--I&#x27;m %dth thread: pid = %d, tid = %lu\n&quot;,i+1, getpid(), pthread_self());</span><br><span class="line">17.</span><br><span class="line">18. return NULL;</span><br><span class="line">19. &#125;</span><br><span class="line">20.</span><br><span class="line">21. int main(int argc, char *argv[])&#123;</span><br><span class="line">22. int i;</span><br><span class="line">23. int ret;</span><br><span class="line">24. pthread_t tid;</span><br><span class="line">25.</span><br><span class="line">26. for(i=0;i&lt;5;i++)&#123;</span><br><span class="line">27. ret = pthread_create(&amp;tid, NULL, tfn, (void *)i);//(void *)&amp;i</span><br><span class="line">28. if (ret != 0) &#123;</span><br><span class="line">29. sys_err(&quot;pthread_create error&quot;);</span><br><span class="line">30. &#125;</span><br><span class="line">31. &#125;</span><br><span class="line">32. sleep(i);</span><br><span class="line">33. printf(&quot;I&#x27;m main, pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">34.</span><br><span class="line">35. return 0;</span><br><span class="line">36. &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-exit-退出"><a href="#pthread-exit-退出" class="headerlink" title="pthread_exit 退出"></a>pthread_exit 退出</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line">如果在回调函数里加一段代码：</span><br><span class="line">if(i == 2)</span><br><span class="line">	exit(0);</span><br><span class="line">看起来好像是退出了第三个子线程，然而运行时，发现后续的 4,5 也没了。这是因为，exit 是退出进程。</span><br><span class="line">一、修改一下，换成：</span><br><span class="line">if(i == 2)</span><br><span class="line">	return NULL;</span><br><span class="line">这样运行一下，发现后续线程不会凉凉，说明 return 是可以达到退出线程的目的。然而真正意义上，return 是返回到函数调用者那里去，线程并没有退出。</span><br><span class="line">二、再修改一下，再定义一个函数 func，直接返回那种</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">运行，发现 1,2,3,4,5 线程都还在，说明没有达到退出目的。</span><br><span class="line">三、再次修改：</span><br><span class="line">void *func(void)&#123;</span><br><span class="line">	pthread_exit(NULL);</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line">if(i == 2)</span><br><span class="line">	func();</span><br><span class="line">编译运行，发现 3 没了，看起来很科学的样子。pthread_exit 表示将当前线程退出。放在函数里，还是直接调用，都可以。</span><br><span class="line">回到之前说的一个问题，由于主线程可能先于子线程结束，所以子线程的输出可能不会打印出来，当时是用主线程 sleep 等待子线程结束来解决的。现在就可以使用 pthread_exit 来解决了。方法就是将 return 0 替换为 pthread_exit，只退出当前线程，不会对其他线程造成影响。</span><br><span class="line">void pthread_exit(void *retval); 退出当前线程。</span><br><span class="line">    retval：退出值。 无退出值时，NULL</span><br><span class="line">    exit(); 退出当前进程。</span><br><span class="line">    return: 返回到调用者那里去。</span><br><span class="line">    pthread_exit(): 退出当前线程。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-join"><a href="#pthread-join" class="headerlink" title="pthread_join"></a>pthread_join</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int pthread_join(pthread_t thread, void **retval); 阻塞 回收线程。</span><br><span class="line">	thread: 待回收的线程 id</span><br><span class="line">	retval：传出参数。 回收的那个线程的退出值。return</span><br><span class="line">线程异常解除，值为 -1。成功被 pthread_cancel() 杀死的线程，返回 -1.使用 pthead_join 回收。</span><br><span class="line">	返回值：成功：0</span><br><span class="line">	失败：errno</span><br></pre></td></tr></table></figure>
+
+<p>下面这个是回收线程并获取子线程返回值的小例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. struct thrd &#123;</span><br><span class="line">9. int var;</span><br><span class="line">10. char str[256];</span><br><span class="line">11. &#125;;</span><br><span class="line">12.</span><br><span class="line">13. void sys_err(const char *str)</span><br><span class="line">14. &#123;</span><br><span class="line">15. perror(str);</span><br><span class="line">16. exit(1);</span><br><span class="line">17. &#125;</span><br><span class="line">18.</span><br><span class="line">19. void *tfn(void *arg)</span><br><span class="line">20. &#123;</span><br><span class="line">21. struct thrd *tval;</span><br><span class="line">22.</span><br><span class="line">23. tval = malloc(sizeof(tval));</span><br><span class="line">24. tval-&gt;var = 100;</span><br><span class="line">25. strcpy(tval-&gt;str, &quot;hello thread&quot;);</span><br><span class="line">26.</span><br><span class="line">27. return (void *)tval;</span><br><span class="line">28. &#125;</span><br><span class="line">29.</span><br><span class="line">30. int main(int argc, char *argv[])</span><br><span class="line">31. &#123;</span><br><span class="line">32. pthread_t tid;</span><br><span class="line">33.</span><br><span class="line">34. struct thrd *retval;</span><br><span class="line">35.</span><br><span class="line">36. int ret = pthread_create(&amp;tid, NULL, tfn, NULL);</span><br><span class="line">37. if (ret != 0)</span><br><span class="line">38. sys_err(&quot;pthread_create error&quot;);</span><br><span class="line">39.</span><br><span class="line">40. //int pthread_join(pthread_t thread, void **retval);//void **retval同样是传出参数</span><br><span class="line">41. ret = pthread_join(tid, (void **)&amp;retval);</span><br><span class="line">42. if (ret != 0)</span><br><span class="line">43. sys_err(&quot;pthread_join error&quot;);</span><br><span class="line">44.</span><br><span class="line">45. printf(&quot;child thread exit with var= %d, str= %s\n&quot;, retval-&gt;var, retval-&gt;str);</span><br><span class="line">46.</span><br><span class="line">47. pthread_exit(NULL);//由于主线程可能先于子线程结束，所以子线程的输出可能不会打印出来，当时是用主线程 sleep 等待子线程结束来解决的。现在就可以使用 pthread_exit 来解决了。方法就是将 return 0 替换为 pthread_exit，只退出当前线程，不会对其他线程造成影响。</span><br><span class="line">48.</span><br><span class="line">49. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>还可以改为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">void *tfn(void *arg)</span><br><span class="line">&#123;</span><br><span class="line">    struct thrd *tval = (struct thrd *)arg;</span><br><span class="line">    tval-&gt;var = 100;</span><br><span class="line">    strcpy(tval-&gt;str,&quot;hello thread&quot;);</span><br><span class="line">    return (void *)tvai;//返回的是arg地址所以可以用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc,char *argv[])</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    pthread_t tid;</span><br><span class="line">    struct thrd arg;</span><br><span class="line">    struct thrd *retval;</span><br><span class="line">    int ret = pthread_create(&amp;tid，NULL, tfn，(void *)&amp;arg);</span><br><span class="line">    if (ret != 0)</span><br><span class="line">        sys_err( &quot;pthread_create error&quot;);</span><br><span class="line">    //int pthread_join(pthread_t thread, void **retval);</span><br><span class="line">    ret = pthread_join(tid,(void **)&amp;retval);</span><br><span class="line">    if (ret != 0)</span><br><span class="line">        sys_err( &quot;pthread_join error&quot;);</span><br><span class="line">    printf( &quot; child thread exit with var= %d，str= %s\n&quot;,retval-&gt;var,retval-&gt;str);</span><br><span class="line">    pthreadexit(NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-cancel-函数"><a href="#pthread-cancel-函数" class="headerlink" title="pthread_cancel 函数"></a>pthread_cancel 函数</h2><p><code>int pthread_cancel(pthread_t thread);</code> 杀死一个线程。 需要到达取消点（保存点），即需要调动系统内核<br>    thread: 待杀死的线程 id<br>    返回值：成功：0<br>    失败：errno<br>如果，子线程没有到达取消点， 那么 pthread_cancel 无效。<br>我们可以在程序中，手动添加一个取消点。使用 pthread_testcancel();<br>成功被 pthread_cancel() 杀死的线程，返回 -1.使用 pthead_join 回收。</p>
+<p>小例子，主线程调用 pthread_cancel 杀死子线程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8.</span><br><span class="line">9. void *tfn(void *arg)&#123;</span><br><span class="line">10. while (1) &#123;</span><br><span class="line">11. printf(&quot;thread: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">12. sleep(1);</span><br><span class="line">13. &#125;</span><br><span class="line">14.</span><br><span class="line">15. return NULL;</span><br><span class="line">16. &#125;</span><br><span class="line">17.</span><br><span class="line">18. int main(int argc, char *argv[])&#123;</span><br><span class="line">19. pthread_t tid;</span><br><span class="line">20.</span><br><span class="line">21. int ret = pthread_create(&amp;tid, NULL, tfn, NULL);</span><br><span class="line">22. if (ret != 0) &#123;</span><br><span class="line">23. fprintf(stderr, &quot;pthread_create error:%s\n&quot;, strerror(ret));</span><br><span class="line">24. exit(1);</span><br><span class="line">25. &#125;</span><br><span class="line">26.</span><br><span class="line">27. printf(&quot;main: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">28.</span><br><span class="line">29. sleep(5);</span><br><span class="line">30.</span><br><span class="line">31. ret = pthread_cancel(tid); // 终止线程</span><br><span class="line">32. if (ret != 0) &#123;</span><br><span class="line">33. fprintf(stderr, &quot;pthread_cancel error:%s\n&quot;, strerror(ret));</span><br><span class="line">34. exit(1);</span><br><span class="line">35. &#125;</span><br><span class="line">36.</span><br><span class="line">37. while (1);</span><br><span class="line">38.</span><br><span class="line">39. pthread_exit((void *)0);//由于主线程可能先于子线程结束，所以子线程的输出可能不会打印出来，当时是用主线程 sleep 等待子线程结束来解决的。现在就可以使用 pthread_exit 来解决了。方法就是将 return 0 替换为 pthread_exit，只退出当前线程，不会对其他线程造成影响。</span><br><span class="line">40. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里要注意一点，pthread_cancel 工作的必要条件是进入内核，如果 tfn 真的奇葩到没有进入内核， 则 pthread_cancel 不能杀死线程，此时需要手动设置取消点，就是 pthread_testcancel()</p>
+<h2 id="检查出错返回"><a href="#检查出错返回" class="headerlink" title="检查出错返回"></a>检查出错返回</h2><p>int pthread_detach(pthread_t thread); 设置线程分离<br>    thread: 待分离的线程 id<br>    返回值：成功：0<br>    失败：errno</p>
+<p>下面这个例子，使用 detach 分离线程，照理来说，分离后的线程会自动回收：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8.</span><br><span class="line">9. void *tfn(void *arg)</span><br><span class="line">10. &#123;</span><br><span class="line">11. printf(&quot;thread: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">12.</span><br><span class="line">13. return NULL;</span><br><span class="line">14. &#125;</span><br><span class="line">15.</span><br><span class="line">16. int main(int argc, char *argv[])</span><br><span class="line">17. &#123;</span><br><span class="line">18. pthread_t tid;</span><br><span class="line">19.</span><br><span class="line">20. int ret = pthread_create(&amp;tid, NULL, tfn, NULL);</span><br><span class="line">21. if (ret != 0) &#123;</span><br><span class="line">22. perror(&quot;pthread_create error&quot;);</span><br><span class="line">23. &#125;</span><br><span class="line">24. ret = pthread_detach(tid); // 设置线程分离` 线程终止,会自动清理 pcb,无需回收</span><br><span class="line">25. if (ret != 0) &#123;</span><br><span class="line">26. perror(&quot;pthread_detach error&quot;);</span><br><span class="line">27. &#125;</span><br><span class="line">28.</span><br><span class="line">29. sleep(1);</span><br><span class="line">30.</span><br><span class="line">31. ret = pthread_join(tid, NULL);</span><br><span class="line">32. printf(&quot;join ret = %d\n&quot;, ret);</span><br><span class="line">33. if (ret != 0) &#123;</span><br><span class="line">34. perror(&quot;pthread_join error&quot;);</span><br><span class="line">35. &#125;</span><br><span class="line">36.</span><br><span class="line">37. printf(&quot;main: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">38.</span><br><span class="line">39. pthread_exit((void *)0);</span><br><span class="line">40. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里，问题出现了，join 出错了，但是没打印错误原因。之前的 perror 方法检查线程错误是有 问题的。应该使用 strerror，修改代码如下，因为perror方法是底层的一个全局变量，线程不能用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">20. int ret = pthread_create(&amp;tid, NULL, tfn, NULL);</span><br><span class="line">21. if (ret != 0) &#123;</span><br><span class="line">22. fprintf(stderr, &quot;pthread_create error: %s\n&quot;, strerror(ret));//stderr,直接输出到终端</span><br><span class="line">23. exit(1);</span><br><span class="line">24. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>出错，是因为线程分离后，系统会自动回收资源，用 pthread_join 去回收已经被系统 回收的线程，那个线程号就是无效参数。</p>
+<p><code>pthread_join()</code>和<code>pthread_detach()</code>是用于管理线程资源的两种方式，但它们的作用是不同的。</p>
+<ul>
+<li><code>pthread_join(thread, status)</code>函数会将主线程阻塞，直到指定的线程 <code>thread</code> 终止。一旦目标线程终止，调用线程将从阻塞状态返回，并可以获取目标线程的退出状态信息。通过这种方式，<code>pthread_join()</code>可以实现对子线程的资源回收和同步等待操作。</li>
+<li><code>pthread_detach(thread)</code>函数则是将指定的线程 <code>thread</code> 设置为分离状态，从而使得线程结束后自动释放其相关资源，包括线程栈空间和线程描述符等。相当于告诉系统不需要进行显式的资源回收操作，由系统自动回收资源。</li>
+</ul>
+<p>所以，虽然<code>pthread_join()</code>和<code>pthread_detach()</code>都能起到资源回收的作用，它们的使用场景和效果略有差异。<code>pthread_join()</code>适用于需要等待线程执行完毕并获取其返回状态的情况，而<code>pthread_detach()</code>适用于不关心线程返回状态，只希望在线程结束后自动回收资源的情况</p>
+<h2 id="进程和线程控制原语对比"><a href="#进程和线程控制原语对比" class="headerlink" title="进程和线程控制原语对比"></a>进程和线程控制原语对比</h2><p>线程控制原语 			进程控制原语<br>pthread_create() 		fork();<br>pthread_self() 			getpid();<br>pthread_exit() 			exit(); 	&#x2F; return &#x2F;&#x2F;exit实际是退出进程，无论在哪个线程都会将整个进程都退出，return是退回到上一次调用的地方，所有只有都在主函数调用的时候效果一样。<br>pthread_join() 			wait()&#x2F;waitpid()<br>pthread_cancel() 		kill()<br>pthread_detach()</p>
+<h2 id="线程属性设置分离线程"><a href="#线程属性设置分离线程" class="headerlink" title="线程属性设置分离线程"></a>线程属性设置分离线程</h2><p>线程属性：<br>设置分离属性。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pthread_attr_t attr 创建一个线程属性结构体变量</span><br><span class="line">pthread_attr_init(&amp;attr); 初始化线程属性</span><br><span class="line">pthread_attr_setdetachstate(&amp;attr, PTHREAD_CREATE_DETACHED); 设置线程属性为分离态</span><br><span class="line">pthread_create(&amp;tid, &amp;attr, tfn, NULL); 借助修改后的 设置线程属性 创建为分离态的新线程</span><br><span class="line">pthread_attr_destroy(&amp;attr); 销毁线程属性</span><br></pre></td></tr></table></figure>
+
+<p>调整线程状态，使线程创建出来就是分离态，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;errno.h&gt;</span><br><span class="line">6. #include &lt;pthread.h&gt;</span><br><span class="line">7.</span><br><span class="line">8.</span><br><span class="line">9. void *tfn(void *arg)</span><br><span class="line">10. &#123;</span><br><span class="line">11. printf(&quot;thread: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">12.</span><br><span class="line">13. return NULL;</span><br><span class="line">14. &#125;</span><br><span class="line">15.</span><br><span class="line">16. int main(int argc, char *argv[])</span><br><span class="line">17. &#123;</span><br><span class="line">18. pthread_t tid;</span><br><span class="line">19.</span><br><span class="line">20. pthread_attr_t attr;</span><br><span class="line">21.</span><br><span class="line">22. int ret = pthread_attr_init(&amp;attr);</span><br><span class="line">23. if (ret != 0) &#123;</span><br><span class="line">24. fprintf(stderr, &quot;attr_init error:%s\n&quot;, strerror(ret));</span><br><span class="line">25. exit(1);</span><br><span class="line">26. &#125;</span><br><span class="line">27.</span><br><span class="line">28. ret = pthread_attr_setdetachstate(&amp;attr, PTHREAD_CREATE_DETACHED); // 设置线程属性为 分离属性</span><br><span class="line">29. if (ret != 0) &#123;</span><br><span class="line">30. fprintf(stderr, &quot;attr_setdetachstate error:%s\n&quot;, strerror(ret));</span><br><span class="line">31. exit(1);</span><br><span class="line">32. &#125;</span><br><span class="line">33.</span><br><span class="line">34. ret = pthread_create(&amp;tid, &amp;attr, tfn, NULL);</span><br><span class="line">35. if (ret != 0) &#123;</span><br><span class="line">36. perror(&quot;pthread_create error&quot;);</span><br><span class="line">37. &#125;</span><br><span class="line">38.</span><br><span class="line">39. ret = pthread_attr_destroy(&amp;attr);</span><br><span class="line">40. if (ret != 0) &#123;</span><br><span class="line">41. fprintf(stderr, &quot;attr_destroy error:%s\n&quot;, strerror(ret));</span><br><span class="line">42. exit(1);</span><br><span class="line">43. &#125;</span><br><span class="line">44.</span><br><span class="line">45. ret = pthread_join(tid, NULL);</span><br><span class="line">46. if (ret != 0) &#123;</span><br><span class="line">47. fprintf(stderr, &quot;pthread_join error:%s\n&quot;, strerror(ret));</span><br><span class="line">48. exit(1);</span><br><span class="line">49. &#125;</span><br><span class="line">50.</span><br><span class="line">51. printf(&quot;main: pid = %d, tid = %lu\n&quot;, getpid(), pthread_self());</span><br><span class="line">52.</span><br><span class="line">53. pthread_exit((void *)0);</span><br><span class="line">54. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>pthread_join 报错，说明线程已经自动回收，设置分离成功</p>
+<h2 id="线程使用注意事项"><a href="#线程使用注意事项" class="headerlink" title="线程使用注意事项"></a>线程使用注意事项</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1.主线程退出其他线程不退出，主线程应调用`pthread_exit`</span><br><span class="line">2.避免僵尸线程。</span><br><span class="line">`pthread_joine`</span><br><span class="line">`pthread_detach`</span><br><span class="line">`pthread_create`	指定分离属性</span><br><span class="line">join线程可能在join函数返回前就释放完自己的所有内存资源，所以不应当返回被回收线程楼中的值;</span><br><span class="line">3. malloc和mmap申请的内存可以被其他线程释放</span><br><span class="line">4.应避免在多线程模型中调用fork，除非马上exec，子进程中只有调用fork 的线程存在，其他线程在子进程中均pthread_exit</span><br><span class="line">5.信号的复杂语义很难和多线程共存，应避免在多线程引入信号机制,因为信号处理是同概率的，每一个的mask是不同的，但是未决信号集是一样的，所有才能在信号来时都会主动处理。</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1821,735 +1985,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/23/linux%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/23/linux%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">linux基础</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-23 14:32:54" itemprop="dateCreated datePublished" datetime="2023-04-23T14:32:54+08:00">2023-04-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-03 16:31:18" itemprop="dateModified" datetime="2023-07-03T16:31:18+08:00">2023-07-03</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Linux的目录结构"><a href="#Linux的目录结构" class="headerlink" title="Linux的目录结构"></a>Linux的目录结构</h1><p>是一个树型结构<br>Windows系统可以拥有多个盘符,如C盘、D盘、E盘<br>Linux没有盘符这个概念,只有一个根目录&#x2F;，所有文件都在它下面</p>
-<p>在Linux系统中，路径之间的层级关系，使用:&#x2F;来表示</p>
-<p>在Windows系统中，路径之间的层级关系，使用:\来表示</p>
-<p>D:\data\work\hello.txt<br>注意:<br>D:表示D盘 ,\表示层级关系</p>
-<p>&#x2F;usr&#x2F;local&#x2F;hello.txt<br>注意:<br>开头的&#x2F;表示根目录,后面的&#x2F;表示层级关系</p>
-<h2 id="ctrl-l清屏"><a href="#ctrl-l清屏" class="headerlink" title="ctrl+l清屏"></a>ctrl+l清屏</h2><h2 id="crtl-c中断"><a href="#crtl-c中断" class="headerlink" title="crtl+c中断"></a>crtl+c中断</h2><h2 id="crtl-d退出或登出"><a href="#crtl-d退出或登出" class="headerlink" title="crtl+d退出或登出"></a>crtl+d退出或登出</h2><ul>
-<li>可以通过快捷键:ctrl + d,退出账户的登录</li>
-<li>或者退出某些特定程序的专属页面，比如python</li>
-</ul>
-<h1 id="Linux命令"><a href="#Linux命令" class="headerlink" title="Linux命令"></a>Linux命令</h1><h2 id="Linux命令基础格式"><a href="#Linux命令基础格式" class="headerlink" title="Linux命令基础格式"></a>Linux命令基础格式</h2><p>无论是什么命令，用于什么用途，在Linux中，命令有其通用的格式:</p>
-<p>command [-options] [parameter]</p>
-<ul>
-<li>command:命令本身</li>
-<li>-options:[可选,非必填]命令的一些<strong>选项</strong>,可以通过选项控制命令的行为细节 </li>
-<li>parameter: [可选，非必填]命令的<strong>参数</strong>，多数用于命令的指向目标等</li>
-</ul>
-<p>语法中的[]表示可选的意思</p>
-<h3 id="ls命令的参数的作用"><a href="#ls命令的参数的作用" class="headerlink" title="ls命令的参数的作用"></a>ls命令的参数的作用</h3><ul>
-<li>可以指定要查看的文件夹(目录)的内容,如果不给定参数,就查看当前工作目录的内容</li>
-</ul>
-<h4 id="ls命令的选项"><a href="#ls命令的选项" class="headerlink" title="ls命令的选项:"></a>ls命令的选项:</h4><ul>
-<li>-a选项,可以展示出隐藏的内容</li>
-<li>以.开头的文件或文件夹默认被隐藏，需要-a才能显示出来</li>
-<li>-l选项,以列表的形式展示内容，并展示更多细节</li>
-<li>-h选项,需要和-l选项搭配使用，以更加人性化的方式显示文件的大小单位</li>
-</ul>
-<h4 id="命令的选项组合使用"><a href="#命令的选项组合使用" class="headerlink" title="命令的选项组合使用"></a>命令的选项组合使用</h4><ul>
-<li>命令的选项是可以组合使用的,比如: ls -lah,等同于ls -a -l -h</li>
-</ul>
-<h3 id="cd切换工作目录"><a href="#cd切换工作目录" class="headerlink" title="cd切换工作目录"></a>cd切换工作目录</h3><p>当Linux终端（命令行）打开的时候，会默认以用户的HOME目录作为当前的工作目录我们可以通过cd命令，更改当前所在的工作目录。<br>cd命令来自英文:Change Directory<br>语法: <code>cd [Linux路径]</code></p>
-<ul>
-<li>cd命令无需选项，只有参数，表示要切换到哪个目录下</li>
-<li>cd命令直接执行，不写参数，表示回到用户的HOME目录</li>
-</ul>
-<h3 id="pwd查看当前工作目录"><a href="#pwd查看当前工作目录" class="headerlink" title="pwd查看当前工作目录"></a>pwd查看当前工作目录</h3><p>通过ls来验证当前的工作目录，其实是不恰当的。</p>
-<p>我们可以通过pwd命令，来查看当前所在的工作目录。</p>
-<p>pwd命令来自:Print Work Directory</p>
-<p>语法:pwd</p>
-<ul>
-<li>pwd命令，无选项，无参数，直接输入pwd即可</li>
-</ul>
-<h3 id="特殊路径符"><a href="#特殊路径符" class="headerlink" title="特殊路径符:"></a>特殊路径符:</h3><ul>
-<li>. 表示当前目录，比如cd .&#x2F;Desktop表示切换到当前目录下的Desktop目录内，和cd Desktop效果一致</li>
-<li>.. 表示上一级目录，比如: cd .. 即可切换到上一级目录，cd ..&#x2F; ..切换到上二级的目录</li>
-<li>~ 表示HOME目录，比如:cd~ 即可切换到HOME目录或cd ~&#x2F;Desktop,切换到HOME内的Desktop目录</li>
-</ul>
-<h3 id="mkdir命令"><a href="#mkdir命令" class="headerlink" title="mkdir命令"></a>mkdir命令</h3><p>通过mkdir命令可以创建新的目录（文件夹)</p>
-<p>mkdir来自英文:Make Directory<br>语法:<code>mkdir [-p] Linux路径</code></p>
-<ul>
-<li>参数必填，表示Linux路径，即要创建的文件夹路径，相对路径或绝对路径均可</li>
-<li>-p选项可选，表示自动创建不存在的父目录，适用于创建连续多层级的目录</li>
-</ul>
-<p>注意︰创建文件夹需要修改权限，请确保操作均在HOME目录内，不要在HOME外操作涉及到权限问题，HOME外无法成功</p>
-<h3 id="touch创建文件"><a href="#touch创建文件" class="headerlink" title="touch创建文件"></a>touch创建文件</h3><p>可以通过touch命令创建文件</p>
-<p>语法: <code>touch Linux路径</code></p>
-<ul>
-<li>touch命令无选项，参数必填，表示要创建的文件路径，相对、绝对、特殊路径符均可以使用</li>
-</ul>
-<h3 id="cat命令查看文件内容"><a href="#cat命令查看文件内容" class="headerlink" title="cat命令查看文件内容"></a>cat命令查看文件内容</h3><p>准备好文件内容后，可以通过cat查看内容。</p>
-<p>语法:<code>cat Linux路径</code></p>
-<ul>
-<li><p>cat同样没有选项，只有必填参数，参数表示:被查看的文件路径，相对、绝对,</p>
-<p>特殊路径符都可以使用</p>
-</li>
-</ul>
-<h3 id="more命令查看文件内容"><a href="#more命令查看文件内容" class="headerlink" title="more命令查看文件内容"></a>more命令查看文件内容</h3><p>more命令同样可以查看文件内容，同cat不同的是:. </p>
-<ul>
-<li>cat是直接将内容全部显示出来</li>
-<li>more支持翻页，如果文件内容过多，可以一页页的展示</li>
-</ul>
-<p>语法:<code>more Linux路径</code></p>
-<ul>
-<li>同样没有选项，只有必填参数，参数表示:被查看的文件路径，相对、绝对、特殊路径符都可以使用</li>
-</ul>
-<p>Linux系统内置有一个文件，路径为:&#x2F;etc&#x2F;services，可以使用more命令查看<br>more &#x2F;etc&#x2F;services</p>
-<ul>
-<li>在查看的过程中，通过空格翻页。</li>
-<li>通过q退出查看</li>
-</ul>
-<h3 id="cp命令复制文件文件夹"><a href="#cp命令复制文件文件夹" class="headerlink" title="cp命令复制文件文件夹"></a>cp命令复制文件文件夹</h3><p>cp命令可以用于复制文件&#x2F;文件夹，cp命令来自英文单词: copy</p>
-<p>语法: cp [-r] 参数1参数2</p>
-<ul>
-<li>-r选项，可选，用于复制文件夹使用，表示递归。</li>
-<li>参数1,Linux路径，表示被复制的文件或文件夹。</li>
-<li>参数2，Linux路径，表示要复制去的地方</li>
-</ul>
-<h3 id="mv移动文件或文件夹"><a href="#mv移动文件或文件夹" class="headerlink" title="mv移动文件或文件夹"></a>mv移动文件或文件夹</h3><p>mv命令可以用于移动文件\文件夹，mv命令来自英文单词:move</p>
-<p>语法:<code>mv参数1参数2</code></p>
-<ul>
-<li>参数1,Linux路径，表示被移动的文件或文件夹</li>
-<li>参数2，Linux路径，表示要移动去的地方，如果目标不存在，则进行改名，确保目标存在</li>
-</ul>
-<h3 id="rm删除文件、文件夹"><a href="#rm删除文件、文件夹" class="headerlink" title="rm删除文件、文件夹"></a>rm删除文件、文件夹</h3><p>rm命令可用于删除文件、文件夹</p>
-<p>rm命令来自英文单词:remove</p>
-<p>语法: <code>rm [-r -f] 参数1参数2 ......参数N</code></p>
-<ul>
-<li>同cp命令一样，-r选项用于删除文件夹</li>
-<li>-f表示force，强制删除（不会弹出提示确认信息)<ul>
-<li>普通用户删除内容不会弹出提示，只有root管理员用户删除内容会有提示</li>
-<li>所以一般普通用户用不到-f选项</li>
-</ul>
-</li>
-<li>参数1、参数2、…….、参数N表示要删除的文件或文件夹路径，按照空格隔开</li>
-</ul>
-<p>rm命令支持通配符 * ，用来做模糊匹配</p>
-<ul>
-<li><p>符号 * 表示通配符，即匹配任意内容（包含空)，示例:.</p>
-</li>
-<li><p>test*，表示匹配任何以test开头的内容</p>
-</li>
-<li><p>*test，表示匹配任何以test结尾的内容 </p>
-</li>
-<li><p>*test *，表示匹配任何包含test的内容</p>
-</li>
-<li><p>演示强制删除，-f选项</p>
-</li>
-<li><p>可以通过 su - root，并输入密码123456（和普通用户默认一样）临时切换到root用户体验</p>
-</li>
-<li><p>通过输入exit命令，退回普通用户,也可以回退到root用户。也可以使用ctrl+d</p>
-</li>
-</ul>
-<h3 id="which命令"><a href="#which命令" class="headerlink" title="which命令"></a>which命令</h3><p>我们在前面学习的Linux命令，其实它们的本体就是一个个的二进制可执行程序。和Windows系统中的.exe文件，是一个意思。</p>
-<p>我们可以通过which命令，查看所使用的一系列<strong>命令</strong>的程序文件存放在哪里</p>
-<p>语法: <code>which 要查找的命令</code></p>
-<h3 id="find命令–按文件名查找文件"><a href="#find命令–按文件名查找文件" class="headerlink" title="find命令–按文件名查找文件"></a>find命令–按文件名查找文件</h3><p>同样，在Linux系统中，我们可以通过find命令去搜索指定的文件。</p>
-<p>语法:<code>find 起始路径 -name  &quot;被查找文件名&quot;</code></p>
-<p>被查找文件名，支持使用通配符*来做模糊查询。</p>
-<h3 id="find命令-按文件大小查找文件"><a href="#find命令-按文件大小查找文件" class="headerlink" title="find命令-按文件大小查找文件"></a>find命令-按文件大小查找文件</h3><p>语法: <code>find 起始路径 -size  +/-n[kMG]</code></p>
-<ul>
-<li>+、-表示大于和小于</li>
-<li>n表示大小数字</li>
-<li>kMG表示大小单位，k(小写字母)表示kb，M表示MB，G表示GB</li>
-</ul>
-<p>示例:</p>
-<ul>
-<li>查找小于10KB的文件: find  &#x2F; -size  -10k</li>
-<li>查找大于100MB的文件: find &#x2F; -size +100M</li>
-<li>查找大于1GB的文件: find &#x2F; -size +1G</li>
-</ul>
-<h3 id="grep命令-按文件大小查找文件内容"><a href="#grep命令-按文件大小查找文件内容" class="headerlink" title="grep命令-按文件大小查找文件内容"></a>grep命令-按文件大小查找文件内容</h3><p>可以通过grep命令，从文件中通过关键字过滤<strong>文件行</strong>。</p>
-<p>ps aux | grep ‘cupsd’ – 检索进程结果集。 使用 grep 搜索进程，有一条结果是搜索进程本身</p>
-<p><code>find … | xargs ls -l</code> 对 find 操作的结果集进行操作 </p>
-<p>等价于 <code>find … -exec ls -l &#123;&#125; \；</code> 两者差别在于当结果集合很大的时候，xargs 会对结果进行分段处理，所以性能好些 </p>
-<p>但 xargs 也有缺陷，xargs 默认用空格来分割结果集，当文件名有空格的时候，会因为文件名被切割 失效</p>
-<p>-xargs：将 find 搜索的结果集执行某一指定命令。 当结果集数量过大时，可以分片映射。 <code>find /usr/ -name &#39;*tmp*&#39; | xargs ls -ld</code></p>
-<p>解决 xargs 的缺陷，指定切分符号位 null </p>
-<p>-print0： <code>find /usr/ -name &#39;*tmp*&#39; -print0 | xargs -print0 ls -l</code> 第一个 print0 指定结果集分隔为 null，第二个 print0 指定 xargs 分隔为 null</p>
-<p>语法: <code>grep [-n] 关键字文件路径</code></p>
-<ul>
-<li>选项-n，可选，表示在结果中显示匹配的行的行号。</li>
-<li>参数，关键字，必填，表示过滤的关键字，带有空格或其它特殊符号，建议使用” ”将关键字包围起来。</li>
-<li>参数，文件路径，必填，表示要过滤内容的文件路径，可作为内容输入端口</li>
-</ul>
-<h3 id="wc命令做数量统计"><a href="#wc命令做数量统计" class="headerlink" title="wc命令做数量统计"></a>wc命令做数量统计</h3><p>可以通过wc命令统计文件的行数、单词数量等</p>
-<p>语法: <code>wc [-c -m -l -w] 文件路径</code></p>
-<ul>
-<li>选项，-c，统计bytes数量。</li>
-<li>选项，-m，统计字符数量</li>
-<li>选项，-l，统计行数</li>
-<li>选项，-w，统计单词数量</li>
-<li>参数，文件路径，被统计的文件，可作为内容输入端口</li>
-</ul>
-<h3 id="管道符"><a href="#管道符" class="headerlink" title="管道符"></a>管道符</h3><p>管道符:l<br>管道符的含义是:将管道符左边命令的结果，作为右边命令的输入</p>
-<ul>
-<li>cat itheima.txt的输出结果（文件内容)。</li>
-<li>作为右边grep命令的输入（被过滤文件)</li>
-</ul>
-<p><code>cat itheima.txt | grep itheima</code>还可以嵌套</p>
-<h3 id="echo命令"><a href="#echo命令" class="headerlink" title="echo命令"></a>echo命令</h3><p>可以使用echo命令在命令行内输出指定内容</p>
-<p>语法:<code>echo 输出的内容</code></p>
-<ul>
-<li><p>无需选项，只有一个参数，表示要输出的内容，复杂内容可以用” ”包围</p>
-</li>
-<li><p>带有空格或\等特殊符号，建议使用双引号包围</p>
-</li>
-<li><p>因为不包围的话，空格后很容易被识别为参数2，尽管echo不受影响，但是要养成习惯哦</p>
-</li>
-</ul>
-<h3 id="反引号-96"><a href="#反引号-96" class="headerlink" title="反引号&#96;"></a>反引号&#96;</h3><p>本意是想，输出当前的工作路径，但是pwd被作为普通字符输出了。<br>我们可以通过将命令用反引号（通常也称之为飘号) &#96; 将其包围<br>被   飘号包围的内容，会被作为命令执行，而非普通字符</p>
-<h3 id="重定向符"><a href="#重定向符" class="headerlink" title="重定向符"></a>重定向符</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;,将左侧命令的结果，覆盖写入到符号右侧指定的文件中</span><br><span class="line">&gt;&gt;,将左侧命令的结果，追加写入到符号右侧指定的文件中</span><br></pre></td></tr></table></figure>
-
-<h3 id="tail命令"><a href="#tail命令" class="headerlink" title="tail命令"></a>tail命令</h3><p>使用tail命令，可以查看文件尾部内容，跟踪文件的最新更改，</p>
-<p>语法如下:<code>tail [-f -num ] Linux路径</code></p>
-<ul>
-<li>参数，Linux路径，表示被跟踪的文件路径。</li>
-<li>选项，-f，表示持续跟踪</li>
-<li>选项，-num，表示，查看尾部多少行，不填默认10行</li>
-</ul>
-<h3 id="vi-vim编辑器介绍"><a href="#vi-vim编辑器介绍" class="headerlink" title="vi\vim编辑器介绍"></a>vi\vim编辑器介绍</h3><p>vi\vim是visual interface的简称，是Linux中最经典的文本编辑器</p>
-<p>同图形化界面中的文本编辑器一样，vi是命令行下对文本文件进行编辑的绝佳选择</p>
-<p>vim是vi的加强版本，兼容vi的所有指令，不仅能编辑文本，而且还具有shell程序编辑的功能，可以不同颜色的字体来辨别语法的正确性，极大方便了程序的设计和编辑性。</p>
-<h4 id="vi-vim编辑器的三种工作模式"><a href="#vi-vim编辑器的三种工作模式" class="headerlink" title="vi\vim编辑器的三种工作模式"></a>vi\vim编辑器的三种工作模式</h4><p>命令模式(Command mode)，最开始状态</p>
-<ul>
-<li>命令模式下，所敲的按键编辑器都理解为命令，以命令驱动执行不同的功能，此模型下，不能自由进行文本编辑。输入i o a进入输入模式，退出输入<strong>：wq</strong></li>
-</ul>
-<p>输入模式(lnsert mode)</p>
-<ul>
-<li>也就是所谓的编辑模式、插入模式。此模式下，可以对文件内容进行自由编辑。ESC键进入命令模式</li>
-</ul>
-<p>底线命令模式(Last line mode)</p>
-<ul>
-<li>以**:**开始，通常用于文件的保存、退出。命令以回车结束运行</li>
-</ul>
-<ol>
-<li>如果文件路径表示的文件不存在，那么此命令会用于编辑新文件</li>
-<li>如果文件路径表示的文件存在，那么此命令用于编辑已有文件</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th>模式</th>
-<th>命令</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>命令模式</td>
-<td>i</td>
-<td>在当前光标位置进入输入模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>a</td>
-<td>在当前光标位置之后进入输入模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>I</td>
-<td>在当前行的开头，进入输入模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>A</td>
-<td>在当前行的结尾，进入输入模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>o</td>
-<td>在当前光标下一行进入输入模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>O</td>
-<td>在当前光标上一行进入输入模式</td>
-</tr>
-<tr>
-<td>输入模式</td>
-<td>esc</td>
-<td>任何情况下输入esc都能回到命令模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>0</td>
-<td>移动光标到当前行的开头</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>$</td>
-<td>移动光标到当前行的结尾</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>pageup( Pgup)</td>
-<td>向上翻页</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>pangdown( PgDn)</td>
-<td>向下翻页</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>&#x2F;</td>
-<td>进入搜索模式</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>n</td>
-<td>向下继续搜索</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>N</td>
-<td>向上继续搜索</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>dd</td>
-<td>删除光标所在行的内容</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>ndd</td>
-<td>n是数字，表示删除当前光标向下n行</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>yy</td>
-<td>复制当前行</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>nyy</td>
-<td>n是数字，复制当前行和下面的n行</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>p</td>
-<td>粘贴复制的内容</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>u</td>
-<td>撤销修改</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>crtl+r</td>
-<td>反向撤销修改</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>gg</td>
-<td>跳到首行</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>G</td>
-<td>跳到行尾</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>dG</td>
-<td>从当前行开始，向下全部删除</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>dgg</td>
-<td>从当前行开始，向上全部删除</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>d$</td>
-<td>从当前光标开始，删除到本行的结尾</td>
-</tr>
-<tr>
-<td>命令模式</td>
-<td>d0</td>
-<td>从当前光标开始，删除到本行的开头</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:wq</td>
-<td>保存并退出</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:q</td>
-<td>仅退出</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:q!</td>
-<td>强制退出</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:w</td>
-<td>仅保存</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:set nu</td>
-<td>显示行号</td>
-</tr>
-<tr>
-<td>底线命令模式</td>
-<td>:set paste</td>
-<td>设置粘贴模式,主要是为了保证外部复制不会格式错乱</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<p>分屏，末行模式下 </p>
-<ul>
-<li>:sp 水平分屏</li>
-<li>:vsp 竖直分屏 </li>
-<li>分屏命令+filename，分屏并打开这个文件 </li>
-<li>分屏后屏幕切换，Ctrl-w-w </li>
-<li>使用:q 退出光标所在窗口 </li>
-<li>使用:qall 退出所有窗口</li>
-</ul>
-<p>从 vim 中跳转 manpage，命令模式下 </p>
-<p>将光标放在待查看单词上，按 K，默认看第一卷 n+K，查看第 n 卷 </p>
-<p>查看宏定义：命令模式 </p>
-<p>光标放在待查看词上，[+d 即可查看</p>
-<p>vim 下使用 shell 命令：末行模式 :! + 命令 操作后，会切换至终端显示结果，按 Enter 后回到 vim 界面</p>
-<h3 id="vim下自动排版命令"><a href="#vim下自动排版命令" class="headerlink" title="vim下自动排版命令"></a>vim下自动排版命令</h3><p>在命令行模式下：</p>
-<p>1、使用“gg”将光标移动到文档开头</p>
-<p>2、使用“v”切换到可视模式</p>
-<p>3、再用“G”将光标移动到文档尾部（相当于全选）</p>
-<p>4、最后使用“&#x3D;”，即可完成整个文档的自动排版。</p>
-<h3 id="sudo命令"><a href="#sudo命令" class="headerlink" title="sudo命令"></a>sudo命令</h3><p>Su命令</p>
-<ul>
-<li>可以切换用户，语法:<code>su [-] [用户名]</code></li>
-<li>-表示切换后加载环境变量,建议带上</li>
-<li>用户可以省略,省略默认切换到root</li>
-</ul>
-<p>在我们得知root密码的时候，可以通过su命令切换到root得到最大权限。但是我们不建议长期使用root用户，避免带来系统损坏。</p>
-<p>我们可以使用sudo命令，为普通的命令授权,临时以root身份执行。</p>
-<p>语法:<code>sudo 其它命令</code></p>
-<ul>
-<li>在其它命令之前，带上sudo,即可为这一条命令临时赋予root授权</li>
-<li>但是并不是所有的用户，都有权利使用sudo，我们需要为普通用户配置sudo认证</li>
-</ul>
-<h4 id="为普通用户配置sudo认证"><a href="#为普通用户配置sudo认证" class="headerlink" title="为普通用户配置sudo认证"></a>为普通用户配置sudo认证</h4><ul>
-<li>切换到root用户,执行visudo命令，会自动通过vi编辑器打开:&#x2F;etc&#x2F;sudoers。</li>
-<li>在文件的最后添加:<br><code>itheima ALL=(ALL)		NOPASSWD: ALL</code><br>其中最后的NOPASSWD:ALL表示使用sudo命令，无需输入密码，itheima是用户名</li>
-<li>最后通过wq保存</li>
-<li>切换回普通用户<br><code>[itheima@localhost ~]$ sudo ls /root</code></li>
-<li><code>anaconda-ks.cfg	original-ks.cfg</code></li>
-<li><code>[itheima@localhost ~]$ sudo mkdir /test</code></li>
-<li><code>[itheima@localhost ~]$</code></li>
-<li>执行的命令，均以root运行</li>
-</ul>
-<h2 id="用户、用户组"><a href="#用户、用户组" class="headerlink" title="用户、用户组"></a>用户、用户组</h2><p>Linux系统中可以:</p>
-<ul>
-<li>配置多个用户</li>
-<li>配置多个用户组</li>
-<li>用户可以加入多个用户组中</li>
-</ul>
-<h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><p>以下命令需root用户执行。</p>
-<ul>
-<li><p>创建用户</p>
-<p>​	useradd [-g -d]用户名<br>​		选项: -g指定用户的组，不指定-g，会创建同名组并自动加入，指定-g需要组已经存在，如已存在同名组，必须使用-g</p>
-<p>​		选项:-d指定用户HOME路径，不指定，HOME目录默认在:&#x2F;home&#x2F;用户名</p>
-</li>
-<li><p>删除用户</p>
-<ul>
-<li>​	userdel [-r]用户名<br>​		选项:-r，删除用户的HOME目录，不使用-r，删除用户时，HOME目录保留</li>
-</ul>
-</li>
-<li><p>查看用户所属组</p>
-<ul>
-<li><p>id[用户名]</p>
-<p>​	参数:用户名，被查看的用户，如果不提供则查看自身。</p>
-</li>
-</ul>
-</li>
-<li><p>修改用户所属组</p>
-<ul>
-<li>usermod -aG 用户组 用户名，将指定用户加入指定用户组，一个用户可以在多个用户组。</li>
-</ul>
-</li>
-</ul>
-<h3 id="getent"><a href="#getent" class="headerlink" title="getent"></a>getent</h3><p>使用getent命令，可以查看当前系统中有哪些用户</p>
-<p>语法: getent passwd</p>
-<p>共有7份信息，分别是:<br>用户名:密码(x):用户ID:组ID:描述信息(无用):HOME目录:执行终端(默认bash)</p>
-<p>使用getent命令,同样可以查看当前系统中有哪些用户组</p>
-<p>语法:getent group</p>
-<p>包含3份信息,组名称:组认证(显示为x):组ID</p>
-<h2 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h2><p>ls -l后</p>
-<p>drwxr-xr-x 2 xiaohuilin xiaohuilin 4096 9月  12  2021 公共的</p>
-<p>举例: d rwx r-x r-x，表示:</p>
-<ul>
-<li>这是一个文件夹，首字母d表示( -表示文件 d表示文件夹 I表示软链接)</li>
-<li>所属用户（第一个xiaohuilin）对d的权限是:有r有w有x, rwx</li>
-<li>所属用户组（第二个xiaohuilin）的权限是:有r无w有x, r-x( -表示无此权限)</li>
-<li>其它用户的权限是：有r无w有x,r-x</li>
-</ul>
-<p>rwx代表什么</p>
-<p>r表示读权限</p>
-<p>w表示写权限</p>
-<p>x表示执行权限</p>
-<p>针对文件、文件夹的不同，rwx的含义有细微差别</p>
-<ul>
-<li>r ,针对文件可以查看文件内容<ul>
-<li>针对文件夹，可以查看文件夹内容，如ls命令</li>
-</ul>
-</li>
-<li>w，针对文件表示可以修改此文件<ul>
-<li>针对文件夹，可以在文件夹内:创建、删除、改名等操作</li>
-</ul>
-</li>
-<li>x,针对文件表示可以将文件作为程序执行<ul>
-<li>针对文件夹，表示可以更改工作目录到此文件夹，即cd进入</li>
-</ul>
-</li>
-</ul>
-<h2 id="chmod命令"><a href="#chmod命令" class="headerlink" title="chmod命令"></a>chmod命令</h2><p>我们可以使用chmod命令，修改文件、文件夹的权限信息。</p>
-<p>注意，只有文件、文件夹的所属用户或root用户可以修改。</p>
-<p>语法: <code>chmod [-R] 权限 文件或文件夹</code></p>
-<ul>
-<li>选项:-R，对文件夹内的全部内容应用同样的操作</li>
-</ul>
-<p>示例:</p>
-<ul>
-<li>chmod u&#x3D;rwx,g&#x3D;rx,o&#x3D;x hello.txt，将文件权限修改为:rwxr-x–x<ul>
-<li>其中:u表示user所属用户权限, g表示group组权限,o表示other其它用户权限</li>
-</ul>
-</li>
-<li>chmod -R u&#x3D;rwx,g&#x3D;rx,0&#x3D;x test,将文件夹test以及文件夹内全部内容权限设置为:rwxr-x–x</li>
-</ul>
-<p>除此之外，还有快捷写法: chmod 751 hello.txt<br>将hello.txt的权限修改为751,r记为4, w记为2,x记为1</p>
-<h2 id="chown命令"><a href="#chown命令" class="headerlink" title="chown命令"></a>chown命令</h2><p>使用chown命令，可以修改文件、文件夹的所属用户和用户组<br>普通用户无法修改所属为其它用户或组，所以此命令只适用于root用户执行</p>
-<p>语法: <code>chown[-R] [用户][:][用户组] 文件或文件夹</code></p>
-<ul>
-<li>选项，-R，同chmod,对文件夹内全部内容应用相同规则</li>
-<li>选项，用户，修改所属用户</li>
-<li>选项，用户组,修改所属用户组</li>
-<li>:用于分隔用户和用户组</li>
-</ul>
-<p>示例:</p>
-<ul>
-<li>chown root hello.txt,将hello.txt所属用户修改为root</li>
-<li>chown :root hello.txt,将hello.txt所属用户组修改为root</li>
-<li>chown root:itheima hello.txt,将hello.txt所属用户修改为root,用户组修改为itheima</li>
-<li>chown -R root test,将文件夹test的所属用户修改为root并对文件夹内全部内容应用同样规则</li>
-</ul>
-<h2 id="历史命令搜索"><a href="#历史命令搜索" class="headerlink" title="历史命令搜索"></a>历史命令搜索</h2><p><code>history</code></p>
-<ul>
-<li>可以通过:!命令前缀，自动执行上次匹配前缀的命令</li>
-<li>可以通过快捷键:ctrl + r,输入内容去匹配历史命令</li>
-</ul>
-<p>如果搜索到的内容是你需要的，那么∶</p>
-<ul>
-<li>回车键可以直接执行</li>
-<li>键盘左右键，可以得到此命令（不执行)</li>
-</ul>
-<h2 id="光标移动快捷键"><a href="#光标移动快捷键" class="headerlink" title="光标移动快捷键"></a>光标移动快捷键</h2><ul>
-<li>ctrl+ a,跳到命令开头</li>
-<li>ctrl+e,跳到命令结尾</li>
-<li>ctrl＋键盘左键,向左跳一个单词</li>
-<li>ctrl＋键盘右键,向右跳一个单词</li>
-</ul>
-<h2 id="清屏"><a href="#清屏" class="headerlink" title="清屏"></a>清屏</h2><ul>
-<li><p>通过快捷键ctrl+l，可以清空终端内容</p>
-</li>
-<li><p>或通过命令clear得到同样效果</p>
-</li>
-</ul>
-<h2 id="systemctl命令"><a href="#systemctl命令" class="headerlink" title="systemctl命令"></a>systemctl命令</h2><p>Linux系统很多软件(内置或第三方)均支持使用systemctl命令控制:启动、停止、开机自启</p>
-<p>能够被systemctl管理的软件，一般也称之为:服务</p>
-<p>语法: <code>systemctl start | stop | status | enable | disable 服务名</code></p>
-<ul>
-<li><p>start启动</p>
-</li>
-<li><p>stop关闭</p>
-</li>
-<li><p>status查看状态</p>
-</li>
-<li><p>enable开启开机自启</p>
-</li>
-<li><p>disable关闭开机自启</p>
-</li>
-</ul>
-<p>系统内置的服务比较多，比如:</p>
-<ul>
-<li><p>NetworkManager,主网络服务</p>
-</li>
-<li><p>network,副网络服务</p>
-</li>
-<li><p>firewalld，防火墙服务</p>
-</li>
-<li><p>sshd, ssh服务(FinalShell远程登录Linux使用的就是这个服务)</p>
-</li>
-</ul>
-<h2 id="ln命令创建软连接"><a href="#ln命令创建软连接" class="headerlink" title="ln命令创建软连接"></a>ln命令创建软连接</h2><p>在系统中创建软链接,可以将文件、文件夹链接到其它位置。</p>
-<p>类似windows系统中的《快捷方式》</p>
-<p>语法: <code>ln -s 参数1参数2</code></p>
-<ul>
-<li>-s选项,创建软连接</li>
-<li>参数1:被链接的文件或文件夹</li>
-<li>参数2:要链接去的目的地</li>
-</ul>
-<p>实例:</p>
-<ul>
-<li>ln -s &#x2F;etc&#x2F;yum.conf ~&#x2F;yum.conf</li>
-<li>ln -s &#x2F;etc&#x2F;yum ~&#x2F;yum</li>
-</ul>
-<h2 id="date命令"><a href="#date命令" class="headerlink" title="date命令"></a>date命令</h2><p>通过date命令可以在命令行中查看系统的时间</p>
-<p>语法: <code>date [-d][+格式化字符串]</code></p>
-<ul>
-<li><p>-d按照给定的字符串显示日期，一般用于日期计算</p>
-</li>
-<li><p>格式化字符串:通过特定的字符串标记,来控制显示的日期格式</p>
-<ul>
-<li><p>%Y	年</p>
-</li>
-<li><p>%y	年份后两位数字(00..99)</p>
-</li>
-<li><p>%m	月份(01..12)</p>
-</li>
-<li><p>%d	日(01..31)</p>
-</li>
-<li><p>%H	小时(00..23)</p>
-</li>
-<li><p>%M	分钟(00..59)</p>
-</li>
-<li><p>%S	秒(00..60)</p>
-</li>
-<li><p>%s	自1970-01-01	00::00::00 UTC到现在的秒数</p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="特殊IP地址"><a href="#特殊IP地址" class="headerlink" title="特殊IP地址"></a>特殊IP地址</h2><ul>
-<li>127.0.0.1，这个IP地址用于指代本机</li>
-<li>0.0.0.0,特殊lP地址<ul>
-<li>可以用于指代本机</li>
-<li>可以在端口绑定中用来确定绑定关系（后续讲解)</li>
-<li>在一些IP地址限制中，表示所有IP的意思,如放行规则设置为0.0.0.0,表示允许任意IP访问</li>
-</ul>
-</li>
-</ul>
-<h2 id="在Linux中修改主机名"><a href="#在Linux中修改主机名" class="headerlink" title="在Linux中修改主机名"></a>在Linux中修改主机名</h2><ul>
-<li>可以使用命令:hostname查看主机名</li>
-<li>可以使用命令: hostnamectl set-hostname主机名,修改主机名（需root)</li>
-</ul>
-<p>什么是域名解析（主机名映射)</p>
-<ul>
-<li>可以通过主机名找到对应计算机的IP地址,这就是主机名映射（域名解析)</li>
-<li>先通过系统本地的记录去查找，如果找不到就联网去公开DNS服务器去查找</li>
-</ul>
-<h2 id="ping命令"><a href="#ping命令" class="headerlink" title="ping命令"></a>ping命令</h2><p>可以通过ping命令,检查指定的网络服务器是否是可联通状态</p>
-<p>语法: <code>ping [-c num] ip或主机名</code></p>
-<ul>
-<li>选项:-c，检查的次数，不使用-c选项,将无限次数持续检查</li>
-<li>参数: ip或主机名，被检查的服务器的ip地址或主机名地址</li>
-</ul>
-<h2 id="wget命令"><a href="#wget命令" class="headerlink" title="wget命令"></a>wget命令</h2><p>wget是非交互式的文件下载器,可以在命令行内下载网络文件</p>
-<p>语法: <code>wget [-b] url</code></p>
-<ul>
-<li>选项: -b，可选，后台下载,会将日志写入到当前工作目录的wget-log文件</li>
-<li>参数: url，下载链接</li>
-</ul>
-<h2 id="curl命令"><a href="#curl命令" class="headerlink" title="curl命令"></a>curl命令</h2><p>curl可以发送http网络请求,可用于:下载文件、获取信息等</p>
-<p>语法: <code>curl [-O] url</code></p>
-<ul>
-<li>选项:-O，用于下载文件，当url是下载链接时,可以使用此选项保存文件</li>
-<li>参数: url，要发起请求的网络地址</li>
-</ul>
-<h2 id="使用top命令可以"><a href="#使用top命令可以" class="headerlink" title="使用top命令可以:"></a>使用top命令可以:</h2><p>类似Windows任务售理器·查看CPU、内存、进程的信息</p>
-<h2 id="使用df命令可以"><a href="#使用df命令可以" class="headerlink" title="使用df命令可以:"></a>使用df命令可以:</h2><p>查看磁盘使用率</p>
-<h2 id="使用iostat可以"><a href="#使用iostat可以" class="headerlink" title="使用iostat可以:"></a>使用iostat可以:</h2><p>查看磁盘速率等信息</p>
-<h2 id="使用sar-n-DEV命令可以"><a href="#使用sar-n-DEV命令可以" class="headerlink" title="使用sar -n DEV命令可以:"></a>使用sar -n DEV命令可以:</h2><p>查看网络情况</p>
-<h2 id="什么是环境变量"><a href="#什么是环境变量" class="headerlink" title="什么是环境变量"></a>什么是环境变量</h2><p>环境变量是一组信息记录,类型是KeyValue型(名称&#x3D;值)，用于操作系统运行的时候记录关键信息</p>
-<h2 id="通过env命令可以查看当前系统配置的环境变量信息"><a href="#通过env命令可以查看当前系统配置的环境变量信息" class="headerlink" title="通过env命令可以查看当前系统配置的环境变量信息"></a>通过env命令可以查看当前系统配置的环境变量信息</h2><h2 id="通过-符号，可以取出环境变量的值"><a href="#通过-符号，可以取出环境变量的值" class="headerlink" title="通过$符号，可以取出环境变量的值"></a>通过$符号，可以取出环境变量的值</h2><h2 id="什么是PATH，作用是"><a href="#什么是PATH，作用是" class="headerlink" title="什么是PATH，作用是"></a>什么是PATH，作用是</h2><p>环境变量PATH会记录一组目录，目录之间用**:**隔开。这里记录的是命令的搜索路径，当执行命令会从记录中记录的目录中挨个搜索要执行的命令并执行。<br>可以通过修改这个项目的值,加入自定义的命令搜索路径<br>如<code>export PATH=$PATH:自定义路径</code></p>
-<h2 id="如何修改环境变量"><a href="#如何修改环境变量" class="headerlink" title="如何修改环境变量"></a>如何修改环境变量</h2><ul>
-<li>临时生效: export名称&#x3D;值</li>
-<li>永久生效:<ul>
-<li>针对用户:~&#x2F;bashrc文件中配置</li>
-<li>针对全部用户:&#x2F;etc&#x2F;profile文件中配置。</li>
-<li>配置完成，可以通过source命令立刻生效</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2619,7 +2054,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
