@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="高并发高性能服务器的一些思路队列+连接池主要的业务逻辑挪到应用服务器处理，数据库只做辅助的业务处理 缓存缓存更新(缓存同步)缓存time out如果缓存失效重新去数据库查询，实时性比较差一但数据库中数据更新，立即通知前端的缓存更新，实时性比较高。缓存换页内存不够，将不活跃的数据换出内存。一些算法FIFO LRU(least recently used)(最近最少使用)LFU(least frequ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-1">
+<meta property="og:url" content="http://example.com/2023/07/27/muduo-1/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="高并发高性能服务器的一些思路队列+连接池主要的业务逻辑挪到应用服务器处理，数据库只做辅助的业务处理 缓存缓存更新(缓存同步)缓存time out如果缓存失效重新去数据库查询，实时性比较差一但数据库中数据更新，立即通知前端的缓存更新，实时性比较高。缓存换页内存不够，将不活跃的数据换出内存。一些算法FIFO LRU(least recently used)(最近最少使用)LFU(least frequ">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727162947044.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727162947044.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727202043348.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727202043348.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727202141040.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727202141040.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727202250355.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727202250355.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727202523487.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727202523487.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727203310555.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727203310555.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230727203423819.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230727203423819.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230728115359271.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230728115359271.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230728120915832.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230728120915832.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230729212329032.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230729212329032.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230730155255822.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230730155255822.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230730155339712.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230730155339712.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230730155404611.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230730155404611.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230730165438382.png">
+<meta property="og:image" content="http://example.com/2023/07/27/muduo-1/image-20230730165438382.png">
+<meta property="og:image" content="http://example.com/muduo-1/image-20230731161906596.png">
+<meta property="article:published_time" content="2023-07-27T08:19:27.000Z">
+<meta property="article:modified_time" content="2023-07-31T09:02:48.582Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-1/image-20230727162947044.png">
+
+<link rel="canonical" href="http://example.com/2023/07/27/muduo-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-1 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/27/muduo-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-27 16:19:27" itemprop="dateCreated datePublished" datetime="2023-07-27T16:19:27+08:00">2023-07-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-31 17:02:48" itemprop="dateModified" datetime="2023-07-31T17:02:48+08:00">2023-07-31</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="高并发高性能服务器的一些思路"><a href="#高并发高性能服务器的一些思路" class="headerlink" title="高并发高性能服务器的一些思路"></a>高并发高性能服务器的一些思路</h1><p>队列+连接池<br>主要的业务逻辑挪到应用服务器处理，数据库只做辅助的业务处理</p>
+<p>缓存<br>缓存更新(缓存同步)缓存time out<br>如果缓存失效重新去数据库查询，实时性比较差<br>一但数据库中数据更新，立即通知前端的缓存更新，实时性比较高。<br>缓存换页内存不够，将不活跃的数据换出内存。一些算法FIFO LRU(least recently used)(最近最少使用)LFU(least frequently used）最不频繁使用</p>
+<p>nosql(反sql) key &#x2F; value非关系型数据库<br>分布式缓存<br>redis<br>mencached</p>
+<p>数据库读写分离，可以避免锁竞争，提高访问速度</p>
+<p>主从服务器</p>
+<p>数据库的读操作&gt;写操作<br>对数据库进行负载均衡 replication机制，即写会同步更新到读库<br>比如数据分区(分库、分表)<br>分库 垂直分区     水平分区，更好用，每个类型的数据都有，更好扩展，需要增加一个数据访问层DAL</p>
+<p>应用服务器的负载均衡<br>增加一个任务服务器来实现，任务服务器可以监视应用服务器的负载，CPU高、I0高、并发高、内存换页高查询到这些信息之后，选取负载最低的服务器分配任务。应用服务器被动接收任务，不公平，任务处理速度不同。</p>
+<p>应用服务器主动到任务服务器接收任务进行处理，即空闲主动。</p>
+<p><img src="/muduo-1/image-20230727162947044.png" alt="image-20230727162947044"></p>
+<img src="/2023/07/27/muduo-1/image-20230727162947044.png" class title="This is an test image">
+
+<p>服务器性能四大杀手</p>
+<ul>
+<li>数据拷贝		缓存</li>
+<li>环境切换	（理性创建线程)该不该用多线程，单线程好还是多线程好，单核服务器（采用状态机编程，效率最佳，不能并行处理任务，相当于操作系统的进程切换，cpu时间分享给多个进程)，多线程能够充分发挥多核服务器的性能，大量的任务提交到服务器时多线程也不能保证并发，这时候线程间的切换开销大</li>
+<li>内存分配		内存池</li>
+<li>锁竞争</li>
+</ul>
+<h1 id="大型网站架构演变过程"><a href="#大型网站架构演变过程" class="headerlink" title="大型网站架构演变过程"></a>大型网站架构演变过程</h1><h2 id="第一步-web-server与数据库分离"><a href="#第一步-web-server与数据库分离" class="headerlink" title="第一步 web server与数据库分离"></a>第一步 web server与数据库分离</h2><p><img src="/muduo-1/image-20230727202043348.png" alt="image-20230727202043348"></p>
+<img src="/2023/07/27/muduo-1/image-20230727202043348.png" class title="This is an test image">
+
+<p><img src="/muduo-1/image-20230727202141040.png" alt="image-20230727202141040"></p>
+<img src="/2023/07/27/muduo-1/image-20230727202141040.png" class title="This is an test image">
+
+<h2 id="第二部-缓存处理"><a href="#第二部-缓存处理" class="headerlink" title="第二部 缓存处理"></a>第二部 缓存处理</h2><p><img src="/muduo-1/image-20230727202250355.png" alt="image-20230727202250355"></p>
+<img src="/2023/07/27/muduo-1/image-20230727202250355.png" class title="This is an test image">
+
+<p>front page cache静态页面</p>
+<h2 id="第三步-web-server集群-读写分离"><a href="#第三步-web-server集群-读写分离" class="headerlink" title="第三步 web server集群+读写分离"></a>第三步 web server集群+读写分离</h2><p><img src="/muduo-1/image-20230727202523487.png" alt="image-20230727202523487"></p>
+<img src="/2023/07/27/muduo-1/image-20230727202523487.png" class title="This is an test image">
+
+<h2 id="第四步-CDN、分布式缓存、分库分表"><a href="#第四步-CDN、分布式缓存、分库分表" class="headerlink" title="第四步 CDN、分布式缓存、分库分表"></a>第四步 CDN、分布式缓存、分库分表</h2><p>CDN:内容分发网络</p>
+<p>不同地区网络速度都得到提升</p>
+<p>目前流行分布式缓存方案:memcached、membase、redis等,基本上当前的NoSQL方案都可以用来做分布式缓存方案</p>
+<h2 id="第五步-多数据中心-分布式存储与计算"><a href="#第五步-多数据中心-分布式存储与计算" class="headerlink" title="第五步 多数据中心+分布式存储与计算"></a>第五步 多数据中心+分布式存储与计算</h2><p>对一致性要求不高的没必要保存在关系型数据库</p>
+<p><img src="/muduo-1/image-20230727203310555.png" alt="image-20230727203310555"></p>
+<img src="/2023/07/27/muduo-1/image-20230727203310555.png" class title="This is an test image">
+
+<p>虽然这个本质是b&#x2F;s架构，但是核心本质还是c&#x2F;s，用到socket</p>
+<p><img src="/muduo-1/image-20230727203423819.png" alt="image-20230727203423819"></p>
+<img src="/2023/07/27/muduo-1/image-20230727203423819.png" class title="This is an test image">
+
+<h1 id="cmake管理过程"><a href="#cmake管理过程" class="headerlink" title="cmake管理过程"></a>cmake管理过程</h1><p>用 <code>build.sh</code> 脚本来进行 CMake 构建。假设项目结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">muduo_test/</span><br><span class="line">	|-build/</span><br><span class="line">		|-bin</span><br><span class="line">	|- build.sh</span><br><span class="line">    |- CMakeLists.txt</span><br><span class="line">    |- src/</span><br><span class="line">         |- bf_test.cpp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们将依次执行以下步骤：</p>
+<ol>
+<li>创建 <code>bf_test.cpp</code> 文件并放入 <code>muduo_test/src/</code> 目录下。</li>
+<li>编写 <code>CMakeLists.txt</code> 文件用于构建 <code>bf_test.cpp</code>。</li>
+<li>创建 <code>build.sh</code> 脚本用于执行 CMake 构建，并将生成的可执行文件放入 <code>muduo_test/build/bin/</code> 目录下。</li>
+</ol>
+<p>首先，让我们创建 <code>bf_test.cpp</code> 文件。你可以使用编辑器（如 <code>nano</code>、<code>vim</code> 或其他文本编辑器）创建该文件，并将以下内容复制到 <code>bf_test.cpp</code> 中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// bf_test.cpp</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    std::cout &lt;&lt; &quot;Hello, muduo_test!&quot; &lt;&lt; std::endl;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，创建 <code>CMakeLists.txt</code> 文件。在 <code>muduo_test/</code> 目录下创建一个名为 <code>CMakeLists.txt</code> 的文件，并将以下内容复制到其中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.10)  # 指定 CMake 最低版本要求</span><br><span class="line">#project() 命令用于定义一个项目。project() 命令的第一个参数是项目的名称，而第二个参数是可选的，用于指定所用的编程语言。</span><br><span class="line">project(muduo_test CXX)  # 设置项目名称，与你的项目名称相同</span><br><span class="line">set(CXX_FLAGS -g -Wall)# 设置编译选项</span><br><span class="line">set(CMAKE_CXX_COMPILER &quot;g++&quot;)# 设置C++编译器为g++</span><br><span class="line"></span><br><span class="line">set(EXECUTABLE_OUTPUT_PATH $&#123;PROJECT_BINARY_DIR&#125;/bin)# 设置可执行文件输出路径</span><br><span class="line">add_executable(bf_test src/bf_test.cpp)# 添加可执行文件</span><br></pre></td></tr></table></figure>
+
+<p>接下来，编写 <code>build.sh</code> 脚本。确保将脚本放在 <code>muduo_test/</code> 同级目录下，并给予执行权限：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">set -x</span><br><span class="line"></span><br><span class="line">SOURCE_DIR=$(pwd)</span><br><span class="line">BUILD_DIR=$&#123;SOURCE_DIR&#125;/build</span><br><span class="line"></span><br><span class="line">mkdir -p $BUILD_DIR \</span><br><span class="line">   &amp;&amp; cd $BUILD_DIR \</span><br><span class="line">   &amp;&amp; cmake $SOURCE_DIR \</span><br><span class="line">   &amp;&amp; make $*</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>现在我们已经准备好一切。并在终端中给予脚本执行权限：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x build.sh</span><br></pre></td></tr></table></figure>
+
+<p>最后，运行 <code>./build.sh</code> 脚本来进行 CMake 构建：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./build.sh</span><br></pre></td></tr></table></figure>
+
+<p>脚本将在 <code>muduo_test/</code> 目录下创建一个名为 <code>build</code> 的目录，并在其中执行 CMake 和 Makefile 构建。然后，生成的可执行文件 <code>bf_test</code> 将被移动到 <code>muduo_test/build/bin/</code> 目录下。</p>
+<p>运行 <code>./build/bin/bf_test</code> 即可看到输出</p>
+<p>运行<code>./build.sh clean</code> 相当于<code>make clean</code></p>
+<h1 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h1><h2 id="LT"><a href="#LT" class="headerlink" title="LT"></a>LT</h2><p>如果内核缓冲区不够了，将未发完的数据添加到应用缓冲区outbuffer,等到内核有空余时就会有connfd的EPOLLOUT事件，如果内核没有数据可以取，却在关注EPOLLOUT事件，就会出现忙等待。</p>
+<p><img src="/muduo-1/image-20230728115359271.png" alt="image-20230728115359271"></p>
+<img src="/2023/07/27/muduo-1/image-20230728115359271.png" class title="This is an test image">
+
+<p>后面都采用LT模式</p>
+<h2 id="ET"><a href="#ET" class="headerlink" title="ET"></a>ET</h2><p><img src="/muduo-1/image-20230728120915832.png" alt="image-20230728120915832"></p>
+<img src="/2023/07/27/muduo-1/image-20230728120915832.png" class title="This is an test image">
+
+<p>因为是电平触发，所有一开始就关注EPOLLOUT事件，EAGAIN如果数据未满，应用缓冲区发送给内核，相当于一直高电平，那么就一直不发送了，填满内核，变为低电平状态，如果被接受，就会变成高电平。</p>
+<p>EMFILE状态，如果有connfd，返回失败，一直处于高电平，则后面的都接受不了，所以需要人为控制</p>
+<h1 id="面向对象编程风格"><a href="#面向对象编程风格" class="headerlink" title="面向对象编程风格"></a>面向对象编程风格</h1><p>继承实现，将基类虚函数实现放到派生类函数来实现，这样调用基类虚函数，会自动调用派生类函数，比如下面的Run函数</p>
+<p>Thread.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Thread&#123;</span><br><span class="line">public:</span><br><span class="line">	Thread():autoDelete_(false);</span><br><span class="line">	virtual ~Thread()=default;//因为多态的性质决定,是一个虚析构函数</span><br><span class="line">	void Start();</span><br><span class="line">	void Join();</span><br><span class="line">	void SetAutoDelate(bool autoDelete);</span><br><span class="line">	</span><br><span class="line">private:</span><br><span class="line">	static void* ThreadRoutine(void* arg);</span><br><span class="line">	virtual void Run()=0;	</span><br><span class="line">	pthread_t id_;</span><br><span class="line">	bool autoDelete_;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Thread.cpp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Thread::Thread()&#123;</span><br><span class="line">	cout&lt;&lt;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::Start()&#123;</span><br><span class="line">	pthread_creat(&amp;id,NULL,ThreadRoutine,this);//this 指向正在创建的 Thread_test 对象。这样，在启动线程时，会在新线程中调用 Thread_test 对象的 Run() 函数</span><br><span class="line">&#125;</span><br><span class="line">void Thread::Join()&#123;</span><br><span class="line">	p_join(id,NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void*  Thread::ThreadRoutine(void* arg)&#123;//静态函数不能调用非静态函数，所以重新th,调用th的Run函数</span><br><span class="line">	thread* th=static_cast&lt;Thread*&gt;(arg);</span><br><span class="line">	th-&gt;Run;</span><br><span class="line">	if(th-&gt;autoDelete_)</span><br><span class="line">		delete th;</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::SetAutoDelate(bool autoDelete)&#123;</span><br><span class="line">	autoDelete_=autoDelete;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Thread_test.cpp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">class Thread_test: public Thread&#123;</span><br><span class="line">public:</span><br><span class="line">	thread(count):count_(count)&#123;</span><br><span class="line">		cout&lt;&lt;</span><br><span class="line">	&#125;</span><br><span class="line">		~thread()&#123;//派生类如果没有显式地定义析构函数，派生类会继承基类的虚析构函数</span><br><span class="line">		//通过继承基类的虚析构函数，派生类可以保证在销毁对象时正确调用基类和派生类的析构函数，实现正确的资源清理</span><br><span class="line">		cout</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	private:</span><br><span class="line">	void Run()&#123;//私有纯虚函数不能直接在派生类中调用，但是可以通过在派生类中重新声明并实现这些函数，并间接地通过公有函数或其他函数来调用。这样，派生类就能够满足基类的接口要求。</span><br><span class="line">	//派生类必须重新实现基类的纯虚函数，但是在基类中调用纯虚函数时，实际上会调用派生类的实现</span><br><span class="line">		while (count_--)&#123;</span><br><span class="line">			cout&lt;&lt;&quot;&quot;this is a test -..&quot;&lt;&lt;endl;</span><br><span class="line">			sleep(1);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	int count_ ;</span><br><span class="line">&#125;</span><br><span class="line">int main()&#123;</span><br><span class="line">	Thread_test t2 = new Thread_test(5);</span><br><span class="line">	t2-&gt;SetAutoDelate(true);</span><br><span class="line">	t2-&gt;Start();</span><br><span class="line">	t2-&gt;Join();</span><br><span class="line">	for (; ; )</span><br><span class="line">		pause();</span><br><span class="line">	return 8;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果基类的run函数变为public，在main函数调用t2-&gt;Run(),则表示在主线程运行。</p>
+<h1 id="基于对象编程风格"><a href="#基于对象编程风格" class="headerlink" title="基于对象编程风格"></a>基于对象编程风格</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;boost/function.hpp&gt;</span><br><span class="line">#include &lt;boost/bind.hpp&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">class Foo</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">	void memberFunc(double d, int i, int j)&#123;</span><br><span class="line">		cout &lt;&lt;d&lt;&lt;endl;//打印0.5</span><br><span class="line">		cout &lt;&lt;i &lt;&lt;endl;//打印100</span><br><span class="line">		cout &lt;&lt;j &lt;&lt;endl;//打印10</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">int main()&#123;</span><br><span class="line">	Foo foo;</span><br><span class="line">	boost::function&lt;void (int)&gt; fp = boost::bind(&amp;Foo::memberFunc,&amp;foo,0.5,_1,10);</span><br><span class="line">	//将Foo的memberFunc(double d, int i, int j)类的成员函数适配成void fp(int)，_1或_加数字表示占位，&amp;不能省略</span><br><span class="line">	fp(100);</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>boost bind&#x2F;function库的出现，替代了stl中的mem fun,ptr fun,bind1 st,bin2nd等函数,相当于函数适配器</p>
+<p>在 C++ 中，成员函数指针和普通函数指针有一些区别。在使用 <code>boost::bind</code> 绑定成员函数时，需要显式地使用 <code>&amp;</code> 来获得成员函数的地址，而普通函数则不需要。</p>
+<p>这是因为在 C++ 中，成员函数有一个隐藏的额外参数，即指向调用成员函数的对象的指针（即 <code>this</code> 指针）。当你使用 <code>&amp;Foo::memberFunc</code> 时，它实际上获取了成员函数 <code>memberFunc</code> 的地址，包括了这个隐藏的 <code>this</code> 指针。所以，通过 <code>&amp;Foo::memberFunc</code> 可以正确地获得成员函数的指针。</p>
+<p>然而，对于普通函数，不涉及到隐藏的 <code>this</code> 指针，因此在使用 <code>boost::bind</code> 绑定普通函数时，不需要显式使用 <code>&amp;</code> 来获取函数的地址。</p>
+<p>综上所述：</p>
+<ul>
+<li>对于成员函数，使用 <code>&amp;</code> 是必需的，以获得成员函数的指针，包括隐藏的 <code>this</code> 指针。</li>
+<li>对于普通函数，不需要使用 <code>&amp;</code>，因为它们没有隐藏的 <code>this</code> 指针。</li>
+</ul>
+<p>注意：在 C++11 及以后的标准中，可以使用更现代的方式来绑定函数和成员函数，例如使用 lambda 表达式或 <code>std::bind</code>。这些方法在使用语法上更加简洁和直观。</p>
+<p>Thread.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class Thread&#123;</span><br><span class="line">public:</span><br><span class="line">	typedef boost::function&lt;void ()&gt; ThreadFunc;</span><br><span class="line">	explicit Thread(const ThreadFunc&amp; func);	</span><br><span class="line">	void Start();</span><br><span class="line">	void Join();</span><br><span class="line">	void SetAutoDelate(bool autoDelete);</span><br><span class="line">	</span><br><span class="line">private:</span><br><span class="line">	static void* ThreadRoutine(void* arg);</span><br><span class="line">	void Run();</span><br><span class="line">    ThreadFunc func_;</span><br><span class="line">	pthread_t id_;</span><br><span class="line">	bool autoDelete_;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Thread.cpp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Thread::Thread(const ThreadFunc&amp; func):func_(func),autoDelete_(false)&#123;</span><br><span class="line">	cout&lt;&lt;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::Start()&#123;</span><br><span class="line">	pthread_creat(&amp;id,NULL,ThreadRoutine,this);</span><br><span class="line">&#125;</span><br><span class="line">void Thread::Join()&#123;</span><br><span class="line">	p_join(id,NULL);</span><br><span class="line">&#125;</span><br><span class="line">void*  Thread::ThreadRoutine(void* arg)&#123;</span><br><span class="line">	thread* th=static_cast&lt;Thread*&gt;(arg);</span><br><span class="line">	th-&gt;Run;</span><br><span class="line">	if(th-&gt;autoDelete_)</span><br><span class="line">		delete th;</span><br><span class="line">	return NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::Run()&#123;</span><br><span class="line">		func_();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::SetAutoDelate(bool autoDelete)&#123;</span><br><span class="line">	autoDelete_=autoDelete;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Thread_test.cpp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void func(int count)&#123;</span><br><span class="line">	while(--count)&#123;</span><br><span class="line">	cout&lt;&lt;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;	</span><br><span class="line">	</span><br><span class="line">int main()&#123;</span><br><span class="line">	Thread t2(boost::bind(func,3));//利用bind适配，</span><br><span class="line">	t2-&gt;SetAutoDelate(true);</span><br><span class="line">	t2-&gt;Start();</span><br><span class="line">	t2-&gt;Join();</span><br><span class="line">	</span><br><span class="line">	return 8;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在C++中，<code>explicit</code>是一个关键字，通常用于修饰单参数的构造函数，用于防止隐式类型转换。当一个构造函数被标记为<code>explicit</code>时，在使用该构造函数进行对象初始化时，编译器不会自动执行隐式的类型转换。</p>
+<p>考虑以下示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class MyClass &#123;</span><br><span class="line">public:</span><br><span class="line">    explicit MyClass(int x) &#123;</span><br><span class="line">        // Constructor code</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    MyClass obj1(10);  // 正确，直接调用构造函数</span><br><span class="line">    MyClass obj2 = 20; // 错误，因为构造函数被声明为explicit，禁止隐式类型转换</span><br><span class="line">    //MyClass obj2 = 20;语句试图将一个int类型的整数值20隐式转换为MyClass类型的对象。然而，由于MyClass的构造函数被声明为explicit，编译器不会自动执行这种类型转换</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的例子中，<code>MyClass</code>拥有一个带有<code>int</code>参数的构造函数，并且该构造函数被标记为<code>explicit</code>。在<code>main()</code>函数中，创建<code>obj1</code>对象时直接调用了构造函数，这是正确的。然而，在尝试将整数值20赋值给<code>obj2</code>对象时，由于构造函数被声明为<code>explicit</code>，编译器会报错，不允许隐式类型转换。</p>
+<p>通过使用<code>explicit</code>关键字，可以防止意外的类型转换，增加代码的清晰性和安全性。不让代码超出预期。</p>
+<p><img src="/muduo-1/image-20230729212329032.png" alt="image-20230729212329032"></p>
+<img src="/2023/07/27/muduo-1/image-20230729212329032.png" class title="This is an test image">
+
+<h1 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h1><p><img src="/muduo-1/image-20230730155255822.png" alt="image-20230730155255822"></p>
+<img src="/2023/07/27/muduo-1/image-20230730155255822.png" class title="This is an test image">
+
+<h2 id="基础库"><a href="#基础库" class="headerlink" title="基础库"></a>基础库</h2><p><img src="/muduo-1/image-20230730155339712.png" alt="image-20230730155339712"></p>
+<img src="/2023/07/27/muduo-1/image-20230730155339712.png" class title="This is an test image">
+
+<p><img src="/muduo-1/image-20230730155404611.png" alt="image-20230730155404611"></p>
+<img src="/2023/07/27/muduo-1/image-20230730155404611.png" class title="This is an test image">
+
+<h2 id="Timestamp类封装"><a href="#Timestamp类封装" class="headerlink" title="Timestamp类封装"></a>Timestamp类封装</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;base/types.h&gt;</span><br></pre></td></tr></table></figure>
+
+<p>less_than_comparable<br>    要求实现&lt;，可自动实现&gt;,&lt;&#x3D;,&gt;&#x3D;</p>
+<p>BOOST_STATIC_ASSERT</p>
+<p>使用PRId64</p>
+<p>Timestamp实现及测试</p>
+<p><strong>BOOST_STATIC_ASSERT</strong>编译时断言<br><strong>assert</strong>是运行时断言</p>
+<p><code>static_assert</code> 是标准 C++ 的一部分，更为现代和推荐的用法，特别是在使用 C++11 及以上标准的项目中。而 <code>BOOST_STATIC_ASSERT</code> 则是为了兼容 C++03 标准而提供的 Boost 库中的宏，在旧的编译环境中可能会使用到。在使用时，根据项目的需求和所支持的 C++ 标准版本来选择使用哪种静态断言宏。</p>
+<h3 id="使用PRld64"><a href="#使用PRld64" class="headerlink" title="使用PRld64"></a>使用PRld64</h3><p>int64_t用来表示64位整数，在32位系统中是long long int，在64位系统中是long int,所以打印int64_t的格式化方法是:<br><code>printf(&quot;%ld&quot;, value);// 64bit os</code></p>
+<p><code>printf(&quot;%lld&quot;, value); // 32bit Os</code></p>
+<p>跨平台的做法:<br><code>#define_STDC_FORMAT_MACROS</code>这是一个预处理指令，用于定义一个宏 <code>_STDC_FORMAT_MACROS</code>。在 <code>inttypes.h</code> 头文件中，如果检测到定义了这个宏，它将启用一系列与格式化整数类型相关的宏定义，包括 <code>PRId64</code>、<code>PRIu64</code> 等</p>
+<p><code>#include &lt;inttypes.h&gt;</code>这是包含 C&#x2F;C++ 标准库中 <code>inttypes.h</code> 头文件的指令。<code>inttypes.h</code> 头文件提供了一系列用于处理整数类型的宏和格式说明符</p>
+<p><code>#undef_STDC_FORMAT_MACROS</code>这是另一个预处理指令，用于取消之前定义的 <code>_STDC_FORMAT_MACROS</code> 宏。在包含完 <code>inttypes.h</code> 头文件之后，我们取消这个宏的定义，以防止它在后续代码中产生影响。</p>
+<p><code>printf(&quot;%&quot;PRId64 &quot;\n&quot;, value);</code></p>
+<p><img src="/muduo-1/image-20230730165438382.png" alt="image-20230730165438382"></p>
+<img src="/2023/07/27/muduo-1/image-20230730165438382.png" class title="This is an test image">
+
+<p>Timestamp.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line">// Use of this source code is governed by a BSD-style license</span><br><span class="line">// that can be found in the License file.</span><br><span class="line">//</span><br><span class="line">// Author: Shuo Chen (chenshuo at chenshuo dot com)</span><br><span class="line"></span><br><span class="line">#ifndef MUDUO_BASE_TIMESTAMP_H</span><br><span class="line">#define MUDUO_BASE_TIMESTAMP_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/copyable.h&quot;</span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;boost/operators.hpp&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo//namespace muduo 是一个命名空间（namespace），用于将一组相关的类、函数、变量等实体封装在一个逻辑上相互隔离的作用域中。这个命名空间在上述代码中包含了一个名为 Timestamp 的类以及与该类相关的一些函数和常量。</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">///</span><br><span class="line">/// Time stamp in UTC, in microseconds resolution.</span><br><span class="line">///</span><br><span class="line">/// This class is immutable.</span><br><span class="line">/// It&#x27;s recommended to pass it by value, since it&#x27;s passed in register on x64.</span><br><span class="line">///</span><br><span class="line">class Timestamp : public muduo::copyable,//是值语义，值语义是指对象的复制行为是复制其值而非引用。在 C++ 中，默认情况下，类的对象的复制行为是浅拷贝，即复制对象的成员变量的值，而不复制指向的资源</span><br><span class="line">                  public boost::equality_comparable&lt;Timestamp&gt;,</span><br><span class="line">                  public boost::less_than_comparable&lt;Timestamp&gt;</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ///</span><br><span class="line">  /// Constucts an invalid Timestamp.</span><br><span class="line">  ///</span><br><span class="line">  Timestamp()</span><br><span class="line">    : microSecondsSinceEpoch_(0)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ///</span><br><span class="line">  /// Constucts a Timestamp at specific time</span><br><span class="line">  ///</span><br><span class="line">  /// @param microSecondsSinceEpoch</span><br><span class="line">  explicit Timestamp(int64_t microSecondsSinceEpochArg)</span><br><span class="line">    : microSecondsSinceEpoch_(microSecondsSinceEpochArg)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void swap(Timestamp&amp; that)</span><br><span class="line">  &#123;</span><br><span class="line">    std::swap(microSecondsSinceEpoch_, that.microSecondsSinceEpoch_);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // default copy/assignment/dtor are Okay</span><br><span class="line"></span><br><span class="line">  string toString() const;</span><br><span class="line">  string toFormattedString(bool showMicroseconds = true) const;</span><br><span class="line"></span><br><span class="line">  bool valid() const &#123; return microSecondsSinceEpoch_ &gt; 0; &#125;</span><br><span class="line"></span><br><span class="line">  // for internal usage.</span><br><span class="line">  int64_t microSecondsSinceEpoch() const &#123; return microSecondsSinceEpoch_; &#125;</span><br><span class="line">  time_t secondsSinceEpoch() const</span><br><span class="line">  &#123; return static_cast&lt;time_t&gt;(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); &#125;</span><br><span class="line"></span><br><span class="line">  ///</span><br><span class="line">  /// Get time of now.</span><br><span class="line">  ///</span><br><span class="line">  static Timestamp now();</span><br><span class="line">  static Timestamp invalid()</span><br><span class="line">  &#123;</span><br><span class="line">    return Timestamp();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  static Timestamp fromUnixTime(time_t t)</span><br><span class="line">  &#123;</span><br><span class="line">    return fromUnixTime(t, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  static Timestamp fromUnixTime(time_t t, int microseconds)</span><br><span class="line">  &#123;</span><br><span class="line">    return Timestamp(static_cast&lt;int64_t&gt;(t) * kMicroSecondsPerSecond + microseconds);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  static const int kMicroSecondsPerSecond = 1000 * 1000;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  int64_t microSecondsSinceEpoch_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">inline bool operator&lt;(Timestamp lhs, Timestamp rhs)//声明和定义都在.h文件</span><br><span class="line">&#123;</span><br><span class="line">  return lhs.microSecondsSinceEpoch() &lt; rhs.microSecondsSinceEpoch();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline bool operator==(Timestamp lhs, Timestamp rhs)//实现&lt;，可自动实现&gt;,&lt;=,&gt;=</span><br><span class="line">&#123;</span><br><span class="line">  return lhs.microSecondsSinceEpoch() == rhs.microSecondsSinceEpoch();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">///</span><br><span class="line">/// Gets time difference of two timestamps, result in seconds.</span><br><span class="line">///</span><br><span class="line">/// @param high, low</span><br><span class="line">/// @return (high-low) in seconds</span><br><span class="line">/// @c double has 52-bit precision, enough for one-microsecond</span><br><span class="line">/// resolution for next 100 years.</span><br><span class="line">inline double timeDifference(Timestamp high, Timestamp low)</span><br><span class="line">&#123;</span><br><span class="line">  int64_t diff = high.microSecondsSinceEpoch() - low.microSecondsSinceEpoch();</span><br><span class="line">  return static_cast&lt;double&gt;(diff) / Timestamp::kMicroSecondsPerSecond;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">///</span><br><span class="line">/// Add @c seconds to given timestamp.</span><br><span class="line">///</span><br><span class="line">/// @return timestamp+seconds as Timestamp</span><br><span class="line">///</span><br><span class="line">inline Timestamp addTime(Timestamp timestamp, double seconds)</span><br><span class="line">&#123;</span><br><span class="line">  int64_t delta = static_cast&lt;int64_t&gt;(seconds * Timestamp::kMicroSecondsPerSecond);</span><br><span class="line">  return Timestamp(timestamp.microSecondsSinceEpoch() + delta);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_BASE_TIMESTAMP_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Timestamp.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">// Use of this source code is governed by a BSD-style license</span><br><span class="line">// that can be found in the License file.</span><br><span class="line">//</span><br><span class="line">// Author: Shuo Chen (chenshuo at chenshuo dot com)</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Timestamp.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;sys/time.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">#ifndef __STDC_FORMAT_MACROS</span><br><span class="line">#define __STDC_FORMAT_MACROS</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">#include &lt;inttypes.h&gt;//如果 __STDC_FORMAT_MACROS 宏未定义，就会将其定义为非零值，然后再包含 &lt;inttypes.h&gt; 头文件，从而确保特殊的格式化宏在代码中可用</span><br><span class="line"></span><br><span class="line">using namespace muduo;//是一个命名空间的使用声明语句。它的作用是将命名空间 muduo 中的所有符号（变量、函数、类等）引入到当前的代码作用域中，使得在代码中可以直接使用这些符号而无需显式指定命名空间前缀。</span><br><span class="line"></span><br><span class="line">static_assert(sizeof(Timestamp) == sizeof(int64_t),</span><br><span class="line">              &quot;Timestamp should be same size as int64_t&quot;);</span><br><span class="line">string Timestamp::toString() const</span><br><span class="line">&#123;</span><br><span class="line">  char buf[32] = &#123;0&#125;;</span><br><span class="line">  int64_t seconds = microSecondsSinceEpoch_ / kMicroSecondsPerSecond;</span><br><span class="line">  int64_t microseconds = microSecondsSinceEpoch_ % kMicroSecondsPerSecond;</span><br><span class="line">  snprintf(buf, sizeof(buf), &quot;%&quot; PRId64 &quot;.%06&quot; PRId64 &quot;&quot;, seconds, microseconds);</span><br><span class="line">  return buf;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">string Timestamp::toFormattedString(bool showMicroseconds) const</span><br><span class="line">&#123;</span><br><span class="line">  char buf[64] = &#123;0&#125;;</span><br><span class="line">  time_t seconds = static_cast&lt;time_t&gt;(microSecondsSinceEpoch_ / kMicroSecondsPerSecond);</span><br><span class="line">  struct tm tm_time;</span><br><span class="line">  gmtime_r(&amp;seconds, &amp;tm_time);//gmtime_r 是 C 语言和 C++ 中的一个函数，用于将 Unix 时间戳（自 1970 年 1 月 1 日以来的秒数）转换为 UTC（协调世界时）时间的结构体表示。该函数的功能与 gmtime 类似，但具有线程安全的特性。</span><br><span class="line"></span><br><span class="line">  if (showMicroseconds)</span><br><span class="line">  &#123;</span><br><span class="line">    int microseconds = static_cast&lt;int&gt;(microSecondsSinceEpoch_ % kMicroSecondsPerSecond);</span><br><span class="line">    snprintf(buf, sizeof(buf), &quot;%4d%02d%02d %02d:%02d:%02d.%06d&quot;,</span><br><span class="line">             tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,</span><br><span class="line">             tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,</span><br><span class="line">             microseconds);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    snprintf(buf, sizeof(buf), &quot;%4d%02d%02d %02d:%02d:%02d&quot;,</span><br><span class="line">             tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,</span><br><span class="line">             tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);</span><br><span class="line">  &#125;</span><br><span class="line">  return buf;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Timestamp Timestamp::now()</span><br><span class="line">&#123;</span><br><span class="line">  struct timeval tv;</span><br><span class="line">  gettimeofday(&amp;tv, NULL);</span><br><span class="line">  int64_t seconds = tv.tv_sec;</span><br><span class="line">  return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">seconds * kMicroSecondsPerSecond + tv.tv_usec</span><br><span class="line">这是计算时间戳的微秒数部分。首先，将 seconds 中的秒数部分转换成微秒，即乘以 kMicroSecondsPerSecond，这个值等于 1,000,000，表示一秒有多少微秒。然后，将这个值与 tv.tv_usec 的微秒数部分相加，得到完整的时间戳的微秒数。</span><br><span class="line">return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);</span><br><span class="line">最后，通过上述计算得到的完整时间戳的微秒数，创建一个 Timestamp 类的对象，并将其作为函数的返回值。</span><br><span class="line">这行代码的作用是获取当前时间，计算得到完整的时间戳（以微秒为单位），然后返回这个时间戳作为 Timestamp 类的对象。</span><br><span class="line">这个时间戳将用于创建一个 Timestamp 类的对象，并作为函数 Timestamp::now() 的返回值。所以该表达式实际上是用于计算返回值</span><br></pre></td></tr></table></figure>
+
+<p>Timestamp_unittest.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/Timestamp.h&quot;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">using muduo::Timestamp;//它的作用是将命名空间 muduo 中的 Timestamp 类引入到当前的代码作用域中，使得在代码中可以直接使用 Timestamp 类而无需显式指定命名空间前缀</span><br><span class="line"></span><br><span class="line">void passByConstReference(const Timestamp&amp; x)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;%s\n&quot;, x.toString().c_str());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void passByValue(Timestamp x)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;%s\n&quot;, x.toString().c_str());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void benchmark()</span><br><span class="line">&#123;</span><br><span class="line">  const int kNumber = 1000*1000;</span><br><span class="line"></span><br><span class="line">  std::vector&lt;Timestamp&gt; stamps;</span><br><span class="line">  stamps.reserve(kNumber);</span><br><span class="line">  for (int i = 0; i &lt; kNumber; ++i)</span><br><span class="line">  &#123;</span><br><span class="line">    stamps.push_back(Timestamp::now());</span><br><span class="line">  &#125;</span><br><span class="line">  printf(&quot;%s\n&quot;, stamps.front().toString().c_str());</span><br><span class="line">  printf(&quot;%s\n&quot;, stamps.back().toString().c_str());</span><br><span class="line">  printf(&quot;%f\n&quot;, timeDifference(stamps.back(), stamps.front()));</span><br><span class="line"></span><br><span class="line">  int increments[100] = &#123; 0 &#125;;</span><br><span class="line">  int64_t start = stamps.front().microSecondsSinceEpoch();</span><br><span class="line">  for (int i = 1; i &lt; kNumber; ++i)</span><br><span class="line">  &#123;</span><br><span class="line">    int64_t next = stamps[i].microSecondsSinceEpoch();</span><br><span class="line">    int64_t inc = next - start;</span><br><span class="line">    start = next;</span><br><span class="line">    if (inc &lt; 0)</span><br><span class="line">    &#123;</span><br><span class="line">      printf(&quot;reverse!\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else if (inc &lt; 100)</span><br><span class="line">    &#123;</span><br><span class="line">      ++increments[inc];</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      printf(&quot;big gap %d\n&quot;, static_cast&lt;int&gt;(inc));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  for (int i = 0; i &lt; 100; ++i)</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;%2d: %d\n&quot;, i, increments[i]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  Timestamp now(Timestamp::now());//这是一个对象的定义和初始化语句，它使用上述调用 now() 的结果来初始化一个名为 now 的 Timestamp 类对象。这里使用的是直接初始化的方式，通过调用 now() 函数得到的时间戳对象来初始化 now 对象</span><br><span class="line">  //相当于Timestamp now=Timestamp::now();调用拷贝构造函数初始化对象</span><br><span class="line">  printf(&quot;%s\n&quot;, now.toString().c_str());</span><br><span class="line">  passByValue(now);</span><br><span class="line">  passByConstReference(now);</span><br><span class="line">  benchmark();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="tests下的CMake"><a href="#tests下的CMake" class="headerlink" title="tests下的CMake"></a>tests下的CMake</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_executable(timestamp_unittest Timestamp_unittest.cc)</span><br><span class="line">target_link_libraries(timestamp_unittest muduo_base)//target_link_libraries 命令用于将库（静态库或动态库）链接到目标（可执行文件或其他库）</span><br><span class="line">add_test(NAME timestamp_unittest COMMAND timestamp_unittest)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Atomic-h-执行原子性操作"><a href="#Atomic-h-执行原子性操作" class="headerlink" title="Atomic.h 执行原子性操作"></a>Atomic.h 执行原子性操作</h2><p>因为多线程用锁的话，是性能杀手，而原子性操作可以有同样效果，但是没有性能问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">// Use of this source code is governed by a BSD-style license</span><br><span class="line">// that can be found in the License file.</span><br><span class="line">//</span><br><span class="line">// Author: Shuo Chen (chenshuo at chenshuo dot com)</span><br><span class="line"></span><br><span class="line">#ifndef MUDUO_BASE_ATOMIC_H</span><br><span class="line">#define MUDUO_BASE_ATOMIC_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/noncopyable.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;stdint.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">namespace detail</span><br><span class="line">&#123;</span><br><span class="line">template&lt;typename T&gt;</span><br><span class="line">class AtomicIntegerT : noncopyable// noncopyable表示这个类不可拷贝的</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  AtomicIntegerT()</span><br><span class="line">    : value_(0)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // uncomment if you need copying and assignment</span><br><span class="line">  //</span><br><span class="line">  // AtomicIntegerT(const AtomicIntegerT&amp; that)</span><br><span class="line">  //   : value_(that.get())</span><br><span class="line">  // &#123;&#125;</span><br><span class="line">  //</span><br><span class="line">  // AtomicIntegerT&amp; operator=(const AtomicIntegerT&amp; that)//把等号运算符做成私有的</span><br><span class="line">  // &#123;</span><br><span class="line">  //   getAndSet(that.get());</span><br><span class="line">  //   return *this;</span><br><span class="line">  // &#125;</span><br><span class="line"></span><br><span class="line">  T get()//原子地比较指定变量的值和期望值，如果相等则将该变量的值设置为新的值，并返回操作之前的值</span><br><span class="line">  &#123;</span><br><span class="line">    // in gcc &gt;= 4.7: __atomic_load_n(&amp;value_, __ATOMIC_SEQ_CST)</span><br><span class="line">    return __sync_val_compare_and_swap(&amp;value_, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  T getAndAdd(T x)//原子地将指定变量的值加上一个增量，并返回变量加增量后的结果</span><br><span class="line">  &#123;</span><br><span class="line">    // in gcc &gt;= 4.7: __atomic_fetch_add(&amp;value_, x, __ATOMIC_SEQ_CST)</span><br><span class="line">    return __sync_fetch_and_add(&amp;value_, x);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  T addAndGet(T x)</span><br><span class="line">  &#123;</span><br><span class="line">    return getAndAdd(x) + x;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  T incrementAndGet()</span><br><span class="line">  &#123;</span><br><span class="line">    return addAndGet(1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  T decrementAndGet()</span><br><span class="line">  &#123;</span><br><span class="line">    return addAndGet(-1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void add(T x)</span><br><span class="line">  &#123;</span><br><span class="line">    getAndAdd(x);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void increment()</span><br><span class="line">  &#123;</span><br><span class="line">    incrementAndGet();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void decrement()</span><br><span class="line">  &#123;</span><br><span class="line">    decrementAndGet();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  T getAndSet(T newValue)</span><br><span class="line">  &#123;</span><br><span class="line">    // in gcc &gt;= 4.7: __atomic_exchange_n(&amp;value_, newValue, __ATOMIC_SEQ_CST)</span><br><span class="line">    return __sync_lock_test_and_set(&amp;value_, newValue);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  volatile T value_;</span><br><span class="line">&#125;;</span><br><span class="line">&#125;  // namespace detail</span><br><span class="line"></span><br><span class="line">typedef detail::AtomicIntegerT&lt;int32_t&gt; AtomicInt32;</span><br><span class="line">typedef detail::AtomicIntegerT&lt;int64_t&gt; AtomicInt64;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_BASE_ATOMIC_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在c++11下有更新</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;atomic&gt;</span><br><span class="line"></span><br><span class="line">template &lt;typename T&gt;</span><br><span class="line">class AtomicIntegerT : noncopyable</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    AtomicIntegerT()</span><br><span class="line">        : value_(0)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T get()</span><br><span class="line">    &#123;</span><br><span class="line">        return value_.load(std::memory_order_seq_cst);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T getAndAdd(T x)</span><br><span class="line">    &#123;</span><br><span class="line">        return value_.fetch_add(x, std::memory_order_seq_cst);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T addAndGet(T x)</span><br><span class="line">    &#123;</span><br><span class="line">        return getAndAdd(x) + x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T incrementAndGet()</span><br><span class="line">    &#123;</span><br><span class="line">        return addAndGet(1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T decrementAndGet()</span><br><span class="line">    &#123;</span><br><span class="line">        return addAndGet(-1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void add(T x)</span><br><span class="line">    &#123;</span><br><span class="line">        getAndAdd(x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void increment()</span><br><span class="line">    &#123;</span><br><span class="line">        incrementAndGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void decrement()</span><br><span class="line">    &#123;</span><br><span class="line">        decrementAndGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T getAndSet(T newValue)</span><br><span class="line">    &#123;</span><br><span class="line">        return value_.exchange(newValue, std::memory_order_seq_cst);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    std::atomic&lt;T&gt; value_;//具有volatile特性</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>测试文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/Atomic.h&quot;</span><br><span class="line">#include &lt;assert.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  &#123;</span><br><span class="line">  muduo::AtomicInt64 a0;</span><br><span class="line">  assert(a0.get() == 0);</span><br><span class="line">  assert(a0.getAndAdd(1) == 0);</span><br><span class="line">  assert(a0.get() == 1);</span><br><span class="line">  assert(a0.addAndGet(2) == 3);</span><br><span class="line">  assert(a0.get() == 3);</span><br><span class="line">  assert(a0.incrementAndGet() == 4);</span><br><span class="line">  assert(a0.get() == 4);</span><br><span class="line">  a0.increment();</span><br><span class="line">  assert(a0.get() == 5);</span><br><span class="line">  assert(a0.addAndGet(-3) == 2);</span><br><span class="line">  assert(a0.getAndSet(100) == 2);</span><br><span class="line">  assert(a0.get() == 100);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">  muduo::AtomicInt32 a1;</span><br><span class="line">  assert(a1.get() == 0);</span><br><span class="line">  assert(a1.getAndAdd(1) == 0);</span><br><span class="line">  assert(a1.get() == 1);</span><br><span class="line">  assert(a1.addAndGet(2) == 3);</span><br><span class="line">  assert(a1.get() == 3);</span><br><span class="line">  assert(a1.incrementAndGet() == 4);</span><br><span class="line">  assert(a1.get() == 4);</span><br><span class="line">  a1.increment();</span><br><span class="line">  assert(a1.get() == 5);</span><br><span class="line">  assert(a1.addAndGet(-3) == 2);</span><br><span class="line">  assert(a1.getAndSet(100) == 2);</span><br><span class="line">  assert(a1.get() == 100);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">在tests下的CMake里不需要target_link_libraries，因为它没有编译静态库</span><br></pre></td></tr></table></figure>
+
+<h3 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h3><p><img src="/muduo-1/image-20230731161906596.png" alt="image-20230731161906596"></p>
+<h3 id="Types-h"><a href="#Types-h" class="headerlink" title="Types.h"></a>Types.h</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename To, typename From&gt;</span><br><span class="line">inline To implicit_cast(From const &amp;f)//隐式转换</span><br><span class="line">&#123;</span><br><span class="line">  return f;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>好处是可以在没有前面代码的基础下能看懂是隐式转换。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename To, typename From&gt;     // use like this: down_cast&lt;T*&gt;(foo);</span><br><span class="line">inline To down_cast(From* f)                     // so we only accept pointers</span><br><span class="line">&#123;//向下转型的函数</span><br><span class="line">  // Ensures that To is a sub-type of From *.  This test is here only</span><br><span class="line">  // for compile-time type checking, and has no overhead in an</span><br><span class="line">  // optimized build at run-time, as it will be optimized away</span><br><span class="line">  // completely.</span><br><span class="line">  if (false)</span><br><span class="line">  &#123;</span><br><span class="line">    implicit_cast&lt;From*, To&gt;(0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">#if !defined(NDEBUG) &amp;&amp; !defined(GOOGLE_PROTOBUF_NO_RTTI)</span><br><span class="line">  assert(f == NULL || dynamic_cast&lt;To&gt;(f) != NULL);  // RTTI: debug mode only!</span><br><span class="line">#endif</span><br><span class="line">  return static_cast&lt;To&gt;(f);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式">
+      <i class="fa fa-chevron-left"></i> 设计模式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E5%B9%B6%E5%8F%91%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">高并发高性能服务器的一些思路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">大型网站架构演变过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5-web-server%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%86%E7%A6%BB"><span class="nav-number">2.1.</span> <span class="nav-text">第一步 web server与数据库分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8-%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86"><span class="nav-number">2.2.</span> <span class="nav-text">第二部 缓存处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5-web-server%E9%9B%86%E7%BE%A4-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">2.3.</span> <span class="nav-text">第三步 web server集群+读写分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5-CDN%E3%80%81%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E3%80%81%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8"><span class="nav-number">2.4.</span> <span class="nav-text">第四步 CDN、分布式缓存、分库分表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5-%E5%A4%9A%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83-%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8%E4%B8%8E%E8%AE%A1%E7%AE%97"><span class="nav-number">2.5.</span> <span class="nav-text">第五步 多数据中心+分布式存储与计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cmake%E7%AE%A1%E7%90%86%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">cmake管理过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#epoll"><span class="nav-number">4.</span> <span class="nav-text">epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LT"><span class="nav-number">4.1.</span> <span class="nav-text">LT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ET"><span class="nav-number">4.2.</span> <span class="nav-text">ET</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B%E9%A3%8E%E6%A0%BC"><span class="nav-number">5.</span> <span class="nav-text">面向对象编程风格</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B%E9%A3%8E%E6%A0%BC"><span class="nav-number">6.</span> <span class="nav-text">基于对象编程风格</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">7.</span> <span class="nav-text">目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%BA%93"><span class="nav-number">7.1.</span> <span class="nav-text">基础库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Timestamp%E7%B1%BB%E5%B0%81%E8%A3%85"><span class="nav-number">7.2.</span> <span class="nav-text">Timestamp类封装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8PRld64"><span class="nav-number">7.2.1.</span> <span class="nav-text">使用PRld64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tests%E4%B8%8B%E7%9A%84CMake"><span class="nav-number">7.2.2.</span> <span class="nav-text">tests下的CMake</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Atomic-h-%E6%89%A7%E8%A1%8C%E5%8E%9F%E5%AD%90%E6%80%A7%E6%93%8D%E4%BD%9C"><span class="nav-number">7.3.</span> <span class="nav-text">Atomic.h 执行原子性操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9"><span class="nav-number">7.3.1.</span> <span class="nav-text">编译选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Types-h"><span class="nav-number">7.3.2.</span> <span class="nav-text">Types.h</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

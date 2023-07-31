@@ -147,6 +147,243 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/03/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/03/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85/" class="post-title-link" itemprop="url">c++补充</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-03 16:59:54" itemprop="dateCreated datePublished" datetime="2023-04-03T16:59:54+08:00">2023-04-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-30 16:14:01" itemprop="dateModified" datetime="2023-07-30T16:14:01+08:00">2023-07-30</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>如果以前使用过C语言，您可能觉得前面讨论的#define语句已经足够完成这样的工作了。但const比#defien好。首先，它能够明确指定类型。其次，可以使用C++的作用域规则将定义限制在特定的函数或文件中（作用域规则描述了名称在各种模块中的可知程度，将在第9章讨论)。第三，可以将const用于更复杂的类型，如第4章将介绍的数组和结构。</p>
+<p>提示:如果读者在学习C++之前学习过C语言，并打算使用#define来定义符号常量，请不要这样做，而应使用const。</p>
+<h3 id="默认初始化"><a href="#默认初始化" class="headerlink" title="默认初始化"></a>默认初始化</h3><p>如果定义变量时没有指定初值，则变量被默认初始化（default initialized)，此时变量被赋予了“默认值”。默认值到底是什么由变量类型决定，同时定义变量的位置也会对此有影响。</p>
+<p>如果是内置类型的变量未被显式初始化，它的值由定义的位置决定。定义于任何函数体之外的变量被初始化为0。一种例外情况是，定义在函数体内部的内置类型变量将不被初始化（uninitialized)。一个未被初始化的内置类型变量的值是未定义的，如果试图拷贝或以其他形式访问此类值将引发错误。</p>
+<p>绝大多数类都支持无须显式初始化而定义对象，这样的类提供了一个合适的默认值。例如，以刚刚所见为例，string类规定如果没有指定初值则生成一个空串。</p>
+<p>一些类要求每个对象都显式初始化，此时如果创建了一个该类的对象而未对其做明确的初始化操作，将引发错误。</p>
+<p>建议初始化每一个内置类型的变量。虽然并非必须这么做，但如果我们不能硝保初始化后程序安全,那么这么做不失为一种简单可靠的方法。</p>
+<hr>
+<p>变量能且只能被定义一次,但是可以被多次声明。<br>声明和定义的区别看起来也许微不足道，但实际上却非常重要。如果要在多个文件中使用同一个变量，就必须将声明和定义分离。此时，变量的定义必须出现在且只能出现在一个文件中，而其他用到该变量的文件必须对其进行声明，却绝对不能重复定义。</p>
+<h3 id="关键概念-静态类型"><a href="#关键概念-静态类型" class="headerlink" title="关键概念:静态类型"></a>关键概念:静态类型</h3><p>C++是一种静态类型(statically typed)语言,其含义是在编译阶段检查类型。其中,检查类型的过程称为类型检查（type checking ).</p>
+<p>我们已经知道，对象的类型决定了对象所能参与的运算。在C++语言中，编译器负责检查数据类型是否支持要执行的运算，如果试图执行类型不支持的运算，编译器将报错并且不会生成可执行文件。<br>程序越复杂，静态类型检查越有助于发现问题。然而，前提是编译器必须知道每一个实体对象的类型，这就要求我们在使用某个变量之前必须声明其类型。</p>
+<h3 id="变量命名规范"><a href="#变量命名规范" class="headerlink" title="变量命名规范"></a>变量命名规范</h3><p>变量命名有许多约定俗成的规范，下面的这些规范能有效提高程序的可读性:标识符要能体现实际含义。<br>变量名一般用小写字母，如 index，不要使用Index或INDEX。用户自定义的类名一般以大写字母开头，如 Sales item。<br>如果标识符由多个单词组成，则单词间应有明显区分，如 student loan或<br>studentLoan，不要使用 studentloan。</p>
+<h3 id="指针值"><a href="#指针值" class="headerlink" title="指针值"></a>指针值</h3><p>指针的值（即地址）应属下列4种状态之一:</p>
+<p>1．指向一个对象。</p>
+<p>2．指向紧邻对象所占空间的下一个位置。</p>
+<p>3.空指针，意味着指针没有指向任何对象。</p>
+<p>4．无效指针，也就是上述情况之外的其他值。</p>
+<p>试图拷贝或以其他方式访问无效指针的值都将引发错误。编译器并不负责检查此类错误,这一点和试图使用未经初始化的变量是一样的。访问无效指针的后果无法预计，因此程序员必须清楚任意给定的指针是否有效。<br>尽管第2种和第3种形式的指针是有效的，但其使用同样受到限制。显然这些指针没有指向任何具体对象，所以试图访问此类指针（假定的）对象的行为不被允许。如果这样做了，后果也无法预计。</p>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">int **main**() &#123;</span><br><span class="line"></span><br><span class="line">  **SetConsoleOutputCP**(65001);</span><br><span class="line"></span><br><span class="line">  int i=42;</span><br><span class="line"></span><br><span class="line">  int &amp;r=i;</span><br><span class="line"></span><br><span class="line">  int *p ;</span><br><span class="line"></span><br><span class="line">  p=&amp;i;</span><br><span class="line"></span><br><span class="line">  *p=i;</span><br><span class="line"></span><br><span class="line">  int &amp;r2=*p;</span><br><span class="line"></span><br><span class="line">  // test01();</span><br><span class="line"></span><br><span class="line">  //test02();</span><br><span class="line"></span><br><span class="line">  cout&lt;&lt;r&lt;&lt;endl&lt;&lt;&amp;r&lt;&lt;endl&lt;&lt;*p&lt;&lt; endl&lt;&lt;p &lt;&lt; endl&lt;&lt;&amp;r2 &lt;&lt;endl&lt;&lt;r2&lt;&lt;endl;</span><br><span class="line"></span><br><span class="line">  system( &quot;pause&quot; );</span><br><span class="line"></span><br><span class="line">  return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">输出</span><br><span class="line">42</span><br><span class="line">0x61fe04</span><br><span class="line">42</span><br><span class="line">0x61fe04</span><br><span class="line">0x61fe04</span><br><span class="line">42//与上面引用类似</span><br></pre></td></tr></table></figure>
+
+<h3 id="建议-初始化所有指针"><a href="#建议-初始化所有指针" class="headerlink" title="建议:初始化所有指针"></a>建议:初始化所有指针</h3><p>使用未经初始化的指针是引发运行时错误的一大原因，和其他变量一样，访问未经初始化的指针所引发的后果也是无法预计的。通常这一行为将造成程序崩溃,而且一旦崩溃，要想定位到出错位置将是特别棘手的问题。</p>
+<p>在大多数编译器环境下，如果使用了未经初始化的指针，则该指针所占内存空间的当前内容将被看作一个地址值。访问该指针,相当于去访问一个本不存在的位置上的本不存在的对象。糟糕的是，如果指针所占内存空间中恰好有内容，而这些内容又被当作了某个地址，我们就很难分清它到底是合法的还是非法的了。</p>
+<p>因此建议初始化所有的指针,并且在可能的情况下，尽量等定义了对象之后再定义指向它的指针。如果实在不清楚指针应该指向何处,就把它初始化为nullptr或者0.这样程序就能检测并知道它没有指向任何具体的对象了。</p>
+<h3 id="赋值和指针"><a href="#赋值和指针" class="headerlink" title="赋值和指针"></a>赋值和指针</h3><p>指针和引用都能提供对其他对象的间接访问，然而在具体实现细节上二者有很大不同，其中最重要的一点就是引用本身并非一个对象。一旦定义了引用，就无法令其再绑定到另外的对象，之后每次使用这个引用都是访问它最初绑定的那个对象。</p>
+<p>指针和它存放的地址之间就没有这种限制了。和其他任何变量(只要不是引用)一样，给指针赋值就是令它存放一个新的地址，从而指向一个新的对象</p>
+<p>有时候要想搞清楚一条赋值语句到底是改变了指针的值还是改变了指针所指对象的值不太容易,最好的办法就是记住赋值永远改变的是等号左侧的对象。当写出如下语句时</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int *p=0;</span><br><span class="line">int ival=1;</span><br><span class="line">p=&amp;ival;</span><br><span class="line"></span><br><span class="line">//意思是为pi赋一个新的值，也就是改变了那个存放在pi内的地址值。相反的，如果写出如下语句，</span><br><span class="line">*p=0;//ival的值被改变,指针pi并没有改变,即*(&amp;ival)=0;</span><br><span class="line">//则*pi（也就是指针pi指向的那个对象）发生改变。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>利用void指针能做的事儿比较有限:拿它和别的指针比较、作为函数的输入或输出，或者赋给另外一个 void指针。不能直接操作 void指针所指的对象，因为我们并不知道这个对象到底是什么类型，也就无法确定能在这个对象上做哪些操作。<br>概括说来，以void的视角来看内存空间也就仅仅是内存空间，没办法访问内存空间中所存的对象.</p>
+<h3 id="指向指针的引用"><a href="#指向指针的引用" class="headerlink" title="指向指针的引用"></a>指向指针的引用</h3><p>引用本身不是一个对象，因此不能定义指向引用的指针。但指针是对象，所以存在对指针的引用:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int i =42;</span><br><span class="line">int *p;//p是一个 int型指针</span><br><span class="line">int *&amp;r =p;// r是一个对指针p的引用</span><br><span class="line">r= &amp;i;//r引用了一个指针，因此给r赋值&amp;i就是令p指向i</span><br><span class="line">*r= 0;//解引用r得到i，也就是p指向的对象，将i的值改为0</span><br></pre></td></tr></table></figure>
+
+<p>要理解r的类型到底是什么，最简单的办法是从右向左阅读r的定义。离变量名最近的符号（此例中是&amp;r的符号&amp;）对变量的类型有最直接的影响，因此r是一个引用。声明符的其余部分用以确定r引用的类型是什么，此例中的符号*说明r引用的是一个指针。最后，声明的基本数据类型部分指出r引用的是一个int指针。</p>
+<p>面对一条比较复杂的指针或引用的声明语句时,从右向左阅读有助于弄清楚它的真实含义。</p>
+<p>解引用——解释引用，说的通俗一点就是，直接去寻找指针所指的地址里面的内容，此内容可以是任何数据类型，当然也可以是指针。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int *p ,a=6;</span><br><span class="line">p=&amp;a;</span><br><span class="line">cout&lt;&lt;p&lt;&lt;endl;</span><br><span class="line">cout&lt;&lt;*p&lt;&lt;endl;//解引用,具体解释指针p所指向的内存地址里存放的内容。</span><br></pre></td></tr></table></figure>
+
+<p>&amp;表示的是引用，就表示函数内的变量和主函数的变量是同一个，函数内改变它的值，主函数相应的变量也就跟着改变了；没有&amp;符号，就表示函数内的变量是主函数的变量的一个副本，在函数内改变其值，是不会改变主函数中变量的值的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int *p ,a=6;</span><br><span class="line">p=&amp;a;</span><br><span class="line">int &amp;c=a;</span><br><span class="line">cout&lt;&lt;c&lt;&lt;endl;</span><br></pre></td></tr></table></figure>
+
+<p>脱解引用——就是用&amp;抵消掉*对a的引用效果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p=&amp;a;</span><br><span class="line">cout&lt;&lt;&amp;*p&lt;&lt;endl;</span><br><span class="line">cout&lt;&lt;*(&amp;*p)&lt;&lt;endl;</span><br><span class="line">因此代码的行输出的是a的内存地址，而代码下一行输出的是a的值。</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><p>某些时候有这样一种const变量，它的初始值不是一个常量表达式，但又确实有必要在文件间共享。这种情况下，我们不希望编译器为每个文件分别生成独立的变量。相反，我们想让这类const对象像其他（非常量）对象一样工作，也就是说，只在一个文件中定义const，而在其他多个文件中声明并使用它。</p>
+<p>解决的办法是，对于 const变量不管是声明还是定义都添加extern关键字，这样只需定义一次就可以了:<br>&#x2F;&#x2F; file_l.cc定义并初始化了一个常量，该常量能被其他文件访问</p>
+<p>extern const int bufSize &#x3D; fcn();</p>
+<p>&#x2F;&#x2F;file l.h头文件</p>
+<p>extern const int bufSize;&#x2F;&#x2F;与file_1.cc中定义的bufSize是同一个</p>
+<p>如上述程序所示，file_1.cc定义并初始化了bufsize。因为这条语句包含了初始值，所以它(显然）是一次定义。然而，因为bufsize是一个常量，必须用extern加以限定使其被其他文件使用。<br>file_1.h头文件中的声明也由extern做了限定，其作用是指明bufSize并非本文件所独有，它的定义将在别处出现。</p>
+<p>如果想在多个文件之间共享 const对象,必须在变量的定义之前添加extern关键字。</p>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int i=42;</span><br><span class="line">const int &amp;r1 = i;//允许将const int&amp;绑定到一个普通int对象上</span><br><span class="line">const int &amp;r2=42; //正确:r1是一个常量引用</span><br><span class="line">const int &amp;r3 = r1* 2; //正确:r3是一个常量引用</span><br><span class="line">int &amp;r4 = r1 * 2;//错误:r4是一个普通的非常量引用</span><br></pre></td></tr></table></figure>
+
+<p>要想理解这种例外情况的原因，最简单的办法是弄清楚当一个常量引用被绑定到另外一种类型上时到底发生了什么:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">double dval = 3.14;</span><br><span class="line">const int &amp;ri = dval;</span><br></pre></td></tr></table></figure>
+
+<p>此处ri引用了一个int型的数。对ri的操作应该是整数运算，但dval却是一个双精度浮点数而非整数。因此为了确保让ri绑定一个整数，编译器把上述代码变成了如下形式:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const int temp = dval;//由双精度浮点数生成一个临时的整型常量</span><br><span class="line">const int &amp;ri = temp;//让ri绑定这个临时量</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，ri 绑定了一个<strong>临时量</strong> (temporary）对象。所谓临时量对象就是当编译器需要一个空间来暂存表达式的求值结果时临时创建的一个未命名的对象。C++程序员们常常把临时量对象简称为临时量。</p>
+<p>接下来探讨当ri不是常量时，如果执行了类似于上面的初始化过程将带来什么样的后果。如果ri不是常量，就允许对ri赋值，这样就会改变ri所引用对象的值。注意，此时绑定的对象是一个临时量而非dval。程序员既然让ri引用dval，就肯定想通过ri改变dval的值，否则干什么要给ri赋值呢?如此看来，既然大家基本上不会想着把引用绑定到临时量上，C++语言也就把这种行为归为非法。</p>
+<h3 id="指针和-const"><a href="#指针和-const" class="headerlink" title="指针和 const"></a>指针和 const</h3><p>与引用一样，也可以令指针指向常量或非常量。类似于常量引用，指向常量的指针（pointer to const)不能用于改变其所指对象的值。要想存放常量对象的地址，只能使用指向常量的指针:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const double pi =3.14;//pi是个常量,它的值不能改变</span><br><span class="line">double *ptr = &amp;pi;//错误:ptr是一个普通指针</span><br><span class="line">const double *cptr = &amp;pi;//正确:cptr可以指向一个双精度常量</span><br><span class="line">*cptr =42;//错误:不能给*cptr赋值</span><br></pre></td></tr></table></figure>
+
+<p>指针的类型必须与其所指对象的类型一致，但是有两个例外。第一种例外情况是允许令一个指向常量的指针指向一个非常量对象:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">double dval = 3.14;//dval是一个双精度浮点数，它的值可以改变</span><br><span class="line">cptr=&amp;dval;//正确:但是不能通过cptr改变 dval的值</span><br></pre></td></tr></table></figure>
+
+<p>和常量引用一样，指向常量的指针也没有规定其所指的对象必须是一个常量。所谓指向常量的指针仅仅要求不能通过该指针改变对象的值，而没有规定那个对象的值不能通过其他途径改变。</p>
+<h3 id="const指针"><a href="#const指针" class="headerlink" title="const指针"></a>const指针</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int errNumb=0;</span><br><span class="line">int *const curErr=&amp;errNumb;// curErr将一直指向errNumb</span><br><span class="line">const double pi=3.14159;</span><br><span class="line">const double *const pip = &amp;pi;// pip是一个指向常量对象的常量指针</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>指针是对象而引用不是，因此就像其他对象类型一样，允许把指针本身定为常量。常量指针(const pointer)必须初始化，而且一旦初始化完成，则它的值(也就是存放在指针中的那个地址）就不能再改变了。把放在const关键字之前用以说明指针是一个常量，这样的书写形式隐含着一层意味，即<strong>不变的是指针本身的值</strong>(地址)而非指向的那个值（*curErr &#x3D;0;&#x2F;&#x2F;正确:把curErr所指的对象的值重置）:所以curErr指向的是一个一般的非常量整数，那么就完全可以用curErr去修改errNumb的值（当errNumb不为0时，）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//如果curErr所指的对象（也就是errNumb)的值不为0</span><br><span class="line">if(*curErr) &#123;</span><br><span class="line">	errorHandler ();</span><br><span class="line">	*curErr =0;//正确:把curErr所指的对象的值重置</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>要想弄清楚这些声明的含义最行之有效的办法是从右向左阅读。此例中，离curErr最近的符号是const，意味着curErr本身是一个常量对象，对象的类型由声明符的其余部分确定。声明符中的下一个符号是*，意思是curErr是一个常量指针。最后，该声明语句的基本数据类型部分确定了常量指针指向的是一个int对象。与之相似，我们也能推断出，pip是一个常量指针，它指向的对象是一个双精度浮点型常量。</p>
+<h3 id="顶层const"><a href="#顶层const" class="headerlink" title="顶层const"></a>顶层const</h3><p>如前所述，指针本身是一个对象，它又可以指向另外一个对象。因此，指针本身是不是常量以及指针所指的是不是一个常量就是两个相互独立的问题。用名词顶层const( top-level const）表示指针本身是个常量，而用名词底层const(low-level const）表示指针所指的对象是一个常量。<br>更一般的，顶层const可以表示任意的对象是常量，这一点对任何数据类型都适用,如算术类型、类、指针等。底层const则与指针和引用等复合类型的基本类型部分有关。比较特殊的是，指针类型既可以是顶层const也可以是底层const，这一点和其他类型相比区别明显:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int i=0;</span><br><span class="line">int *const pl =&amp;i;//不能改变p1的值，这是一个顶层const</span><br><span class="line">const int ci =42;</span><br><span class="line">//不能改变ci的值，这是一个顶层const</span><br><span class="line">const int *p2= &amp;ci;</span><br><span class="line">//允许改变p2的值，这是一个底层const</span><br><span class="line">const int &amp;r=ci;</span><br><span class="line">//  所有的引用本身都是顶层 const，因为引用一旦初始化就不能再改为其他对象的引用，这里用于声明引用的 const 都是底层 const</span><br></pre></td></tr></table></figure>
+
+<p>当执行对象的拷贝操作时，常量是顶层const还是底层const区别明显。其中，顶层const不受什么影响:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">i= ci;//正确:铂贝ci的值，ci是一个顶层const，对此操作无影响</span><br><span class="line">p2 = p3;//正确:p2和p3指向的对象类型相同,p3顶层const的部分不影响</span><br></pre></td></tr></table></figure>
+
+<p>执行拷贝操作并不会改变被拷贝对象的值，因此，拷入和拷出的对象是否是常量都没什么影响。</p>
+<p>另一方面，底层 const 的限制却不能忽视。当执行对象的拷贝操作时，拷入和拷出的对象必须具有相同的底层const资格，或者两个对象的数据类型必须能够转换。一般来说，非常量可以转换成常量，反之则不行:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">*int p= p3;</span><br><span class="line">//错误:p3包含底层const的定义，而p没有</span><br><span class="line">p2= p3;</span><br><span class="line">//正确:p2和p3都是底层const</span><br><span class="line">p2 = &amp;i;</span><br><span class="line">//正确:int*能转换成const int*</span><br><span class="line">int &amp;r =ci;</span><br><span class="line">//错误:普通的int&amp;不能绑定到int常量上</span><br><span class="line">const int &amp;r2 =i;</span><br><span class="line">//正确:const int&amp;可以绑定到一个普通int上</span><br></pre></td></tr></table></figure>
+
+<p>p3既是顶层const也是底层const，拷贝p3时可以不在乎它是一个顶层const，但是必须清楚它指向的对象得是一个常量。因此，不能用p3去初始化p，因为p指向的是一个普通的（非常量)整数。另一方面，p3的值可以赋给p2，是因为这两个指针都是底层const，尽管p3同时也是一个常量指针（顶层 const)，仅就这次赋值而言不会有什么影响。</p>
+<h3 id="constexpr变量"><a href="#constexpr变量" class="headerlink" title="constexpr变量"></a>constexpr变量</h3><p>在一个复杂系统中，很难（几乎肯定不能）分辨一个初始值到底是不是常量表达式。当然可以定义一个 const变量并把它的初始值设为我们认为的某个常量表达式，但在实际使用时，尽管要求如此却常常发现初始值并非常量表达式的情况。可以这么说，在此种情况下，对象的定义和使用根本就是两回事儿。<br>C++11新标准规定，允许将变量声明为constexpr类型以便由编译器来验证变量的值是否是一个常量表达式。声明为constexpr的变量一定是一个常量，而且必须用常量表达式初始化:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">constexpr int mf = 20;// 20是常量表达式</span><br><span class="line">constexpr int limit = mf +1;// mf +1是常量表达式</span><br><span class="line">constexpr int sz=size();//只有当size是一个constexpr函数时,才是一条正确的声明语句</span><br></pre></td></tr></table></figure>
+
+<p>尽管不能使用普通函数作为constexpr变量的初始值，新标准允许定义一种特殊的constexpr函数。这种函数应该足够简单以使得编译时就可以计算其结果,这样就能用constexpr函数去初始化constexpr变量了。</p>
+<p>一般来说，如果你认定变量是一个常量表达式，那就把它声明成constexpr类型。</p>
+<h3 id="字面值类型"><a href="#字面值类型" class="headerlink" title="字面值类型"></a>字面值类型</h3><p>常量表达式的值需要在编译时就得到计算，因此对声明constexpr时用到的类型必须有所限制。因为这些类型一般比较简单，值也显而易见、容易得到，就把它们称为“字面值类型”(literal type）。</p>
+<p>到目前为止接触过的数据类型中，<strong>算术类型、引用和指针</strong>都属于字面值类型。自定义类sales item、IO库、string 类型则不属于字面值类型，也就不能被定义成constexpr。</p>
+<p>尽管指针和引用都能定义成constexpr，但它们的初始值却受到严格限制。一个constexpr指针的初始值必须是nullptr或者0,或者是存储于某个固定地址中的对象。</p>
+<p>函数体内定义的变量一般来说并非存放在固定地址中，因此constexpr指针不能指向这样的变量。相反的，定义于所有函数体之外的对象其地址固定不变，能用来初始化constexpr 指针。允许函数定义一类有效范围超出函数本身的变量，这类变量和定义在函数体之外的变量一样也有固定地址。因此，constexpr 引用能绑定到这样的变量上，constexpr指针也能指向这样的变量。定义constexpr常量都要在函数体外。</p>
+<p>必须明确一点，在constexpr声明中如果定义了一个指针，限定符constexpr仅对指针有效，与指针所指的对象无关:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const int *p = nullptr;// p是一个指向整型常量的指针</span><br><span class="line">constexpr int *q= nullptr; //q是一个指向整数的常量指针</span><br></pre></td></tr></table></figure>
+
+<p>p和q的类型相差甚远，p是一个指向常量的指针，而q是一个常量指针，其中的关键在于constexpr把它所定义的对象置为了顶层const。</p>
+<hr>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">cin.<span class="built_in">tie</span>(<span class="number">0</span>),cout.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>一.sync_with_stdio</strong><br>这个函数是一个“是否兼容stdio”的开关，C++为了兼容C，保证程序在使用了<code>std::printf</code>和<code>std::cout</code>的时候不发生混乱，将输出流绑到了一起。<br><code>cin</code>，<code>cout</code>之所以效率低，是因为先把要输出的东西存入缓冲区，再输出，导致效率降低，而这段语句可以来打消iostream的输入输出缓存，可以节省许多时间，使效率与scanf与printf相差无几.</p>
+<p><strong>应用</strong><br>在ACM里，经常出现数据集超大造成 cin <strong>运行超时</strong> &#x2F;<code>Time Limit Exceeded</code>【TLE】的情况。这时候大部分人（包括原来我也是）认为这是cin的效率不及scanf的错，甚至还上升到C语言和C++语言的执行效率层面的无聊争论。其实像上文所说，这<strong>只是C++为了兼容而采取的保守措施</strong>。我们可以<strong>在IO之前将stdio解除绑定</strong>，这样做了之后要注意不要同时混用cout&#x2F;cin和printf&#x2F;scanf之类。</p>
+<p><strong>二.tie</strong><br><code>tie</code>是将两个stream绑定的函数，空参数的话返回当前的输出流指针。<br>在默认的情况下<code>cin</code>绑定的是<code>cout</code>，每次执行 &lt;&lt; 操作符的时候都要调用flush，这样会增加IO负担。可以通过<code>tie(0)</code>（0表示NULL）来解除<code>cin</code>与<code>cout</code>的绑定，进一步加快执行效率。</p>
+<hr>
+<h3 id="c-11"><a href="#c-11" class="headerlink" title="c++11"></a>c++11</h3><p>在 C++11新标准中，如果我们需要默认的行为，那么可以通过在参数列表后面写上&#x3D; default来要求编译器生成构造函数。其中，&#x3D; default 既可以和声明一起出现在类的内部，也可以作为定义出现在类的外部。和其他函数一样，如果&#x3D; default在类的内部，则默认构造函数是内联的;如果它在类的外部，则该成员默认情况下不是内联的。</p>
+<h3 id="构造函数初始值列表"><a href="#构造函数初始值列表" class="headerlink" title="构造函数初始值列表"></a>构造函数初始值列表</h3><p>接下来我们介绍类中定义的另外两个构造函数:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sales_data(const std: :string &amp;s): bookNo(s) &#123;&#125;</span><br><span class="line">Sales_data (const std: :string &amp;s,unsigned n, double p):</span><br><span class="line">bookNo(s), units_sold(n),revenue(p*n)&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个定义中出现了新的部分，即冒号以及冒号和花括号之间的代码，其中花括号定义了(空的）函数体。我们把新出现的部分称为构造函数初始值列表(constructor initialize list)，它负责为新创建的对象的一个或几个数据成员赋初值。构造函数初始值是成员名字的一个列表，每个名字后面紧跟括号括起来的(或者在花括号内的）成员初始值。不同成员的初始化通过逗号分隔开来。</p>
+<p>含有三个参数的构造函数分别使用它的前两个参数初始化成员 bookNo和units_sold,revenue的初始值则通过将售出图书总数和每本书单价相乘计算得到。<br>只有一个string类型参数的构造函数使用这个string对象初始化bookNo，对于units sold和revenue则没有显式地初始化。当某个数据成员被构造函数初始值列表忽略时，它将以与合成默认构造函数相同的方式<strong>隐式初始化</strong>。在此例中，这样的成员使用类内初始值初始化，因此只接受一个string参数的构造函数等价于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//与上面定义的那个构造函数效果相同</span><br><span class="line">Sales_ data(const std: :string &amp;s):</span><br><span class="line">bookNo (s) , units_sold(0), revenue(0)&#123;&#125;</span><br><span class="line">std::string bookNo;</span><br><span class="line">unsigned units_sold = 0;</span><br><span class="line">double revenue = 0.0;</span><br></pre></td></tr></table></figure>
+
+<p>通常情况下，构造函数使用类内初始值不失为一种好的选择，因为只要这样的初始值存在我们就能确保为成员赋予了一个正确的值。不过，如果你的编译器不支持类内初始值，则所有构造函数都应该显式地初始化每个内置类型的成员。</p>
+<h3 id="关键字-new"><a href="#关键字-new" class="headerlink" title="关键字 new"></a>关键字 <code>new</code></h3><p>在 C++ 中，你可以使用关键字 <code>new</code> 来动态分配内存并创建对象。根据你的代码片段，你正在创建一个名为 <code>transfer</code> 的指针，它指向 <code>AbstractWorker</code> 类型的对象，并将其初始化为 <code>TransferBankWorker</code> 类的实例。</p>
+<p>以下是示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cppCopy CodeAbstractWorker *transfer = new TransferBankWorker();</span><br></pre></td></tr></table></figure>
+
+<p>这里假设 <code>AbstractWorker</code> 是一个抽象类（或者接口），而 <code>TransferBankWorker</code> 是该抽象类的派生类（或者实现类）。通过使用 <code>new</code> 运算符，你动态地在堆内存中分配了足够的空间来存储 <code>TransferBankWorker</code> 对象，并返回一个指向该对象的指针。</p>
+<p>请记得在不再需要使用时释放通过 <code>new</code> 分配的内存，以避免内存泄漏：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cppCopy Codedelete transfer;</span><br></pre></td></tr></table></figure>
+
+<p>这将释放 <code>transfer</code> 指针所指向的对象所占用的内存空间。</p>
+<p>抽象类无法直接实例化对象。当你尝试使用 <code>new AbstractWorker()</code> 来创建一个抽象类的实例时，编译器会报错。</p>
+<p>抽象类是一种不能被直接实例化的类，它用于定义共享属性和方法，作为其他具体派生类的基类。抽象类中可能包含纯虚函数（没有具体实现的虚函数）或其他纯虚函数的实现。由于抽象类无法完全实现其自身的功能，所以无法直接创建对象。</p>
+<p>因此，在使用抽象类时，你应该通过创建派生类的对象来实现多态性。这意味着你只能使用派生类来创建对象，例如 <code>AbstractWorker* transfer = new TransferBankWorker();</code>，其中 <code>TransferBankWorker</code> 是 <code>AbstractWorker</code> 的派生类。这样，你可以在代码中使用 <code>transfer</code> 对象，调用派生类和基类的相关方法。</p>
+<p>总结起来，抽象类本身不能被实例化，只能通过派生类来创建对象并进行使用。</p>
+<h3 id="派生类构造函数规则"><a href="#派生类构造函数规则" class="headerlink" title="派生类构造函数规则"></a>派生类构造函数规则</h3><p>如果基类拥有构造函数但是没有默认构造函数，那么派生类的构造函数必须显示的调用基类的某个构造函数。</p>
+<p>以B类从A类派生为例，我们总结如下：</p>
+<p>1、若B有构造函数而A没有，当创建B类的对象时，B的相应构造函数被自动调用。</p>
+<p>2、若B没有构造函数而A有，则A必须拥有默认构造函数，只有这样，当创建B类的对象时，才能自动执行A的默认构造函数。</p>
+<p>3、若B有构造函数，且A有默认构造函数，则创建B类的对象时，A的默认构造函数会自动执行，除非当前被调用的派生类构造函数在其初始化段中显示的调用了A的非默认构造函数。</p>
+<p>4、若B和A都有构造函数，但A没有默认构造函数，则B的每个构造函数必须在其初始化段中显示地调用A的某个构造函数。只有这样，当创建B的对象时，A的构造函数才能获得执行机会。</p>
+<p>再次强调，在创建派生类对象时，必须显示地或隐式地执行其基类的某个构造函数，这一点非常重要，有时候，派生类的构造函数可能会依赖基类的构造函数来完成一些必要的操作，例如，依赖基类的构造函数来完成部分数据成员的初始化。而且，一般可以认为派生类对象是对基类对象的特化，这进一步说明了为什么基类的构造函数（如果该类有构造函数）必须在派生类对象创建时首先执行，在此之后，派生类的构造函数再负责处理派生类中的特化信息（派生类中的新增数据成员）。</p>
+<p>代码实例：（1）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt; </span><br><span class="line">using namespace std;  </span><br><span class="line">class A  </span><br><span class="line">&#123;  </span><br><span class="line">public:</span><br><span class="line">private:  </span><br><span class="line">    int x;  </span><br><span class="line">&#125;; </span><br><span class="line">class B:public A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    B(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        y=c;  </span><br><span class="line">        cout&lt;&lt;&quot;Bb&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">    void fun()  </span><br><span class="line">    &#123;  </span><br><span class="line">        cout&lt;&lt;&quot;in B fun&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int y;  </span><br><span class="line">&#125;;  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    </span><br><span class="line">    A *b=new B(2); </span><br><span class="line">    system(&quot;pause&quot;);  </span><br><span class="line">    return 0;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果为Bb</p>
+<p>代码实例（2）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;  </span><br><span class="line">using namespace std;  </span><br><span class="line">class A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    A() &#123;cout&lt;&lt;&quot;Aa&quot;&lt;&lt;endl; &#125;     </span><br><span class="line">private:  </span><br><span class="line">    int x;  </span><br><span class="line">&#125;;  </span><br><span class="line">class B:public A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">   </span><br><span class="line">private:  </span><br><span class="line">    int y;  </span><br><span class="line">&#125;;  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    </span><br><span class="line">    A*b=new B;</span><br><span class="line">    system(&quot;pause&quot;);  </span><br><span class="line">    return 0;  </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>执行结果为Aa</p>
+<p>代码实例（3）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;  </span><br><span class="line">using namespace std;  </span><br><span class="line">class A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    A() &#123;cout&lt;&lt;&quot;Aa&quot;&lt;&lt;endl; &#125;    </span><br><span class="line">    A(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        x=c;  </span><br><span class="line">        cout&lt;&lt;&quot;A&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">    void fun()  </span><br><span class="line">    &#123;  </span><br><span class="line">        cout&lt;&lt;&quot;in A fun&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int x;  </span><br><span class="line">&#125;;    </span><br><span class="line">class B:public A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    /*</span><br><span class="line">B(int c,int b) :A(c) </span><br><span class="line">    &#123;  </span><br><span class="line">        y=b;  </span><br><span class="line">        cout&lt;&lt;&quot;B&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">*/</span><br><span class="line">B(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        y=c;  </span><br><span class="line">        cout&lt;&lt;&quot;Bb&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">    void fun()  </span><br><span class="line">    &#123;  </span><br><span class="line">        cout&lt;&lt;&quot;in B fun&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int y;  </span><br><span class="line">&#125;;  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    //A *a=new B(2,3); </span><br><span class="line">    A *b=new B(2); </span><br><span class="line">    // A*b=new B;</span><br><span class="line">    system(&quot;pause&quot;);  </span><br><span class="line">    return 0;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果是Aa Bb</p>
+<p>代码实例（4）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt; </span><br><span class="line">using namespace std;  </span><br><span class="line">class A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    //A() &#123;cout&lt;&lt;&quot;Aa&quot;&lt;&lt;endl; &#125;    </span><br><span class="line">    A(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        x=c;  </span><br><span class="line">        cout&lt;&lt;&quot;A&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int x;  </span><br><span class="line">&#125;;  </span><br><span class="line">class B:public A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    </span><br><span class="line">B(int c,int b) :A(c) </span><br><span class="line">    &#123;  </span><br><span class="line">        y=b;  </span><br><span class="line">        cout&lt;&lt;&quot;B&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">/*</span><br><span class="line">B(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        y=c;  </span><br><span class="line">        cout&lt;&lt;&quot;Bb&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  */</span><br><span class="line">private:  </span><br><span class="line">    int y;  </span><br><span class="line">&#125;;  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    A *a=new B(2,3); </span><br><span class="line">    //A *b=new B(2); </span><br><span class="line">    // A*b=new B;</span><br><span class="line">    system(&quot;pause&quot;);  </span><br><span class="line">    return 0;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果A B</p>
+<p>代码实例（5）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;  </span><br><span class="line">using namespace std;  </span><br><span class="line">class A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    A() &#123;cout&lt;&lt;&quot;Aa&quot;&lt;&lt;endl; &#125;   </span><br><span class="line">    A(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        x=c;  </span><br><span class="line">        cout&lt;&lt;&quot;A&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int x;  </span><br><span class="line">&#125;;  </span><br><span class="line">class B:public A  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">B(int c,int b) :A(c) </span><br><span class="line">    &#123;  </span><br><span class="line">        y=b;  </span><br><span class="line">        cout&lt;&lt;&quot;B&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">B(int c)  </span><br><span class="line">    &#123;  </span><br><span class="line">        y=c;  </span><br><span class="line">        cout&lt;&lt;&quot;Bb&quot;&lt;&lt;endl;  </span><br><span class="line">    &#125;  </span><br><span class="line">private:  </span><br><span class="line">    int y;  </span><br><span class="line">&#125;;  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    A *a=new B(2,3); </span><br><span class="line">    A *b=new B(2); </span><br><span class="line">    system(&quot;pause&quot;);  </span><br><span class="line">    return 0;  </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>执行结果A B Aa Bb</p>
+<hr>
+<p>在C++中，有两种主要的语义概念：值语义和对象语义。这些概念与如何处理数据和对象相关。</p>
+<h3 id="值语义（Value-Semantics）"><a href="#值语义（Value-Semantics）" class="headerlink" title="值语义（Value Semantics）:"></a>值语义（Value Semantics）:</h3><p>值语义是指对象在赋值或传递时，复制其内容而不是引用。当使用值语义时，每个对象都有自己的独立数据，修改一个对象不会影响其他对象。这是C++内置类型（例如整数、浮点数等）的默认语义。当你对值类型对象执行赋值或传递给函数时，会复制对象的值。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cpp复制代码int a = 5;</span><br><span class="line">int b = a; // b被赋予了a的值，而不是引用a</span><br></pre></td></tr></table></figure>
+
+<p>值语义确保数据的独立性，但在处理大型对象时可能会引发性能问题，因为需要复制整个对象。</p>
+<h3 id="对象语义（Object-Semantics）"><a href="#对象语义（Object-Semantics）" class="headerlink" title="对象语义（Object Semantics）:"></a>对象语义（Object Semantics）:</h3><p>对象语义是指对象在赋值或传递时，复制的是引用或指针而不是实际数据。这意味着多个对象可能共享相同的数据，修改其中一个对象会影响所有引用该数据的对象。C++中，对象语义通过自定义拷贝构造函数、拷贝赋值运算符和析构函数来实现。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cpp复制代码class MyClass &#123;</span><br><span class="line">public:</span><br><span class="line">    int value;</span><br><span class="line">    // constructor, destructor, and other methods</span><br><span class="line"></span><br><span class="line">    // Custom copy constructor to implement object semantics</span><br><span class="line">    MyClass(const MyClass&amp; other) : value(other.value) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyClass obj1;</span><br><span class="line">obj1.value = 10;</span><br><span class="line"></span><br><span class="line">MyClass obj2 = obj1; // obj2指向obj1的数据，而不是复制数据</span><br><span class="line">obj2.value = 20;     // 会影响obj1和obj2的值，因为它们共享相同的数据</span><br></pre></td></tr></table></figure>
+
+<p>对象语义允许在大型对象之间共享数据，但需要注意正确管理数据的生命周期，避免悬空指针和资源泄漏等问题。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/03/c%E5%92%8Cc++/%E7%AC%AC%E4%BA%94%E5%A4%A9-c/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -178,7 +415,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-23 14:50:14" itemprop="dateModified" datetime="2023-07-23T14:50:14+08:00">2023-07-23</time>
+                <time title="修改时间：2023-07-31 16:16:09" itemprop="dateModified" datetime="2023-07-31T16:16:09+08:00">2023-07-31</time>
               </span>
 
           
@@ -209,7 +446,7 @@
 <p>多态满足条件</p>
 <ul>
 <li>有继承关系</li>
-<li>子类<strong>重写</strong>父类中的虚函数</li>
+<li>子类<strong>重写</strong>父类中的虚函数，也可以继承</li>
 </ul>
 <p>多态信用条件</p>
 <ul>
@@ -1444,310 +1681,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/20/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/20/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AD%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第六天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-03-20 10:28:59 / 修改时间：19:57:21" itemprop="dateCreated datePublished" datetime="2023-03-20T10:28:59+08:00">2023-03-20</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-文件读写"><a href="#C-文件读写" class="headerlink" title="C 文件读写"></a>C 文件读写</h1><h2 id="打开文件"><a href="#打开文件" class="headerlink" title="打开文件"></a>打开文件</h2><p>您可以使用 <strong>fopen( )</strong> 函数来<strong>创建一个新的文件或者打开一个已有的文件</strong>，这个调用会初始化类型 <strong>FILE</strong> 的一个对象，类型 <strong>FILE</strong> 包含了所有用来控制流的必要的信息。下面是这个函数调用的原型：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FILE *fopen( const char *filename, const char *mode );</span><br></pre></td></tr></table></figure>
-
-<p>对 fopen()函数补充说明几点：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FILE *fopen( const char * filename, const char * mode );</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>该函数可能执行失败，返回值是NULL，安全起见必须对返回值进行合法性判断；</li>
-<li>该函数有多种模式，其中r+和w+看似一样，都是读写其实还是有几点区别的；</li>
-<li>1.模式r+找不到文件不会自动新建，而w+会；</li>
-<li>2.模式r+打开文件后，不会清除文件原数据，若直接开始写入，只会从起始位置开始进行<strong>覆盖</strong>，而w+会直接<strong>清零</strong>后，再开始读写；</li>
-<li>模式的合法性说明：不能用大写，只能是小写，且rb+和r+b都是合法的，但br+和+rb等都是非法的，w和a也是一样的处理；</li>
-<li>模式w的自动新建文件是有条件的，只有对应的路径存在(即文件所在的文件夹存在)，文件不存在才会新建，否则是不会新建的，返回NULL</li>
-</ul>
-<p>在这里，<strong>filename</strong> 是字符串，用来命名文件，访问模式 <strong>mode</strong> 的值可以是下列值中的一个：</p>
-<table>
-<thead>
-<tr>
-<th align="left">模式</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">r</td>
-<td align="left">打开一个已有的文本文件，允许读取文件。</td>
-</tr>
-<tr>
-<td align="left">w</td>
-<td align="left">打开一个文本文件，允许写入文件。如果文件不存在，则会创建一个新文件。在这里，您的程序会从文件的开头写入内容。如果文件存在，则该会被截断为零长度，重新写入。</td>
-</tr>
-<tr>
-<td align="left">a</td>
-<td align="left">打开一个文本文件，以追加模式写入文件。如果文件不存在，则会创建一个新文件。在这里，您的程序会在已有的文件内容中追加内容。</td>
-</tr>
-<tr>
-<td align="left">r+</td>
-<td align="left">打开一个文本文件，允许读写文件。</td>
-</tr>
-<tr>
-<td align="left">w+</td>
-<td align="left">打开一个文本文件，允许读写文件。如果文件已存在，则文件会被截断为零长度，如果文件不存在，则会创建一个新文件。</td>
-</tr>
-<tr>
-<td align="left">a+</td>
-<td align="left">打开一个文本文件，允许读写文件。如果文件不存在，则会创建一个新文件。读取会从文件的开头开始，写入则只能是追加模式。</td>
-</tr>
-</tbody></table>
-<p>如果处理的是二进制文件，则需使用下面的访问模式来取代上面的访问模式：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;rb&quot;, &quot;wb&quot;, &quot;ab&quot;, &quot;rb+&quot;, &quot;r+b&quot;, &quot;wb+&quot;, &quot;w+b&quot;, &quot;ab+&quot;, &quot;a+b&quot;</span><br></pre></td></tr></table></figure>
-
-<h2 id="关闭文件"><a href="#关闭文件" class="headerlink" title="关闭文件"></a>关闭文件</h2><p>为了关闭文件，请使用 fclose( ) 函数。函数的原型如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fclose( FILE *fp );</span><br></pre></td></tr></table></figure>
-
-<p>如果成功关闭文件，<strong>fclose( )</strong> 函数<strong>返回零</strong>，如果关闭文件时发生错误，函数返回 <strong>EOF</strong>。这个函数实际上，会清空缓冲区中的数据，关闭文件，并释放用于该文件的所有内存。EOF 是一个定义在头文件 <strong>stdio.h</strong> 中的常量。</p>
-<p>C 标准库提供了各种函数来按字符或者以固定长度字符串的形式读写文件。</p>
-<h2 id="写入文件"><a href="#写入文件" class="headerlink" title="写入文件"></a>写入文件</h2><p>下面是把字符写入到流中的最简单的函数：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fputc( int c, FILE *fp );</span><br></pre></td></tr></table></figure>
-
-<p>函数 <strong>fputc()</strong> 把参数 c 的字符值写入到 fp 所指向的输出流中。如果写入成功，它会返回写入的字符，如果发生错误，则会返回 <strong>EOF</strong>。您可以使用下面的函数来把一个以 null 结尾的字符串写入到流中：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fputs( const char *s, FILE *fp );</span><br></pre></td></tr></table></figure>
-
-<p>函数 <strong>fputs()</strong> 把字符串 <strong>s</strong> 写入到 fp 所指向的输出流中。如果写入成功，它会返回一个非负值，如果发生错误，则会返回 <strong>EOF</strong>。您也可以使用 <strong>int fprintf(FILE *fp,const char *format, …)</strong> 函数把一个字符串写入到文件中。尝试下面的实例：</p>
-<blockquote>
-<p><strong>注意：</strong>请确保您<strong>有可用的 tmp 目录</strong>，如果不存在该目录，则需要在您的计算机上先创建该目录。</p>
-<p><strong>&#x2F;tmp</strong> 一般是 Linux 系统上的临时目录，如果你在 Windows 系统上运行，则需要修改为本地环境中已存在的目录，例如: <strong>C:\tmp</strong>、<strong>D:\tmp</strong>等。</p>
-</blockquote>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   FILE *fp = NULL;</span><br><span class="line"> </span><br><span class="line">   fp = fopen(&quot;/tmp/test.txt&quot;, &quot;w+&quot;);</span><br><span class="line">   fprintf(fp, &quot;This is testing for fprintf...\n&quot;);</span><br><span class="line">   fputs(&quot;This is testing for fputs...\n&quot;, fp);</span><br><span class="line">   fclose(fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当上面的代码被编译和执行时，它会在 &#x2F;tmp 目录中创建一个新的文件 <strong>test.txt</strong>，并使用两个不同的函数写入两行。接下来让我们来读取这个文件。</p>
-<h2 id="读取文件"><a href="#读取文件" class="headerlink" title="读取文件"></a>读取文件</h2><p>下面是从文件读取单个字符的最简单的函数：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fgetc( FILE * fp );</span><br></pre></td></tr></table></figure>
-
-<p><strong>fgetc()</strong> 函数从 fp 所指向的输入文件中读取一个字符。返回值是读取的字符，如果发生错误则返回 <strong>EOF</strong>。下面的函数允许您从流中读取一个字符串：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">char *fgets( char *buf, int n, FILE *fp );</span><br></pre></td></tr></table></figure>
-
-<p>函数 <strong>fgets()</strong> 从 fp 所指向的输入流中读取 n - 1 个字符。它会把读取的字符串复制到缓冲区 <strong>buf</strong>，并在最后追加一个 <strong>null</strong> 字符来终止字符串。</p>
-<p>如果这个函数在读取最后一个字符之前就遇到一个<strong>换行符 ‘\n’</strong> 或文件的末尾 EOF，则只会返回读取到的字符，<strong>包括换行符</strong>。您也可以使用 <strong>int fscanf(FILE *fp, const char *format, …)</strong> 函数来从文件中读取字符串，但是在遇到<strong>第一个空格和换行符</strong>时，它会停止读取。</p>
-<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   FILE *fp = NULL;</span><br><span class="line">   char buff[255];</span><br><span class="line"> </span><br><span class="line">   fp = fopen(&quot;/tmp/test.txt&quot;, &quot;r&quot;);</span><br><span class="line">   fscanf(fp, &quot;%s&quot;, buff);</span><br><span class="line">   printf(&quot;1: %s\n&quot;, buff );</span><br><span class="line"> </span><br><span class="line">   fgets(buff, 255, (FILE*)fp);</span><br><span class="line">   printf(&quot;2: %s\n&quot;, buff );</span><br><span class="line">   </span><br><span class="line">   fgets(buff, 255, (FILE*)fp);</span><br><span class="line">   printf(&quot;3: %s\n&quot;, buff );</span><br><span class="line">   fclose(fp);</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当上面的代码被编译和执行时，它会读取上一部分创建的文件，产生下列结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1: This</span><br><span class="line">2: is testing for fprintf...</span><br><span class="line"></span><br><span class="line">3: This is testing for fputs...</span><br></pre></td></tr></table></figure>
-
-<p>首先，<strong>fscanf()</strong> 方法只读取了 <strong>This</strong>，因为它在后边遇到了一个空格。其次，调用 <strong>fgets()</strong> 读取剩余的部分，直到行尾。最后，调用 <strong>fgets()</strong> 完整地读取第二行。<strong>依次读取</strong></p>
-<h2 id="fseek-可以移动文件指针到指定位置读-或插入写"><a href="#fseek-可以移动文件指针到指定位置读-或插入写" class="headerlink" title="fseek 可以移动文件指针到指定位置读,或插入写:"></a>fseek 可以移动文件指针到指定位置读,或插入写:</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fseek(FILE *stream, long offset, int whence);</span><br></pre></td></tr></table></figure>
-
-<p>fseek 设置当前读写点到 offset 处, whence 可以是 SEEK_SET,SEEK_CUR,SEEK_END 这些值决定是从文件头、当前点和文件尾计算偏移量 offset。</p>
-<p>你可以定义一个文件指针 <strong>FILE *fp</strong>,当你打开一个文件时，文件指针指向开头，你要指到多少个字节，只要控制偏移量就好，例如, 相对当前位置往后移动一个字节：<strong>fseek(fp,1,SEEK_CUR);</strong> 中间的值就是偏移量。 如果你要往前移动一个字节，直接改为负值就可以：**fseek(fp,-1,SEEK_CUR)**。</p>
-<p>执行以下实例前，确保当前目录下 <strong>test.txt</strong> 文件已创建：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main()&#123;   </span><br><span class="line">    FILE *fp = NULL;</span><br><span class="line">    fp = fopen(&quot;test.txt&quot;, &quot;r+&quot;);  // 确保 test.txt 文件已创建</span><br><span class="line">    fprintf(fp, &quot;This is testing for fprintf...\n&quot;);   </span><br><span class="line">    fseek(fp, 10, SEEK_SET);</span><br><span class="line">    if (fputc(65,fp) == EOF) &#123;//将65对应字符值A替换掉当前指针指向的s，函数 fputc() 把参数 c 的字符值写入到 fp 所指向的输出流中。如果写入成功，它会返回写入的字符，如果发生错误，则会返回 EOF</span><br><span class="line">        printf(&quot;fputc fail&quot;);   </span><br><span class="line">    &#125;   </span><br><span class="line">    fclose(fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结束后，打开 test.txt 文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">This is teAting for fprintf...</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：</strong> 只有用 <strong>r+</strong> 模式打开文件才能插入内容，<strong>w</strong> 或 <strong>w+</strong> 模式都会清空掉原来文件的内容再来写，<strong>a</strong> 或 <strong>a+</strong> 模式即总会在文件最尾添加内容，哪怕用 fseek() 移动了文件指针位置。</p>
-<h1 id="C-预处理器"><a href="#C-预处理器" class="headerlink" title="C 预处理器"></a>C 预处理器</h1><p><strong>C 预处理器</strong>不是编译器的组成部分，但是它是编译过程中一个单独的步骤。简言之，C 预处理器只不过是一个文本替换工具而已，它们会指示编译器在实际编译之前完成所需的预处理。我们将把 C 预处理器（C Preprocessor）简写为 CPP。</p>
-<p>所有的预处理器命令都是以井号（#）开头。它必须是第一个非空字符，为了增强可读性，预处理器指令应从第一列开始。下面列出了所有重要的预处理器指令：</p>
-<table>
-<thead>
-<tr>
-<th align="left">指令</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">#define</td>
-<td align="left">定义宏</td>
-</tr>
-<tr>
-<td align="left">#include</td>
-<td align="left">包含一个源代码文件</td>
-</tr>
-<tr>
-<td align="left">#undef</td>
-<td align="left">取消已定义的宏</td>
-</tr>
-<tr>
-<td align="left">#ifdef</td>
-<td align="left">如果宏已经定义，则返回真</td>
-</tr>
-<tr>
-<td align="left">#ifndef</td>
-<td align="left">如果宏没有定义，则返回真</td>
-</tr>
-<tr>
-<td align="left">#if</td>
-<td align="left">如果给定条件为真，则编译下面代码</td>
-</tr>
-<tr>
-<td align="left">#else</td>
-<td align="left">#if 的替代方案</td>
-</tr>
-<tr>
-<td align="left">#elif</td>
-<td align="left">如果前面的 #if 给定条件不为真，当前条件为真，则编译下面代码</td>
-</tr>
-<tr>
-<td align="left">#endif</td>
-<td align="left">结束一个 #if……#else 条件编译块</td>
-</tr>
-<tr>
-<td align="left">#error</td>
-<td align="left">当遇到标准错误时，输出错误消息</td>
-</tr>
-<tr>
-<td align="left">#pragma</td>
-<td align="left">使用标准化方法，向编译器发布特殊的命令到编译器中</td>
-</tr>
-</tbody></table>
-<hr>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &quot;myheader.h&quot;</span><br></pre></td></tr></table></figure>
-
-<p>这些指令告诉 CPP 从<strong>系统库</strong>中获取 stdio.h，并添加文本到当前的源文件中。下一行告诉 CPP 从本地目录中获取 <strong>myheader.h</strong>，并添加内容到当前的源文件中。</p>
-<hr>
-<p>这些指令告诉 CPP 从<strong>系统库</strong>中获取 stdio.h，并添加文本到当前的源文件中。下一行告诉 CPP 从本地目录中获取 <strong>myheader.h</strong>，并添加内容到当前的源文件中。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#undef  FILE_SIZE</span><br><span class="line">#define FILE_SIZE 42</span><br></pre></td></tr></table></figure>
-
-<p>这个指令告诉 CPP 取消已定义的 FILE_SIZE，并定义它为 42。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MESSAGE</span><br><span class="line">   #define MESSAGE &quot;You wish!&quot;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-
-<p>这个指令告诉 CPP 只有当 MESSAGE 未定义时，才定义 MESSAGE。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#ifdef DEBUG</span><br><span class="line">   /* Your debugging statements here */</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-
-<p>这个指令告诉 CPP 如果<strong>定义了 DEBUG，则执行处理语句</strong>。在编译时，如果您向 gcc 编译器传递了 <em>-DDEBUG</em> 开关量，这个指令就非常有用。它定义了 DEBUG，您可以在编译期间<strong>随时开启或关闭调试</strong>。</p>
-<hr>
-<h2 id="预定义宏"><a href="#预定义宏" class="headerlink" title="预定义宏"></a>预定义宏</h2><p>ANSI C 定义了许多宏。在编程中您可以使用这些宏，但是不能直接修改这些预定义的宏。</p>
-<table>
-<thead>
-<tr>
-<th align="left">宏</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left"><strong>DATE</strong></td>
-<td align="left">当前日期，一个以 “MMM DD YYYY” 格式表示的字符常量。</td>
-</tr>
-<tr>
-<td align="left"><strong>TIME</strong></td>
-<td align="left">当前时间，一个以 “HH:MM:SS” 格式表示的字符常量。</td>
-</tr>
-<tr>
-<td align="left"><strong>FILE</strong></td>
-<td align="left">这会包含当前文件名，一个字符串常量。</td>
-</tr>
-<tr>
-<td align="left"><strong>LINE</strong></td>
-<td align="left">这会包含当前行号，一个十进制常量。</td>
-</tr>
-<tr>
-<td align="left"><strong>STDC</strong></td>
-<td align="left">当编译器以 ANSI 标准编译时，则定义为 1。</td>
-</tr>
-</tbody></table>
-<h2 id="预处理器运算符"><a href="#预处理器运算符" class="headerlink" title="预处理器运算符"></a>预处理器运算符</h2><p>C 预处理器提供了下列的运算符来帮助您创建宏：</p>
-<h3 id="宏延续运算符（-）"><a href="#宏延续运算符（-）" class="headerlink" title="宏延续运算符（\）"></a>宏延续运算符（\）</h3><p>一个宏通常写在一个单行上。但是如果宏太长，一个单行容纳不下，则使用宏延续运算符（\）。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define  message_for(a, b)  \</span><br><span class="line">    printf(#a &quot; and &quot; #b &quot;: We love you!\n&quot;)</span><br></pre></td></tr></table></figure>
-
-<h3 id="字符串常量化运算符（-）"><a href="#字符串常量化运算符（-）" class="headerlink" title="字符串常量化运算符（#）"></a>字符串常量化运算符（#）</h3><p>在宏定义中，当需要把一个宏的参数转换为字符串常量时，则使用字符串常量化运算符（#）。在宏中使用的该运算符有一个特定的参数或参数列表。例如：</p>
-<h4 id="实例-2"><a href="#实例-2" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#define  message_for(a, b)  \</span><br><span class="line">    printf(#a &quot; and &quot; #b &quot;: We love you!\n&quot;)</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   message_for(Carole, Debra);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="标记粘贴运算符（-）"><a href="#标记粘贴运算符（-）" class="headerlink" title="标记粘贴运算符（##）"></a>标记粘贴运算符（##）</h3><p>宏定义内的标记粘贴运算符（##）会合并两个参数。它允许在宏定义中两个独立的标记被合并为一个标记。例如：</p>
-<h4 id="实例-3"><a href="#实例-3" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#define tokenpaster(n) printf (&quot;token&quot; #n &quot; = %d&quot;, token##n)</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   int token34 = 40;</span><br><span class="line">   </span><br><span class="line">   tokenpaster(34);</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当上面的代码被编译和执行时，它会产生下列结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">token34 = 40</span><br></pre></td></tr></table></figure>
-
-<p>这是怎么发生的，因为这个实例会从编译器产生下列的实际输出：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf (&quot;token34 = %d&quot;, token34);</span><br></pre></td></tr></table></figure>
-
-<p>这个实例演示了 token##n 会连接到 token34 中，在这里，我们使用了<strong>字符串常量化运算符（#）</strong>和<strong>标记粘贴运算符（##）</strong>。</p>
-<h3 id="defined-运算符"><a href="#defined-运算符" class="headerlink" title="defined() 运算符"></a>defined() 运算符</h3><p>预处理器 <strong>defined</strong> 运算符是用在常量表达式中的，用来确定一个标识符是否已经使用 #define 定义过。如果指定的标识符已定义，则值为真（非零）。如果指定的标识符未定义，则值为假（零）。下面的实例演示了 defined() 运算符的用法：</p>
-<h4 id="实例-4"><a href="#实例-4" class="headerlink" title="实例"></a>实例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"> </span><br><span class="line">#if !defined (MESSAGE)</span><br><span class="line">   #define MESSAGE &quot;You wish!&quot;</span><br><span class="line">#endif</span><br><span class="line"> </span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;Here is the message: %s\n&quot;, MESSAGE);  </span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用#define含参时，参数括号很重要，如上例中省略括号会导致运算错误：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">#define square(x) ((x) * (x))</span><br><span class="line"></span><br><span class="line">#define square_1(x) (x * x)</span><br><span class="line"></span><br><span class="line">int main(void)</span><br><span class="line">&#123;</span><br><span class="line">   printf(&quot;square 5+4 is %d\n&quot;, square(5+4));  </span><br><span class="line">   printf(&quot;square_1 5+4 is %d\n&quot;, square_1(5+4)); </span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">square 5+4 is 81</span><br><span class="line">square_1 5+4 is 29</span><br></pre></td></tr></table></figure>
-
-<p>原因:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">square   等价于   （5+4）*（5+4）=81</span><br><span class="line">square_1 等价于   5+4*5+4=29</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h1 id="关于两数值的交换"><a href="#关于两数值的交换" class="headerlink" title="关于两数值的交换"></a>关于两数值的交换</h1><p>异或运算可以达到交换两数的目的，代码如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    a = a^b;</span><br><span class="line">    b = a^b;</span><br><span class="line">    a = a^b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>但不推荐使用这种方式</strong>，附上常用的临时变量方法对比说明。</p>
-<p>临时变量方法:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    int tmp = a;</span><br><span class="line">    a = b;</span><br><span class="line">    b = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对于临时变量法，每次赋值只要读取一个变量的值到寄存器，然后再从寄存器写回到另一个变量中即可，前后涉及两次内存写入操作； 但是对于异或运算操作，每次都需要读取两个数据到寄存器中，再进行运算操作，之后把结果写回到变量中，前后共需要三次内存写入操作。 另外一点，异或操作的代码可读性差。</p>
-<p>如果使用C语言实现上述两种方法，并用gcc编译器编译，可以使用命令 <strong>gcc -S swap.c</strong> 查看相应的汇编代码，临时变量法代码行数更少，另外使用 <strong>gcc</strong> 编译器时，用异或运算交换数组会出错。</p>
-<p>在不引入临时变量的基础上，交换两数的值还可以使用三次加减法，代码如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;a, int &amp;b)</span><br><span class="line">&#123;</span><br><span class="line">    a = a + b;</span><br><span class="line">    b = a - b;</span><br><span class="line">    a = a - b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这种方式同样需要三次内存写入操作，同时代码可读性也较差。</p>
-<h1 id="C-头文件"><a href="#C-头文件" class="headerlink" title="C 头文件"></a>C 头文件</h1><p><strong>C 语言中 include &lt;&gt; 与include “” 的区别?</strong></p>
-<p><strong>#include &lt; &gt;</strong> 引用的是编译器的类库路径里面的头文件。</p>
-<p><strong>#include “ “</strong> 引用的是你程序目录的相对路径中的头文件，如果在程序目录没有找到引用的头文件则到编译器的类库路径的目录下找该头文件。</p>
-<h2 id="只引用一次头文件"><a href="#只引用一次头文件" class="headerlink" title="只引用一次头文件"></a>只引用一次头文件</h2><p>如果一个头文件被引用两次，编译器会处理两次头文件的内容，这将产生错误。为了防止这种情况，标准的做法是把文件的整个内容放在条件编译语句中，如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef HEADER_FILE</span><br><span class="line">#define HEADER_FILE</span><br><span class="line"></span><br><span class="line">the entire header file file</span><br><span class="line"></span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-
-<p>这种结构就是通常所说的包装器 <strong>#ifndef</strong>。当再次引用头文件时，条件为假，因为 HEADER_FILE 已定义。此时，预处理器会跳过文件的整个内容，编译器会忽略它。</p>
-<p>在有多个 <strong>.h</strong> 文件和多个 <strong>.c</strong> 文件的时候，往往我们会用一个 <strong>global.h</strong> 的头文件来包括所有的 <strong>.h</strong> 文件，然后在除 <strong>global.h</strong> 文件外的头文件中 包含 <strong>global.h</strong> 就可以实现所有头文件的包含，同时不会乱。方便在各个文件里面调用其他文件的函数或者变量。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef _GLOBAL_H</span><br><span class="line">#define _GLOBAL_H</span><br><span class="line">#include &lt;fstream&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line">#include &lt;Config.h&gt;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1817,7 +1750,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">48</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
