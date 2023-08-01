@@ -147,6 +147,181 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">Linux-网络基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-06 10:44:33" itemprop="dateCreated datePublished" datetime="2023-07-06T10:44:33+08:00">2023-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-10 15:25:03" itemprop="dateModified" datetime="2023-07-10T15:25:03+08:00">2023-07-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什么是协议"><a href="#什么是协议" class="headerlink" title="什么是协议"></a>什么是协议</h2><p>从应用的角度出发，协议可理解为“规则”，是数据传输和数据的解释的规则。</p>
+<p>假设，A、B双方欲传输文件。规定：</p>
+<p>第一次，传输文件名，接收方接收到文件名，应答OK给传输方；</p>
+<p>第二次，发送文件的尺寸，接收方接收到该数据再次应答一个OK；</p>
+<p>第三次，传输文件内容。同样，接收方接收数据完成后应答OK表示文件内容接收成功。</p>
+<p>由此，无论A、B之间传递何种文件，都是通过三次数据传输来完成。A、B之间形成了一个最简单的数据传输规则。双方都按此规则发送、接收数据。A、B之间达成的这个相互遵守的规则即为协议。</p>
+<p>这种仅在A、B之间被遵守的协议称之为<strong>原始协议</strong>。当此协议被更多的人采用，不断的增加、改进、维护、完善。最终形成一个稳定的、完整的文件传输协议，被广泛应用于各种文件传输过程中。该协议就成为一个<strong>标准协议</strong>。最早的ftp协议就是由此衍生而来。</p>
+<p>TCP协议注重数据的传输。http协议着重于数据的解释。</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" alt="image-20230706104601518"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104601518.png" class title="This is an test image">
+
+<h2 id="7层模型和4层模型及代表协议"><a href="#7层模型和4层模型及代表协议" class="headerlink" title="7层模型和4层模型及代表协议"></a>7层模型和4层模型及代表协议</h2><p>分层模型结构： </p>
+<p>  OSI七层模型： 物、数、网、传、会、表、应</p>
+<p>  TCP&#x2F;IP 4层模型：网（链路层&#x2F;网络接口层）、网、传、应</p>
+<p>​    应用层：http、ftp、nfs、ssh、telnet。。。</p>
+<p>​    传输层：TCP、UDP</p>
+<p>​    网络层：IP、ICMP、IGMP</p>
+<p>​    链路层：以太网帧协议、ARP</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" alt="image-20230706104711613"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104711613.png" class title="This is an test image">
+
+<p>网络传输流程： </p>
+<p>  数据没有封装之前，是不能在网络中传递。</p>
+<p>  数据-》应用层-》传输层-》网络层-》链路层 — 网络环境</p>
+<h2 id="以太网帧和ARP请求"><a href="#以太网帧和ARP请求" class="headerlink" title="以太网帧和ARP请求"></a>以太网帧和ARP请求</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" alt="image-20230706104959831"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230706104959831.png" class title="This is an test image">
+
+<p>以太网帧协议：</p>
+<p>  ARP协议：根据 Ip 地址获取 mac 地址。</p>
+<p>  以太网帧协议：根据mac地址，完成数据包传输。</p>
+<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP协议：  </p>
+<p>  版本： IPv4、IPv6 – 4位</p>
+<p>  TTL： time to live 。 设置数据包在路由节点中的跳转上限。每经过一个路由节点，该值-1， 减为0的路由，有义务将该数据包丢弃</p>
+<p>  源IP： 32位。— 4字节   192.168.1.108 — 点分十进制 IP地址（string） — 二进制 </p>
+<p>  目的IP：32位。— 4字节</p>
+<h2 id="端口号和UDP协议"><a href="#端口号和UDP协议" class="headerlink" title="端口号和UDP协议"></a>端口号和UDP协议</h2><p>UDP：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>IP地址：可以在网络环境中，唯一标识一台主机。</p>
+<p>端口号：可以网络的一台主机上，唯一标识一个进程。</p>
+<p>ip地址+端口号：可以在网络环境中，唯一标识一个进程。</p>
+<h2 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h2><p>TCP协议：</p>
+<p>  16位：源端口号。 2^16 &#x3D; 65536 </p>
+<p>  16位：目的端口号。</p>
+<p>  32序号;</p>
+<p>  32确认序号。 </p>
+<p>  6个标志位。</p>
+<p>  16位窗口大小。  2^16 &#x3D; 65536</p>
+<h2 id="BS和CS模型对比"><a href="#BS和CS模型对比" class="headerlink" title="BS和CS模型对比"></a>BS和CS模型对比</h2><p>c&#x2F;s模型： </p>
+<p>  client-server </p>
+<p>b&#x2F;s模型： </p>
+<p>  browser-server </p>
+<p>​      C&#x2F;S        																																				B&#x2F;S</p>
+<p>  优点： 缓存大量数据、协议选择灵活、速度快、迭代快（只需要发布再client就行）    				 安全性、跨平台、开发工作量较小</p>
+<p>  缺点： 安全性、跨平台、开发工作量较大    						 																不能缓存大量数据、严格遵守 http</p>
+<h2 id="套接字"><a href="#套接字" class="headerlink" title="套接字"></a>套接字</h2><p>网络套接字： socket</p>
+<p>  一个文件描述符指向一个套接字（该套接字内部由内核借助两个缓冲区实现。）</p>
+<p>  在通信过程中， 套接字一定是成对出现的。</p>
+<h2 id="三次握手建立连接"><a href="#三次握手建立连接" class="headerlink" title="三次握手建立连接"></a>三次握手建立连接</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708145906727.png" alt="image-20230708145906727"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708145906727.png" class title="This is an test image">
+
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708145932093.png" alt="image-20230708145932093"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708145932093.png" class title="This is an test image">
+
+<h2 id="数据通信"><a href="#数据通信" class="headerlink" title="数据通信"></a>数据通信</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150003066.png" alt="image-20230708150003066"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150003066.png" class title="This is an test image">
+
+<p>并不是一次发送，一次应答。也可以批量应答</p>
+<h2 id="四次挥手关闭连接"><a href="#四次挥手关闭连接" class="headerlink" title="四次挥手关闭连接"></a>四次挥手关闭连接</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150114631.png" alt="image-20230708150114631"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150114631.png" class title="This is an test image">
+
+<p>完成两次挥手后，不是说两端的连接断开了，主动端关闭了写缓冲区，不能再向对端发送数据，被动端关闭了读缓冲区，不能再从对端读取数据。然而主动端还是能够读取对端发来的数据。</p>
+<h2 id="滑动窗口和TCP数据包格式"><a href="#滑动窗口和TCP数据包格式" class="headerlink" title="滑动窗口和TCP数据包格式"></a>滑动窗口和TCP数据包格式</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150203279.png" alt="image-20230708150203279"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150203279.png" class title="This is an test image">
+
+<p>滑动窗口： </p>
+<p>  发送给连接对端，本端的缓冲区大小（实时），保证数据不会丢失。</p>
+<p>也就是这里win4096,注意几个阶段win可能含义不同。</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150611193.png" alt="image-20230708150611193"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150611193.png" class title="This is an test image">
+
+<h2 id="通信时序与代码对应关系"><a href="#通信时序与代码对应关系" class="headerlink" title="通信时序与代码对应关系"></a>通信时序与代码对应关系</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150636465.png" alt="image-20230708150636465"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230708150636465.png" class title="This is an test image">
+
+<p>三次握手：</p>
+<p>  主动发起连接请求端，发送 SYN 标志位，请求建立连接。 携带序号号、数据字节数(0)、滑动窗口大小。</p>
+<p>  被动接受连接请求端，发送 ACK 标志位，同时携带 SYN 请求标志位。携带序号、确认序号、数据字节数(0)、滑动窗口大小。</p>
+<p>  主动发起连接请求端，发送 ACK 标志位，应答服务器连接请求。携带确认序号。</p>
+<p>四次挥手：</p>
+<p>  主动关闭连接请求端， 发送 FIN 标志位。 </p>
+<p>  被动关闭连接请求端， 应答 ACK 标志位。      —– 半关闭完成。</p>
+<p>  被动关闭连接请求端， 发送 FIN 标志位。</p>
+<p>  主动关闭连接请求端， 应答 ACK 标志位。   —– 连接全部关闭</p>
+<p>滑动窗口：</p>
+<p>  发送给连接对端，本端的缓冲区大小（实时），保证数据不会丢失。</p>
+<h2 id="TCP状态"><a href="#TCP状态" class="headerlink" title="TCP状态"></a>TCP状态</h2><p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230710142750740.png" alt="image-20230710142750740"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230710142750740.png" class title="This is an test image">
+
+<p>实线是主动发起连接和关闭连接请求的一端，虚线是被动发起和关闭连接请求的一端。</p>
+<p><code>netstat -apn | grep client</code>  查看客户端网络连接状态</p>
+<p><code>netstat -apn | grep port</code>   查看端口的网络连接状态</p>
+<p><img src="/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230710142832690.png" alt="image-20230710142832690"></p>
+<img src="/2023/07/06/Linux-%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/image-20230710142832690.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">TCP状态时序图：</span><br><span class="line"></span><br><span class="line">	结合三次握手、四次挥手 理解记忆。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	1. 主动发起连接请求端：	CLOSE -- 发送SYN -- SEND_SYN -- 接收 ACK、SYN -- SEND_SYN -- 发送 ACK -- ESTABLISHED（数据通信态）</span><br><span class="line"></span><br><span class="line">	2. 主动关闭连接请求端： ESTABLISHED（数据通信态） -- 发送 FIN -- FIN_WAIT_1 -- 接收ACK -- FIN_WAIT_2（半关闭）</span><br><span class="line"></span><br><span class="line">				-- 接收对端发送 FIN -- FIN_WAIT_2（半关闭）-- 回发ACK -- TIME_WAIT（只有主动关闭连接方，会经历该状态）</span><br><span class="line"></span><br><span class="line">				-- 等 2MSL时长 -- CLOSE </span><br><span class="line"></span><br><span class="line">	3. 被动接收连接请求端： CLOSE -- LISTEN -- 接收 SYN -- LISTEN -- 发送 ACK、SYN -- SYN_RCVD -- 接收ACK -- ESTABLISHED（数据通信态）</span><br><span class="line"></span><br><span class="line">	4. 被动关闭连接请求端： ESTABLISHED（数据通信态） -- 接收 FIN -- ESTABLISHED（数据通信态） -- 发送ACK </span><br><span class="line"></span><br><span class="line">				-- CLOSE_WAIT (说明对端【主动关闭连接端】处于半关闭状态) -- 发送FIN -- LAST_ACK -- 接收ACK -- CLOSE</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	重点记忆： ESTABLISHED、FIN_WAIT_2 &lt;--&gt; CLOSE_WAIT、TIME_WAIT（2MSL）</span><br><span class="line"></span><br><span class="line">	netstat -apn | grep  端口号</span><br><span class="line"></span><br><span class="line">2MSL时长：</span><br><span class="line"></span><br><span class="line">	一定出现在【主动关闭连接请求端】。 --- 对应 TIME_WAIT 状态。</span><br><span class="line"></span><br><span class="line">	保证，最后一个 ACK 能成功被对端接收。（等待期间，对端没收到我发的ACK，对端会再次发送FIN请求。）</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="端口复用函数"><a href="#端口复用函数" class="headerlink" title="端口复用函数"></a>端口复用函数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">端口复用:</span><br><span class="line"></span><br><span class="line">	int opt = 1;		// 设置端口复用。</span><br><span class="line"></span><br><span class="line">	setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, (void *)&amp;opt, sizeof(opt))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以直接套的模板，复用的意思是这个端口是TIME_WAIT（一定出现在【主动关闭连接请求端】），即服务端close，防止等待时间太长，可以连续用这个端口。</p>
+<h2 id="半关闭及shutdown函数"><a href="#半关闭及shutdown函数" class="headerlink" title="半关闭及shutdown函数"></a>半关闭及shutdown函数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">半关闭：</span><br><span class="line"></span><br><span class="line">	通信双方中，只有一端关闭通信。  --- FIN_WAIT_2</span><br><span class="line"></span><br><span class="line">	close（cfd）;</span><br><span class="line"></span><br><span class="line">	shutdown(int fd, int how);	</span><br><span class="line"></span><br><span class="line">		how: 	SHUT_RD	关读端</span><br><span class="line"></span><br><span class="line">			SHUT_WR	关写端</span><br><span class="line"></span><br><span class="line">			SHUT_RDWR 关读写</span><br><span class="line"></span><br><span class="line">	shutdown在关闭多个文件描述符应用的文件时，采用全关闭方法。close，只关闭一个。即dup2多个文件描述符指向同一个时，shutdown关闭一个会将指向同一个的都关闭。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/20/Linux-%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1877,145 +2052,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解计算机系统</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-05 16:12:22" itemprop="dateCreated datePublished" datetime="2023-05-05T16:12:22+08:00">2023-05-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-11 17:40:00" itemprop="dateModified" datetime="2023-05-11T17:40:00+08:00">2023-05-11</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="第2章-信息的表示和处理"><a href="#第2章-信息的表示和处理" class="headerlink" title="第2章 信息的表示和处理"></a>第2章 信息的表示和处理</h1><h4 id="文字编码的Unicode标准"><a href="#文字编码的Unicode标准" class="headerlink" title="文字编码的Unicode标准"></a>文字编码的Unicode标准</h4><p>基本编码，称为Unicode的“统一字符集”，使用32位来表示字符。这好像要求文本串中每个字符要占用4个字节。不过，可以有一些替代编码，常见的字符只需要1个或2个字节，而不太常用的字符需要多一些的字节数。特别地，UTF-8表示将每个字符编码为一个字节序列，<strong>这样标准ASCII字符还是使用和它们在ASCII 中一样的单字节编码</strong>，这也就意味着所有的ASCII字节序列用ASCII码表示和用UTF-8表示是一样的。</p>
-<p>Java编程语言使用Unicode来表示字符串。对于C语言也有支持 Unicode的程序库。</p>
-<p>在使用ASCII码作为字符码的任何系统上都将得到相同的结果，与字节顺序和字大小规则无关。因而，<strong>文本数据比二进制数据具有更强的平台独立性</strong>。</p>
-<p>不同的机器类型使用不同的且不兼容的指令和编码方式。即使是完全一样的进程，运行在不同的操作系统上也会有不同的编码规则，因此二进制代码是不兼容的。二进制代码很少能在不同机器和操作系统组合之间移植。</p>
-<h2 id="c语言的移位运算"><a href="#c语言的移位运算" class="headerlink" title="c语言的移位运算"></a>c语言的移位运算</h2><p>C语言标准并没有明确定义对于有符号数应该使用哪种类型的右移–算术右移或者<strong>逻辑右移</strong>（不管符号均补0）都可以。不幸地，这就意味着任何假设一种或者另一种右移形式的代码都可能会遇到可移植性问题。然而，实际上，几乎所有的编译器&#x2F;机器组合都对有符号数使用<strong>算术右移</strong>（有符号时最高位是1补1），且许多程序员也都假设机器会使用这种右移。另一方面，对于无符号数，右移必须是逻辑的。<br>与C相比，Java对于如何进行右移有明确的定义。表达是x&gt;&gt;k会将x算术右移k个位置，而x&gt;&gt;&gt;k会对x做逻辑右移。</p>
-<h3 id="移动k-位，这里k-很大"><a href="#移动k-位，这里k-很大" class="headerlink" title="移动k 位，这里k 很大"></a>移动k 位，这里k 很大</h3><p>对于一个由w位组成的数据类型，如果要移动k≥w位会得到什么结果呢?例如，计算下面的表达式会得到什么结果，假设数据类型int为w&#x3D;32:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">intlval =OxFEDCBA98&lt;&lt; 32;</span><br><span class="line">intaval =OxFEDCBA98&gt;&gt;36;</span><br><span class="line">unsigned uval =OxFEDCBA98u &gt;&gt;40;</span><br></pre></td></tr></table></figure>
-
-<p>C语言标准很小心地规避了说明在这种情况下该如何做。在许多机器上，当移动一个w位的值时，移位指令只考虑位移量的低 log2 w位，因此实际上位移量就是通过计算k mod w得到的。例如，当w&#x3D;32时，上面三个移位运算分别是移动0、4和8位，得到结果:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lval 0xFEDCBA98</span><br><span class="line">aval 0xFFEDCBA9</span><br><span class="line">uval 0x00FEDCBA</span><br></pre></td></tr></table></figure>
-
-<p>不过这种行为对于C程序来说是没有保证的，所以应该保持位移量小于待移位值的位数。另一方面，Java 特别要求位移数量应该按照我们前面所讲的求模的方法来计算。</p>
-<h2 id="补码编码"><a href="#补码编码" class="headerlink" title="补码编码"></a>补码编码</h2><p>采用补码表示的32位大端法机器（符合习惯，先输出低地址的高位）上输出打印16进制时：是看补码来转换。</p>
-<p>原理:补码编码的定义<br><img src="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
-<p>例如1001（-1）的补码是1111可以根据上面计算-8+7&#x3D;-1</p>
-<p><strong>负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码</strong>。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的</p>
-<p>对于大多数C语言的实现，处理同样字长的有符号数和无符号数之间相互转换的一般规则是:数值可能会改变，但是<strong>位模式不变</strong>。</p>
-<p>无符号表示中的UMax竟有着和补码表示的-1相同的位模式。我们在这两个数之间也能看到这种关系<br>$$<br>:1+UMax_w&#x3D;2^w<br>$$<br>原理:补码转换为无符号数<br>对满足TMin_x≤x≤TMax_w的x有:<br>$$<br>T2U_w(x)&#x3D;\begin{cases} x+2^w,x&lt;0\ x,x&gt;&#x3D;0\end{cases}<br>$$<br>一个无符号数u和与之对应的有符号数U2T_w(u)之间的关系:</p>
-<p>原理:无符号数转换为补码</p>
-<p>对满足0≤u≤UMax _w的u有:<br>$$<br>U2T_w(u)&#x3D;\begin{cases} u-2^w,u&gt;TMax_w\ u,x&lt;&#x3D;TMax_w\end{cases}<br>$$<br>总结一下，我们考虑无符号与补码表示之间互相转换的结果。对于在范围0≤T&lt;TMax_w之内的值x而言，我们得到T2U_w(x)&#x3D;x和U2T_w(x)&#x3D;x。也就是说，在这个范围内的数字有相同的无符号和补码表示。对于这个范围以外的数值，转换需要加上或者减去2^w。例如，我们有<br>$$<br>T2U_w(-1)&#x3D;-1+2^w&#x3D;UMax_w<br>$$<br>—-最靠近0的负数映射为最大的无符号数</p>
-<h2 id="c语言里面TMin不能写成-2147483648的原因"><a href="#c语言里面TMin不能写成-2147483648的原因" class="headerlink" title="c语言里面TMin不能写成-2147483648的原因"></a>c语言里面TMin不能写成-2147483648的原因</h2><p>C语言中，将TMin（32位有符号整数的最小值）写成 <strong>-2147483647-1</strong>，而不是简单地写成 -2147483648 或 0x80000000 。</p>
-<p>可见如果不发生溢出，整型常量的值总是非负数。如果前面<strong>出现符号</strong>，则是对整型常量使用的一元运算符，而不是整型常量的一部分。</p>
-<p>如果将TMin32写成-2147483648并且将代码在一个32位的机器上面编译，当编译器遇到**-X<strong>形式的数值，它首先会确定</strong>X<strong>的数据类型和值，然后取</strong>X**的。</p>
-<p>由于-2147483648超过了int所能够表示的范围，编译器就会再次选择一种可以正确的表示此值的类型。然后它就会按照第一个表格（十进制）的顺序往下继续尝试类型，再假设编译器采用的标准是ISO C90，int-&gt;long-&gt;unsigned，然后就发现unsigned是第一个合适的数据类型。正如我们知道的，2147483648和-2147483648在32位数值上拥有同样的位表示，使得此常量的最终数据类型是unsigned且值为2147483648。这对于16进制的0x80000000也是相同的结果。</p>
-<p>用一句话来解释C语言中TMin32的古怪写法的原因：虽然-2147483648 这个数值能够用int类型(4字节)来表示，但在C语言中却没法写出对应这个数值的int类型常量。</p>
-<h2 id="补码的非"><a href="#补码的非" class="headerlink" title="补码的非"></a>补码的非</h2><p>原理:补码的非<br>对满足TMin_w≤x≤TMax_w 的x，其补码的非-^t_wx由下式给出<br>$$<br>-^t_wx&#x3D;\begin{cases}TMin_w,x&#x3D;TMin_w\-x,x&gt;TMin_w\end{cases}<br>$$<br>此处设w&#x3D;4，用补码可表示的范围就是[-8,7]，对于-8，它的“补码的非”还是-8,而[-7,7]补码的非就是原数的负数，比如说-4的“补码的非”是-4取负，即：4，而3的“补码的非”是3取负，即：-3。这是“补码的非”的定义；注意：“补码的非”并不是把“一个数的补码按位取非”</p>
-<p>TMin_w&#x3D;-2^w-1</p>
-<p>执行位级补码非的第一种方法是对每一位求反，再对结果加1。在C语言中，我们可以说，对于任意整数值x，计算表达式-x和~x+1得到的结果完全一样。</p>
-<h2 id="对TMin-w-x3D-2-w-1的解释"><a href="#对TMin-w-x3D-2-w-1的解释" class="headerlink" title="对TMin_w&#x3D;-2^w-1的解释"></a>对TMin_w&#x3D;-2^w-1的解释</h2><p>如w&#x3D;4的-8&#x3D;1000，可以参考-2为例</p>
-<p>[-2]原 &#x3D; 1 0010    [-2]补 &#x3D; 11110</p>
-<p>如我所说，没有符号位，那么11110就是30，也就是说 -2的补码是30（%2^5）</p>
-<h2 id="补码移位"><a href="#补码移位" class="headerlink" title="补码移位"></a>补码移位</h2><p>移位也是运算，需要将负数的原码变成补码移位</p>
-<p>对无符号运算使用移位是非常简单的，部分原因是由于无符号数的右移一定是逻辑右移（不管最高位符号）。对于x大于等于0的有符号一样逻辑右移。</p>
-<p>负数在执行算术右移之前加上一个适当的偏置量是可以导致结果正确舍入的。</p>
-<p>补码除以2的幂(<strong>右移之前加上一个偏量</strong>，结果就向零舍入了).</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int optarith(int x, int y)</span><br><span class="line">&#123;</span><br><span class="line">    int t = x;</span><br><span class="line">    x &lt;&lt;= 5;</span><br><span class="line">    x -= t;</span><br><span class="line">    if (y &lt; 0)</span><br><span class="line">        y += 7;//加上一个适当的偏置量111,是为了正确右移3位，若右移4位，则加15（1111）</span><br><span class="line">    y &gt;&gt;= 3; /* Arithmetic shift */</span><br><span class="line">    return x + y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="IEEE浮点标准"><a href="#IEEE浮点标准" class="headerlink" title="IEEE浮点标准"></a>IEEE浮点标准</h2><p>IEEE浮点标准用<br>$$<br>V&#x3D;（-1）^s<em>M</em>2^E<br>$$<br> 的形式来表示一个数，符号s，尾数M，阶码E</p>
-<p>C语言中，单精度（float）的s为1b，E为8b，M为23b，双精度（double）的s为1b，E为11b，M为52b。</p>
-<p>阶码的值<strong>E&#x3D;e-Bias</strong>，e是无符号数，Bias为偏置值，等于 2^(k-1)−1 (float为127，double为1023)</p>
-<h3 id="计算-IEEE-754-标准浮点数的真值"><a href="#计算-IEEE-754-标准浮点数的真值" class="headerlink" title="计算 IEEE 754 标准浮点数的真值"></a>计算 IEEE 754 标准浮点数的真值</h3><p>在上述内容的分析之后，再通过观察分析以下这个 IEEE 754 单精度浮点数格式表示的数，系统性了解如何计算出 IEEE 754 标准浮点数的真值：</p>
-<p>1 100 0000 1010 0000 0000 0000 0000 0000<br>上数分别对应图1-1的中 S（符号码，0 正，1 负），E (阶码) ，M (尾数数值)为：</p>
-<p>S (红色部分) ：1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1，表示这个浮点数是个负数；</span><br></pre></td></tr></table></figure>
-
-<p>E (蓝色部分) ：100 0000 1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">100 0000 1，阶码，其真值为 ：移码 - 偏置值 =&gt; 1000 0001 - 0111 1111 = 0000 0010 = 2D；（对应下面的2^2D）</span><br></pre></td></tr></table></figure>
-
-<p>M (黑色部分) ：010 0000 0000 0000 0000 0000</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">010 0000 0000 0000 0000 0000 表示这个浮点数的尾数部分，其真值为：被隐含的最高位1 + 0.尾数部分 =&gt; 1 + 0.01 = 1.01B;</span><br></pre></td></tr></table></figure>
-
-<p>通过对 S，E，M 的分析，我们可以计算出该浮点数的真值，即：</p>
-<p>-1.01B * 2^10B &#x3D; 1.25D （-1.01B）* 2^2D &#x3D; -5.0D</p>
-<hr>
-<p>十进制数12345具有二进制[0011 0000 0011 1001]（0x3039），通过将二进制小数点左移13位，得到这个数的一个规格化表示 </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">12345=1.1000000111001_2×2^13 </span><br></pre></td></tr></table></figure>
-
-<p>，为了使用IEEE单精度（float）形式来编码，我们丢弃开头的1，并且在末尾增加10个0（单精度的尾数位23位，13+10&#x3D;23），来构造小数字段，得到二进制[1000000111001<em>0000000000</em>]，为了得到阶码字段，将13加上偏置量127，得到140，二进制表示为[10001100]，加上符号位0，得到12345.0的二进制浮点数[0100 0110 0100 0000 1110 0100 0000 0000]（0x4640E400），比较整数12345（0x3039）和浮点数12345.0（0x4640E400）的位级表示：</p>
-<p>（0x00003039）0000000000000000001<em><strong>1000000111001</strong></em></p>
-<p>（0x4640E400）010001100<em><strong>1000000111001</strong></em>0000000000</p>
-<p>阶码的值E&#x3D;e-Bias,产生指数的取值范围，对于单精度是一126～＋127，而对于双精度是一1022~+1023。</p>
-<h3 id="十进制数转为-IEEE-754-浮点数格式"><a href="#十进制数转为-IEEE-754-浮点数格式" class="headerlink" title="十进制数转为 IEEE 754 浮点数格式"></a>十进制数转为 IEEE 754 浮点数格式</h3><p>同样地再用一个例子 十进制数转为 IEEE 754 浮点数的例子，加深对 十进制数 与 IEEE 754 浮点数之间的转换的理解。</p>
-<p> 例如：将十进制数 -0.75 转为 IEEE 754 的单精度浮点数格式表示，分析过程如下：</p>
-<p>过程A： -0.75D &#x3D; -0.11B &#x3D; -1.1B * 2^(-1B)<br>S：1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-0.75 为负数，故 S 符号码为 1</span><br></pre></td></tr></table></figure>
-
-<p>E：0111 1110</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由 过程A 得，阶码的真值为 -0000 0001(因为是2^(-1B)，与上面例子一致) ，其移码为：-0000 0001 + 0111 1111 = 0111 1110</span><br></pre></td></tr></table></figure>
-
-<p>M：100 0000 0000 0000 0000 0000</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由 过程A 得，尾数码真值为：-1.1，隐含最高位 1 ，取小数部分，得100 0000 0000 0000 0000 0000</span><br></pre></td></tr></table></figure>
-
-<p>最终结果为：</p>
-<p>1 011 1111 0100 0000 0000 0000 0000 0000</p>
-<h2 id="向偶数舍人在大多数现实情况中避免了这种统计偏差。"><a href="#向偶数舍人在大多数现实情况中避免了这种统计偏差。" class="headerlink" title="向偶数舍人在大多数现实情况中避免了这种统计偏差。"></a><strong>向偶数舍人在大多数现实情况中避免了这种统计偏差</strong>。</h2><p>在50%的时间里，它将向上舍人，而在50%的时间里，它将向下舍入。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2085,7 +2121,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
