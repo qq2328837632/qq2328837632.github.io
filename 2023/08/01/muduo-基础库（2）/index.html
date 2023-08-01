@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="线程封装Thread__thread，gcc内置的线程局部存储设施  __thread只能修饰POD类型 POD类型（plain old data），与C兼容的原始数据,例如，结构和整型等C语言中的类型是POD类型，但带有用户定义的构造函数或虚函数的类则不是.  123456789101112131415161718192021void afterFork()&#x2F;&#x2F;fork可能是在主线程中调用，也可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-基础库（2）">
+<meta property="og:url" content="http://example.com/2023/08/01/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%882%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="线程封装Thread__thread，gcc内置的线程局部存储设施  __thread只能修饰POD类型 POD类型（plain old data），与C兼容的原始数据,例如，结构和整型等C语言中的类型是POD类型，但带有用户定义的构造函数或虚函数的类则不是.  123456789101112131415161718192021void afterFork()&#x2F;&#x2F;fork可能是在主线程中调用，也可">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-01T07:52:49.000Z">
+<meta property="article:modified_time" content="2023-08-01T14:56:31.997Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/08/01/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%882%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-基础库（2） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/01/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%882%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-基础库（2）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-01 15:52:49 / 修改时间：22:56:31" itemprop="dateCreated datePublished" datetime="2023-08-01T15:52:49+08:00">2023-08-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="线程封装Thread"><a href="#线程封装Thread" class="headerlink" title="线程封装Thread"></a>线程封装Thread</h1><p><code>__thread</code>，gcc内置的线程局部存储设施</p>
+<ul>
+<li><code>__thread</code>只能修饰POD类型</li>
+<li>POD类型（plain old data），与C兼容的原始数据,例如，结构和整型等C语言中的类型是POD类型，但带有用户定义的构造函数或虚函数的类则不是.</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">void afterFork()//fork可能是在主线程中调用，也可能是在子线程中调用</span><br><span class="line">				//fork得到一个新进程，新进程只有一个执行序列，只有一个线程（调用fork的线程被继承下来)</span><br><span class="line">&#123;</span><br><span class="line">  muduo::CurrentThread::t_cachedTid = 0;</span><br><span class="line">  muduo::CurrentThread::t_threadName = &quot;main&quot;;</span><br><span class="line">  CurrentThread::tid();</span><br><span class="line">  // no need to call pthread_atfork(NULL, NULL, &amp;afterFork);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class ThreadNameInitializer</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ThreadNameInitializer()</span><br><span class="line">  &#123;</span><br><span class="line">    muduo::CurrentThread::t_threadName = &quot;main&quot;;</span><br><span class="line">    CurrentThread::tid();</span><br><span class="line">    pthread_atfork(NULL, NULL, &amp;afterFork);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ThreadNameInitializer init;//相当于全局变量，一开始就构造了</span><br></pre></td></tr></table></figure>
+
+<p><code>pthread_atfork</code> 是一个 POSIX 线程库中的函数，用于注册在 <code>fork</code> 调用之前和之后执行的回调函数，以便在创建子进程时进行资源管理和同步操作。</p>
+<p>该函数的原型如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;pthread.h&gt;</span><br><span class="line"></span><br><span class="line">int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>prepare</code>: 当调用 <code>fork</code> 准备复制父进程之前，会调用此函数指定的回调函数。在此回调函数中，可以释放或重新初始化某些资源，以确保子进程继承了预期状态。该回调函数在父进程中执行。</li>
+<li><code>parent</code>: 在成功创建子进程后，会在父进程中调用此函数指定的回调函数。在此回调函数中，可以恢复资源状态或重新初始化需要在父进程中使用的资源。</li>
+<li><code>child</code>: 在成功创建子进程后，会在子进程中调用此函数指定的回调函数。在此回调函数中，可以重新初始化需要在子进程中使用的资源。</li>
+</ul>
+<p><code>pthread_atfork</code> 的使用场景通常涉及到多线程程序中调用 <code>fork</code> 创建新进程时，因为 <code>fork</code> 会复制当前进程的所有线程和资源，可能导致一些资源和同步问题。通过注册 <code>pthread_atfork</code> 提供的回调函数，我们可以在 <code>fork</code> 前后进行一些资源管理和同步操作，以确保子进程的创建过程是可控的。</p>
+<p>需要注意的是，使用 <code>fork</code> 和 <code>pthread_atfork</code> 需要非常小心，因为它涉及到多线程和多进程的复杂情况。在使用之前，确保你充分理解了相关的潜在问题和风险，并进行必要的测试和验证。另外，如果可能，尽量避免在多线程程序中使用 <code>fork</code>，以减少潜在的问题和调试难度。</p>
+<p>父进程在创建了一个线程，在doit并对mutex加锁,<br>父进程创建一个子进程，在子进程中调用doit，由于子进程会复制父进程的内存，这时候mutex处于锁的状态，父进程在复制子进程的时候，只会复制当前线程的执行状态,其它线程不会复制。因此子进程会处于死锁的状态。相当于在不知道加锁的情况下又加锁</p>
+<p>CurrentThread</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// internal,__thread修饰的变量是线程局部存储的。也就是私有的线程内的全局变量。</span><br><span class="line"> extern __thread int t_cachedTid;//线程真实pid（tid）的缓存，是为了提高获取tid的效率，减少系统调用的次数::syscall(SYS_gettid)</span><br><span class="line"> extern __thread char t_tidString[32];//tid字符串的表现形式</span><br><span class="line"> extern __thread int t_tidStringLength;</span><br><span class="line"> extern __thread const char* t_threadName;//每个线程的名称</span><br></pre></td></tr></table></figure>
+
+<p>Thread.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_BASE_THREAD_H</span><br><span class="line">#define MUDUO_BASE_THREAD_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Atomic.h&quot;</span><br><span class="line">#include &quot;muduo/base/CountDownLatch.h&quot;</span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;functional&gt;</span><br><span class="line">#include &lt;memory&gt;</span><br><span class="line">#include &lt;pthread.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class Thread : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void ()&gt; ThreadFunc;</span><br><span class="line"></span><br><span class="line">  explicit Thread(ThreadFunc, const string&amp; name = string());</span><br><span class="line">  // FIXME: make it movable in C++11</span><br><span class="line">  ~Thread();</span><br><span class="line"></span><br><span class="line">  void start();</span><br><span class="line">  int join(); // return pthread_join()</span><br><span class="line"></span><br><span class="line">  bool started() const &#123; return started_; &#125;</span><br><span class="line">  // pthread_t pthreadId() const &#123; return pthreadId_; &#125;</span><br><span class="line">  pid_t tid() const &#123; return tid_; &#125;</span><br><span class="line">  const string&amp; name() const &#123; return name_; &#125;</span><br><span class="line"></span><br><span class="line">  static int numCreated() &#123; return numCreated_.get(); &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void setDefaultName();</span><br><span class="line"></span><br><span class="line">  bool       started_;</span><br><span class="line">  bool       joined_;</span><br><span class="line">  pthread_t  pthreadId_;</span><br><span class="line">  pid_t      tid_;</span><br><span class="line">  ThreadFunc func_;</span><br><span class="line">  string     name_;</span><br><span class="line">  CountDownLatch latch_;</span><br><span class="line"></span><br><span class="line">  static AtomicInt32 numCreated_;//private 成员只能在类的成员函数（包括静态成员函数）内部访问，不能在类外部直接访问。</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line">#endif  // MUDUO_BASE_THREAD_H</span><br></pre></td></tr></table></figure>
+
+<p>Thread.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/Thread.h&quot;</span><br><span class="line">#include &quot;muduo/base/CurrentThread.h&quot;</span><br><span class="line">#include &quot;muduo/base/Exception.h&quot;</span><br><span class="line">//#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;type_traits&gt;</span><br><span class="line"></span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;sys/prctl.h&gt;</span><br><span class="line">#include &lt;sys/syscall.h&gt;</span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;linux/unistd.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace detail</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">pid_t gettid()</span><br><span class="line">&#123;</span><br><span class="line">  return static_cast&lt;pid_t&gt;(::syscall(SYS_gettid));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void afterFork()</span><br><span class="line">&#123;</span><br><span class="line">  muduo::CurrentThread::t_cachedTid = 0;</span><br><span class="line">  muduo::CurrentThread::t_threadName = &quot;main&quot;;</span><br><span class="line">  CurrentThread::tid();</span><br><span class="line">  // no need to call pthread_atfork(NULL, NULL, &amp;afterFork);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class ThreadNameInitializer</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ThreadNameInitializer()</span><br><span class="line">  &#123;</span><br><span class="line">    muduo::CurrentThread::t_threadName = &quot;main&quot;;</span><br><span class="line">    CurrentThread::tid();</span><br><span class="line">    pthread_atfork(NULL, NULL, &amp;afterFork);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ThreadNameInitializer init;</span><br><span class="line"></span><br><span class="line">struct ThreadData</span><br><span class="line">&#123;</span><br><span class="line">  typedef muduo::Thread::ThreadFunc ThreadFunc;</span><br><span class="line">  ThreadFunc func_;</span><br><span class="line">  string name_;</span><br><span class="line">  pid_t* tid_;</span><br><span class="line">  CountDownLatch* latch_;</span><br><span class="line"></span><br><span class="line">  ThreadData(ThreadFunc func,</span><br><span class="line">             const string&amp; name,</span><br><span class="line">             pid_t* tid,</span><br><span class="line">             CountDownLatch* latch)</span><br><span class="line">    : func_(std::move(func)),</span><br><span class="line">      name_(name),</span><br><span class="line">      tid_(tid),</span><br><span class="line">      latch_(latch)</span><br><span class="line">  &#123; &#125;</span><br><span class="line"></span><br><span class="line">  void runInThread()</span><br><span class="line">  &#123;</span><br><span class="line">    *tid_ = muduo::CurrentThread::tid();</span><br><span class="line">    tid_ = NULL;</span><br><span class="line">    latch_-&gt;countDown();</span><br><span class="line">    latch_ = NULL;</span><br><span class="line"></span><br><span class="line">    muduo::CurrentThread::t_threadName = name_.empty() ? &quot;muduoThread&quot; : name_.c_str();</span><br><span class="line">    ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);</span><br><span class="line">    try</span><br><span class="line">    &#123;</span><br><span class="line">      func_();</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;finished&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (const Exception&amp; ex)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      fprintf(stderr, &quot;reason: %s\n&quot;, ex.what());</span><br><span class="line">      fprintf(stderr, &quot;stack trace: %s\n&quot;, ex.stackTrace());</span><br><span class="line">      abort();</span><br><span class="line">    &#125;</span><br><span class="line">    catch (const std::exception&amp; ex)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      fprintf(stderr, &quot;reason: %s\n&quot;, ex.what());</span><br><span class="line">      abort();</span><br><span class="line">    &#125;</span><br><span class="line">    catch (...)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;unknown exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      throw; // rethrow</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void* startThread(void* obj)</span><br><span class="line">&#123;</span><br><span class="line">  ThreadData* data = static_cast&lt;ThreadData*&gt;(obj);</span><br><span class="line">  data-&gt;runInThread();</span><br><span class="line">  delete data;</span><br><span class="line">  return NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace detail</span><br><span class="line"></span><br><span class="line">void CurrentThread::cacheTid()</span><br><span class="line">&#123;</span><br><span class="line">  if (t_cachedTid == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    t_cachedTid = detail::gettid();</span><br><span class="line">    t_tidStringLength = snprintf(t_tidString, sizeof t_tidString, &quot;%5d &quot;, t_cachedTid);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool CurrentThread::isMainThread()</span><br><span class="line">&#123;</span><br><span class="line">  return tid() == ::getpid();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void CurrentThread::sleepUsec(int64_t usec)</span><br><span class="line">&#123;</span><br><span class="line">  struct timespec ts = &#123; 0, 0 &#125;;</span><br><span class="line">  ts.tv_sec = static_cast&lt;time_t&gt;(usec / Timestamp::kMicroSecondsPerSecond);</span><br><span class="line">  ts.tv_nsec = static_cast&lt;long&gt;(usec % Timestamp::kMicroSecondsPerSecond * 1000);</span><br><span class="line">  ::nanosleep(&amp;ts, NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AtomicInt32 Thread::numCreated_;</span><br><span class="line"></span><br><span class="line">Thread::Thread(ThreadFunc func, const string&amp; n)</span><br><span class="line">  : started_(false),</span><br><span class="line">    joined_(false),</span><br><span class="line">    pthreadId_(0),</span><br><span class="line">    tid_(0),</span><br><span class="line">    func_(std::move(func)),</span><br><span class="line">    name_(n),</span><br><span class="line">    latch_(1)</span><br><span class="line">&#123;</span><br><span class="line">  setDefaultName();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Thread::~Thread()</span><br><span class="line">&#123;</span><br><span class="line">  if (started_ &amp;&amp; !joined_)</span><br><span class="line">  &#123;</span><br><span class="line">    pthread_detach(pthreadId_);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::setDefaultName()</span><br><span class="line">&#123;</span><br><span class="line">  int num = numCreated_.incrementAndGet();//使用原子类型确保了多线程环境下对 numCreated_ 的增加操作是安全的，不会出现竞态条件。因此，无论多少个线程同时创建 Thread 对象，都能保证 numCreated_ 的计数正确并且线程安全。</span><br><span class="line">  if (name_.empty())</span><br><span class="line">  &#123;</span><br><span class="line">    char buf[32];</span><br><span class="line">    snprintf(buf, sizeof buf, &quot;Thread%d&quot;, num);</span><br><span class="line">    name_ = buf;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Thread::start()</span><br><span class="line">&#123;</span><br><span class="line">  assert(!started_);</span><br><span class="line">  started_ = true;</span><br><span class="line">  // FIXME: move(func_)</span><br><span class="line">  detail::ThreadData* data = new detail::ThreadData(func_, name_, &amp;tid_, &amp;latch_);</span><br><span class="line">  if (pthread_create(&amp;pthreadId_, NULL, &amp;detail::startThread, data))</span><br><span class="line">  &#123;</span><br><span class="line">    started_ = false;</span><br><span class="line">    delete data; // or no delete?</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;Failed in pthread_create&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    latch_.wait();</span><br><span class="line">    assert(tid_ &gt; 0);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int Thread::join()</span><br><span class="line">&#123;</span><br><span class="line">  assert(started_);</span><br><span class="line">  assert(!joined_);</span><br><span class="line">  joined_ = true;</span><br><span class="line">  return pthread_join(pthreadId_, NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br></pre></td></tr></table></figure>
+
+<p>CurrentThread.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_BASE_CURRENTTHREAD_H</span><br><span class="line">#define MUDUO_BASE_CURRENTTHREAD_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace CurrentThread</span><br><span class="line">&#123;</span><br><span class="line">  // internal,__thread修饰的变量是线程局部存储的。也就是私有的线程内的全局变量。</span><br><span class="line">  extern __thread int t_cachedTid;//线程真实pid（tid）的缓存，是为了提高获取tid的效率，减少系统调用的次数::syscall(SYS_gettid)</span><br><span class="line">  extern __thread char t_tidString[32];//tid字符串的表现形式</span><br><span class="line">  extern __thread int t_tidStringLength;</span><br><span class="line">  extern __thread const char* t_threadName;//每个线程的名称</span><br><span class="line">  void cacheTid();</span><br><span class="line"></span><br><span class="line">  inline int tid()</span><br><span class="line">  &#123;</span><br><span class="line">    if (__builtin_expect(t_cachedTid == 0, 0))//__builtin_expect 是 GCC（GNU Compiler Collection）提供的编译器内置函数。它用于告诉编译器一个分支条件的预期，以便编译器优化代码执行路径</span><br><span class="line">    &#123;</span><br><span class="line">      cacheTid();</span><br><span class="line">    &#125;</span><br><span class="line">    return t_cachedTid;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  inline const char* tidString() // for logging</span><br><span class="line">  &#123;</span><br><span class="line">    return t_tidString;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  inline int tidStringLength() // for logging</span><br><span class="line">  &#123;</span><br><span class="line">    return t_tidStringLength;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  inline const char* name()</span><br><span class="line">  &#123;</span><br><span class="line">    return t_threadName;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  bool isMainThread();</span><br><span class="line"></span><br><span class="line">  void sleepUsec(int64_t usec);  // for testing</span><br><span class="line"></span><br><span class="line">  string stackTrace(bool demangle);</span><br><span class="line">&#125;  // namespace CurrentThread</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_BASE_CURRENTTHREAD_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>CurrentThread.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/CurrentThread.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;cxxabi.h&gt;</span><br><span class="line">#include &lt;execinfo.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace CurrentThread</span><br><span class="line">&#123;</span><br><span class="line">__thread int t_cachedTid = 0;</span><br><span class="line">__thread char t_tidString[32];</span><br><span class="line">__thread int t_tidStringLength = 6;</span><br><span class="line">__thread const char* t_threadName = &quot;unknown&quot;;</span><br><span class="line">static_assert(std::is_same&lt;int, pid_t&gt;::value, &quot;pid_t should be int&quot;);</span><br><span class="line"></span><br><span class="line">string stackTrace(bool demangle)</span><br><span class="line">&#123;</span><br><span class="line">  string stack;</span><br><span class="line">  const int max_frames = 200;</span><br><span class="line">  void* frame[max_frames];</span><br><span class="line">  int nptrs = ::backtrace(frame, max_frames);</span><br><span class="line">  char** strings = ::backtrace_symbols(frame, nptrs);</span><br><span class="line">  if (strings)</span><br><span class="line">  &#123;</span><br><span class="line">    size_t len = 256;</span><br><span class="line">    char* demangled = demangle ? static_cast&lt;char*&gt;(::malloc(len)) : nullptr;</span><br><span class="line">    for (int i = 1; i &lt; nptrs; ++i)  // skipping the 0-th, which is this function</span><br><span class="line">    &#123;</span><br><span class="line">      if (demangle)</span><br><span class="line">      &#123;</span><br><span class="line">        // https://panthema.net/2008/0901-stacktrace-demangled/</span><br><span class="line">        // bin/exception_test(_ZN3Bar4testEv+0x79) [0x401909]</span><br><span class="line">        char* left_par = nullptr;</span><br><span class="line">        char* plus = nullptr;</span><br><span class="line">        for (char* p = strings[i]; *p; ++p)</span><br><span class="line">        &#123;</span><br><span class="line">          if (*p == &#x27;(&#x27;)</span><br><span class="line">            left_par = p;</span><br><span class="line">          else if (*p == &#x27;+&#x27;)</span><br><span class="line">            plus = p;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (left_par &amp;&amp; plus)</span><br><span class="line">        &#123;</span><br><span class="line">          *plus = &#x27;\0&#x27;;</span><br><span class="line">          int status = 0;</span><br><span class="line">          char* ret = abi::__cxa_demangle(left_par+1, demangled, &amp;len, &amp;status);</span><br><span class="line">          *plus = &#x27;+&#x27;;</span><br><span class="line">          if (status == 0)</span><br><span class="line">          &#123;</span><br><span class="line">            demangled = ret;  // ret could be realloc()</span><br><span class="line">            stack.append(strings[i], left_par+1);</span><br><span class="line">            stack.append(demangled);</span><br><span class="line">            stack.append(plus);</span><br><span class="line">            stack.push_back(&#x27;\n&#x27;);</span><br><span class="line">            continue;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      // Fallback to mangled names</span><br><span class="line">      stack.append(strings[i]);</span><br><span class="line">      stack.push_back(&#x27;\n&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">    free(demangled);</span><br><span class="line">    free(strings);</span><br><span class="line">  &#125;</span><br><span class="line">  return stack;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace CurrentThread</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Thread_test.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/Thread.h&quot;</span><br><span class="line">#include &quot;muduo/base/CurrentThread.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">void mysleep(int seconds)</span><br><span class="line">&#123;</span><br><span class="line">  timespec t = &#123; seconds, 0 &#125;;//timespec 是 POSIX 中定义的用于表示时间的结构体，包含了秒数和纳秒数两个成员</span><br><span class="line">  nanosleep(&amp;t, NULL); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void threadFunc()</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;tid=%d\n&quot;, muduo::CurrentThread::tid());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void threadFunc2(int x)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;tid=%d, x=%d\n&quot;, muduo::CurrentThread::tid(), x);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void threadFunc3()</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;tid=%d\n&quot;, muduo::CurrentThread::tid());</span><br><span class="line">  mysleep(1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Foo</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  explicit Foo(double x)</span><br><span class="line">    : x_(x)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void memberFunc()</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;tid=%d, Foo::x_=%f\n&quot;, muduo::CurrentThread::tid(), x_);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void memberFunc2(const std::string&amp; text)</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;tid=%d, Foo::x_=%f, text=%s\n&quot;, muduo::CurrentThread::tid(), x_, text.c_str());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  double x_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;pid=%d, tid=%d\n&quot;, ::getpid(), muduo::CurrentThread::tid());</span><br><span class="line"></span><br><span class="line">  muduo::Thread t1(threadFunc);</span><br><span class="line">  t1.start();</span><br><span class="line">  printf(&quot;t1.tid=%d\n&quot;, t1.tid());</span><br><span class="line">  t1.join();</span><br><span class="line"></span><br><span class="line">  muduo::Thread t2(std::bind(threadFunc2, 42),</span><br><span class="line">                   &quot;thread for free function with argument&quot;);</span><br><span class="line">  t2.start();</span><br><span class="line">  printf(&quot;t2.tid=%d\n&quot;, t2.tid());</span><br><span class="line">  t2.join();</span><br><span class="line"></span><br><span class="line">  Foo foo(87.53);</span><br><span class="line">  muduo::Thread t3(std::bind(&amp;Foo::memberFunc, &amp;foo),</span><br><span class="line">                   &quot;thread for member function without argument&quot;);</span><br><span class="line">  t3.start();</span><br><span class="line">  t3.join();</span><br><span class="line"></span><br><span class="line">  muduo::Thread t4(std::bind(&amp;Foo::memberFunc2, std::ref(foo), std::string(&quot;Shuo Chen&quot;)));</span><br><span class="line">  t4.start();</span><br><span class="line">  t4.join();</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    muduo::Thread t5(threadFunc3);</span><br><span class="line">    t5.start();</span><br><span class="line">    // t5 may destruct eariler than thread creation.</span><br><span class="line">  &#125;</span><br><span class="line">  mysleep(2);</span><br><span class="line">  &#123;</span><br><span class="line">    muduo::Thread t6(threadFunc3);</span><br><span class="line">    t6.start();</span><br><span class="line">    mysleep(2);</span><br><span class="line">    // t6 destruct later than thread creation.</span><br><span class="line">  &#125;</span><br><span class="line">  sleep(2);</span><br><span class="line">  printf(&quot;number of created threads %d\n&quot;, muduo::Thread::numCreated());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>从测试文件开始，主要是<strong>基于对象编程思想</strong>，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">muduo::Thread t2(std::bind(threadFunc2, 42),</span><br><span class="line">                   &quot;thread for free function with argument&quot;);</span><br><span class="line">t2.start();</span><br></pre></td></tr></table></figure>
+
+<p>将threadFunc2利用函数适配器传入func_(std::move(func))</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Thread::Thread(ThreadFunc func, const string&amp; n)</span><br><span class="line">  : started_(false),</span><br><span class="line">    joined_(false),</span><br><span class="line">    pthreadId_(0),</span><br><span class="line">    tid_(0),</span><br><span class="line">    func_(std::move(func)),</span><br><span class="line">    name_(n),</span><br><span class="line">    latch_(1)</span><br><span class="line">&#123;</span><br><span class="line">  setDefaultName();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void Thread::start()</span><br><span class="line">&#123;</span><br><span class="line">  assert(!started_);</span><br><span class="line">  started_ = true;</span><br><span class="line">  // FIXME: move(func_)</span><br><span class="line">  detail::ThreadData* data = new detail::ThreadData(func_, name_, &amp;tid_, &amp;latch_);</span><br><span class="line">  if (pthread_create(&amp;pthreadId_, NULL, &amp;detail::startThread, data))</span><br><span class="line">  &#123;</span><br><span class="line">    started_ = false;</span><br><span class="line">    delete data; // or no delete?</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;Failed in pthread_create&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    latch_.wait();</span><br><span class="line">    assert(tid_ &gt; 0);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后再start函数初始化data，调用detail::ThreadData构造函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ThreadData(ThreadFunc func,</span><br><span class="line">             const string&amp; name,</span><br><span class="line">             pid_t* tid,</span><br><span class="line">             CountDownLatch* latch)</span><br><span class="line">    : func_(std::move(func)),</span><br><span class="line">      name_(name),</span><br><span class="line">      tid_(tid),</span><br><span class="line">      latch_(latch)</span><br><span class="line">  &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>将上面的适配函数threadFunc2传入<code>func_(std::move(func))</code>，然后<code>pthread_create(&amp;pthreadId_, NULL, &amp;detail::startThread, data)</code>，创建一个线程进入detail::startThread，并将data传入，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void* startThread(void* obj)</span><br><span class="line">&#123;</span><br><span class="line">  ThreadData* data = static_cast&lt;ThreadData*&gt;(obj);</span><br><span class="line">  data-&gt;runInThread();</span><br><span class="line">  delete data;</span><br><span class="line">  return NULL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再调用runInThread，接着就是<code>func_();</code></p>
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p>异常处理是编程中的重要概念，可以帮助我们更好地处理错误和异常情况，避免程序崩溃或数据不一致。在 C++ 中，异常处理通过 <code>try-catch</code> 块来实现。</p>
+<p><code>try-catch</code> 块的处理规则如下：</p>
+<ol>
+<li><code>try</code> 块：在 <code>try</code> 后面的代码块中编写可能会抛出异常的代码。当程序执行到 <code>try</code> 块时，会尝试执行其中的代码。</li>
+<li><code>catch</code> 块：如果在 <code>try</code> 块中的代码执行过程中抛出了异常，程序会跳过 <code>try</code> 块中剩余的代码，并进入与异常类型匹配的 <code>catch</code> 块（如果有的话）。<ul>
+<li><code>catch</code> 后面跟着异常类型的参数，如 <code>catch (const std::exception&amp; ex)</code>，这表示该 <code>catch</code> 块用于捕获该类型的异常。可以根据需要捕获多种异常类型，每种类型用一个 <code>catch</code> 块来处理。</li>
+</ul>
+</li>
+<li>匹配异常类型：当程序抛出异常时，它会在 <code>try</code> 块外部搜索与异常类型匹配的 <code>catch</code> 块。它会按照代码中 <code>catch</code> 块的顺序进行匹配，找到第一个匹配的 <code>catch</code> 块来处理异常。匹配规则是：异常类型必须与 <code>catch</code> 块中指定的类型相同，或者是该类型的派生类。</li>
+<li>处理异常：一旦找到匹配的 <code>catch</code> 块，程序会执行该 <code>catch</code> 块中的代码，处理异常。在 <code>catch</code> 块中，通常会输出异常信息、记录日志、进行清理操作或者再次抛出异常。</li>
+<li>多个 <code>catch</code> 块：可以在一个 <code>try</code> 块中使用多个 <code>catch</code> 块来处理不同类型的异常。它们按照出现的顺序依次匹配，找到匹配的 <code>catch</code> 块后，其它的 <code>catch</code> 块不会被执行。</li>
+<li>嵌套 <code>try-catch</code>：可以在一个 <code>catch</code> 块中嵌套另一个 <code>try-catch</code> 块来处理更复杂的异常情况。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">try</span><br><span class="line">    &#123;</span><br><span class="line">      func_();</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;finished&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (const Exception&amp; ex)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      fprintf(stderr, &quot;reason: %s\n&quot;, ex.what());</span><br><span class="line">      fprintf(stderr, &quot;stack trace: %s\n&quot;, ex.stackTrace());</span><br><span class="line">      abort();</span><br><span class="line">    &#125;</span><br><span class="line">    catch (const std::exception&amp; ex)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      fprintf(stderr, &quot;reason: %s\n&quot;, ex.what());</span><br><span class="line">      abort();</span><br><span class="line">    &#125;</span><br><span class="line">    catch (...)</span><br><span class="line">    &#123;</span><br><span class="line">      muduo::CurrentThread::t_threadName = &quot;crashed&quot;;</span><br><span class="line">      fprintf(stderr, &quot;unknown exception caught in Thread %s\n&quot;, name_.c_str());</span><br><span class="line">      throw; // rethrow</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码是一个线程函数的异常处理代码块。它捕获可能抛出的异常并做出相应的处理。让我们逐个解释代码的含义：</p>
+<ol>
+<li><code>try</code>: 这是异常处理的起始点，表示接下来的代码可能会抛出异常。</li>
+<li><code>func_()</code>: 这是一个函数调用，其中 <code>func_()</code> 可能会抛出异常。</li>
+<li><code>catch (const Exception&amp; ex)</code>: 这是针对自定义的 <code>Exception</code> 类型的异常的捕获块。如果 <code>func_()</code> 抛出了 <code>Exception</code> 类型的异常，它会被这个 <code>catch</code> 块捕获。</li>
+<li><code>catch (const std::exception&amp; ex)</code>: 这是针对标准库 <code>std::exception</code> 类型的异常的捕获块。如果 <code>func_()</code> 抛出了标准库的异常，它会被这个 <code>catch</code> 块捕获。</li>
+<li><code>catch (...)</code>: 这是一个通配符的异常捕获块，可以捕获任何未被前面的 <code>catch</code> 块捕获的异常。通常用于处理未知类型的异常，或者为了在捕获后再次抛出异常。</li>
+</ol>
+<p>在处理不同类型的异常时，它们执行了类似的操作：</p>
+<ul>
+<li>设置当前线程的名称为 “crashed”，表示线程发生了异常。</li>
+<li>输出异常信息到标准错误流 (stderr) ，包括线程名称、异常原因和堆栈跟踪。</li>
+<li>如果是自定义的 <code>Exception</code> 或标准库的 <code>std::exception</code> 异常，则调用 <code>abort()</code> 终止程序执行。</li>
+<li>对于其他未知类型的异常，它会重新抛出异常，使得异常继续传播到更高级别的异常处理代码。</li>
+</ul>
+<p>总结：就是测试文件传入一个适配函数，给Thread类，然后再start函数初始化data，调用detail::ThreadData构造函数，设置data的func_函数，再创建线程，传入子线程回调函数，进入startThread，调用data-&gt;runInThread();后面就是正常使用适配函数，打印例如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void threadFunc2(int x)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;tid=%d, x=%d\n&quot;, muduo::CurrentThread::tid(), x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这就是<strong>基于对象编程</strong>思想编写的多线程封装</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/01/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%881%EF%BC%89/" rel="prev" title="muduo-基础库（1）">
+      <i class="fa fa-chevron-left"></i> muduo-基础库（1）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%B0%81%E8%A3%85Thread"><span class="nav-number">1.</span> <span class="nav-text">线程封装Thread</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">异常处理</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
