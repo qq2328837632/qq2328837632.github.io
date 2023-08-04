@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="日志类封装日志作用开发过程中:  调试错误 更好的理解程序  运行过程中:  诊断系统故障并处理  记录系统运行状态   日志级别TRACE  指出比DEBUG粒度更细的一些信息事件（开发过程中使用)  DEBUG  指出细粒度信息事件对调试应用程序是非常有帮助的。(开发过程中使用)  INFO  表明消息在粗粒度级别上突出强调应用程序的运行过程。  WARN  系统能正常运行，但可能会出现潜在错">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-基础库（4）">
+<meta property="og:url" content="http://example.com/2023/08/04/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="日志类封装日志作用开发过程中:  调试错误 更好的理解程序  运行过程中:  诊断系统故障并处理  记录系统运行状态   日志级别TRACE  指出比DEBUG粒度更细的一些信息事件（开发过程中使用)  DEBUG  指出细粒度信息事件对调试应用程序是非常有帮助的。(开发过程中使用)  INFO  表明消息在粗粒度级别上突出强调应用程序的运行过程。  WARN  系统能正常运行，但可能会出现潜在错">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/image-20230804163115384.png">
+<meta property="og:image" content="http://example.com/2023/08/04/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/image-20230804163115384.png">
+<meta property="article:published_time" content="2023-08-04T07:25:09.000Z">
+<meta property="article:modified_time" content="2023-08-04T09:18:07.111Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/image-20230804163115384.png">
+
+<link rel="canonical" href="http://example.com/2023/08/04/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-基础库（4） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/04/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-基础库（4）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-04 15:25:09 / 修改时间：17:18:07" itemprop="dateCreated datePublished" datetime="2023-08-04T15:25:09+08:00">2023-08-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="日志类封装"><a href="#日志类封装" class="headerlink" title="日志类封装"></a>日志类封装</h1><h2 id="日志作用"><a href="#日志作用" class="headerlink" title="日志作用"></a>日志作用</h2><p>开发过程中:</p>
+<ul>
+<li>调试错误</li>
+<li>更好的理解程序</li>
+</ul>
+<p>运行过程中:</p>
+<ul>
+<li><p>诊断系统故障并处理</p>
+</li>
+<li><p>记录系统运行状态</p>
+</li>
+</ul>
+<h2 id="日志级别"><a href="#日志级别" class="headerlink" title="日志级别"></a>日志级别</h2><p>TRACE</p>
+<ul>
+<li>指出比DEBUG粒度更细的一些信息事件（开发过程中使用)</li>
+</ul>
+<p>DEBUG</p>
+<ul>
+<li>指出细粒度信息事件对调试应用程序是非常有帮助的。(开发过程中使用)</li>
+</ul>
+<p>INFO</p>
+<ul>
+<li>表明消息在粗粒度级别上突出强调应用程序的运行过程。</li>
+</ul>
+<p>WARN</p>
+<ul>
+<li>系统能正常运行，但可能会出现潜在错误的情形。</li>
+</ul>
+<p>ERROR</p>
+<ul>
+<li>指出虽然发生错误事件，但仍然不影响系统的继续运行。</li>
+</ul>
+<p>FATAL</p>
+<ul>
+<li>指出每个严重的错误事件将会导致应用程序的退出。</li>
+</ul>
+<h2 id="Logger使用时序图"><a href="#Logger使用时序图" class="headerlink" title="Logger使用时序图"></a>Logger使用时序图</h2><p>Logger &#x3D;&gt; lmpl &#x3D;&gt; LogStream &#x3D;&gt; operator&lt;&lt;FixedBuffer &#x3D;&gt; g_output &#x3D;&gt; g_flush</p>
+<p>Logger：最外层的日志类</p>
+<p>Impl:内部实际的实现，比如如何格式化日志</p>
+<p> LogStream ：Impl类借助于它来输出日志，输出到FixedBuffer 缓冲区</p>
+<p>g_output：标准输出或文件</p>
+<p>g_flush：清空，写到文件里面,是将输出缓冲区中的数据立即刷新（写入）到相应的输出流（此处是标准输出流 <code>stdout</code>）</p>
+<p><img src="/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/image-20230804163115384.png" alt="image-20230804163115384"></p>
+<img src="/2023/08/04/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%884%EF%BC%89/image-20230804163115384.png" class title="This is an test image">
+
+<p>使用的时候：比如<code>LOG_TRACE &lt;&lt; &quot;trace CST&quot;</code>;首先调用匿名对象构造，调用stream(),实际上是调用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LogStream&amp; stream() &#123; return impl_.stream_; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就格式化了一些数据到缓冲区了，比如时间</p>
+<p>相关函数</p>
+<p>Logging.h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class TimeZone;</span><br><span class="line"></span><br><span class="line">class Logger</span><br><span class="line">&#123;</span><br><span class="line">public</span><br><span class="line">	enum LogLevel//从上往下0开始，一共有NUM_LOG_LEVELS=6个级别</span><br><span class="line">	  &#123;</span><br><span class="line">	    TRACE,</span><br><span class="line">	    DEBUG,</span><br><span class="line">	    INFO,</span><br><span class="line">	    WARN,</span><br><span class="line">	    ERROR,</span><br><span class="line">	    FATAL,</span><br><span class="line">	    NUM_LOG_LEVELS,</span><br><span class="line">	  &#125;;</span><br><span class="line">	  </span><br><span class="line">	  </span><br><span class="line">	LogStream&amp; stream() &#123; return impl_.stream_; &#125;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	typedef void (*OutputFunc)(const char* msg, int len);</span><br><span class="line">	  typedef void (*FlushFunc)();</span><br><span class="line">	  static void setOutput(OutputFunc);</span><br><span class="line">	  static void setFlush(FlushFunc);</span><br><span class="line">	  static void setTimeZone(const TimeZone&amp; tz);</span><br><span class="line">private:</span><br><span class="line"></span><br><span class="line">	class Impl//实际是Logger类内部的嵌套类</span><br><span class="line">	&#123;</span><br><span class="line">	 public:</span><br><span class="line">	  typedef Logger::LogLevel LogLevel;</span><br><span class="line">	  Impl(LogLevel level, int old_errno, const SourceFile&amp; file, int line);</span><br><span class="line">	  void formatTime();</span><br><span class="line">	  void finish();</span><br><span class="line">	</span><br><span class="line">	  Timestamp time_;</span><br><span class="line">	  LogStream stream_;</span><br><span class="line">	  LogLevel level_;</span><br><span class="line">	  int line_;</span><br><span class="line">	  SourceFile basename_;</span><br><span class="line">	&#125;;</span><br><span class="line">	</span><br><span class="line">	  Impl impl_;</span><br><span class="line">	</span><br><span class="line">&#125;;</span><br><span class="line">extern Logger::LogLevel g_logLevel;//设置级别</span><br><span class="line"></span><br><span class="line">inline Logger::LogLevel Logger::logLevel()//static inline muduo::Logger::LogLevel muduo::Logger::logLevel()</span><br><span class="line">&#123;</span><br><span class="line">  return g_logLevel;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//因为logLevel()大于后面的，所以最高级别只输出INFO</span><br><span class="line">#define LOG_TRACE if (muduo::Logger::logLevel() &lt;= muduo::Logger::TRACE) \</span><br><span class="line">  muduo::Logger(__FILE__, __LINE__, muduo::Logger::TRACE, __func__).stream()//调用的是匿名对象，会调用析构</span><br><span class="line">#define LOG_DEBUG if (muduo::Logger::logLevel() &lt;= muduo::Logger::DEBUG) \</span><br><span class="line">  muduo::Logger(__FILE__, __LINE__, muduo::Logger::DEBUG, __func__).stream()</span><br><span class="line">#define LOG_INFO if (muduo::Logger::logLevel() &lt;= muduo::Logger::INFO) \</span><br><span class="line">  muduo::Logger(__FILE__, __LINE__).stream()</span><br><span class="line">#define LOG_WARN muduo::Logger(__FILE__, __LINE__, muduo::Logger::WARN).stream()</span><br><span class="line">#define LOG_ERROR muduo::Logger(__FILE__, __LINE__, muduo::Logger::ERROR).stream()</span><br><span class="line">#define LOG_FATAL muduo::Logger(__FILE__, __LINE__, muduo::Logger::FATAL).stream()</span><br><span class="line">#define LOG_SYSERR muduo::Logger(__FILE__, __LINE__, false).stream()//false表示不会退出程序</span><br><span class="line">#define LOG_SYSFATAL muduo::Logger(__FILE__, __LINE__, true).stream()//true表示FATAL级别会退出程序</span><br></pre></td></tr></table></figure>
+
+<p>Logging.cc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">Logger::LogLevel initLogLevel()//这里可以更改级别，比如直接return Logger::TRACE;</span><br><span class="line">&#123;</span><br><span class="line">  if (::getenv(&quot;MUDUO_LOG_TRACE&quot;))</span><br><span class="line">    return Logger::TRACE;</span><br><span class="line">  else if (::getenv(&quot;MUDUO_LOG_DEBUG&quot;))</span><br><span class="line">    return Logger::DEBUG;</span><br><span class="line">  else</span><br><span class="line">    return Logger::INFO;</span><br><span class="line">&#125;</span><br><span class="line">Logger::LogLevel g_logLevel = initLogLevel();//设置级别</span><br><span class="line">const char* LogLevelName[Logger::NUM_LOG_LEVELS] =</span><br><span class="line">&#123;</span><br><span class="line">  &quot;TRACE &quot;,</span><br><span class="line">  &quot;DEBUG &quot;,</span><br><span class="line">  &quot;INFO  &quot;,</span><br><span class="line">  &quot;WARN  &quot;,</span><br><span class="line">  &quot;ERROR &quot;,</span><br><span class="line">  &quot;FATAL &quot;,</span><br><span class="line">&#125;;</span><br><span class="line">// helper class for known string length at compile time</span><br><span class="line">class T</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  T(const char* str, unsigned len)</span><br><span class="line">    :str_(str),</span><br><span class="line">     len_(len)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(strlen(str) == len_);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const char* str_;</span><br><span class="line">  const unsigned len_;</span><br><span class="line">&#125;;</span><br><span class="line">void defaultOutput(const char* msg, int len)</span><br><span class="line">&#123;</span><br><span class="line">  size_t n = fwrite(msg, 1, len, stdout);</span><br><span class="line">  //FIXME check n</span><br><span class="line">  (void)n;</span><br><span class="line">  //在这段代码中，fwrite 函数用于将数据写入到标准输出流 stdout 中。fwrite 的返回值是写入成功的数据项个数，通常用 size_t 类型表示。在实际应用中，为了避免编译器的未使用变量警告，常常使用 (void)n; 这样的语句来“使用”变量 n，以便在代码中明确表达它是有意的、预期的未使用状态。</span><br><span class="line"></span><br><span class="line">  //在一些编译器中，未使用变量可能会导致警告，因为它可能表明代码逻辑有问题。通过使用 (void)n; 这样的语句，开发者可以明确表示这个变量是有意的未使用状态，从而避免编译器警告，同时保持代码的清晰和易读.</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void defaultFlush()</span><br><span class="line">&#123;</span><br><span class="line">  fflush(stdout);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Logger::OutputFunc g_output = defaultOutput;</span><br><span class="line">//typedef void (*OutputFunc)(const char* msg, int len);--&gt;&gt;void g_output(const char* msg, int len)</span><br><span class="line">Logger::FlushFunc g_flush = defaultFlush;</span><br><span class="line">TimeZone g_logTimeZone;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo这是一个 C++ 中的命名空间（namespace）定义示例，名为 muduo，可以通过 muduo:: 前缀来访问命名空间内的成员</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line"></span><br><span class="line">Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile&amp; file, int line)</span><br><span class="line">  : time_(Timestamp::now()),</span><br><span class="line">    stream_(),</span><br><span class="line">    level_(level),</span><br><span class="line">    line_(line),</span><br><span class="line">    basename_(file)</span><br><span class="line">&#123;</span><br><span class="line">  formatTime();</span><br><span class="line">  CurrentThread::tid();//缓存一下当前线程的id</span><br><span class="line">  stream_ &lt;&lt; T(CurrentThread::tidString(), CurrentThread::tidStringLength());</span><br><span class="line">  stream_ &lt;&lt; T(LogLevelName[level], 6);</span><br><span class="line">  if (savedErrno != 0)</span><br><span class="line">  &#123;</span><br><span class="line">    stream_ &lt;&lt; strerror_tl(savedErrno) &lt;&lt; &quot; (errno=&quot; &lt;&lt; savedErrno &lt;&lt; &quot;) &quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Logger::Impl::formatTime()</span><br><span class="line">&#123;</span><br><span class="line">  int64_t microSecondsSinceEpoch = time_.microSecondsSinceEpoch();</span><br><span class="line">  time_t seconds = static_cast&lt;time_t&gt;(microSecondsSinceEpoch / Timestamp::kMicroSecondsPerSecond);</span><br><span class="line">  int microseconds = static_cast&lt;int&gt;(microSecondsSinceEpoch % Timestamp::kMicroSecondsPerSecond);</span><br><span class="line">  if (seconds != t_lastSecond)</span><br><span class="line">  &#123;</span><br><span class="line">    t_lastSecond = seconds;</span><br><span class="line">    struct DateTime dt;</span><br><span class="line">    if (g_logTimeZone.valid())</span><br><span class="line">    &#123;</span><br><span class="line">      dt = g_logTimeZone.toLocalTime(seconds);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      dt = TimeZone::toUtcTime(seconds);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int len = snprintf(t_time, sizeof(t_time), &quot;%4d%02d%02d %02d:%02d:%02d&quot;,</span><br><span class="line">        dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);</span><br><span class="line">    assert(len == 17); (void)len;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (g_logTimeZone.valid())</span><br><span class="line">  &#123;</span><br><span class="line">    Fmt us(&quot;.%06d &quot;, microseconds);</span><br><span class="line">    assert(us.length() == 8);</span><br><span class="line">    stream_ &lt;&lt; T(t_time, 17) &lt;&lt; T(us.data(), 8);//将时间和格式化的微秒输出到缓冲区</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    Fmt us(&quot;.%06dZ &quot;, microseconds);</span><br><span class="line">    assert(us.length() == 9);</span><br><span class="line">    stream_ &lt;&lt; T(t_time, 17) &lt;&lt; T(us.data(), 9);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Logger::Logger(SourceFile file, int line, LogLevel level)</span><br><span class="line">  : impl_(level, 0, file, line)</span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Logger::Logger(SourceFile file, int line, bool toAbort)</span><br><span class="line">  : impl_(toAbort?FATAL:ERROR, errno, file, line)//根据muduo::Logger(__FILE__, __LINE__, true)来判断级别是FATAL还是ERROR</span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Logger::~Logger()</span><br><span class="line">&#123;</span><br><span class="line">  impl_.finish();</span><br><span class="line">  const LogStream::Buffer&amp; buf(stream().buffer());//引用的缓冲区，所以不需要拷贝</span><br><span class="line">  g_output(buf.data(), buf.length());//输出，调用defaultOutput</span><br><span class="line">  if (impl_.level_ == FATAL)</span><br><span class="line">  &#123;</span><br><span class="line">    g_flush();//defaultFlush</span><br><span class="line">    abort();//终止程序</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Logger::setLogLevel(Logger::LogLevel level)</span><br><span class="line">&#123;</span><br><span class="line">  g_logLevel = level;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Logger::setOutput(OutputFunc out)</span><br><span class="line">&#123;</span><br><span class="line">  g_output = out;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果需要输出到文件当中就可以在测试文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">用文件描述符而不用stdout</span><br><span class="line">muduo::Logger::setOutput(outputFunc);</span><br><span class="line">muduo::Logger::setFlush(flushFunc);</span><br></pre></td></tr></table></figure>
+
+<p>重新指定函数</p>
+<hr>
+<h3 id="fmt"><a href="#fmt" class="headerlink" title="fmt"></a>fmt</h3><p>C++ 的库 fmt （即 fmtlib），用于格式化字符串输出。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fmt us(&quot;.%06d &quot;, microseconds);</span><br></pre></td></tr></table></figure>
+
+<p>这行代码定义了一个 <code>Fmt</code> 对象 <code>us</code>，并使用格式化字符串来初始化它。<code>Fmt</code> 可能是一个自定义的类或者别名，没有提供完整的上下文信息，所以具体实现和含义可能因上下文而异。</p>
+<p>假设 <code>Fmt</code> 是一个自定义类，那么 <code>. %06d </code> 是格式化字符串的部分，它包含了以下内容：</p>
+<ol>
+<li><code>.</code>：一个点号，表示在输出中添加一个小数点。</li>
+<li><code>%06d</code>：这是格式说明符，表示将一个整数（microseconds）格式化为一个带有六位数的十进制整数，并且如果位数不足六位，则在前面用零填充。</li>
+</ol>
+<p>例如，假设 <code>microseconds</code> 的值为 <code>12345</code>，那么 <code>Fmt us(&quot;.%06d &quot;, microseconds)</code> 将返回字符串 “.012345 “（注意：此处字符串末尾有一个空格）。</p>
+<h3 id="fwrite"><a href="#fwrite" class="headerlink" title="fwrite"></a>fwrite</h3><p> C 标准库中的 <code>fwrite</code> 函数，它的作用是将数据写入到标准输出流 <code>stdout</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fwrite(msg, 1, len, stdout);</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><code>msg</code> 是一个指向要写入的数据的指针，通常是一个字符数组或者字节流的指针。</li>
+<li><code>1</code> 是写入数据块的大小，表示每个数据项的大小为 1 字节。</li>
+<li><code>len</code> 表示要写入的数据项的个数，通常用 <code>size_t</code> 类型表示。</li>
+</ul>
+<p>该函数将 <code>len</code> 个数据项（每个数据项大小为 1 字节）从 <code>msg</code> 指针所指向的内存地址写入到标准输出流 <code>stdout</code> 中。在写入成功时，它会返回成功写入的数据项个数，通常等于 <code>len</code>。失败时，返回值可能会小于 <code>len</code>，或者出现错误。所以，实际应用中一般会检查返回值来确保写入操作成功。</p>
+<h3 id="fflush"><a href="#fflush" class="headerlink" title="fflush"></a>fflush</h3><p>C 标准库中的 <code>fflush</code> 函数，它的作用是将输出缓冲区中的数据立即刷新（写入）到相应的输出流（此处是标准输出流 <code>stdout</code>）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fflush(stdout);</span><br></pre></td></tr></table></figure>
+
+<p>在 C&#x2F;C++ 程序中，标准输出流 <code>stdout</code> 是一个带有输出缓冲区的流。当使用输出函数（如 <code>printf</code> 或 <code>fwrite</code>）输出数据时，这些数据会先被放入输出缓冲区，而不是立即输出到终端或文件。输出缓冲区会在满时、程序结束时、或者调用 <code>fflush</code> 函数时进行刷新，将数据真正写入到目标输出设备。</p>
+<p>调用 <code>fflush(stdout)</code> 可以强制将输出缓冲区中的数据立即刷新到终端，这在某些情况下是必要的，例如：</p>
+<ol>
+<li>当需要在输出内容后立即显示在屏幕上，而不等到输出缓冲区满或程序结束时。</li>
+<li>在输出文件和控制台混合使用时，确保输出的顺序正确。</li>
+<li>当程序需要在输出之后执行一些可能导致崩溃的操作，为了确保输出的数据已经被正确保存。</li>
+</ol>
+<p>需要注意的是，频繁地调用 <code>fflush</code> 可能会导致性能下降，因为刷新输出缓冲区通常比较耗时。在一般情况下，系统会自动地在合适的时机进行缓冲区刷新，而无需手动调用 <code>fflush</code>。但在某些特殊情况下，手动调用 <code>fflush</code> 是有必要的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/03/muduo-%E5%9F%BA%E7%A1%80%E5%BA%93%EF%BC%883%EF%BC%89/" rel="prev" title="muduo-基础库（3）">
+      <i class="fa fa-chevron-left"></i> muduo-基础库（3）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E7%B1%BB%E5%B0%81%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">日志类封装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">日志作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E7%BA%A7%E5%88%AB"><span class="nav-number">1.2.</span> <span class="nav-text">日志级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logger%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="nav-number">1.3.</span> <span class="nav-text">Logger使用时序图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fmt"><span class="nav-number">1.3.1.</span> <span class="nav-text">fmt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fwrite"><span class="nav-number">1.3.2.</span> <span class="nav-text">fwrite</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fflush"><span class="nav-number">1.3.3.</span> <span class="nav-text">fflush</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -147,6 +147,619 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/10/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/10/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c/" class="post-title-link" itemprop="url">第八天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-10 16:38:50" itemprop="dateCreated datePublished" datetime="2023-04-10T16:38:50+08:00">2023-04-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-16 13:41:42" itemprop="dateModified" datetime="2023-04-16T13:41:42+08:00">2023-04-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="stack容器"><a href="#stack容器" class="headerlink" title="stack容器"></a>stack容器</h2><h3 id="stack基本概念"><a href="#stack基本概念" class="headerlink" title="stack基本概念"></a>stack基本概念</h3><p>概念: stack是一种先进后出(First In Last Out,FILO)的数据结构，它只有一个出口</p>
+<p>栈中只有顶端的元素才可以被外界使用，因此栈不允许有遍历行为</p>
+<h3 id="stack常用接口"><a href="#stack常用接口" class="headerlink" title="stack常用接口"></a>stack常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
+<p>构造函数:</p>
+<ul>
+<li>stack<T> stk;&#x2F;&#x2F;stack采用模板类实现, stack对象的默认构造形式</T></li>
+<li>stack( const stack &amp;stk);&#x2F;&#x2F;拷贝构造函数</li>
+</ul>
+<p>赋值操作:</p>
+<ul>
+<li>stack&amp; operator&#x3D;(const stack &amp;stk);&#x2F;&#x2F;重载等号操作符</li>
+</ul>
+<p>数据存取:</p>
+<ul>
+<li>push(elem);&#x2F;&#x2F;向栈顶添加元素</li>
+<li>pop();&#x2F;&#x2F;从栈顶移除第一个元素</li>
+<li>top();&#x2F;&#x2F;返回栈顶元素</li>
+</ul>
+<p>大小操作:</p>
+<ul>
+<li>empty();&#x2F;&#x2F;判断堆栈是否为空</li>
+<li>size();&#x2F;&#x2F;返回栈的大小</li>
+</ul>
+<h2 id="queue容器"><a href="#queue容器" class="headerlink" title="queue容器"></a>queue容器</h2><h3 id="queue基本概念"><a href="#queue基本概念" class="headerlink" title="queue基本概念"></a>queue基本概念</h3><p>概念:Queud是一种先进先出(First ln First Out,FIFO)的数据结构，它有两个出口</p>
+<ul>
+<li>队列容器允许从一端新增元素，从另一端移除元素</li>
+<li>队列中只有队头和队尾才可以被外界使用，因此队列不允许有遍历行为</li>
+<li>队列中进数据称为—入队push</li>
+<li>队列中出数据称为—出队pop</li>
+</ul>
+<h3 id="queue-常用接口"><a href="#queue-常用接口" class="headerlink" title="queue 常用接口"></a>queue 常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
+<p>构造函数:</p>
+<ul>
+<li>queue<T> que;&#x2F;&#x2F;queue采用模板类实现，queue对象的默认构造形式</T></li>
+<li>queue(const queue &amp;que) ;&#x2F;&#x2F;拷贝构造函数</li>
+</ul>
+<p>赋值操作:</p>
+<ul>
+<li>queue&amp; operator&#x3D;(const queue &amp;que) ;&#x2F;&#x2F;重载等号操作符</li>
+</ul>
+<p>数据存取:</p>
+<ul>
+<li>push(elem) ;&#x2F;&#x2F;往队尾添加元素</li>
+<li>pop();&#x2F;&#x2F;从队头移除第一个元素</li>
+<li>back();&#x2F;&#x2F;返回最后一个元素</li>
+<li>front();&#x2F;&#x2F;返回第一个元素</li>
+</ul>
+<p>大小操作:</p>
+<ul>
+<li>empty();&#x2F;&#x2F;判断堆栈是否为空</li>
+<li>size();&#x2F;&#x2F;返回栈的大小</li>
+</ul>
+<h2 id="list容器"><a href="#list容器" class="headerlink" title="list容器"></a>list容器</h2><h3 id="list基本概念"><a href="#list基本概念" class="headerlink" title="list基本概念"></a>list基本概念</h3><p>功能:将数据进行链式存储</p>
+<p>链表(list)是一种物理存储单元上非连续的存储结构，数据元素的逻辑顺序是通过链表中的指针链接实现的</p>
+<p>链表的组成:链表由一系列结点组成</p>
+<p>结点的组成:一个是存储数据元素的数据域，另一个是存储下一个结点地址的指针域</p>
+<p>STL中的链表是一个双向循环链表</p>
+<p>由于链表的存储方式并不是连续的内存空间，因此链表list中的迭代器只支持前移和后移，属于双向迭代器</p>
+<p>list的优点:</p>
+<ul>
+<li>采用动态存储分配，不会造成内存浪费和溢出</li>
+<li>链表执行插入和删除操作十分方便，修改指针即可，不需要移动大量元素</li>
+</ul>
+<p>list的缺点:</p>
+<ul>
+<li>链表灵活，但是空间(指针域)和时间(遍历额外耗费较大</li>
+</ul>
+<p>List有一个重要的性质，插入操作和删除操作都不会造成原有list迭代器的失效，这在vector是不成立的。</p>
+<p>总结:STL中List和vector是两个最常被使用的容器，各有优缺点</p>
+<h3 id="list构造函数"><a href="#list构造函数" class="headerlink" title="list构造函数"></a>list构造函数</h3><p>函数原型:</p>
+<ul>
+<li>list<T> lst;&#x2F;&#x2F;list采用采用模板类实现,对象的默认构造形式:</T></li>
+<li>list(beg,end) ;&#x2F;&#x2F;构造函数将[beg, end)区间中的元素拷贝给本身。</li>
+<li>list(n,elem) ;&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
+<li>list(const list &amp;lst);&#x2F;&#x2F;拷贝构造函数。</li>
+</ul>
+<p>总结:list构造方式同其他几个STL常用容器，熟练掌握即可</p>
+<h3 id="list赋值和交换"><a href="#list赋值和交换" class="headerlink" title="list赋值和交换"></a>list赋值和交换</h3><p>函数原型:</p>
+<ul>
+<li>assign(beg,_end) ;&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
+<li>assign(n, eiem) ;&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
+<li>list&amp; operator&#x3D;(const list &amp;lst);&#x2F;&#x2F;重载等号操作符</li>
+<li>swap(lst);&#x2F;&#x2F;将lst与本身的元素互换。</li>
+</ul>
+<h3 id="list大小操作"><a href="#list大小操作" class="headerlink" title="list大小操作"></a>list大小操作</h3><p>函数原型:</p>
+<ul>
+<li>size();&#x2F;&#x2F;返回容器中元素的个数</li>
+<li>empty();&#x2F;&#x2F;判断容器是否为空</li>
+<li>resize(num ) ;&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以默认值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
+<li>resize(num，elem);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以elem值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
+</ul>
+<h3 id="list插入和删除"><a href="#list插入和删除" class="headerlink" title="list插入和删除"></a>list插入和删除</h3><p>函数原型:</p>
+<ul>
+<li>push_back(elem);&#x2F;&#x2F;在容器尾部加入一个元素.</li>
+<li>pop_back();&#x2F;&#x2F;删除容器中最后一个元素</li>
+<li>push_front(elem);&#x2F;&#x2F;在容器开头插入一个元素.</li>
+<li>pop_front();&#x2F;&#x2F;从容器开头移除第一个元素</li>
+<li>insert(pos,elem);&#x2F;&#x2F;在pos位置插elem元素的拷贝，返回新数据的位置。</li>
+<li>insert(pos,n,elem);&#x2F;&#x2F;在pos位置插入n个elem数据，无返回值。</li>
+<li>insert(pos,beg,end);&#x2F;&#x2F;在pos位置插入[beg,end)区间的数据，无返回值。</li>
+<li>clear();&#x2F;&#x2F;移除容器的所有数据</li>
+<li>erase(beg,end);&#x2F;&#x2F;删除[beg,end)区间的数据，返回下一个数据的位置。</li>
+<li>erase(pos);&#x2F;&#x2F;删除pos位置的数据，返回下一个数据的位置。</li>
+<li>remove(elem);&#x2F;&#x2F;删除容器中所有与elem值匹配的元素。</li>
+</ul>
+<h3 id="list数据存取"><a href="#list数据存取" class="headerlink" title="list数据存取"></a>list数据存取</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//L1[0]不可以用[]访问list容器中的元素</span><br><span class="line">//L1.at(O)不可以用at方式访问list容器中的元素</span><br><span class="line">//原因是list本质链表，不是用连续线性空间存储数据，迭代器也是不支持随机访问的</span><br><span class="line">cout &lt;&lt;&quot;第一个元素为:&quot;&lt;&lt; L1.front() &lt;&lt; endl;</span><br><span class="line">cout&lt;&lt;&quot;最后一个元素为:&quot;&lt;&lt; L1. back() &lt;&lt; endl ;</span><br><span class="line">//验证迭代器是不支持随机访问的</span><br><span class="line">list&lt;int&gt; : :iterator it = L1. begin();</span><br><span class="line">it++;//支持双向,可以用来判断其它容器是否支持双向访问，随机访问也一样</span><br><span class="line">it--;</span><br><span class="line">//it = it + 1;//不支持随机访问</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li>list容器中不可以通过[]或者at方式访问数据</li>
+<li>返回第一个元素— front</li>
+<li>返回最后一个元素— back</li>
+</ul>
+<h3 id="list反转和排序"><a href="#list反转和排序" class="headerlink" title="list反转和排序"></a>list反转和排序</h3><p>函数原型:</p>
+<ul>
+<li>reverse();&#x2F;&#x2F;反转链表</li>
+<li>sort(); &#x2F;&#x2F;链表排序</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//指定排序规则</span><br><span class="line">bool mycompare( int val1 , int val2)&#123;</span><br><span class="line">	return val1 &gt; val2;</span><br><span class="line">&#125;</span><br><span class="line">//所有不支持随机访问迭代器的容器，不可以用标准算法</span><br><span class="line">//不支持随机访问迭代器的容器，内部会提供对应一些算法</span><br><span class="line">//sort(L1.begin()，L1.end() ) ;</span><br><span class="line">L1.sort();//默认排序规则从小到大升序</span><br><span class="line">L.sort( myCompare); //指定规则，从大到小</span><br></pre></td></tr></table></figure>
+
+<p>总结:</p>
+<ul>
+<li><p>对于自定义数据类型，必须要指定排序规则(</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bool mycompare( int val1 , int val2)&#123;</span><br><span class="line">	return val1 &gt; val2;</span><br><span class="line">&#125;//val可以是任何类型，注意引用</span><br></pre></td></tr></table></figure>
+
+<p>)，否则编译器不知道如何进行排序</p>
+</li>
+<li><p>高级排序只是在排序规则上再进行一次逻辑规则制定，并不复杂</p>
+</li>
+</ul>
+<h2 id="set-x2F-multiset容器"><a href="#set-x2F-multiset容器" class="headerlink" title="set&#x2F; multiset容器"></a>set&#x2F; multiset容器</h2><h3 id="set基本概念"><a href="#set基本概念" class="headerlink" title="set基本概念"></a>set基本概念</h3><p>简介:</p>
+<ul>
+<li>所有元素都会在插入时自动被排序</li>
+</ul>
+<p>本质:</p>
+<ul>
+<li>set&#x2F;multiset属于关联式容器，底层结构是用二叉树实现。</li>
+</ul>
+<p>set和multiset区别:</p>
+<ul>
+<li>set不允许容器中有重复的元素（无resize）</li>
+<li>multiset允许容器中有重复的元素</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>set容器插入数据时用insert</li>
+<li>set容器插入数据的数据会自动排序</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>统计大小— size</li>
+<li>判断是否为空— empty</li>
+<li>交换容器— swap</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li><p>insert(elem);&#x2F;&#x2F;在容器中插入元素。</p>
+</li>
+<li><p>clear();&#x2F;&#x2F;清除所有元素</p>
+</li>
+<li><p>erase(pos);&#x2F;&#x2F;删除pos迭代器所指的元素，返回下一个元素的迭代器。</p>
+</li>
+<li><p>erase(beg, end);&#x2F;&#x2F;删除区间[beg,end)的所有元素，返回下一个元素的迭代器。</p>
+</li>
+<li><p>erase(elem);&#x2F;&#x2F;删除容器中值为elem的元素。</p>
+</li>
+<li><p>find(key ) ;&#x2F;&#x2F;查找key是否存在,若存在，返回该键的元素的迭代器;若不存在，返回set.end();</p>
+</li>
+<li><p>count(key);&#x2F;&#x2F;统计key的元素个数,对于set而言统计结果要么是0要么是1</p>
+</li>
+</ul>
+<h3 id="set和multiset区别"><a href="#set和multiset区别" class="headerlink" title="set和multiset区别"></a>set和multiset区别</h3><p>区别:</p>
+<ul>
+<li>set不可以插入重复数据，而multiset可以</li>
+<li>set插入数据的同时会返回插入结果，表示插入是否成功. multiset不会检测数据，因此可以插入重复数据</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>如果不允许插入重复数据可以利用set</li>
+<li>如果需要插入重复数据利用multiset</li>
+</ul>
+<h3 id="pair对组创建"><a href="#pair对组创建" class="headerlink" title="pair对组创建"></a>pair对组创建</h3><p>功能描述:</p>
+<ul>
+<li>成对出现的数据，利用对组可以返回两个数据</li>
+</ul>
+<p>两种创建方式:</p>
+<ul>
+<li>pair&lt;type, tyie&gt; p ( value1, value2 );</li>
+<li>pair&lt;type, type&gt; p &#x3D; make_pair( value1，value2 );</li>
+</ul>
+<h3 id="set容器排序"><a href="#set容器排序" class="headerlink" title="set容器排序"></a>set容器排序</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class MyCompare&#123;</span><br><span class="line">public:</span><br><span class="line">	bool operator()(int v1,int v2)//重载（），//自定义数据类型都会指定排序规则</span><br><span class="line">	&#123;</span><br><span class="line">		return v1 &gt; v2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test()&#123;</span><br><span class="line">	set&lt;int，MyCompare&gt;s2;//要放在插入之前，int与上面传入的数据类型一致,MyCompare是仿函数</span><br><span class="line">	s2.insert(10) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:利用仿函数可以指定set容器的排序规则</p>
+<p>总结:<br>对于自定义数据类型，set必须指定排序规则才可以插入数据</p>
+<h2 id="map-x2F-multimap容器"><a href="#map-x2F-multimap容器" class="headerlink" title="map&#x2F;multimap容器"></a>map&#x2F;multimap容器</h2><h3 id="map基本概念"><a href="#map基本概念" class="headerlink" title="map基本概念"></a>map基本概念</h3><p>简介:</p>
+<ul>
+<li>map中所有元素都是pair</li>
+<li>pair中第一个元素为key(键值)，起到索引作期，第二个元素为value(实值)·所有元素都会</li>
+</ul>
+<p>本质:</p>
+<ul>
+<li>map&#x2F;multimap属于关联式容器，底层结构是用二叉树实现。</li>
+</ul>
+<p>优点:</p>
+<ul>
+<li>可以根据key值快速找到value值</li>
+</ul>
+<p>map和multimap区别:</p>
+<ul>
+<li>map不允许容器中有重复key值元素</li>
+<li>multimap允许容器中有重复key值元素</li>
+</ul>
+<h3 id="map构造和赋值"><a href="#map构造和赋值" class="headerlink" title="map构造和赋值"></a>map构造和赋值</h3><p>构造:</p>
+<ul>
+<li>map&lt;T1，T2&gt; mp;&#x2F;&#x2F;map默认构造函数:</li>
+<li>map(const ma &amp;mp );&#x2F;&#x2F;拷贝构造函数</li>
+</ul>
+<p>赋值:</p>
+<ul>
+<li>map&amp; operator&#x3D;(const map &amp;mp);&#x2F;&#x2F;重载等号操作符</li>
+</ul>
+<p>总结: map中所有元素都是成对出现，插入数据时候要使用对组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map&lt;int,int&gt;m;//默认构造</span><br><span class="line">m.insert(pair&lt;int, int&gt;(1，10));</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>统计大小— size</p>
+</li>
+<li><p>判断是否为空— empty</p>
+</li>
+<li><p>交换容器— swap</p>
+</li>
+<li><p>insert(elem);&#x2F;&#x2F;在容器中插入元素。</p>
+</li>
+<li><p>clear();&#x2F;&#x2F;清除所有元素</p>
+</li>
+<li><p>erase(pos);&#x2F;&#x2F;删除pos迭代器所指的元素，返回下一个元素的迭代器。</p>
+</li>
+<li><p>erase(beg, end);&#x2F;&#x2F;删除区间[beg,end)的所有元素，返回下一个元素的迭代器。</p>
+</li>
+<li><p>erase(key);&#x2F;&#x2F;删除容器中值为elem的元素。</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">m[4] = 40;</span><br><span class="line">//[]不建议插入，用途	可以利用key访问到value</span><br><span class="line">cout &lt;&lt; m[4]&lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>find(key ) ;&#x2F;&#x2F;查找key是否存在,若存在，返回该键的元素的迭代器;若不存在，返回set.end();返回迭代器，需要迭代器接受map&lt;int,int&gt;: :iterator pos &#x3D; m. find(3) ;</li>
+<li>count(key);&#x2F;&#x2F;统计key的元素个数,对于set而言统计结果要么是0要么是1</li>
+</ul>
+<p>map不允许插入重复key元素，count统计而言结果要么是0要么是1</p>
+<p>multimap的count统计可能大于1</p>
+<h3 id="map容器排序"><a href="#map容器排序" class="headerlink" title="map容器排序"></a>map容器排序</h3><p>学习目标:</p>
+<ul>
+<li>map容器默认排序规则为按照key值进行从小到大排序，掌握如何改变排序规则</li>
+</ul>
+<p>主要技术点:</p>
+<ul>
+<li>利用仿函数，可以改变排序规则</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>利用仿函数可以指定map容器的排序规则</li>
+<li>对于自定义数据类型，map必须要指定排序规则，同set容器</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/" class="post-title-link" itemprop="url">第七天 c++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-08 20:26:50" itemprop="dateCreated datePublished" datetime="2023-04-08T20:26:50+08:00">2023-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-28 14:32:11" itemprop="dateModified" datetime="2023-04-28T14:32:11+08:00">2023-04-28</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="容器算法迭代器初识"><a href="#容器算法迭代器初识" class="headerlink" title="容器算法迭代器初识"></a>容器算法迭代器初识</h1><h2 id="vector存放内置数据类型"><a href="#vector存放内置数据类型" class="headerlink" title="vector存放内置数据类型"></a>vector存放内置数据类型</h2><p>容器:<code>vector</code></p>
+<p>算法:<code>for_each</code></p>
+<p>迭代器:<code>vector&lt;int&gt;::iterator</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;algorilhm&gt;</span><br><span class="line">void MyPrint(int val)&#123;</span><br><span class="line">	cout &lt;&lt; val &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test01() &#123;</span><br><span class="line">	//创建vector容器对象，并且通过模板参数指定容器中存放的数据的类型</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//向容器中放数据</span><br><span class="line">	v.push_back(10);</span><br><span class="line">	v.push_back(20);</span><br><span class="line">	v.push_back(30);</span><br><span class="line">	v.push_back(40);</span><br><span class="line">	//每一个容器都有自己的迭代器,迭代器是用来遍历容器中的元素</span><br><span class="line">	//v.begin()返回迭代器，这个迭代器指向容器中第一个数据</span><br><span class="line">	//v.end()返回迭代器，这个迭代器指向容器元素的最后一个元素的下一个位置</span><br><span class="line">	//vector&lt;int&gt;::iterator拿到vector&lt;int&gt;这种容器的迭代器类型</span><br><span class="line">	vector&lt;int&gt; ::iterator pBegin = v.begin();</span><br><span class="line">	vector&lt;int&gt; ::iterator pEnd = v.end();</span><br><span class="line">	//第—种遍历方式:</span><br><span class="line">	while (pBegin ! = pEnd)&#123;</span><br><span class="line">		cout &lt;&lt;*pBegin &lt;&lt; endl;</span><br><span class="line">		pBegin++;</span><br><span class="line">	&#125;</span><br><span class="line">	//第二种遍历方式:</span><br><span class="line">	for (vector&lt;int&gt; : :iterator it = v.begin(); it != v.end( ); it++) &#123;</span><br><span class="line">		cout &lt;&lt;*it &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">	//第三种遍历方式:</span><br><span class="line">	//使用STL提供标准遍历算法头文件algorithm</span><br><span class="line">	for_each(v.begin(), v.end( ), MyPrint);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Vector容器嵌套容器"><a href="#Vector容器嵌套容器" class="headerlink" title="Vector容器嵌套容器"></a>Vector容器嵌套容器</h2><p>学习目标:</p>
+<p>容器中嵌套容器，我们将所有数据进行遍历输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//容器嵌套容器</span><br><span class="line">void test01() &#123;</span><br><span class="line">	vector&lt; vector&lt;int&gt; &gt;v ;</span><br><span class="line">	vector&lt;int&gt; v1;</span><br><span class="line">	vector&lt;int&gt; v2;</span><br><span class="line">	vector&lt;int&gt; v3;</span><br><span class="line">	vector&lt;int&gt; v4;</span><br><span class="line">	for (int i = ; i &lt; 4; i++) &#123;</span><br><span class="line">		v1.push_back(i + 1);</span><br><span class="line">		v2.push_back(i + 2);</span><br><span class="line">		v3.push_back(i + 3);</span><br><span class="line">		v4.push_back(i + 4);</span><br><span class="line">	&#125;</span><br><span class="line">	//将容器元素插入到vector v中</span><br><span class="line">	v.push_back(v1);</span><br><span class="line">	v.push_back(v2);</span><br><span class="line">	v.push_back(v3);</span><br><span class="line">	v.push_back(v4);</span><br><span class="line">	for (vector&lt;vector&lt;int&gt;&gt;::iterator it = v.begin(); it != v.end(); it++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (vector&lt;int&gt;: :iterator vit = (*it).begin(); vit != (*it).end(); vit++) </span><br><span class="line">		&#123;</span><br><span class="line">			cout &lt;&lt;*vit &lt;&lt; &quot; &quot;;</span><br><span class="line">		&#125;</span><br><span class="line">	cout&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="string容器"><a href="#string容器" class="headerlink" title="string容器"></a>string容器</h2><h3 id="string赋值操作"><a href="#string赋值操作" class="headerlink" title="string赋值操作"></a>string赋值操作</h3><p>功能描述:</p>
+<ul>
+<li>给string字符串进行赋值</li>
+</ul>
+<p>赋值的函数原型:</p>
+<ul>
+<li>string&amp; operator&#x3D;(const char* s );&#x2F;&#x2F;char*类型字符串赋值给当前的字符串</li>
+<li>string&amp; operator&#x3D;(const string &amp;s );&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
+<li>string&amp; operator&#x3D;( char c);&#x2F;&#x2F;字符赋值给当前的字符串</li>
+<li>string&amp; assign(const char *s ) ;&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
+<li>string&amp; assign(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符赋给当前的字符串</li>
+<li>string&amp; assign( const sting &amp;s );&#x2F;&#x2F;把字符串s赋给当前字符串</li>
+<li>string&amp; assign(int n, char c);&#x2F;&#x2F;用n个字符c赋给当前字符串</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">void test01()&#123;</span><br><span class="line">	str1 = &quot;hello vorld&quot;;</span><br><span class="line">	cout &lt;&lt; &quot;str1 - &quot; &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str2;</span><br><span class="line">	str2 = str1;</span><br><span class="line">	cout &lt;&lt; &quot;str2 = &quot; &lt;&lt; str2 &lt;&lt; endl;</span><br><span class="line">	string str3;</span><br><span class="line">	str3 = &#x27;a &#x27;;</span><br><span class="line">	cout &lt;&lt; &quot;str3 = &quot; &lt;&lt; str3 &lt;&lt; endl;</span><br><span class="line">	string str4;</span><br><span class="line">	str4.assign( &quot;hello c++&quot;);</span><br><span class="line">	cout &lt;&lt; &quot;str4 = &quot; &lt;&lt;str4 &lt;&lt; endl;</span><br><span class="line">	string str5;</span><br><span class="line">	str5.assign(&quot;hello c++&quot;,5);</span><br><span class="line">	cout &lt;&lt; &quot;str5 =&lt;&lt; str5 &lt;&lt; endl;</span><br><span class="line">	string str6;</span><br><span class="line">	str6.assign(str5);</span><br><span class="line">	cout &lt;&lt; &quot;str6 = &quot; &lt;&lt; str6 &lt;&lt; endl;</span><br><span class="line">	string str7;</span><br><span class="line">	str7 .assign(5，&#x27;x&#x27;);</span><br><span class="line">	cout &lt;&lt; &quot;str7 = &quot; &lt;&lt; str7 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:<br>string的赋值方式很多,operator&#x3D;这种方式是比较实用的</p>
+<h3 id="string字符串拼接"><a href="#string字符串拼接" class="headerlink" title="string字符串拼接"></a>string字符串拼接</h3><p>功能描述:</p>
+<ul>
+<li>实现在字符串末尾拼接字符串</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>string&amp; operator+&#x3D;(const char* str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;( const char c);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; operator+&#x3D;( const string&amp; str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
+<li>string&amp; append(const char *s );&#x2F;&#x2F;把字符串s连接到当前字符串结尾</li>
+<li>string&amp; append(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符连接到当前字符串结尾</li>
+<li>string&amp; append(const string &amp;s );&#x2F;&#x2F;同operator+&#x3D;(const string&amp; str)</li>
+<li>string&amp; append(const string &amp;s，int pos，int n);&#x2F;&#x2F;字符串s中从pos开始的n个字符连接到字符串结尾</li>
+</ul>
+<h3 id="string查找和替换"><a href="#string查找和替换" class="headerlink" title="string查找和替换"></a>string查找和替换</h3><p>函数原型:</p>
+<ul>
+<li>int find(const string&amp; str, int pos &#x3D; 0) const;&#x2F;&#x2F;查找str第一次出现位置,从pos开始查找</li>
+<li>int find( cqhst char* s , int pos &#x3D;0) const;&#x2F;&#x2F;查找s第一次出现位置,从pos开始查找</li>
+<li>int find(const char* s, int pos， int n) const;&#x2F;&#x2F;从pos位置查找s的前n个字符第一次位置</li>
+<li>int find(const char c, int pos &#x3D;0) const;&#x2F;&#x2F;查找字符c第一次出现位置</li>
+<li>int rfind(const string&amp; str, int pos &#x3D; npos) const;&#x2F;&#x2F;查找str最后一次位置,从pos开始查找</li>
+<li>int rfind(const char* s, int pos &#x3D; npos) const;&#x2F;&#x2F;查找s最后一次出现位置,从pos开始查找</li>
+<li>int rfind(const char* s, int pos, int n) const;&#x2F;&#x2F;从pos查找s的前n个字符最后一次位置</li>
+<li>int rfind(const char c, int pos &#x3D; npos) const;&#x2F;&#x2F;查找字符c最后一次出现位置</li>
+<li>string&amp; replace(int pos, int n, const string&amp; str);&#x2F;&#x2F;替换从pos开始n个字符为字符串str</li>
+<li>string&amp; replace(int pos, int n,const char*s );&#x2F;&#x2F;替换从pos开始的n个字符为字符串s</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li><p>. find查找是从左往后，rfind从右往左</p>
+</li>
+<li><p>. find找到字符串后返回查找的第一个字符位置，找不到返回-1</p>
+</li>
+<li><p>. replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串</p>
+<hr>
+</li>
+</ul>
+<p>总结:字符串对比主要是用于比较两个字符串是否相等，判断谁大谁小的意义并不是很大</p>
+<hr>
+<p>string中单个字符存取方式有两种</p>
+<ul>
+<li><p>char&amp; operator[](int n);&#x2F;&#x2F;通过[]方式取字符</p>
+</li>
+<li><p>char&amp; at(int n);&#x2F;&#x2F;通过at方法获取字符</p>
+<hr>
+</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li><p>string&amp; insert(int pos, const char* s );&#x2F;&#x2F;插入字符串</p>
+</li>
+<li><p>string&amp; insert(int pos, const string&amp; str);&#x2F;&#x2F;插入字符串</p>
+</li>
+<li><p>string&amp; insert(int pos, int n, char c);&#x2F;&#x2F;在指定位置插入n个字符c</p>
+</li>
+<li><p>string&amp; erase(int pos, int n &#x3D; npos);&#x2F;&#x2F;删除从Pos开始的n个字符</p>
+<hr>
+</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>string substr(int pos &#x3D; 0,int n &#x3D; npos) const;&#x2F;&#x2F;返回由pos开始的n个字符组成的字符串</li>
+</ul>
+<h2 id="vector容器"><a href="#vector容器" class="headerlink" title="vector容器"></a>vector容器</h2><h3 id="vector构造函数"><a href="#vector构造函数" class="headerlink" title="vector构造函数"></a>vector构造函数</h3><p>功能描述:</p>
+<ul>
+<li>创建vector容器</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>vector<T> v;&#x2F;&#x2F;采用模板实现类实现，默认构造函数</T></li>
+<li>vector(v.begin(), v.end());&#x2F;&#x2F;将v[begin(), end())区间中的元素拷贝给本身。</li>
+<li>vector(n, elem );&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
+<li>vector( const vector &amp;vec);&#x2F;&#x2F;拷贝构造函数。</li>
+</ul>
+<h3 id="vector赋值操作"><a href="#vector赋值操作" class="headerlink" title="vector赋值操作"></a>vector赋值操作</h3><p>函数原型:</p>
+<ul>
+<li>vector&amp; operator&#x3D;(const vector &amp;vec);&#x2F;&#x2F;重载等号操作符</li>
+<li>assign(beg, end);&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
+<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
+</ul>
+<h3 id="vector容量和大小"><a href="#vector容量和大小" class="headerlink" title="vector容量和大小"></a>vector容量和大小</h3><p>函数原型:</p>
+<ul>
+<li>empty();&#x2F;&#x2F;判断容器是否为空</li>
+<li>capacity();&#x2F;&#x2F;容器的容量</li>
+<li>size();&#x2F;&#x2F;返回容器中元素的个数</li>
+<li>resize(int num);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以默认值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
+<li>resize(int num，elem);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以elem值填充新位置。<br>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除</li>
+</ul>
+<h3 id="vector插入和删除"><a href="#vector插入和删除" class="headerlink" title="vector插入和删除"></a>vector插入和删除</h3><p>函数原型:</p>
+<ul>
+<li>push_back(ele);&#x2F;&#x2F;尾部插入元素ele</li>
+<li>pop_back();&#x2F;&#x2F;删除最后一个元素</li>
+<li>insert(const_iterator pos,ele);&#x2F;&#x2F;迭代器指向位置pos插入元素ele</li>
+<li>insert(const_iterator pos, int cunt,ele);&#x2F;&#x2F;迭代器指向位置pos插入count个元素ele</li>
+<li>erase(const_iterator pos);&#x2F;&#x2F;删除迭代器指向的元素</li>
+<li>erase(const_iterator start， const_iterator end);&#x2F;&#x2F;删除迭代器从start到end之间的元素</li>
+<li>clear();&#x2F;&#x2F;删除容器中所有元素</li>
+</ul>
+<h3 id="vector互换容器"><a href="#vector互换容器" class="headerlink" title="vector互换容器"></a>vector互换容器</h3><p>函数原型;</p>
+<ul>
+<li>swap(vec);&#x2F;&#x2F;将vec与本身的元素互换</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void teste2()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	for (int i - e; i &lt;100000; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;&quot;v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;&quot;v的大小为:&quot;&lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">	v.resize(3);</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;“v的大小为: &quot; &lt;&lt; v.size()&lt;&lt; endl;</span><br><span class="line">	//收缩内存</span><br><span class="line">	vector&lt;int&gt;(v).swap(v); //匿名对象vector&lt;int&gt;(v),读完这行自动被系统删除，匿名对象创建与v.size相同大小的cap和size</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;v的大小为:&quot; &lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结: swap可以使两个容器互换，可以达到实用的收缩内存效果.</p>
+<h3 id="vector预留空间"><a href="#vector预留空间" class="headerlink" title="vector预留空间"></a>vector预留空间</h3><p>功能描述:</p>
+<ul>
+<li>减少vector在动态扩展容量时的扩展次数</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li>reserve(int len);&#x2F;&#x2F;容器预留len个元素长度，预留位置不初始化，元素不可访问。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void teste1()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//预留空间</span><br><span class="line">	v.reserve ( 100000);</span><br><span class="line">	int num = 0;</span><br><span class="line">	int* p = NULL;</span><br><span class="line">	for (int i = 0; i &lt; 100080; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	if (p != &amp;v[0])&#123;</span><br><span class="line">		p = &amp;v[0];//用来计算开辟了多少次内存,如果没有预留内存，则每次vector容量不够会重新分配，即&amp;v[0]会改变</span><br><span class="line">		num++;</span><br><span class="line">	&#125;</span><br><span class="line">	cout&lt;&lt;&quot;num=&quot;&lt;&lt;num&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结:如果数据量较大，可以一开始利用reserve预留空间</p>
+<h2 id="C-中resize和reserve的区别"><a href="#C-中resize和reserve的区别" class="headerlink" title="C++中resize和reserve的区别"></a>C++中resize和reserve的区别</h2><p>reserve是设置了capacity的值，比如reserve(20)，表示该容器最大容量为20，但此时容器内还没有任何对象，也<strong>不能通过下标访问</strong>。会发生问题。<br>resize既分配了空间，也创建了对象，可以通过下标访问。<br>reserve只修改capacity大小，不修改size大小，resize既修改capacity大小，也修改size大小。</p>
+<p>所以以后访问string容器的值不够用什么方法都需要resize来初始化默认值防止出现错误。</p>
+<h2 id="deque容器"><a href="#deque容器" class="headerlink" title="deque容器"></a>deque容器</h2><h3 id="deque容器基本概念"><a href="#deque容器基本概念" class="headerlink" title="deque容器基本概念"></a>deque容器基本概念</h3><p>功能:</p>
+<ul>
+<li>双端数组，可以对头端进行插入删除操作</li>
+</ul>
+<p>deque与vector区别:</p>
+<ul>
+<li>vector对于头部的插入删除效率低，数据量越大，效率越低.</li>
+<li>deque相对而言，对头部的插入删除速度比vector快</li>
+<li>vector访问元素时的速度会比deque快,这和两者内部实现有关</li>
+</ul>
+<p>deque内部工作原理:</p>
+<p>deque内部有个中控器，维护每段缓冲区中的内容，缓冲区中存放真实数据</p>
+<p>中控器维护的是每个缓冲区的地址，使得使用deque时像—片连续的内存空间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void printDeque(const deque&lt;int&gt;&amp; d)&#123;//限制不允许修改，只读，则 const_iterator</span><br><span class="line">	for (deque&lt;int&gt; :: const_iterator it = d.begin(); it != d.end(); it++)&#123;</span><br><span class="line">		cout &lt;&lt;*it&lt;&lt;&quot;&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">// deque构造</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	deque&lt;int&gt; d1;//无参构造函数</span><br><span class="line">	for (int i = e; i &lt; 10; i++)&#123;</span><br><span class="line">		d1.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	printDeque(d1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结: deque容器和vector容器的构造方式几乎一致，灵活使用即可</p>
+<h3 id="deque赋值操作"><a href="#deque赋值操作" class="headerlink" title="deque赋值操作"></a>deque赋值操作</h3><p>函数原型:</p>
+<ul>
+<li>deque&amp; operator&#x3D;(const deque &amp;deq);&#x2F;&#x2F;重载等号操作符</li>
+<li>assign(beg, end) ;&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
+<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
+</ul>
+<p>函数原型:</p>
+<ul>
+<li><p>deque.empty();&#x2F;&#x2F;判断容器是否为空</p>
+</li>
+<li><p>deque.size();&#x2F;&#x2F;返回容器中元素的个数,deque没有容量概念（cap）</p>
+</li>
+<li><p>deque.resize(num );&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以默认值0填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
+</li>
+<li><p>deque.resize(num，elem);&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以elem值填充新位置</p>
+<p>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
+</li>
+</ul>
+<p>总结:</p>
+<ul>
+<li>deque没有容量的概念</li>
+<li>判断是否为空— empty</li>
+<li>返回元素个数— size</li>
+<li>重新指定个数— resize</li>
+</ul>
+<h3 id="3-3-5-deque插入和删除"><a href="#3-3-5-deque插入和删除" class="headerlink" title="3.3.5 deque插入和删除"></a>3.3.5 deque插入和删除</h3><p>功能描述:</p>
+<ul>
+<li>向deque容器中插入和删除数据</li>
+</ul>
+<p>函数原型:</p>
+<p>​	两端插入操作:</p>
+<ul>
+<li>push_back(elem);&#x2F;&#x2F;在容器尾部添加一个数据</li>
+<li>push_front(elem);&#x2F;&#x2F;在容器头部插入一个数据</li>
+<li>pop_back();&#x2F;&#x2F;删除容器最后一个数据</li>
+<li>pop_front( );&#x2F;&#x2F;删除容器第一个数据</li>
+</ul>
+<p>指定位置操作:</p>
+<ul>
+<li>insert(pos,elem) ;&#x2F;&#x2F;在pos位置插入一个elem元素的拷贝，返回新数据的位置。</li>
+<li>insert( pos,n,elem);&#x2F;&#x2F;在pos位置插入n个elem数据，无返回值。</li>
+<li>insert(pos ,beg,end);&#x2F;&#x2F;在pos位置插入[beg,end)区间的数据，无返回值。</li>
+<li>clear();清空容器的所有数据</li>
+<li>erase(beg,end);&#x2F;&#x2F;删除[beg,end)区间的数据，返回下一个数据的位置。</li>
+<li>erase(pos);&#x2F;&#x2F;删除pos位置的数据，返回下一个数据的位置。</li>
+</ul>
+<p>总结:</p>
+<p>插入和删除提供的位置是迭代器!(如d.begin()),还可以</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">deque&lt;int&gt;::iterator it = d1.begin() ;</span><br><span class="line">it++;</span><br><span class="line">d1.erase(it);</span><br></pre></td></tr></table></figure>
+
+<p>尾插— push_back</p>
+<p>尾删— pop_back</p>
+<p>头插— push_front</p>
+<p>头删— pop_front</p>
+<hr>
+<p>函数原型:</p>
+<ul>
+<li>at(int idx);&#x2F;&#x2F;返回索引idx所指的数据</li>
+<li>operator[]; &#x2F;&#x2F;返回索引idx所指的数据</li>
+<li>front( );&#x2F;&#x2F;返回容器中第一个数据元素</li>
+<li>back();&#x2F;&#x2F;返回容器中最后一个数据元素</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/08/c%E5%92%8Cc++/c-%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -178,7 +791,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-28 12:09:19" itemprop="dateModified" datetime="2023-04-28T12:09:19+08:00">2023-04-28</time>
+                <time title="修改时间：2023-08-02 14:45:30" itemprop="dateModified" datetime="2023-08-02T14:45:30+08:00">2023-08-02</time>
               </span>
 
           
@@ -252,7 +865,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#ifndef SALES_DATA_H</span><br><span class="line">#define SALES_DATA_H</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">struct Sales_data &#123;</span><br><span class="line">	std::string bookNo;</span><br><span class="line">	unsigned units_sold = 0;</span><br><span class="line">	double revenue = 0.0;</span><br><span class="line">&#125;;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
 
 <h1 id="字符串、向量和数组"><a href="#字符串、向量和数组" class="headerlink" title="字符串、向量和数组"></a>字符串、向量和数组</h1><h2 id="命名空间的using声明"><a href="#命名空间的using声明" class="headerlink" title="命名空间的using声明"></a>命名空间的using声明</h2><p>头文件不应包含using声明</p>
-<p>位于头文件的代码一般来说不应该使用using声明。这是因为头文件的内容会铂贝到所有引用它的文件中去，如果头文件里有某个using 声明,那么每个使用了该头文件的文件就都会有这个声明。对于某些程序来说，由于不经意间包含了一些名字,反而可能产生始料未及的名字冲突。</p>
+<p>位于头文件的代码一般来说不应该使用using声明。这是因为头文件的内容会拷贝到所有引用它的文件中去，如果头文件里有某个using 声明,那么每个使用了该头文件的文件就都会有这个声明。对于某些程序来说，由于不经意间包含了一些名字,反而可能产生始料未及的名字冲突。</p>
 <h3 id="使用getline读取一整行"><a href="#使用getline读取一整行" class="headerlink" title="使用getline读取一整行"></a>使用getline读取一整行</h3><p>有时我们希望能在最终得到的字符串中保留输入时的空白符，这时应该用getline函数代替原来的&gt;&gt;运算符。getline函数的参数是一个输入流和一个string对象，函数从给定的输入流中读入内容，直到遇到换行符为止（注意换行符也被读进来了)，然后把所读的内容存入到那个string对象中去(注意不存换行符)。getline只要一遇到换行符就结束读取操作并返回结果，哪怕输入的一开始就是换行符也是如此。如果输入真的一开始就是换行符，那么所得的结果是个空string。</p>
 <p>和输入运算符一样，getline也会返回它的流参数。因此既然输入运算符能作为判断的条件，我们也能用getline的结果作为条件。例如，可以通过改写之前的程序让它一次输出一整行，而不再是每行输出一个词了:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">while (getline(cin,line))</span><br><span class="line">	cout&lt;&lt; line &lt;&lt;endl;</span><br></pre></td></tr></table></figure>
@@ -707,7 +1320,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-01 15:48:58" itemprop="dateModified" datetime="2023-08-01T15:48:58+08:00">2023-08-01</time>
+                <time title="修改时间：2023-08-03 10:00:15" itemprop="dateModified" datetime="2023-08-03T10:00:15+08:00">2023-08-03</time>
               </span>
 
           
@@ -834,6 +1447,14 @@
 <p><strong>二.tie</strong><br><code>tie</code>是将两个stream绑定的函数，空参数的话返回当前的输出流指针。<br>在默认的情况下<code>cin</code>绑定的是<code>cout</code>，每次执行 &lt;&lt; 操作符的时候都要调用flush，这样会增加IO负担。可以通过<code>tie(0)</code>（0表示NULL）来解除<code>cin</code>与<code>cout</code>的绑定，进一步加快执行效率。</p>
 <hr>
 <h3 id="c-11"><a href="#c-11" class="headerlink" title="c++11"></a>c++11</h3><p>在 C++11新标准中，如果我们需要默认的行为，那么可以通过在参数列表后面写上&#x3D; default来要求编译器生成构造函数。其中，&#x3D; default 既可以和声明一起出现在类的内部，也可以作为定义出现在类的外部。和其他函数一样，如果&#x3D; default在类的内部，则默认构造函数是内联的;如果它在类的外部，则该成员默认情况下不是内联的。</p>
+<p><code>std::move</code> 是 C++ 中的一个标准库函数，定义在 <code>&lt;utility&gt;</code> 头文件中。它用于将对象转换为右值引用，从而支持对象的移动语义。</p>
+<p>移动语义是 C++11 中引入的一个重要概念，旨在提高对象的性能和效率。通常，当我们将一个对象传递给函数或从函数返回一个对象时，会发生拷贝构造或拷贝赋值操作。但是对于某些对象，拷贝操作可能会比较昂贵，例如包含大量资源的对象。</p>
+<p>使用 <code>std::move</code> 可以将一个对象转换为右值引用，这意味着对象的资源可以被“移动”而不是“拷贝”，从而避免不必要的资源复制，提高程序的性能。</p>
+<p>使用方式：<code>std::move(object)</code></p>
+<p>例如，假设有一个类 <code>MyClass</code>，它具有移动构造函数和移动赋值操作符，可以使用 <code>std::move</code> 进行对象的移动：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;utility&gt;</span><br><span class="line"></span><br><span class="line">class MyClass &#123;</span><br><span class="line">public:</span><br><span class="line">    // 移动构造函数</span><br><span class="line">    MyClass(MyClass&amp;&amp; other) noexcept &#123;</span><br><span class="line">        // ... perform move operations ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 移动赋值操作符</span><br><span class="line">    MyClass&amp; operator=(MyClass&amp;&amp; other) noexcept &#123;</span><br><span class="line">        if (this != &amp;other) &#123;</span><br><span class="line">            // ... perform move operations ...</span><br><span class="line">        &#125;</span><br><span class="line">        return *this;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    MyClass obj1; // 假设有一个对象 obj1</span><br><span class="line">    MyClass obj2 = std::move(obj1); // 使用 std::move 进行移动操作</span><br><span class="line">    // 现在 obj1 的资源已经被 obj2 移走，obj1 可能处于有效但未定义的状态</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，使用 <code>std::move</code> 后，原对象处于未定义但有效的状态，不应该对其进行操作，除非赋予新值或销毁。另外，不是所有的对象都适合移动，只有那些支持移动语义的类才会有移动构造函数和移动赋值操作符。</p>
 <h3 id="构造函数初始值列表"><a href="#构造函数初始值列表" class="headerlink" title="构造函数初始值列表"></a>构造函数初始值列表</h3><p>接下来我们介绍类中定义的另外两个构造函数:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sales_data(const std: :string &amp;s): bookNo(s) &#123;&#125;</span><br><span class="line">Sales_data (const std: :string &amp;s,unsigned n, double p):</span><br><span class="line">bookNo(s), units_sold(n),revenue(p*n)&#123;&#125;</span><br></pre></td></tr></table></figure>
 
@@ -1718,268 +2339,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/25/c%E5%92%8Cc++/%E7%AC%AC%E5%8D%81%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/25/c%E5%92%8Cc++/%E7%AC%AC%E5%8D%81%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第十天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-03-25 14:53:39" itemprop="dateCreated datePublished" datetime="2023-03-25T14:53:39+08:00">2023-03-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-03-27 20:30:19" itemprop="dateModified" datetime="2023-03-27T20:30:19+08:00">2023-03-27</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-命令行参数"><a href="#C-命令行参数" class="headerlink" title="C 命令行参数"></a>C 命令行参数</h1><p>执行程序时，可以从命令行传值给 C 程序。这些值被称为<strong>命令行参数</strong>，它们对程序很重要，特别是当您想从外部控制程序，而不是在代码内对这些值进行硬编码时，就显得尤为重要了。</p>
-<p>命令行参数是使用 main() 函数参数来处理的，其中，<strong>argc</strong> 是指传入参数的个数，<strong>argv[]</strong> 是一个指针数组，指向传递给程序的每个参数。下面是一个简单的实例，检查命令行是否有提供参数，并根据参数执行相应的动作：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main( int argc, char *argv[] )  </span><br><span class="line">&#123;</span><br><span class="line">//应当指出的是，argv[0] 存储程序的名称(编译文件的名称)，argv[1] 是一个指向第一个命令行参数的指针，*argv[n] 是最后一个参数。如果没有提供任何参数，argc 将为 1，否则，如果传递了一个参数，argc 将被设置为 2。</span><br><span class="line"></span><br><span class="line">//多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么传递参数的时候应把参数放置在双引号 &quot;&quot; 或单引号 &#x27;&#x27; 内部(&quot;&quot;里面表示一个参数)。让我们重新编写上面的实例，有一个空间，那么你可以通过这样的观点，把它们放在双引号或单引号&quot;&quot;&quot;&quot;。让我们重新编写上面的实例，向程序传递一个放置在双引号内部的命令行参数：</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>main 的两个参数的参数名如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int main( int argc, char *argv[] )</span><br></pre></td></tr></table></figure>
-
-<p>并不一定这样写，只是约定俗成罢了。但是亦可以写成下面这样:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int main( int test_argc, char *test_argv[] )  </span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><strong>冒泡排序</strong>是一种<strong>稳定</strong>的排序方式！</p>
-<p><strong>选择排序</strong>是一种<strong>不稳定</strong>的排序方式！</p>
-<p>所谓<strong>稳定</strong>，就是指排完序后序列的各个元素的下标不会改变，如：冒泡排序</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 1;i &lt;= n - 1;i ++)</span><br><span class="line"> for (int j = 1;j &lt;= n - i;j ++)</span><br><span class="line">  if (a[j] &gt; a[j + 1]) swap(a[j],a[j + 1]);</span><br></pre></td></tr></table></figure>
-
-<p>第零趟：<strong>2</strong>,3,2,1</p>
-<p>第一趟：<strong>2</strong> 2 1 3 </p>
-<p>2： <strong>2</strong> 1 2 3</p>
-<p>3:    1 <strong>2</strong> 2 3</p>
-<p>排完之后，加粗的2还在前面。</p>
-<p>所谓<strong>不稳定</strong>，恰恰相反，如：选择排序</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 1;i &lt;= n - 1;i ++)</span><br><span class="line"> for (int j = i + 1;j &lt;= n;j ++)</span><br><span class="line">  if (a[i] &gt; a[j]) swap(a[i],a[j]);</span><br></pre></td></tr></table></figure>
-
-<p>第零趟：<strong>2</strong> 3 2 1</p>
-<p>第一趟：1 3 2 <strong>2</strong></p>
-<p>第二趟：1 2 3 <strong>2</strong></p>
-<p>3:1 2 <strong>2</strong> 3</p>
-<p>排完之后，加粗的2到后面去了。</p>
-<p><strong>稳定性</strong>非常重要！</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/23/c%E5%92%8Cc++/%E7%AC%AC%E4%B9%9D%E5%A4%A9-c%E8%AF%AD%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/23/c%E5%92%8Cc++/%E7%AC%AC%E4%B9%9D%E5%A4%A9-c%E8%AF%AD%E8%A8%80/" class="post-title-link" itemprop="url">第九天 c语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-03-23 14:43:06 / 修改时间：21:07:01" itemprop="dateCreated datePublished" datetime="2023-03-23T14:43:06+08:00">2023-03-23</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-内存管理"><a href="#C-内存管理" class="headerlink" title="C 内存管理"></a>C 内存管理</h1><p>C 语言为内存的分配和管理提供了几个函数。这些函数可以在 <strong>&lt;stdlib.h&gt;</strong> 头文件中找到。</p>
-<p>1.stdlib.h中的几个函数操作内存；calloc(）分配指定个数指定大小的连续内存块，返回值是这些连续内存块组成的大内存块地址；malloc()分配指定大小的一块内存，返回值是内存的地址；realloc()通过已分配的内存块的地址扩展或者减小内存的大小；free()释放指定地址对应的内存块，无返回值；alloc是allocate 分配的缩写；malloc mess+allocate 整块的分配</p>
-<p>2.stdlib中几个内存管理的函数返回值是 void *,表示任意类型的指针，或者说它可以转化成任意类型；</p>
-<p>3.内存管理的意义：数组、基本数据类型、结构体、共用体都是固定的为数据分配内存空间，而内存管理却可以直接申请一块内存，然后给其指定存储的数据类型，之后就可以存储数据了，且还可以根据数据的大小来扩展内存空间；</p>
-<hr>
-<p>malloc与calloc没有本质区别，malloc之后的未初始化内存可以使用memset进行初始化。</p>
-<p>主要的不同是malloc不初始化分配的内存，calloc初始化已分配的内存为0。</p>
-<p>次要的不同是calloc返回的是一个数组，而malloc返回的是一个对象。</p>
-<p>calloc等于malloc后再memset，所以malloc比calloc更高效。</p>
-<p>分配内存空间函数malloc 调用形式: (类型说明符*) malloc (size) 。</p>
-<p>分配内存空间函数 calloc calloc 也用于分配内存空间。</p>
-<p>为什么多用malloc而很少用calloc？</p>
-<p>因为calloc虽然对内存进行了初始化（全部初始化为0），</p>
-<p>calloc相当于</p>
-<p>p &#x3D; malloc();</p>
-<p>memset(p, 0,size);(C 库函数 <strong>void *memset(void *str, int c, size_t n)</strong> 复制字符 <strong>c</strong>（一个无符号字符）到参数 <strong>str</strong> 所指向的字符串的前 <strong>n</strong> 个字符。)</p>
-<p>相对于malloc多了对内存的写零操作，而写零这个操作我们有时候需要，而大部分时间不需要。</p>
-<hr>
-<table>
-<thead>
-<tr>
-<th align="left">序号</th>
-<th align="left">函数和描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">1</td>
-<td align="left"><strong>void *calloc(int num, int size);</strong> 在内存中动态地分配 num 个长度为 size 的连续空间，并将每一个字节都初始化为 0。所以它的结果是分配了 num*size 个字节长度的内存空间，并且每个字节的值都是 0。</td>
-</tr>
-<tr>
-<td align="left">2</td>
-<td align="left"><strong>void free(void *address);</strong> 该函数释放 address 所指向的内存块,释放的是动态分配的内存空间。</td>
-</tr>
-<tr>
-<td align="left">3</td>
-<td align="left"><strong>void *malloc(int num);</strong> 在堆区分配一块指定大小的内存空间，用来存放数据。这块内存空间在函数执行完成后不会被初始化，它们的值是未知的。</td>
-</tr>
-<tr>
-<td align="left">4</td>
-<td align="left"><strong>void *realloc(void *address, int newsize);</strong> 该函数重新分配内存，把内存扩展到 <strong>newsize</strong>。</td>
-</tr>
-</tbody></table>
-<p>直接使用原来的指针变量接收 <strong>realloc</strong> 的返回值是可能存在内存泄漏的。例如以下语句：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = (char *) realloc( description, 100 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>若 realloc 函数执行失败，description 原先所指向的空间不变，realloc 函数返回 NULL。</p>
-<p>此时 description 的值被赋为 NULL, 但原先指向的空间未被释放，造成了内存泄漏。（内存泄漏 （Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存 。 内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，导致在释放该段内存之前就失去了对该段内存的控制，从而造成了内存的浪费。 内存泄漏通常情况下只能由获得程序源代码的程序员才能分析出来。）</p>
-<hr>
-<p><strong>注意：</strong>void * 类型表示未确定类型的指针。C、C++ 规定 void * 类型可以通过类型转换强制转换为任何其它类型的指针。</p>
-<p><strong>注：</strong>void 指针可以任意类型的数据，可以在程序中给我们带来一些好处，函数中形为指针类型时，我们可以将其定义为 void 指针，这样函数就可以接受任意类型的指针。</p>
-<p>void 指针可以指向任意类型的数据，就是说可以用任意类型的指针对 void 指针对 void 指针赋值。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int *a；</span><br><span class="line">void *p；</span><br><span class="line">p=a；</span><br></pre></td></tr></table></figure>
-
-<p>如果要将 void 指针 p 赋给其他类型的指针，则需要强制类型转换，就本例而言：<strong>a&#x3D;（int *）p</strong>。</p>
-<p>对于 void 指针，GNU 认为 <strong>void *</strong> 和 <strong>char *</strong> 一样，所以以下写法是正确的:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = malloc( 200 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>但按照 ANSI(American National Standards Institute) 标准，需要对 void 指针进行强制转换，如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">description = (char *)malloc( 200 * sizeof(char) );</span><br></pre></td></tr></table></figure>
-
-<p>同时，按照 ANSI(American National Standards Institute) 标准，不能对 void 指针进行算法操作:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void * pvoid;</span><br><span class="line">pvoid++; //ANSI：错误</span><br><span class="line">pvoid += 1; //ANSI：错误</span><br><span class="line">// ANSI标准之所以这样认定，是因为它坚持：进行算法操作的指针必须是确定知道其指向数据类型大小的。</span><br><span class="line"></span><br><span class="line">int *pint;</span><br><span class="line">pint++; //ANSI：正确</span><br></pre></td></tr></table></figure>
-
-<p>在实际的程序设计中，为迎合 ANSI 标准，并提高程序的可移植性，我们可以这样编写实现同样功能的代码：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void * pvoid;</span><br><span class="line">((char *)pvoid)++; //ANSI：错误；GNU：正确</span><br><span class="line">(char *)pvoid += 1; //ANSI：错误；GNU：正确</span><br></pre></td></tr></table></figure>
-
-<h2 id="动态分配内存"><a href="#动态分配内存" class="headerlink" title="动态分配内存"></a>动态分配内存</h2><p>预先不知道需要存储的文本长度，例如您想存储有关一个主题的详细描述。在这里，我们需要定义一个指针，该指针指向未定义所需内存大小的字符，后续再根据需求来分配内存，如下所示：</p>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   char name[100];</span><br><span class="line">   char *description;</span><br><span class="line"> </span><br><span class="line">   strcpy(name, &quot;Zara Ali&quot;);</span><br><span class="line"> </span><br><span class="line">   /* 动态分配内存 */</span><br><span class="line">   description = (char *)malloc( 200 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcpy( description, &quot;Zara ali a DPS student in class 10th&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   printf(&quot;Name = %s\n&quot;, name );</span><br><span class="line">   printf(&quot;Description: %s\n&quot;, description );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的程序也可以使用 <strong>calloc()</strong> 来编写，只需要把 malloc 替换为 calloc 即可，如下所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">calloc(200, sizeof(char));</span><br></pre></td></tr></table></figure>
-
-<p>当动态分配内存时，您有完全控制权，可以传递任何大小的值。而那些预先定义了大小的数组，一旦定义则无法改变大小。</p>
-<h2 id="重新调整内存的大小和释放内存"><a href="#重新调整内存的大小和释放内存" class="headerlink" title="重新调整内存的大小和释放内存"></a>重新调整内存的大小和释放内存</h2><p>当程序退出时，操作系统会自动释放所有分配给程序的内存，但是，建议您在不需要内存时，都应该调用函数 <strong>free()</strong> 来释放内存。</p>
-<p>或者，您可以通过调用函数 <strong>realloc()</strong> 来增加或减少已分配的内存块的大小。让我们使用 realloc() 和 free() 函数，再次查看上面的实例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">   char name[100];</span><br><span class="line">   char *description;</span><br><span class="line"> </span><br><span class="line">   strcpy(name, &quot;Zara Ali&quot;);</span><br><span class="line"> </span><br><span class="line">   /* 动态分配内存 */</span><br><span class="line">   description = (char *)malloc( 30 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcpy( description, &quot;Zara ali a DPS student.&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   /* 假设您想要存储更大的描述信息 */</span><br><span class="line">   description = (char *) realloc( description, 100 * sizeof(char) );</span><br><span class="line">   if( description == NULL )</span><br><span class="line">   &#123;</span><br><span class="line">      fprintf(stderr, &quot;Error - unable to allocate required memory\n&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   else</span><br><span class="line">   &#123;</span><br><span class="line">      strcat( description, &quot;She is in class 10th&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   printf(&quot;Name = %s\n&quot;, name );</span><br><span class="line">   printf(&quot;Description: %s\n&quot;, description );</span><br><span class="line"> </span><br><span class="line">   /* 使用 free() 函数释放内存 */</span><br><span class="line">   free(description);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>尝试一下不重新分配额外的内存，strcat() 函数会生成一个错误，因为存储 description 时可用的内存不足。</p>
-<hr>
-<p>动态可变长的结构体：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef struct</span><br><span class="line">&#123;</span><br><span class="line">  int id;</span><br><span class="line">  char name[0];</span><br><span class="line">&#125;stu_t;</span><br></pre></td></tr></table></figure>
-
-<p>定义该结构体，只占用4字节的内存，name不占用内存。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">stu_t *s = NULL;    //定义一个结构体指针</span><br><span class="line">s = malloc(sizeof(*s) + 100);//sizeof(*s)获取的是4，但加上了100，4字节给id成员使用，100字节是属于name成员的</span><br><span class="line">s-&gt;id = 1010;</span><br><span class="line">strcpy(s-&gt;name,&quot;hello&quot;);</span><br></pre></td></tr></table></figure>
-
-<p>注意：一个结构体中只能有一个可变长的成员，并且该成员必须是最后一个成员。</p>
-<h3 id="C-语言中常用的内存管理函数和运算符"><a href="#C-语言中常用的内存管理函数和运算符" class="headerlink" title="C 语言中常用的内存管理函数和运算符"></a>C 语言中常用的内存管理函数和运算符</h3><ul>
-<li>malloc() 函数：用于动态分配内存。它接受一个参数，即需要分配的内存大小（以字节为单位），并返回一个指向分配内存的指针。</li>
-<li>free() 函数：用于释放先前分配的内存。它接受一个指向要释放内存的指针作为参数，并将该内存标记为未使用状态。</li>
-<li>calloc() 函数：用于动态分配内存，并将其初始化为零。它接受两个参数，即需要分配的内存块数和每个内存块的大小（以字节为单位），并返回一个指向分配内存的指针。</li>
-<li>realloc() 函数：用于重新分配内存。它接受两个参数，即一个先前分配的指针和一个新的内存大小，然后尝试重新调整先前分配的内存块的大小。如果调整成功，它将返回一个指向重新分配内存的指针，否则返回一个空指针。</li>
-<li>sizeof 运算符：用于获取数据类型或变量的大小（以字节为单位）。</li>
-<li>指针运算符：用于获取指针所指向的内存地址或变量的值。</li>
-<li>&amp; 运算符：用于获取变量的内存地址。</li>
-<li>***** 运算符：用于获取指针所指向的变量的值。</li>
-<li><strong>-&gt;</strong> 运算符：用于指针访问结构体成员，语法为 <strong>pointer-&gt;member</strong>，等价于 <strong>(*pointer).member</strong>。</li>
-<li>memcpy() 函数：用于从源内存区域复制数据到目标内存区域。它接受三个参数，即目标内存区域的指针、源内存区域的指针和要复制的数据大小（以字节为单位）。<strong>void *memcpy(void *str1, const void *str2, size_t n)</strong> 从存储区 <strong>str2</strong> 复制 <strong>n</strong> 个字节到存储区 <strong>str1</strong>。该函数返回一个指向目标存储区 str1 的指针。</li>
-<li>memmove() 函数：类似于 memcpy() 函数，但它可以处理重叠的内存区域。它接受三个参数，即目标内存区域的指针、源内存区域的指针和要复制的数据大小（以字节为单位）。<strong>void *memmove(void *str1, const void *str2, size_t n)</strong> 从 <strong>str2</strong> 复制 <strong>n</strong> 个字符到 <strong>str1</strong>，但是在重叠内存块这方面，memmove() 是比 memcpy() 更安全的方法。如果目标区域和源区域有重叠的话，memmove() 能够保证源串在被覆盖之前将重叠区域的字节拷贝到目标区域中，复制后源区域的内容会被更改。如果目标区域与源区域没有重叠，则和 memcpy() 函数功能相同。</li>
-</ul>
-<p>任何类型的指针都可以传入 memcpy 和 memset 中</p>
-<hr>
-<p>对于我们手动分配的内存，在 C 语言中是不用强制转换类型的。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">description = malloc( 200 * sizeof(char) ); // C 语言正确。</span><br><span class="line">description = malloc( 200 * sizeof(char) ); // C++ 错误</span><br></pre></td></tr></table></figure>
-
-<p>但是 C++ 是强制要求的，不然会报错。</p>
-<hr>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2045,7 +2408,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

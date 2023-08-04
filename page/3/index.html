@@ -147,6 +147,504 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/" class="post-title-link" itemprop="url">Linux系统编程-文件IO</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-05-21 10:50:39" itemprop="dateCreated datePublished" datetime="2023-05-21T10:50:39+08:00">2023-05-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-19 20:17:21" itemprop="dateModified" datetime="2023-06-19T20:17:21+08:00">2023-06-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>系统调用 内核提供的函数 </p>
+<p>库调用 程序库中的函数</p>
+<h2 id="open-函数"><a href="#open-函数" class="headerlink" title="open 函数"></a>open 函数</h2><p>open 函数： <code>int open(char *pathname, int flags)  	#include  &lt;unistd.h&gt;</code> </p>
+<p>参数： pathname: 欲打开的文件路径名 	flags：文件打开方式： <code>#include  &lt;unistd.h&gt; O_RDONLY|O_WRONLY|O_RDWR|O_CREAT|O_APPEND|O_TRUNC|O_EXCL|O_NONBLOCK ....</code> </p>
+<p>返回值： 成功： 打开文件所得到对应的 文件描述符（整数） </p>
+<p>失败： -1， 设置 errno </p>
+<p><code>int open(char *pathname, int flags， mode_t mode) 	123 775</code> </p>
+<p>参数： pathname: 欲打开的文件路径名 </p>
+<p>flags：文件打开方式O_RDONLY|O_WRONLY|O_RDWR|O_CREAT|O_APPEND|O_TRUNC|O_EXCL|O_NONBLOCK …. </p>
+<p>mode: 参数 3 使用的前提， 参 2 指定了 O_CREAT。 取值 8 进制数，用来描述文件的 访问权限。</p>
+<p> rwx 0664 创建文件最终权限 &#x3D; mode &amp; ~umask (umask是系统默认0002取反775)</p>
+<p>返回值： 成功： 打开文件所得到对应的 文件描述符（整数） </p>
+<p>失败： -1， 设置 errno </p>
+<p>close 函数： <code>int close(int fd);</code></p>
+<h2 id="read和write实现cp"><a href="#read和write实现cp" class="headerlink" title="read和write实现cp"></a>read和write实现cp</h2><p>read函数：</p>
+<p>  <code>ssize_t read(int fd, void *buf, size_t count);</code></p>
+<p>  参数：</p>
+<p>​    fd：文件描述符</p>
+<p>​    buf：存数据的缓冲区</p>
+<p>​    count：缓冲区大小</p>
+<p>  返回值：</p>
+<p>​    0：读到文件末尾。</p>
+<p>​    成功； &gt; 0 读到的字节数。</p>
+<p>​    失败： -1， 设置 errno</p>
+<p>​    -1： 并且 errno &#x3D; EAGIN 或 EWOULDBLOCK, 说明不是read失败，而是read在以非阻塞方式读一个设备文件（网络文件），并且文件无数据。</p>
+<p>write函数：</p>
+<p>  <code>ssize_t write(int fd, const void *buf, size_t count);</code></p>
+<p>  参数：</p>
+<p>​    fd：文件描述符</p>
+<p>​    buf：待写出数据的缓冲区</p>
+<p>​    count：数据大小</p>
+<p>  返回值：</p>
+<p>​    成功； 写入的字节数。</p>
+<p>​    失败： -1， 设置 errno</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" alt="image-20230523223219656"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" class title="This is an test image">
+
+<p>可以在复制函数里加入错误检测：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(fd1 == -1)&#123;</span><br><span class="line"></span><br><span class="line">  perror(“open argv[1] error”);</span><br><span class="line"></span><br><span class="line">  exit(1);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>错误处理函数：    与 errno 相关。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;xxx error: %d\n&quot;, errno);</span><br><span class="line"></span><br><span class="line">char *strerror(int errnum);</span><br><span class="line"></span><br><span class="line">printf(&quot;xxx error: %s\n&quot;, strerror(errno));</span><br><span class="line"></span><br><span class="line">void perror(const char *s);</span><br><span class="line"></span><br><span class="line">  perror(&quot;open error&quot;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="系统调用和库函数比较—预读入缓输出"><a href="#系统调用和库函数比较—预读入缓输出" class="headerlink" title="系统调用和库函数比较—预读入缓输出"></a>系统调用和库函数比较—预读入缓输出</h2><p>所以系统函数并不是一定比库函数牛逼，能使用库函数的地方就使用库函数。 标准 IO 函数（如fputc&#x2F;fgetc）自带用户缓冲区（一般是4096，即4kb再向内核写入），系统调用（read&#x2F;write 这块，每次写一个字节，自己定义buf为1，会疯狂进行内核态和用户态的切换，所以非常耗时）无用户级缓冲。系统缓冲区是都有的。</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" alt="image-20230525171335770"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" class title="This is an test image">
+
+<h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" alt="image-20230525185325288"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" class title="This is an test image">
+
+<p>文件描述符是指向一个文件结构体的指针 </p>
+<p>PCB 进程控制块：本质 结构体。</p>
+<p> 成员：文件描述符表。 </p>
+<p>文件描述符：0&#x2F;1&#x2F;2&#x2F;3&#x2F;4。。。。&#x2F;1023 表中可用的最小的。 </p>
+<p>0 - STDIN_FILENO </p>
+<p>1 - STDOUT_FILENO </p>
+<p>2 - STDERR_FILENO</p>
+<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞、非阻塞： 是<strong>设备文件、网络文件</strong>的属性。普通创建的文件没有。</p>
+<p>产生阻塞的场景。 读设备文件。读网络文件。（读常规文件无阻塞概念。） &#x2F;dev&#x2F;tty – 终端文件。 </p>
+<p>open(“&#x2F;dev&#x2F;tty”, O_RDWR|O_NONBLOCK)	 — 设置 &#x2F;dev&#x2F;tty (当前终端)非阻塞状态。(默认为阻塞状态)</p>
+<h2 id="fcntl-改文件属性"><a href="#fcntl-改文件属性" class="headerlink" title="fcntl 改文件属性"></a>fcntl 改文件属性</h2><p>fcntl 用来改变一个【已经打开】的文件的 访问控制属性 </p>
+<p>重点掌握两个参数的使用， F_GETFL，F_SETFL </p>
+<p>fcntl： </p>
+<p>​	int (int fd, int cmd, …) </p>
+<p>fd 文件描述符 cmd 命令，决定了后续参数个数 </p>
+<p>int flgs &#x3D; fcntl(fd, F_GETFL);</p>
+<p>flgs |&#x3D; O_NONBLOCK </p>
+<p>fcntl(fd, F_SETFL, flgs); </p>
+<p>获取文件状态： F_GETFL </p>
+<p>设置文件状态： F_SETFL</p>
+<p>终端文件默认是阻塞读的，这里用 fcntl 将其更改为非阻塞读</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;unistd.h&gt;</span><br><span class="line">2. #include &lt;fcntl.h&gt;</span><br><span class="line">3. #include &lt;errno.h&gt;</span><br><span class="line">4. #include &lt;stdio.h&gt;</span><br><span class="line">5. #include &lt;stdlib.h&gt;</span><br><span class="line">6. #include &lt;string.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. #define MSG_TRY &quot;try again\n&quot;</span><br><span class="line">9.</span><br><span class="line">10. int main(void)</span><br><span class="line">11. &#123;</span><br><span class="line">12. char buf[10];</span><br><span class="line">13. int flags, n;</span><br><span class="line">14.</span><br><span class="line">15. flags = fcntl(STDIN_FILENO, F_GETFL); //获取 stdin 属性信息</span><br><span class="line">16. if(flags == -1)&#123;</span><br><span class="line">17. perror(&quot;fcntl error&quot;);</span><br><span class="line">18. exit(1);</span><br><span class="line">19. &#125;</span><br><span class="line">20. flags |= O_NONBLOCK;</span><br><span class="line">21. int ret = fcntl(STDIN_FILENO, F_SETFL, flags);</span><br><span class="line">22. if(ret == -1)&#123;</span><br><span class="line">23. perror(&quot;fcntl error&quot;);</span><br><span class="line">24. exit(1);</span><br><span class="line">25. &#125;</span><br><span class="line">26.</span><br><span class="line">27. tryagain:</span><br><span class="line">28. n = read(STDIN_FILENO, buf, 10);</span><br><span class="line">29. if(n &lt; 0)&#123;</span><br><span class="line">30. if(errno != EAGAIN)&#123;</span><br><span class="line">31. perror(&quot;read /dev/tty&quot;);</span><br><span class="line">32. exit(1);</span><br><span class="line">33. &#125;</span><br><span class="line">34. sleep(3);</span><br><span class="line">35. write(STDOUT_FILENO, MSG_TRY, strlen(MSG_TRY));</span><br><span class="line">36. goto tryagain;</span><br><span class="line">37. &#125;</span><br><span class="line">38. write(STDOUT_FILENO, buf, n);</span><br><span class="line">39.</span><br><span class="line">40. return 0;</span><br><span class="line">41. &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek 函数"></a>lseek 函数</h2><p>lseek 函数： <code>off_t lseek(int fd, off_t offset, int whence);</code></p>
+<p> 参数： fd：文件描述符 		offset： 偏移量，就是将读写指针从 whence 指定位置向后偏移 offset 个单位 		whence：起始偏移位置：开始，读到，结尾 SEEK_SET&#x2F;SEEK_CUR&#x2F;SEEK_END </p>
+<p>返回值： 成功：较起始位置偏移量 失败：-1 errno </p>
+<p>应用场景： </p>
+<ol>
+<li><p>文件的“读”、“写”使用同一偏移位置。 2. 使用 lseek 获取文件大小 3. 使用 lseek 拓展文件大小：要想使文件大小真正拓展，必须引起 IO 操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int lenth = lseek ( fd,101，SEEK_END);</span><br><span class="line">printf( &quot;file size: %d\n&quot; , lenth) ;</span><br><span class="line">write(fd,&quot;$&quot;，1);</span><br></pre></td></tr></table></figure>
+
+<p>​			 使用 truncate 函数，直接拓展文件。 <code>int ret = truncate(&quot;dict.cp&quot;, 250);</code>&#x2F;&#x2F;dict.cp是必须存在的</p>
+</li>
+</ol>
+<p>lseek 示例，写一个句子到空白文件，完事调整光标位置，读取刚才写那个文件。 这个示例中，如果不调整光标位置，是读取不到内容的，因为读写指针在内容的末尾 代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;unistd.h&gt;</span><br><span class="line">4. #include &lt;string.h&gt;</span><br><span class="line">5. #include &lt;fcntl.h&gt;</span><br><span class="line">6.</span><br><span class="line">7. int main(void)</span><br><span class="line">8. &#123;</span><br><span class="line">9. int fd, n;</span><br><span class="line">10. char msg[] = &quot;It&#x27;s a test for lseek\n&quot;;</span><br><span class="line">11. char ch;</span><br><span class="line">12.</span><br><span class="line">13. fd = open(&quot;lseek.txt&quot;, O_RDWR|O_CREAT, 0644);</span><br><span class="line">14. if(fd &lt; 0)&#123;</span><br><span class="line">15. perror(&quot;open lseek.txt error&quot;);</span><br><span class="line">16. exit(1);</span><br><span class="line">17. &#125;</span><br><span class="line">18.</span><br><span class="line">19. write(fd, msg, strlen(msg)); //使用 fd 对打开的文件进行写操作，问价读写位置位于文件结尾处。</span><br><span class="line">20.</span><br><span class="line">21. lseek(fd, 0, SEEK_SET); //修改文件读写指针位置，位于文件开头。 注释该行会怎样呢？</span><br><span class="line">22.</span><br><span class="line">23. while((n = read(fd, &amp;ch, 1)))&#123;</span><br><span class="line">24. if(n &lt; 0)&#123;</span><br><span class="line">25. perror(&quot;read error&quot;);</span><br><span class="line">26. exit(1);</span><br><span class="line">27. &#125;</span><br><span class="line">28. write(STDOUT_FILENO, &amp;ch, n); //将文件内容按字节读出，写出到屏幕</span><br><span class="line">29. &#125;</span><br><span class="line">30.</span><br><span class="line">31. close(fd);</span><br><span class="line">32.</span><br><span class="line">33. return 0;</span><br><span class="line">34. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面这个代码用 lseek 的偏移来读取文件大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int lenth = lseek(fd,0,SEEK_END);</span><br><span class="line">printf ( &quot;file size: %d\n&quot; , lenth) ;</span><br></pre></td></tr></table></figure>
+
+<p>对于写文件再读取那个例子，由于文件写完之后未关闭，读写指针在文件末尾，所以不调节指针，直 接读取不到内容。</p>
+<p> lseek 读取的文件大小总是相对文件头部而言。 </p>
+<p>用 lseek 读取文件大小实际用的是读写指针初末位置的偏移差，一个新开文件，读写指针初位置都在 文件开头。如果用这个来扩展文件大小，必须引起 IO 才行，于是就至少要写入一个字符。上面代码 出现 lseek 返回 799，ls 查看为 800 的原因是，lseek 读取到偏移差的时候，还没有写入最后的‘$’ 符号. 末尾那一大堆^@，是文件空洞，如果自己写进去的也想保持队形，就写入“\0”。 </p>
+<p>拓展文件直接使用 truncate，简单粗暴： 使用 truncate 函数，直接拓展文件。 int ret &#x3D; truncate(“dict.cp”, 250);</p>
+<h2 id="传入传出参数"><a href="#传入传出参数" class="headerlink" title="传入传出参数"></a>传入传出参数</h2><p>传入参数： 1. 指针作为函数参数。 2. 同常有 const 关键字修饰。 3. 指针指向有效区域， 在函数内部做读操作。</p>
+<p> 传出参数： 1. 指针作为函数参数。 2. 在函数调用之前，指针指向的空间可以无意义，但必须有效。 3. 在函数内部，做写操作。 4。函数调用结束后，充当函数返回值。 </p>
+<p>传入传出参数： 1. 指针作为函数参数。 2. 在函数调用之前，指针指向的空间有实际意义。 3. 在函数内部，先做读操作，后做写操作。 4. 函数调用结束后，充当函数返回值</p>
+<h2 id="目录项和-inode"><a href="#目录项和-inode" class="headerlink" title="目录项和 inode"></a>目录项和 inode</h2><p>一个文件主要由两部分组成，dentry(目录项)和 inode </p>
+<p>inode 本质是结构体，存储文件的属性信息，如：权限、类型、大小、时间、用户、盘快位置… 也叫做文件属性管理结构，大多数的 inode 都存储在磁盘上。 </p>
+<p>少量常用、近期使用的 inode 会被缓存到内存中。 </p>
+<p>所谓的删除文件，就是删除 inode，但是数据其实还是在硬盘上，以后会覆盖掉。</p>
+<h2 id="stat-函数"><a href="#stat-函数" class="headerlink" title="stat 函数"></a>stat 函数</h2><p>获取文件属性，（从 inode 结构体中获取） </p>
+<p>stat&#x2F;lstat 函数： <code>int stat(const char *path, struct stat *buf);</code> </p>
+<p>参数： </p>
+<p>​	path： 文件路径 </p>
+<p>​	buf：（传出参数） 存放文件属性，inode 结构体指针。 </p>
+<p>返回值： </p>
+<p>​	成功： 0 </p>
+<p>​	失败： -1 errno </p>
+<p>获取文件大小： buf.st_size </p>
+<p>获取文件类型： buf.st_mode </p>
+<p>获取文件权限： buf.st_mode </p>
+<p>符号穿透：stat 会。lstat 不会。</p>
+<p>下面这个例子是获取文件大小的正规军解法，用 stat：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" alt="image-20230526211019247"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man 2 stat</span><br><span class="line">进入之后G</span><br><span class="line">一般比较大的函数或者是难度大的有example</span><br></pre></td></tr></table></figure>
+
+<p>stat 会拿到符号链接指向那个文件或目录的属性。 不想穿透符号就用 lstat（两个除了穿透符号这个性质以外就一样）</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" alt="image-20230526213815013"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">用sb.st_mode &amp; SIFMT前4位就是SIFMT与上文件得出的mode</span><br><span class="line">switch (sb.st_mode &amp; S_IFMT) &#123;</span><br><span class="line">           case S_IFBLK:  printf(&quot;block device\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFCHR:  printf(&quot;character device\n&quot;);        br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFDIR:  printf(&quot;directory\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFIFO:  printf(&quot;FIFO/pipe\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFLNK:  printf(&quot;symlink\n&quot;);                 br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFREG:  printf(&quot;regular file\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFSOCK: printf(&quot;socket\n&quot;);                  br</span><br><span class="line">eak;</span><br><span class="line">           default:       printf(&quot;unknown?\n&quot;);                br</span><br><span class="line">eak;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="link-和-Unlink-隐式回收"><a href="#link-和-Unlink-隐式回收" class="headerlink" title="link 和 Unlink 隐式回收"></a>link 和 Unlink 隐式回收</h2><p>硬链接数就是 dentry 数目 </p>
+<p>link 就是用来创建硬链接的 （硬链接的作用是允许一个文件拥有多个有效路径名，这样用户就可以建立硬链接到重要文件,以防止“误删”的功能假设我们删除了原始的<code>foo.txt</code>文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="built_in">rm</span> -f foo.txt </span><br><span class="line">➜  <span class="built_in">cat</span> bar.txt </span><br><span class="line">LeetCode</span><br></pre></td></tr></table></figure>
+
+<p>此时文件的内容依然存在，所以只删除一个连接并不影响索引节点本身和其它的连接，只有当最后一个链接被删除后，文件的数据块及目录的连接才会被释放，也就是说，文件才会被真正删除）</p>
+<p>（软连接可以是任意文件或目录，可以链接不同文件系统的文件，在对符号文件进行读或写操作的时候，系统会自动把该操作转换为对源文件的操作，但删除链接文件时，系统仅仅删除链接文件，而不删除源文件本身，这一点类似于 Windows 操作系统下的快捷方式。）</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230619154914148.png" alt="image-20230619154914148"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230619154914148.png" class title="This is an test image">
+
+<p>link 可以用来实现 mv 命令 </p>
+<p>函数原型： <code>int link(const char *oldpath, const char *newpath)</code> 用这个来实现 mv，用 oldpath 来创建 newpath，完事儿删除 oldpath 就行。 </p>
+<p>删除一个链接 <code>int unlink(const char *pathname)</code> </p>
+<p>unlink 是删除一个文件的目录项 dentry，使硬链接数-1 </p>
+<p>unlink 函数的特征：清除文件时，如果文件的硬链接数到 0 了，没有 dentry 对应，但该文件仍不会 马上被释放，要等到所有打开文件的进程关闭该文件，系统才会挑时间将该文件释放掉。</p>
+<p>在程序中加入段错误成分，段错误在 unlink 之前，由于发生段错误，程序后续删除 temp.txt 的 dentry 部分就不会再执行，temp.txt 就保留了下来，这是不科学的。 </p>
+<p>在编程中以下几类做法容易导致段错误,基本上是<strong>错误地使用指针引起的</strong>。 所谓的段错误就是指访问的内存超出了系统所给这个程序的内存空间，段错误应该就是访问了不可访问的内存，这个内存区要么是不存在的，要么是受到系统保护的。</p>
+<p>解决办法是检测 fd 有效性后，立即释放 temp.txt，由于进程未结束，虽然 temp.txt 的硬链接数已 经为 0，但还不会立即释放，仍然存在，要等到程序执行完才会释放。这样就能避免程序出错导致临 时文件保留下来。</p>
+<p>因为文件创建后，硬链接数立马减为 0，即使程序异常退出，这个文件也会被清理掉。这时候的内容 是写在内核空间的缓冲区。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">1. /*</span><br><span class="line">2. *unlink 函数是删除一个 dentry</span><br><span class="line">3. */</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;fcntl.h&gt;</span><br><span class="line">6. #include &lt;stdlib.h&gt;</span><br><span class="line">7. #include &lt;string.h&gt;</span><br><span class="line">8. #include &lt;stdio.h&gt;</span><br><span class="line">9.</span><br><span class="line">10.</span><br><span class="line">11. int main(void)</span><br><span class="line">12. &#123;</span><br><span class="line">13. int fd, ret;</span><br><span class="line">14. char *p = &quot;test of unlink\n&quot;;</span><br><span class="line">15. char *p2 = &quot;after write something.\n&quot;;</span><br><span class="line">16.</span><br><span class="line">17. fd = open(&quot;temp.txt&quot;, O_RDWR|O_CREAT|O_TRUNC, 0644);</span><br><span class="line">18. if(fd &lt; 0)&#123;</span><br><span class="line">19. perror(&quot;open temp error&quot;);</span><br><span class="line">20. exit(1);</span><br><span class="line">21. &#125;</span><br><span class="line">22.</span><br><span class="line">23. ret = unlink(&quot;temp.txt&quot;); //具备了被释放的条件</span><br><span class="line">24. if(ret &lt; 0)&#123;</span><br><span class="line">25. perror(&quot;unlink error&quot;);</span><br><span class="line">26. exit(1);</span><br><span class="line">27. &#125;</span><br><span class="line">28.</span><br><span class="line">29. ret = write(fd, p, strlen(p));</span><br><span class="line">30. if (ret == -1) &#123;</span><br><span class="line">31. perror(&quot;-----write error&quot;);</span><br><span class="line">32. &#125;</span><br><span class="line">33.</span><br><span class="line">34. printf(&quot;hi! I&#x27;m printf\n&quot;);</span><br><span class="line">35. ret = write(fd, p2, strlen(p2));</span><br><span class="line">36. if (ret == -1) &#123;</span><br><span class="line">37. perror(&quot;-----write error&quot;);</span><br><span class="line">38. &#125;</span><br><span class="line">39.</span><br><span class="line">40. printf(&quot;Enter anykey continue\n&quot;);</span><br><span class="line">41. getchar();//在调用getchar()函数时，编译器会依次读取用户键入缓存区的一个字符(注意这里只读取一个字符，如果缓存区有多个字符，那么将会读取上一次被读取字符的下一个字符),是阻塞状态，在这里可以方便查看文件</span><br><span class="line">42.</span><br><span class="line">43. close(fd);</span><br><span class="line">44.</span><br><span class="line">45. return 0;</span><br><span class="line">46. &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>隐式回收</strong>： </p>
+<p>​		当进程结束运行时，所有进程打开的文件会被关闭，申请的内存空间会被释放。系统的这一特性 称之为隐式回收系统资源。 </p>
+<p>​		比如上面那个程序，要是没有在程序中关闭文件描述符，没有隐式回收的话，这个文件描述符会保留， 多次出现这种情况会导致系统文件描述符耗尽。所以隐式回收会在程序结束时收回它打开的文件使用 的文件描述符。</p>
+<p><strong>文件描述符</strong>（file descriptor）就是内核为了高效管理这些已经被打开的文件所创建的索引，其是一个非负整数（通常是小整数），用于指代被打开的文件，所有执行I&#x2F;O操作的系统调用都通过文件描述符来实现。同时还规定系统刚刚启动的时候，0是标准输入，1是标准输出，2是标准错误。这意味着如果此时去打开一个新的文件，它的文件描述符会是3，再打开一个文件文件描述符就是4……</p>
+<h2 id="文件目录-rwx-权限差异"><a href="#文件目录-rwx-权限差异" class="headerlink" title="文件目录 rwx 权限差异"></a>文件目录 rwx 权限差异</h2><p>vi 目录 会得到目录项的列表</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" alt="image-20230527200057726"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" class title="This is an test image">
+
+<h2 id="目录操作函数"><a href="#目录操作函数" class="headerlink" title="目录操作函数"></a>目录操作函数</h2><p>目录操作函数： <code>DIR * opendir(char *name);</code> </p>
+<p><code>int closedir(DIR *dp);</code></p>
+<p><code>struct dirent *readdir(DIR * dp);</code> </p>
+<p><code>struct dirent &#123; </code></p>
+<p><code>inode </code></p>
+<p><code>char dname[256]; &#125;</code></p>
+<p> 没有写目录操作，因为目录写操作就是创建文件。可以用 touch</p>
+<p>下面用目录操作函数实现一个 ls 操作：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" alt="image-20230527200502344"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" class title="This is an test image">
+
+<p>要隐藏这个.和..的话，在输出文件名的时候判定一下，只输出不是.和..的就行了</p>
+<h2 id="应用程序的系统调用过程"><a href="#应用程序的系统调用过程" class="headerlink" title="应用程序的系统调用过程"></a>应用程序的系统调用过程</h2><p>应用程序-&gt;标库函数-&gt;系统调用-&gt;驱动-&gt;硬件</p>
+<h2 id="递归遍历目录实现"><a href="#递归遍历目录实现" class="headerlink" title="递归遍历目录实现"></a>递归遍历目录实现</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">先写个简易版的，可以判定文件，读取文件大小：</span><br><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;pthread.h&gt;</span><br><span class="line">6. #include &lt;sys/stat.h&gt;</span><br><span class="line">7.</span><br><span class="line">8. void isFile(char *name)&#123;</span><br><span class="line">9. int ret = 0;</span><br><span class="line">10. struct stat sb;</span><br><span class="line">11.</span><br><span class="line">12. ret = stat(name, &amp;sb);</span><br><span class="line">13. if(ret == -1)&#123;</span><br><span class="line">14. perror(&quot;stat error&quot;);</span><br><span class="line">15. return;</span><br><span class="line">16. &#125;</span><br><span class="line">17.</span><br><span class="line">18. if(S_ISDIR(sb.st_mode))&#123;</span><br><span class="line">19.</span><br><span class="line">20. &#125;</span><br><span class="line">21. printf(&quot;%s\t%ld\n&quot;, name, sb.st_size);</span><br><span class="line">22.</span><br><span class="line">23. return;</span><br><span class="line">24. &#125;</span><br><span class="line">25. int main(int argc, char *argv[])&#123;</span><br><span class="line">26. if(argc == 1) &#123;</span><br><span class="line">27. isFile(&quot;.&quot;);</span><br><span class="line">28. &#125;</span><br><span class="line">29. else &#123;</span><br><span class="line">30. isFile(argv[1]);</span><br><span class="line">31. &#125;</span><br><span class="line">32.</span><br><span class="line">33. return 0;</span><br><span class="line">34. &#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面完善功能，把对目录的递归处理补全，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;sys/stat.h&gt;</span><br><span class="line">6. #include &lt;dirent.h&gt;</span><br><span class="line">7. #include &lt;pthread.h&gt;</span><br><span class="line">8.</span><br><span class="line">9. void isFile(char *name);</span><br><span class="line">10.</span><br><span class="line">11. // 打开目录读取,处理目录</span><br><span class="line">12. void read_dir(char *dir, void (*func)(char *))</span><br><span class="line">13. &#123;</span><br><span class="line">14. char path[256];</span><br><span class="line">15. DIR *dp;</span><br><span class="line">16. struct dirent *sdp;</span><br><span class="line">17.</span><br><span class="line">18. dp = opendir(dir);</span><br><span class="line">19. if (dp == NULL) &#123;</span><br><span class="line">20. perror(&quot;opendir error&quot;);</span><br><span class="line">21. return;</span><br><span class="line">22. &#125;</span><br><span class="line">23. // 读取目录项</span><br><span class="line">24. while((sdp = readdir(dp)) != NULL) &#123;</span><br><span class="line">25. if (strcmp(sdp-&gt;d_name, &quot;.&quot;) == 0 || strcmp(sdp-&gt;d_name, &quot;..&quot;) == 0) &#123;</span><br><span class="line">26. continue;</span><br><span class="line">27. &#125;</span><br><span class="line">28. //fprintf();发送格式化输出到流 stream 中简单一点：把数据写入文件（但是文件流不只是文件，c++可以定义文件流,比如stderr)</span><br><span class="line">29. // 目录项本身不可访问, 拼接. 目录/目录项</span><br><span class="line">30. sprintf(path, &quot;%s/%s&quot;, dir, sdp-&gt;d_name);//sprintf的作用是将一个格式化的字符串输出到一个目的字符串中</span><br><span class="line">31.</span><br><span class="line">32. // 判断文件类型,目录递归进入,文件显示名字/大小</span><br><span class="line">33. //isFile(path);</span><br><span class="line">34. (*func)(path);</span><br><span class="line">35. &#125;</span><br><span class="line">36.</span><br><span class="line">37. closedir(dp);</span><br><span class="line">38.</span><br><span class="line">39. return ;</span><br><span class="line">40. &#125;</span><br><span class="line">41.</span><br><span class="line">42. void isFile(char *name)</span><br><span class="line">43. &#123;</span><br><span class="line">44. int ret = 0;</span><br><span class="line">45. struct stat sb;</span><br><span class="line">46.</span><br><span class="line">47. // 获取文件属性, 判断文件类型</span><br><span class="line">48. ret = stat(name, &amp;sb);</span><br><span class="line">49. if (ret == -1) &#123;</span><br><span class="line">50. perror(&quot;stat error&quot;);</span><br><span class="line">51. return ;</span><br><span class="line">52. &#125;</span><br><span class="line">53. // 是目录文件</span><br><span class="line">54. if (S_ISDIR(sb.st_mode)) &#123;</span><br><span class="line">55. read_dir(name, isFile);</span><br><span class="line">56. &#125;</span><br><span class="line">57. // 是普通文件, 显示名字/大小</span><br><span class="line">58. printf(&quot;%10s\t\t%ld\n&quot;, name, sb.st_size);</span><br><span class="line">59.</span><br><span class="line">60. return;</span><br><span class="line">61. &#125;</span><br><span class="line">62.</span><br><span class="line">63.</span><br><span class="line">64. int main(int argc, char *argv[])</span><br><span class="line">65. &#123;</span><br><span class="line">66. // 判断命令行参数</span><br><span class="line">67. if (argc == 1) &#123;</span><br><span class="line">68. isFile(&quot;.&quot;);</span><br><span class="line">69. &#125; else &#123;</span><br><span class="line">70. isFile(argv[1]);</span><br><span class="line">71. &#125;</span><br><span class="line">72.</span><br><span class="line">73. return 0;</span><br><span class="line">74. &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="dup-和-dup2"><a href="#dup-和-dup2" class="headerlink" title="dup 和 dup2"></a>dup 和 dup2</h2><p>用来做重定向，本质就是复制文件描述符：<br>dup 和 dup2：<br><code>int dup(int oldfd);</code> 文件描述符复制。<br>oldfd: 已有文件描述符<br>返回：新文件描述符，这个描述符和 oldfd 指向相同内容。<br><code>int dup2(int oldfd, int newfd);</code> 文件描述符复制，oldfd 拷贝给 newfd。返回 newfd</p>
+<p>下面讲 dup2（dupto）： 下面这个例子，将一个已有文件描述符 fd1 复制给另一个文件描述符 fd2，<strong>然后用 fd2 修改 fd1</strong> 指向 的文件：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" alt="image-20230531192509565"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" class title="This is an test image">
+
+<p>上面那个例子，fd1 是打开 hello.c 的文件描述符，fd2 是打开 hello2.c 的文件描述符 用 dup2 将 fd1 复制给了 fd2，于是在对 fd2 指向的文件进行写操作时，实际上就是对 fd1 指向的 hello.c 进行写操作。 这里需要注意一个问题，由于 hello.c 和 hello2.c 都是空文件，所以直接写进去没关系。但如果 hello.c 是非空的，写进去的内容默认从文件头部开始写，会覆盖原有内容。</p>
+<p>dup2 也可以用于标准输入输出的重定向。 下面这个例子，将输出到 STDOUT 的内容重定向到文件里：</p>
+<p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" alt="image-20230531192739775"></p>
+<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" class title="This is an test image">
+
+<p>这个程序，将 fd1 的内容复制给了 fd2，使得原来指向 hello2.c 的 fd2 也指向了 hello.c 并通过 fd2 向 hello.c 里写入了…。完事儿将标准输出重定向至 fd1，就是将要显示在标准输出的内容，写入了 fd1 指向的文件，就是 hello.c 中 这里有一点和上面程序不同，就是 hello.c 是处于打开状态的，连续写入两段话，写入… 的时候，读写指针在这句话末尾，就不会覆盖前面这句话。 这里再强调一下，打开一个文件，读写指针默认在文件头，如果文件本身有内容，直接写入会覆盖有内容。</p>
+<h2 id="fcntl-实现-dup-描述符"><a href="#fcntl-实现-dup-描述符" class="headerlink" title="fcntl 实现 dup 描述符"></a>fcntl 实现 dup 描述符</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fcntl 函数实现 dup：</span><br><span class="line">	int fcntl(int fd, int cmd, ....)</span><br><span class="line">	cmd: F_DUPFD</span><br><span class="line">	参 3: 被占用的，返回最小可用的。</span><br><span class="line">			未被占用的， 返回=该值的文件描述符。</span><br></pre></td></tr></table></figure>
+
+<p>对于 fcntl 中的参数 0，这个表示 0 被占用，fcntl 使用文件描述符表中的最小文件描述符返回 假设传入 0，传一个 7，且 7 未被占用，则会返回 7 所以这个参数可以这样理解，你传入一个文件描述符 k，如果 k 没被占用，则直接用 k 复制 fd1 的内 容。如果 k 被占用，则返回描述符表中最小可用描述符，也就是自己指定一个一志愿，如果行，就返 回这个。如果不行，国家给你分配一个最小的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/" class="post-title-link" itemprop="url">Linux上gcc编译</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-05-14 10:41:46" itemprop="dateCreated datePublished" datetime="2023-05-14T10:41:46+08:00">2023-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-21 10:34:55" itemprop="dateModified" datetime="2023-05-21T10:34:55+08:00">2023-05-21</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="gcc-编译-4-步骤"><a href="#gcc-编译-4-步骤" class="headerlink" title="gcc 编译 4 步骤"></a>gcc 编译 4 步骤</h1><p>GCC（GNU Compiler Collection）是由 GNU 开发的编程语言编译器。 GCC最初代表“GNU C Compiler”，当时只支持C语言。 后来又扩展能够支持更多编程语言，包括 C++、Fortran 和 Java 等。</p>
+<p>GCC 编译工具链在编译一个C源文件时需要经过以下 4 步：</p>
+<ul>
+<li>预处理：为把头文件的代码、宏之类的内容转换成生成的.i文件，还是C代码。</li>
+<li>编译：把预处理后的.i文件通过编译成.s文件，汇编语言。</li>
+<li>汇编：将汇编语言文件生成目标文件.o文件，机器码。</li>
+<li>链接：将每个源文件对应的.o文件链接起来，就生成一个可执行程序文件</li>
+</ul>
+<p><strong>（1）预处理阶段</strong></p>
+<p>预处理过程中，对源代码文件中的文件包含 (include)、 预编译语句 (如宏定义define等)进行展开，生成 .i 文件。 可理解为把头文件的代码、宏之类的内容转换成更纯粹的C代码，不过生成的文件以.i为后缀。</p>
+<p>使用GCC的参数 “-E”，可以让编译器生成 .i 文件，参数 “-o”，可以指定输出文件的名字。</p>
+<p>具体命令如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 预处理，可理解为把头文件的代码汇总成C代码，把*.c转换得到*.i文件</span><br><span class="line">gcc –E hello.c –o hello.i</span><br></pre></td></tr></table></figure>
+
+<p><strong>（2）编译阶段</strong>（消耗时间、系统资源最多）</p>
+<p>把预处理后的.i文件通过编译成为汇编语言，生成.s文件，即把代码从C语言转换成汇编语言，这是GCC编译器完成的工作。在这个过程，GCC会检查各个源文件的语法，即使我们调用了一个没有定义的函数，也不会报错。</p>
+<p>GCC可以使用-S选项，让编译程序生成汇编语言的代码文件（.s后缀）。</p>
+<p>warning时如果有行号，说明是编译阶段出错。</p>
+<p>具体命令如下:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译，可理解为把C代码转换为汇编代码，把*.i转换得到*.s文件</span></span><br><span class="line">gcc –S hello.i –o hello.s</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接以C文件作为输入进行编译，与上面的命令是等价的</span></span><br><span class="line">gcc –S hello.c –o hello.s</span><br></pre></td></tr></table></figure>
+
+<p><strong>（3）汇编阶段</strong></p>
+<p>将汇编语言文件经过汇编，生成目标文件.o文件，每一个源文件都对应一个目标文件。即把汇编语言的代码转换成机器码，这是as汇编器完成的工作。</p>
+<p>GCC的参数“c”表示只编译(compile)源文件但不链接，会将源程序编译成目标文件（.o后缀）。计算机只认识0或者1，不懂得C语言，也不懂得汇编语言，经过编译汇编之后，生成的目标文件包含着机器代码，这部分代码就可以直接被计算机执行。一般情况下，可以直接使用参数“c”，跳过上述的两个过程，具体命令 如下：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 汇编，可理解为把汇编代码转换为机器码，把*.s转换得到*.o，即目标文件</span></span><br><span class="line">gcc –c hello.s –o hello.o</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接以C文件作为输入进行汇编，与上面的命令是等价的</span></span><br><span class="line">gcc –c hello.c –o hello.o</span><br></pre></td></tr></table></figure>
+
+<p>Linux下生成的 <em>.o目标文件、</em>so动态库文件以及下一小节链接阶段生成最终的可执行文件都是elf格式的， 可以使用“readelf”工具来查看它们的内容。</p>
+<p><strong>（4）链接阶段</strong></p>
+<p>最后将每个源文件对应的目标.o文件链接起来，就生成一个可执行程序文件，这是链接器ld完成的工作。</p>
+<p>例如一个工程里包含了A和B两个代码文件，在链接阶段， 链接过程需要把A和B之间的函数调用关系理顺，也就是说要告诉A在哪里能够调用到fun函数， 建立映射关系，所以称之为链接。若链接过程中找不到fun函数的具体定义，则会链接报错。</p>
+<p>虽然本示例只有一个hello.c文件，但它调用了C标准代码库的printf函数， 所以链接器会把它和printf函数链接起来，生成最终的可执行文件。</p>
+<p>链接分为两种：</p>
+<ul>
+<li>动态链接：GCC编译时的默认选项。动态是指在应用程序运行时才去加载外部的代码库，不同的程序可以共用代码库。 所以动态链接生成的程序比较小，占用较少的内存。</li>
+<li>静态链接：链接时使用选项 “–static”，它在编译阶段就会把所有用到的库打包到自己的可执行程序中。 所以静态链接的优点是具有较好的兼容性，不依赖外部环境，但是生成的程序比较大。</li>
+</ul>
+<p>执行如下命令体验静态链接与动态链接的区别：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在hello.o所在的目录执行如下命令</span></span><br><span class="line"><span class="comment"># 动态链接，生成名为hello的可执行文件</span></span><br><span class="line">//<span class="literal">-o</span>是用来指定生成文件的名字</span><br><span class="line">gcc hello.o –o hello</span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接使用C文件一步生成，与上面的命令等价</span></span><br><span class="line">gcc hello.c <span class="literal">-o</span> hello</span><br><span class="line"></span><br><span class="line"><span class="comment"># 静态链接，使用--static参数，生成名为hello_static的可执行文件</span></span><br><span class="line">gcc hello.o –o hello_static <span class="literal">--static</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以直接使用C文件一步生成，与上面的命令等价</span></span><br><span class="line">gcc hello.c <span class="literal">-o</span> hello_static <span class="literal">--static</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="当头文件和源码不在一个目录下时，需要指定头文件"><a href="#当头文件和源码不在一个目录下时，需要指定头文件" class="headerlink" title="当头文件和源码不在一个目录下时，需要指定头文件"></a>当头文件和源码不在一个目录下时，需要指定头文件</h2><p>gcc -I .&#x2F;hellodir hello.c -o hello 其中-I 参数指定头文件所在位置，位置可以在编译文件前，也可以在后面</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-I 指定头文件所在目录位置</span><br><span class="line">-c 只做预处理，编译，汇编。得到二进制文件</span><br><span class="line">-g 编译时添加调试文件，用于 gdb 调试</span><br><span class="line">-Wall 显示所有警告信息</span><br><span class="line">-D 向程序中“动态”注册宏定义，一般可以用在调试，制作一个开关，比如ifdef,发布的时候就可以不用删除调试信息</span><br><span class="line">-l 指定动态库库名</span><br><span class="line">-L 指定动态库路径</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="动态库和静态库理论对比"><a href="#动态库和静态库理论对比" class="headerlink" title="动态库和静态库理论对比"></a>动态库和静态库理论对比</h2><p>静态库在文件中静态展开，所以有多少文件就展开多少次，非常吃内存，100M 展开 100 次，就是 1G， 但是这样的好处就是静态加载的速度快 </p>
+<p>使用动态库会将动态库加载到内存，10 个文件也只需要加载一次，然后这些文件用到库的时候临时去加载，速度慢一些，但是很省内存 </p>
+<p>动态库和静态库各有优劣，根据实际情况合理选用即可。</p>
+<ul>
+<li>1.动态库是否加载到内存,取决于程序是否运行</li>
+<li>2.动态库每次加载的位置不固定</li>
+<li>3.动、静态库共存时,编译器默认使用动态库</li>
+</ul>
+<h3 id="静态库制作"><a href="#静态库制作" class="headerlink" title="静态库制作"></a>静态库制作</h3><p>静态库名字以 lib 开头，以.a 结尾 ，.a是ELF文件，可重定位目标文件。</p>
+<p>例如：<code>libmylib.a</code> </p>
+<p>静态库生成指令 <code>ar rcs libmylib.a file1.o</code></p>
+<p>步骤一： 写好源代码</p>
+<p>步骤二： 编译源代码生成.o 文件</p>
+<p>步骤三： 制作静态库 ar rcs libname.a file1.o file2.o …</p>
+<p>静态库的使用： gcc test.c lib 库名.a -o a.out</p>
+<h3 id="动态库制作-生成与位置无关代码"><a href="#动态库制作-生成与位置无关代码" class="headerlink" title="动态库制作-生成与位置无关代码"></a>动态库制作-生成与位置无关代码</h3><p>写在源代码里的函数，相对 main 函数偏移是一定的，链接时，回填 main 函数地址之后，其他源代码里的函数也就得到了地址。 </p>
+<p>动态库里的函数会用一个@plt 来标识，当动态库加载到内存时，再用加载进去的地址将@plt 替换掉。</p>
+<p>制作动态库的步骤 </p>
+<ol>
+<li>生成位置无关的.o 文件 <code>gcc -c add.c -o add.o -fPIC</code> 使用这个参数过后，生成的函数就和位置无关，挂上@plt 标识，等待动态绑定 </li>
+<li>使用 gcc -shared 制作动态库 <code>gcc -shared -o lib 库名.so add.o sub.o div.o</code> </li>
+<li>编译可执行程序时指定所使用的动态库。-l:指定库名 -L:指定库路径 <code>gcc test.c -o a.out -l mymath -L ./lib</code> </li>
+<li>运行可执行程序.&#x2F;a.out</li>
+</ol>
+<h4 id="动态库加载错误原因及解决方式"><a href="#动态库加载错误原因及解决方式" class="headerlink" title="动态库加载错误原因及解决方式"></a>动态库加载错误原因及解决方式</h4><p>出错原因分析： </p>
+<p>连接器： 工作于链接阶段，工作时需要 -l 和 -L </p>
+<p>动态链接器： 工作于程序运行阶段，工作时需要提供动态库所在目录位置 </p>
+<p>指定动态库路径并使其生效，然后再执行文件 </p>
+<p>通过环境变量指定动态库所在位置：<code>export LD_LIBRARY_PATH=动态库路径</code></p>
+<p>当关闭终端，再次执行 a.out 时，又报错。 </p>
+<p>这是因为，环境变量是进程的概念，关闭终端之后再打开，是两个进程，环境变量发生了变化。 </p>
+<p>要想永久生效，需要修改 bash 的配置文件：<code>vi ~./bashrc</code> </p>
+<p>修改后要使配置文件立即生效：<code>. .bashrc</code> 或者 <code>source .bashrc</code> 或者重开终端让其自己加载 这下再执行 a.out 就不会报错</p>
+<h4 id="动态库加载错误原因及解决方式-2"><a href="#动态库加载错误原因及解决方式-2" class="headerlink" title="动态库加载错误原因及解决方式 2"></a>动态库加载错误原因及解决方式 2</h4><p>解决方式： </p>
+<p>【1】 通过环境变量： <code>export LD_LIBRARY_PATH=动态库路径</code></p>
+<p> .&#x2F;a.out 成功！！！ （临时生效， 终端重启环境变量失效） </p>
+<p>【2】 永久生效： 写入 终端配置文件。 .bashrc 建议使用绝对路径。 </p>
+<pre><code>1) vi ~/.bashrc
+2) 写入 export LD_LIBRARY_PATH=动态库路径 保存 
+3) ..bashrc/ source .bashrc / 重启 终端 (三种方法都可以)---&gt; 让修改后的.bashrc 生效 
+4) ./a.out 成功！！！ 
+</code></pre>
+<p>【3】 拷贝自定义动态库 到 &#x2F;lib (标准 C 库所在目录位置) </p>
+<p>【4】 配置文件法 </p>
+<ul>
+<li>sudo vi &#x2F;etc&#x2F;ld.so.conf</li>
+<li>写入 动态库绝对路径 保存 </li>
+<li>sudo ldconfig -v 使配置文件生效。 </li>
+<li>.&#x2F;a.out 成功！！！— 使用 ldd a.out 查看</li>
+</ul>
+<h3 id="数据段合并"><a href="#数据段合并" class="headerlink" title="数据段合并"></a>数据段合并</h3><p>在链接阶段完成，节省空间，将同样工作（例如只读）的数据段合并。</p>
+<h2 id="头文件守卫："><a href="#头文件守卫：" class="headerlink" title="头文件守卫："></a>头文件守卫：</h2><p>防止头文件被重复包含 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#ifndef _HEAD_H_ </span><br><span class="line">#define _HEAD_H_ </span><br><span class="line">...... </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<h2 id="gdb-调试基础指令"><a href="#gdb-调试基础指令" class="headerlink" title="gdb 调试基础指令"></a>gdb 调试基础指令</h2><p>使用 gdb 之前，要求对文件进行编译时增加-g 参数，加了这个参数过后生成的编译文件会大一些， 这是因为增加了 gdb 调试内容 </p>
+<p>gdb 调试工具： 大前提：程序是你自己写的。 —逻辑错误 </p>
+<p>基础指令： </p>
+<p>​	-g：使用该参数编译可以执行文件，得到调试表。 </p>
+<p>​	gdb .&#x2F;a.out </p>
+<p>​	list： list 1 列出源码。根据源码指定 行号设置断点。 断点那一行不会执行</p>
+<p>​	b： b 20 在 20 行位置设置断点。 </p>
+<p>​	run&#x2F;r: 运行程序 </p>
+<p>​	n&#x2F;next: 下一条指令（会越过函数） </p>
+<p>​	next&#x2F;n :下一个，调用函数就跑 </p>
+<p>​	step&#x2F;s :单步，会进入调用的函数 </p>
+<p>​	要注意的是，如果是系统函数，按 s 就出不来了，这时用 until+行号直接执行到行号处</p>
+<p>​	s&#x2F;step: 下一条指令（会进入函数） </p>
+<p>​	p&#x2F;print：p i 查看变量的值。 </p>
+<p>​	continue：继续执行断点后续指令。 </p>
+<p>​	finish：结束当前函数调用。 </p>
+<p>​	quit：退出 gdb 当前调试。 </p>
+<p>其他指令： </p>
+<p>​	run：使用 run 查找段错误出现位置。 </p>
+<p>​	set args： 设置 main 函数命令行参数 （在 start、run 之前） </p>
+<p>​	run 字串 1 字串 2 …: 设置 main 函数命令行参数 </p>
+<p>​	info b: 查看断点信息表 </p>
+<p>​	b 20 if i &#x3D; 5： 设置条件断点。 </p>
+<p>​	ptype：查看变量类型。 </p>
+<p>​	bt：列出当前程序正存活着的栈帧。 </p>
+<p>​	frame： 根据栈帧编号，切换栈帧。 </p>
+<p>​	display：设置跟踪变量 </p>
+<p>​	undisplay：取消设置跟踪变量。 使用跟踪变量的编号。</p>
+<p>没有符号被读取—编译时没加-g 参数 </p>
+<p>file 后面加使用-g 编译的文件，可以不用退出，gdb 直接读取后进行调试。</p>
+<h2 id="makefile-基础规则"><a href="#makefile-基础规则" class="headerlink" title="makefile 基础规则"></a>makefile 基础规则</h2><p>makefile： 管理项目。 </p>
+<p>命名：makefile 	Makefile — make 命令 </p>
+<p>1 个规则： </p>
+<p>目标：依赖条件 </p>
+<p>​	（一个 tab 缩进）命令 </p>
+<ol>
+<li>目标的时间必须晚于依赖条件的时间，否则，更新目标 </li>
+<li>依赖条件如果不存在，找寻新的规则去产生依赖条件。</li>
+</ol>
+<p>ALL：指定 makefile 的终极目标（第一行）。</p>
+<p>2 个函数：</p>
+<p>​    src &#x3D; $(wildcard .&#x2F;*.c): 匹配当前工作目录下的所有.c 文件。将文件名组成列表，赋值给变量 src。 src &#x3D; add.c sub.c div1.c </p>
+<p>​    obj &#x3D; $(patsubst %.c, %.o, $(src)): 将参数3中，包含参数1的部分，替换为参数2。 obj &#x3D; add.o sub.o div1.o</p>
+<p>  clean: (没有依赖)</p>
+<p>​    -rm -rf $(obj) a.out “-”：作用是，删除不存在文件时，不报错。顺序执行结束。</p>
+<p>  3 个自动变量：</p>
+<p>​    $@: 在规则的命令中，表示规则中的目标。</p>
+<p>​    $^: 在规则的命令中，表示所有依赖条件。</p>
+<p>​    $&lt;: 在规则的命令中，表示第一个依赖条件。如果将该变量应用在模式规则中，它可将依赖条件列表中的依赖依次取出，套用模式规则。</p>
+<p>  模式规则：</p>
+<p>​    %.o:%.c</p>
+<p>​      gcc -c $&lt; -o %@</p>
+<p>  静态模式规则：</p>
+<p>​    $(obj):%.o:%.c</p>
+<p>​      gcc -c $&lt; -o %@  </p>
+<p>  伪目标：</p>
+<p>​    .PHONY: clean ALL</p>
+<p>  参数：</p>
+<p>​    -n：模拟执行make、make clean 命令。</p>
+<p>​    -f：指定文件执行 make 命令。       xxxx.mk</p>
+<p> makefile检测原理：</p>
+<p>修改文件后，文件的修改时间发生变化，会出现目标文件的时间早于作为依赖材料的时间，出现这种情况的文件会重新编译。</p>
+<p>修改sub.c后，sub.o的时间就早于sub.c ，a.out的时间也早于sub.o的时间了，于是重新编译这俩文件了。</p>
+<h2 id="makefile两个函数和clean"><a href="#makefile两个函数和clean" class="headerlink" title="makefile两个函数和clean"></a>makefile两个函数和clean</h2><p>src &#x3D; $(wildcard *.c)</p>
+<p>找到当前目录下所有后缀为.c的文件，赋值给src</p>
+<p>obj &#x3D; $(patsubset %.c,%.o, $(src))</p>
+<p>把src变量里所有后缀为.c的文件替换成.o</p>
+<p>rm前面的-，代表出错依然执行。比如，待删除文件集合是5个，已经手动删除了1个，就只剩下4个，然而删除命令里面还是5个的集合，就会有删除不存在文件的问题，不加这-，就会报错，告诉你有一个文件找不到。加了-就不会因为这个报错。</p>
+<h2 id="makefile3个自动变量和模式规则"><a href="#makefile3个自动变量和模式规则" class="headerlink" title="makefile3个自动变量和模式规则"></a>makefile3个自动变量和模式规则</h2><p>3个自动变量</p>
+<p>$@ ：在规则命令中，表示规则中的目标</p>
+<p>$&lt; ：在规则命令中，表示规则中的第一个条件，如果将该变量用在模式规则中，它可以将依赖条件列表中的依赖依次取出，套用模式规则</p>
+<p>$^ ：在规则命令中，表示规则中的所有条件，组成一个列表，以空格隔开，如果这个列表中有重复项，则去重</p>
+<p>模式规则：</p>
+<p>%.o:%.c</p>
+<p>  gcc -c $&lt; -o $@</p>
+<h2 id="静态模式规则"><a href="#静态模式规则" class="headerlink" title="静态模式规则"></a>静态模式规则</h2><p>继续优化makefile，使用静态模式规则，就是指定模式规则给谁用，这里指定模式规则给obj用，以后文件多了，文件集合会有很多个，就需要指定哪个文件集合用什么规则</p>
+<p>$(obj):%.o:%.c</p>
+<p>gcc -c $&lt; -o $@</p>
+<p>再来一个扩展</p>
+<p>当前文件夹下有ALL文件或者clean文件时，会导致makefile瘫痪，如下所示，make clean没有工作</p>
+<p>用伪目标来解决，添加一行  .PHONY: clean ALL</p>
+<p>还有一个扩展就是，编译时的参数，-g,-Wall这些，可以放在makefile里面</p>
+<p>主要是注意%的匹配理解，只匹配文件名，目录位置要手动添加</p>
+<p>如果makefile的名字变化一下，比如，叫m6</p>
+<p>用m6执行makefile，   make -f m6</p>
+<p>用m6执行clean      make -f m6 clean</p>
+<p>源码 add.c,sub.c 这些在 src 目录下，.o 文件要放在 obj 目录下，头文件 head.h 在 inc 目录下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">src = $(wildcard ./src/*.c)	# ./src/add.c ./src/ sub.c...</span><br><span class="line">obj = $(patsubst ./src/%.c, ./obj/%.o，$(src))</span><br><span class="line">inc_path = ./inc</span><br><span class="line">myArgs = -Wall -g</span><br><span class="line">ALL:a.out</span><br><span class="line">$(obj):./obj/%.o:./src/%.c</span><br><span class="line">	gcc -c $&lt; -o $@ $(myArgs) -I $(inc_path)</span><br><span class="line">a.out: $(obj)</span><br><span class="line">	gcc $^ -o $@ $(myArgs)</span><br><span class="line">clean:</span><br><span class="line">	-rm -rf $(obj) a.out</span><br><span class="line">.PHONY: clean ALL</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2053,623 +2551,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/10/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/10/c%E5%92%8Cc++/%E7%AC%AC%E5%85%AB%E5%A4%A9-c/" class="post-title-link" itemprop="url">第八天 c++</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-10 16:38:50" itemprop="dateCreated datePublished" datetime="2023-04-10T16:38:50+08:00">2023-04-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-16 13:41:42" itemprop="dateModified" datetime="2023-04-16T13:41:42+08:00">2023-04-16</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="stack容器"><a href="#stack容器" class="headerlink" title="stack容器"></a>stack容器</h2><h3 id="stack基本概念"><a href="#stack基本概念" class="headerlink" title="stack基本概念"></a>stack基本概念</h3><p>概念: stack是一种先进后出(First In Last Out,FILO)的数据结构，它只有一个出口</p>
-<p>栈中只有顶端的元素才可以被外界使用，因此栈不允许有遍历行为</p>
-<h3 id="stack常用接口"><a href="#stack常用接口" class="headerlink" title="stack常用接口"></a>stack常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
-<p>构造函数:</p>
-<ul>
-<li>stack<T> stk;&#x2F;&#x2F;stack采用模板类实现, stack对象的默认构造形式</T></li>
-<li>stack( const stack &amp;stk);&#x2F;&#x2F;拷贝构造函数</li>
-</ul>
-<p>赋值操作:</p>
-<ul>
-<li>stack&amp; operator&#x3D;(const stack &amp;stk);&#x2F;&#x2F;重载等号操作符</li>
-</ul>
-<p>数据存取:</p>
-<ul>
-<li>push(elem);&#x2F;&#x2F;向栈顶添加元素</li>
-<li>pop();&#x2F;&#x2F;从栈顶移除第一个元素</li>
-<li>top();&#x2F;&#x2F;返回栈顶元素</li>
-</ul>
-<p>大小操作:</p>
-<ul>
-<li>empty();&#x2F;&#x2F;判断堆栈是否为空</li>
-<li>size();&#x2F;&#x2F;返回栈的大小</li>
-</ul>
-<h2 id="queue容器"><a href="#queue容器" class="headerlink" title="queue容器"></a>queue容器</h2><h3 id="queue基本概念"><a href="#queue基本概念" class="headerlink" title="queue基本概念"></a>queue基本概念</h3><p>概念:Queud是一种先进先出(First ln First Out,FIFO)的数据结构，它有两个出口</p>
-<ul>
-<li>队列容器允许从一端新增元素，从另一端移除元素</li>
-<li>队列中只有队头和队尾才可以被外界使用，因此队列不允许有遍历行为</li>
-<li>队列中进数据称为—入队push</li>
-<li>队列中出数据称为—出队pop</li>
-</ul>
-<h3 id="queue-常用接口"><a href="#queue-常用接口" class="headerlink" title="queue 常用接口"></a>queue 常用接口</h3><p>功能描述:栈容器常用的对外接口</p>
-<p>构造函数:</p>
-<ul>
-<li>queue<T> que;&#x2F;&#x2F;queue采用模板类实现，queue对象的默认构造形式</T></li>
-<li>queue(const queue &amp;que) ;&#x2F;&#x2F;拷贝构造函数</li>
-</ul>
-<p>赋值操作:</p>
-<ul>
-<li>queue&amp; operator&#x3D;(const queue &amp;que) ;&#x2F;&#x2F;重载等号操作符</li>
-</ul>
-<p>数据存取:</p>
-<ul>
-<li>push(elem) ;&#x2F;&#x2F;往队尾添加元素</li>
-<li>pop();&#x2F;&#x2F;从队头移除第一个元素</li>
-<li>back();&#x2F;&#x2F;返回最后一个元素</li>
-<li>front();&#x2F;&#x2F;返回第一个元素</li>
-</ul>
-<p>大小操作:</p>
-<ul>
-<li>empty();&#x2F;&#x2F;判断堆栈是否为空</li>
-<li>size();&#x2F;&#x2F;返回栈的大小</li>
-</ul>
-<h2 id="list容器"><a href="#list容器" class="headerlink" title="list容器"></a>list容器</h2><h3 id="list基本概念"><a href="#list基本概念" class="headerlink" title="list基本概念"></a>list基本概念</h3><p>功能:将数据进行链式存储</p>
-<p>链表(list)是一种物理存储单元上非连续的存储结构，数据元素的逻辑顺序是通过链表中的指针链接实现的</p>
-<p>链表的组成:链表由一系列结点组成</p>
-<p>结点的组成:一个是存储数据元素的数据域，另一个是存储下一个结点地址的指针域</p>
-<p>STL中的链表是一个双向循环链表</p>
-<p>由于链表的存储方式并不是连续的内存空间，因此链表list中的迭代器只支持前移和后移，属于双向迭代器</p>
-<p>list的优点:</p>
-<ul>
-<li>采用动态存储分配，不会造成内存浪费和溢出</li>
-<li>链表执行插入和删除操作十分方便，修改指针即可，不需要移动大量元素</li>
-</ul>
-<p>list的缺点:</p>
-<ul>
-<li>链表灵活，但是空间(指针域)和时间(遍历额外耗费较大</li>
-</ul>
-<p>List有一个重要的性质，插入操作和删除操作都不会造成原有list迭代器的失效，这在vector是不成立的。</p>
-<p>总结:STL中List和vector是两个最常被使用的容器，各有优缺点</p>
-<h3 id="list构造函数"><a href="#list构造函数" class="headerlink" title="list构造函数"></a>list构造函数</h3><p>函数原型:</p>
-<ul>
-<li>list<T> lst;&#x2F;&#x2F;list采用采用模板类实现,对象的默认构造形式:</T></li>
-<li>list(beg,end) ;&#x2F;&#x2F;构造函数将[beg, end)区间中的元素拷贝给本身。</li>
-<li>list(n,elem) ;&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
-<li>list(const list &amp;lst);&#x2F;&#x2F;拷贝构造函数。</li>
-</ul>
-<p>总结:list构造方式同其他几个STL常用容器，熟练掌握即可</p>
-<h3 id="list赋值和交换"><a href="#list赋值和交换" class="headerlink" title="list赋值和交换"></a>list赋值和交换</h3><p>函数原型:</p>
-<ul>
-<li>assign(beg,_end) ;&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
-<li>assign(n, eiem) ;&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
-<li>list&amp; operator&#x3D;(const list &amp;lst);&#x2F;&#x2F;重载等号操作符</li>
-<li>swap(lst);&#x2F;&#x2F;将lst与本身的元素互换。</li>
-</ul>
-<h3 id="list大小操作"><a href="#list大小操作" class="headerlink" title="list大小操作"></a>list大小操作</h3><p>函数原型:</p>
-<ul>
-<li>size();&#x2F;&#x2F;返回容器中元素的个数</li>
-<li>empty();&#x2F;&#x2F;判断容器是否为空</li>
-<li>resize(num ) ;&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以默认值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
-<li>resize(num，elem);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以elem值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
-</ul>
-<h3 id="list插入和删除"><a href="#list插入和删除" class="headerlink" title="list插入和删除"></a>list插入和删除</h3><p>函数原型:</p>
-<ul>
-<li>push_back(elem);&#x2F;&#x2F;在容器尾部加入一个元素.</li>
-<li>pop_back();&#x2F;&#x2F;删除容器中最后一个元素</li>
-<li>push_front(elem);&#x2F;&#x2F;在容器开头插入一个元素.</li>
-<li>pop_front();&#x2F;&#x2F;从容器开头移除第一个元素</li>
-<li>insert(pos,elem);&#x2F;&#x2F;在pos位置插elem元素的拷贝，返回新数据的位置。</li>
-<li>insert(pos,n,elem);&#x2F;&#x2F;在pos位置插入n个elem数据，无返回值。</li>
-<li>insert(pos,beg,end);&#x2F;&#x2F;在pos位置插入[beg,end)区间的数据，无返回值。</li>
-<li>clear();&#x2F;&#x2F;移除容器的所有数据</li>
-<li>erase(beg,end);&#x2F;&#x2F;删除[beg,end)区间的数据，返回下一个数据的位置。</li>
-<li>erase(pos);&#x2F;&#x2F;删除pos位置的数据，返回下一个数据的位置。</li>
-<li>remove(elem);&#x2F;&#x2F;删除容器中所有与elem值匹配的元素。</li>
-</ul>
-<h3 id="list数据存取"><a href="#list数据存取" class="headerlink" title="list数据存取"></a>list数据存取</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//L1[0]不可以用[]访问list容器中的元素</span><br><span class="line">//L1.at(O)不可以用at方式访问list容器中的元素</span><br><span class="line">//原因是list本质链表，不是用连续线性空间存储数据，迭代器也是不支持随机访问的</span><br><span class="line">cout &lt;&lt;&quot;第一个元素为:&quot;&lt;&lt; L1.front() &lt;&lt; endl;</span><br><span class="line">cout&lt;&lt;&quot;最后一个元素为:&quot;&lt;&lt; L1. back() &lt;&lt; endl ;</span><br><span class="line">//验证迭代器是不支持随机访问的</span><br><span class="line">list&lt;int&gt; : :iterator it = L1. begin();</span><br><span class="line">it++;//支持双向,可以用来判断其它容器是否支持双向访问，随机访问也一样</span><br><span class="line">it--;</span><br><span class="line">//it = it + 1;//不支持随机访问</span><br></pre></td></tr></table></figure>
-
-<p>总结:</p>
-<ul>
-<li>list容器中不可以通过[]或者at方式访问数据</li>
-<li>返回第一个元素— front</li>
-<li>返回最后一个元素— back</li>
-</ul>
-<h3 id="list反转和排序"><a href="#list反转和排序" class="headerlink" title="list反转和排序"></a>list反转和排序</h3><p>函数原型:</p>
-<ul>
-<li>reverse();&#x2F;&#x2F;反转链表</li>
-<li>sort(); &#x2F;&#x2F;链表排序</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//指定排序规则</span><br><span class="line">bool mycompare( int val1 , int val2)&#123;</span><br><span class="line">	return val1 &gt; val2;</span><br><span class="line">&#125;</span><br><span class="line">//所有不支持随机访问迭代器的容器，不可以用标准算法</span><br><span class="line">//不支持随机访问迭代器的容器，内部会提供对应一些算法</span><br><span class="line">//sort(L1.begin()，L1.end() ) ;</span><br><span class="line">L1.sort();//默认排序规则从小到大升序</span><br><span class="line">L.sort( myCompare); //指定规则，从大到小</span><br></pre></td></tr></table></figure>
-
-<p>总结:</p>
-<ul>
-<li><p>对于自定义数据类型，必须要指定排序规则(</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bool mycompare( int val1 , int val2)&#123;</span><br><span class="line">	return val1 &gt; val2;</span><br><span class="line">&#125;//val可以是任何类型，注意引用</span><br></pre></td></tr></table></figure>
-
-<p>)，否则编译器不知道如何进行排序</p>
-</li>
-<li><p>高级排序只是在排序规则上再进行一次逻辑规则制定，并不复杂</p>
-</li>
-</ul>
-<h2 id="set-x2F-multiset容器"><a href="#set-x2F-multiset容器" class="headerlink" title="set&#x2F; multiset容器"></a>set&#x2F; multiset容器</h2><h3 id="set基本概念"><a href="#set基本概念" class="headerlink" title="set基本概念"></a>set基本概念</h3><p>简介:</p>
-<ul>
-<li>所有元素都会在插入时自动被排序</li>
-</ul>
-<p>本质:</p>
-<ul>
-<li>set&#x2F;multiset属于关联式容器，底层结构是用二叉树实现。</li>
-</ul>
-<p>set和multiset区别:</p>
-<ul>
-<li>set不允许容器中有重复的元素（无resize）</li>
-<li>multiset允许容器中有重复的元素</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li>set容器插入数据时用insert</li>
-<li>set容器插入数据的数据会自动排序</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li>统计大小— size</li>
-<li>判断是否为空— empty</li>
-<li>交换容器— swap</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li><p>insert(elem);&#x2F;&#x2F;在容器中插入元素。</p>
-</li>
-<li><p>clear();&#x2F;&#x2F;清除所有元素</p>
-</li>
-<li><p>erase(pos);&#x2F;&#x2F;删除pos迭代器所指的元素，返回下一个元素的迭代器。</p>
-</li>
-<li><p>erase(beg, end);&#x2F;&#x2F;删除区间[beg,end)的所有元素，返回下一个元素的迭代器。</p>
-</li>
-<li><p>erase(elem);&#x2F;&#x2F;删除容器中值为elem的元素。</p>
-</li>
-<li><p>find(key ) ;&#x2F;&#x2F;查找key是否存在,若存在，返回该键的元素的迭代器;若不存在，返回set.end();</p>
-</li>
-<li><p>count(key);&#x2F;&#x2F;统计key的元素个数,对于set而言统计结果要么是0要么是1</p>
-</li>
-</ul>
-<h3 id="set和multiset区别"><a href="#set和multiset区别" class="headerlink" title="set和multiset区别"></a>set和multiset区别</h3><p>区别:</p>
-<ul>
-<li>set不可以插入重复数据，而multiset可以</li>
-<li>set插入数据的同时会返回插入结果，表示插入是否成功. multiset不会检测数据，因此可以插入重复数据</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li>如果不允许插入重复数据可以利用set</li>
-<li>如果需要插入重复数据利用multiset</li>
-</ul>
-<h3 id="pair对组创建"><a href="#pair对组创建" class="headerlink" title="pair对组创建"></a>pair对组创建</h3><p>功能描述:</p>
-<ul>
-<li>成对出现的数据，利用对组可以返回两个数据</li>
-</ul>
-<p>两种创建方式:</p>
-<ul>
-<li>pair&lt;type, tyie&gt; p ( value1, value2 );</li>
-<li>pair&lt;type, type&gt; p &#x3D; make_pair( value1，value2 );</li>
-</ul>
-<h3 id="set容器排序"><a href="#set容器排序" class="headerlink" title="set容器排序"></a>set容器排序</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class MyCompare&#123;</span><br><span class="line">public:</span><br><span class="line">	bool operator()(int v1,int v2)//重载（），//自定义数据类型都会指定排序规则</span><br><span class="line">	&#123;</span><br><span class="line">		return v1 &gt; v2;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">void test()&#123;</span><br><span class="line">	set&lt;int，MyCompare&gt;s2;//要放在插入之前，int与上面传入的数据类型一致,MyCompare是仿函数</span><br><span class="line">	s2.insert(10) ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结:利用仿函数可以指定set容器的排序规则</p>
-<p>总结:<br>对于自定义数据类型，set必须指定排序规则才可以插入数据</p>
-<h2 id="map-x2F-multimap容器"><a href="#map-x2F-multimap容器" class="headerlink" title="map&#x2F;multimap容器"></a>map&#x2F;multimap容器</h2><h3 id="map基本概念"><a href="#map基本概念" class="headerlink" title="map基本概念"></a>map基本概念</h3><p>简介:</p>
-<ul>
-<li>map中所有元素都是pair</li>
-<li>pair中第一个元素为key(键值)，起到索引作期，第二个元素为value(实值)·所有元素都会</li>
-</ul>
-<p>本质:</p>
-<ul>
-<li>map&#x2F;multimap属于关联式容器，底层结构是用二叉树实现。</li>
-</ul>
-<p>优点:</p>
-<ul>
-<li>可以根据key值快速找到value值</li>
-</ul>
-<p>map和multimap区别:</p>
-<ul>
-<li>map不允许容器中有重复key值元素</li>
-<li>multimap允许容器中有重复key值元素</li>
-</ul>
-<h3 id="map构造和赋值"><a href="#map构造和赋值" class="headerlink" title="map构造和赋值"></a>map构造和赋值</h3><p>构造:</p>
-<ul>
-<li>map&lt;T1，T2&gt; mp;&#x2F;&#x2F;map默认构造函数:</li>
-<li>map(const ma &amp;mp );&#x2F;&#x2F;拷贝构造函数</li>
-</ul>
-<p>赋值:</p>
-<ul>
-<li>map&amp; operator&#x3D;(const map &amp;mp);&#x2F;&#x2F;重载等号操作符</li>
-</ul>
-<p>总结: map中所有元素都是成对出现，插入数据时候要使用对组</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map&lt;int,int&gt;m;//默认构造</span><br><span class="line">m.insert(pair&lt;int, int&gt;(1，10));</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>统计大小— size</p>
-</li>
-<li><p>判断是否为空— empty</p>
-</li>
-<li><p>交换容器— swap</p>
-</li>
-<li><p>insert(elem);&#x2F;&#x2F;在容器中插入元素。</p>
-</li>
-<li><p>clear();&#x2F;&#x2F;清除所有元素</p>
-</li>
-<li><p>erase(pos);&#x2F;&#x2F;删除pos迭代器所指的元素，返回下一个元素的迭代器。</p>
-</li>
-<li><p>erase(beg, end);&#x2F;&#x2F;删除区间[beg,end)的所有元素，返回下一个元素的迭代器。</p>
-</li>
-<li><p>erase(key);&#x2F;&#x2F;删除容器中值为elem的元素。</p>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">m[4] = 40;</span><br><span class="line">//[]不建议插入，用途	可以利用key访问到value</span><br><span class="line">cout &lt;&lt; m[4]&lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>find(key ) ;&#x2F;&#x2F;查找key是否存在,若存在，返回该键的元素的迭代器;若不存在，返回set.end();返回迭代器，需要迭代器接受map&lt;int,int&gt;: :iterator pos &#x3D; m. find(3) ;</li>
-<li>count(key);&#x2F;&#x2F;统计key的元素个数,对于set而言统计结果要么是0要么是1</li>
-</ul>
-<p>map不允许插入重复key元素，count统计而言结果要么是0要么是1</p>
-<p>multimap的count统计可能大于1</p>
-<h3 id="map容器排序"><a href="#map容器排序" class="headerlink" title="map容器排序"></a>map容器排序</h3><p>学习目标:</p>
-<ul>
-<li>map容器默认排序规则为按照key值进行从小到大排序，掌握如何改变排序规则</li>
-</ul>
-<p>主要技术点:</p>
-<ul>
-<li>利用仿函数，可以改变排序规则</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li>利用仿函数可以指定map容器的排序规则</li>
-<li>对于自定义数据类型，map必须要指定排序规则，同set容器</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="肖汇林">
-      <meta itemprop="description" content="选择有时候比努力更重要">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="肖汇林的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/08/c%E5%92%8Cc++/%E7%AC%AC%E4%B8%83%E5%A4%A9-c/" class="post-title-link" itemprop="url">第七天 c++</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-08 20:26:50" itemprop="dateCreated datePublished" datetime="2023-04-08T20:26:50+08:00">2023-04-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-28 14:32:11" itemprop="dateModified" datetime="2023-04-28T14:32:11+08:00">2023-04-28</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="容器算法迭代器初识"><a href="#容器算法迭代器初识" class="headerlink" title="容器算法迭代器初识"></a>容器算法迭代器初识</h1><h2 id="vector存放内置数据类型"><a href="#vector存放内置数据类型" class="headerlink" title="vector存放内置数据类型"></a>vector存放内置数据类型</h2><p>容器:<code>vector</code></p>
-<p>算法:<code>for_each</code></p>
-<p>迭代器:<code>vector&lt;int&gt;::iterator</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;algorilhm&gt;</span><br><span class="line">void MyPrint(int val)&#123;</span><br><span class="line">	cout &lt;&lt; val &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void test01() &#123;</span><br><span class="line">	//创建vector容器对象，并且通过模板参数指定容器中存放的数据的类型</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//向容器中放数据</span><br><span class="line">	v.push_back(10);</span><br><span class="line">	v.push_back(20);</span><br><span class="line">	v.push_back(30);</span><br><span class="line">	v.push_back(40);</span><br><span class="line">	//每一个容器都有自己的迭代器,迭代器是用来遍历容器中的元素</span><br><span class="line">	//v.begin()返回迭代器，这个迭代器指向容器中第一个数据</span><br><span class="line">	//v.end()返回迭代器，这个迭代器指向容器元素的最后一个元素的下一个位置</span><br><span class="line">	//vector&lt;int&gt;::iterator拿到vector&lt;int&gt;这种容器的迭代器类型</span><br><span class="line">	vector&lt;int&gt; ::iterator pBegin = v.begin();</span><br><span class="line">	vector&lt;int&gt; ::iterator pEnd = v.end();</span><br><span class="line">	//第—种遍历方式:</span><br><span class="line">	while (pBegin ! = pEnd)&#123;</span><br><span class="line">		cout &lt;&lt;*pBegin &lt;&lt; endl;</span><br><span class="line">		pBegin++;</span><br><span class="line">	&#125;</span><br><span class="line">	//第二种遍历方式:</span><br><span class="line">	for (vector&lt;int&gt; : :iterator it = v.begin(); it != v.end( ); it++) &#123;</span><br><span class="line">		cout &lt;&lt;*it &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">	//第三种遍历方式:</span><br><span class="line">	//使用STL提供标准遍历算法头文件algorithm</span><br><span class="line">	for_each(v.begin(), v.end( ), MyPrint);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Vector容器嵌套容器"><a href="#Vector容器嵌套容器" class="headerlink" title="Vector容器嵌套容器"></a>Vector容器嵌套容器</h2><p>学习目标:</p>
-<p>容器中嵌套容器，我们将所有数据进行遍历输出</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//容器嵌套容器</span><br><span class="line">void test01() &#123;</span><br><span class="line">	vector&lt; vector&lt;int&gt; &gt;v ;</span><br><span class="line">	vector&lt;int&gt; v1;</span><br><span class="line">	vector&lt;int&gt; v2;</span><br><span class="line">	vector&lt;int&gt; v3;</span><br><span class="line">	vector&lt;int&gt; v4;</span><br><span class="line">	for (int i = ; i &lt; 4; i++) &#123;</span><br><span class="line">		v1.push_back(i + 1);</span><br><span class="line">		v2.push_back(i + 2);</span><br><span class="line">		v3.push_back(i + 3);</span><br><span class="line">		v4.push_back(i + 4);</span><br><span class="line">	&#125;</span><br><span class="line">	//将容器元素插入到vector v中</span><br><span class="line">	v.push_back(v1);</span><br><span class="line">	v.push_back(v2);</span><br><span class="line">	v.push_back(v3);</span><br><span class="line">	v.push_back(v4);</span><br><span class="line">	for (vector&lt;vector&lt;int&gt;&gt;::iterator it = v.begin(); it != v.end(); it++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (vector&lt;int&gt;: :iterator vit = (*it).begin(); vit != (*it).end(); vit++) </span><br><span class="line">		&#123;</span><br><span class="line">			cout &lt;&lt;*vit &lt;&lt; &quot; &quot;;</span><br><span class="line">		&#125;</span><br><span class="line">	cout&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="string容器"><a href="#string容器" class="headerlink" title="string容器"></a>string容器</h2><h3 id="string赋值操作"><a href="#string赋值操作" class="headerlink" title="string赋值操作"></a>string赋值操作</h3><p>功能描述:</p>
-<ul>
-<li>给string字符串进行赋值</li>
-</ul>
-<p>赋值的函数原型:</p>
-<ul>
-<li>string&amp; operator&#x3D;(const char* s );&#x2F;&#x2F;char*类型字符串赋值给当前的字符串</li>
-<li>string&amp; operator&#x3D;(const string &amp;s );&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
-<li>string&amp; operator&#x3D;( char c);&#x2F;&#x2F;字符赋值给当前的字符串</li>
-<li>string&amp; assign(const char *s ) ;&#x2F;&#x2F;把字符串s赋给当前的字符串</li>
-<li>string&amp; assign(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符赋给当前的字符串</li>
-<li>string&amp; assign( const sting &amp;s );&#x2F;&#x2F;把字符串s赋给当前字符串</li>
-<li>string&amp; assign(int n, char c);&#x2F;&#x2F;用n个字符c赋给当前字符串</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">void test01()&#123;</span><br><span class="line">	str1 = &quot;hello vorld&quot;;</span><br><span class="line">	cout &lt;&lt; &quot;str1 - &quot; &lt;&lt; str1 &lt;&lt; endl;</span><br><span class="line">	string str2;</span><br><span class="line">	str2 = str1;</span><br><span class="line">	cout &lt;&lt; &quot;str2 = &quot; &lt;&lt; str2 &lt;&lt; endl;</span><br><span class="line">	string str3;</span><br><span class="line">	str3 = &#x27;a &#x27;;</span><br><span class="line">	cout &lt;&lt; &quot;str3 = &quot; &lt;&lt; str3 &lt;&lt; endl;</span><br><span class="line">	string str4;</span><br><span class="line">	str4.assign( &quot;hello c++&quot;);</span><br><span class="line">	cout &lt;&lt; &quot;str4 = &quot; &lt;&lt;str4 &lt;&lt; endl;</span><br><span class="line">	string str5;</span><br><span class="line">	str5.assign(&quot;hello c++&quot;,5);</span><br><span class="line">	cout &lt;&lt; &quot;str5 =&lt;&lt; str5 &lt;&lt; endl;</span><br><span class="line">	string str6;</span><br><span class="line">	str6.assign(str5);</span><br><span class="line">	cout &lt;&lt; &quot;str6 = &quot; &lt;&lt; str6 &lt;&lt; endl;</span><br><span class="line">	string str7;</span><br><span class="line">	str7 .assign(5，&#x27;x&#x27;);</span><br><span class="line">	cout &lt;&lt; &quot;str7 = &quot; &lt;&lt; str7 &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结:<br>string的赋值方式很多,operator&#x3D;这种方式是比较实用的</p>
-<h3 id="string字符串拼接"><a href="#string字符串拼接" class="headerlink" title="string字符串拼接"></a>string字符串拼接</h3><p>功能描述:</p>
-<ul>
-<li>实现在字符串末尾拼接字符串</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li>string&amp; operator+&#x3D;(const char* str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
-<li>string&amp; operator+&#x3D;( const char c);&#x2F;&#x2F;重载+&#x3D;操作符</li>
-<li>string&amp; operator+&#x3D;( const string&amp; str);&#x2F;&#x2F;重载+&#x3D;操作符</li>
-<li>string&amp; append(const char *s );&#x2F;&#x2F;把字符串s连接到当前字符串结尾</li>
-<li>string&amp; append(const char *s, int n);&#x2F;&#x2F;把字符串s的前n个字符连接到当前字符串结尾</li>
-<li>string&amp; append(const string &amp;s );&#x2F;&#x2F;同operator+&#x3D;(const string&amp; str)</li>
-<li>string&amp; append(const string &amp;s，int pos，int n);&#x2F;&#x2F;字符串s中从pos开始的n个字符连接到字符串结尾</li>
-</ul>
-<h3 id="string查找和替换"><a href="#string查找和替换" class="headerlink" title="string查找和替换"></a>string查找和替换</h3><p>函数原型:</p>
-<ul>
-<li>int find(const string&amp; str, int pos &#x3D; 0) const;&#x2F;&#x2F;查找str第一次出现位置,从pos开始查找</li>
-<li>int find( cqhst char* s , int pos &#x3D;0) const;&#x2F;&#x2F;查找s第一次出现位置,从pos开始查找</li>
-<li>int find(const char* s, int pos， int n) const;&#x2F;&#x2F;从pos位置查找s的前n个字符第一次位置</li>
-<li>int find(const char c, int pos &#x3D;0) const;&#x2F;&#x2F;查找字符c第一次出现位置</li>
-<li>int rfind(const string&amp; str, int pos &#x3D; npos) const;&#x2F;&#x2F;查找str最后一次位置,从pos开始查找</li>
-<li>int rfind(const char* s, int pos &#x3D; npos) const;&#x2F;&#x2F;查找s最后一次出现位置,从pos开始查找</li>
-<li>int rfind(const char* s, int pos, int n) const;&#x2F;&#x2F;从pos查找s的前n个字符最后一次位置</li>
-<li>int rfind(const char c, int pos &#x3D; npos) const;&#x2F;&#x2F;查找字符c最后一次出现位置</li>
-<li>string&amp; replace(int pos, int n, const string&amp; str);&#x2F;&#x2F;替换从pos开始n个字符为字符串str</li>
-<li>string&amp; replace(int pos, int n,const char*s );&#x2F;&#x2F;替换从pos开始的n个字符为字符串s</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li><p>. find查找是从左往后，rfind从右往左</p>
-</li>
-<li><p>. find找到字符串后返回查找的第一个字符位置，找不到返回-1</p>
-</li>
-<li><p>. replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串</p>
-<hr>
-</li>
-</ul>
-<p>总结:字符串对比主要是用于比较两个字符串是否相等，判断谁大谁小的意义并不是很大</p>
-<hr>
-<p>string中单个字符存取方式有两种</p>
-<ul>
-<li><p>char&amp; operator[](int n);&#x2F;&#x2F;通过[]方式取字符</p>
-</li>
-<li><p>char&amp; at(int n);&#x2F;&#x2F;通过at方法获取字符</p>
-<hr>
-</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li><p>string&amp; insert(int pos, const char* s );&#x2F;&#x2F;插入字符串</p>
-</li>
-<li><p>string&amp; insert(int pos, const string&amp; str);&#x2F;&#x2F;插入字符串</p>
-</li>
-<li><p>string&amp; insert(int pos, int n, char c);&#x2F;&#x2F;在指定位置插入n个字符c</p>
-</li>
-<li><p>string&amp; erase(int pos, int n &#x3D; npos);&#x2F;&#x2F;删除从Pos开始的n个字符</p>
-<hr>
-</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li>string substr(int pos &#x3D; 0,int n &#x3D; npos) const;&#x2F;&#x2F;返回由pos开始的n个字符组成的字符串</li>
-</ul>
-<h2 id="vector容器"><a href="#vector容器" class="headerlink" title="vector容器"></a>vector容器</h2><h3 id="vector构造函数"><a href="#vector构造函数" class="headerlink" title="vector构造函数"></a>vector构造函数</h3><p>功能描述:</p>
-<ul>
-<li>创建vector容器</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li>vector<T> v;&#x2F;&#x2F;采用模板实现类实现，默认构造函数</T></li>
-<li>vector(v.begin(), v.end());&#x2F;&#x2F;将v[begin(), end())区间中的元素拷贝给本身。</li>
-<li>vector(n, elem );&#x2F;&#x2F;构造函数将n个elem拷贝给本身。</li>
-<li>vector( const vector &amp;vec);&#x2F;&#x2F;拷贝构造函数。</li>
-</ul>
-<h3 id="vector赋值操作"><a href="#vector赋值操作" class="headerlink" title="vector赋值操作"></a>vector赋值操作</h3><p>函数原型:</p>
-<ul>
-<li>vector&amp; operator&#x3D;(const vector &amp;vec);&#x2F;&#x2F;重载等号操作符</li>
-<li>assign(beg, end);&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
-<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
-</ul>
-<h3 id="vector容量和大小"><a href="#vector容量和大小" class="headerlink" title="vector容量和大小"></a>vector容量和大小</h3><p>函数原型:</p>
-<ul>
-<li>empty();&#x2F;&#x2F;判断容器是否为空</li>
-<li>capacity();&#x2F;&#x2F;容器的容量</li>
-<li>size();&#x2F;&#x2F;返回容器中元素的个数</li>
-<li>resize(int num);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以默认值填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</li>
-<li>resize(int num，elem);&#x2F;&#x2F;重新指定容器的长度为num，若容器变长，则以elem值填充新位置。<br>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除</li>
-</ul>
-<h3 id="vector插入和删除"><a href="#vector插入和删除" class="headerlink" title="vector插入和删除"></a>vector插入和删除</h3><p>函数原型:</p>
-<ul>
-<li>push_back(ele);&#x2F;&#x2F;尾部插入元素ele</li>
-<li>pop_back();&#x2F;&#x2F;删除最后一个元素</li>
-<li>insert(const_iterator pos,ele);&#x2F;&#x2F;迭代器指向位置pos插入元素ele</li>
-<li>insert(const_iterator pos, int cunt,ele);&#x2F;&#x2F;迭代器指向位置pos插入count个元素ele</li>
-<li>erase(const_iterator pos);&#x2F;&#x2F;删除迭代器指向的元素</li>
-<li>erase(const_iterator start， const_iterator end);&#x2F;&#x2F;删除迭代器从start到end之间的元素</li>
-<li>clear();&#x2F;&#x2F;删除容器中所有元素</li>
-</ul>
-<h3 id="vector互换容器"><a href="#vector互换容器" class="headerlink" title="vector互换容器"></a>vector互换容器</h3><p>函数原型;</p>
-<ul>
-<li>swap(vec);&#x2F;&#x2F;将vec与本身的元素互换</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void teste2()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	for (int i - e; i &lt;100000; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;&quot;v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;&quot;v的大小为:&quot;&lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">	v.resize(3);</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt;“v的大小为: &quot; &lt;&lt; v.size()&lt;&lt; endl;</span><br><span class="line">	//收缩内存</span><br><span class="line">	vector&lt;int&gt;(v).swap(v); //匿名对象vector&lt;int&gt;(v),读完这行自动被系统删除，匿名对象创建与v.size相同大小的cap和size</span><br><span class="line">	cout &lt;&lt;“v的容量为:&quot;&lt;&lt; v.capacity() &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;v的大小为:&quot; &lt;&lt; v.size() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结: swap可以使两个容器互换，可以达到实用的收缩内存效果.</p>
-<h3 id="vector预留空间"><a href="#vector预留空间" class="headerlink" title="vector预留空间"></a>vector预留空间</h3><p>功能描述:</p>
-<ul>
-<li>减少vector在动态扩展容量时的扩展次数</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li>reserve(int len);&#x2F;&#x2F;容器预留len个元素长度，预留位置不初始化，元素不可访问。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void teste1()</span><br><span class="line">&#123;</span><br><span class="line">	vector&lt;int&gt; v;</span><br><span class="line">	//预留空间</span><br><span class="line">	v.reserve ( 100000);</span><br><span class="line">	int num = 0;</span><br><span class="line">	int* p = NULL;</span><br><span class="line">	for (int i = 0; i &lt; 100080; i++) &#123;</span><br><span class="line">		v.push_back(i);</span><br><span class="line">	if (p != &amp;v[0])&#123;</span><br><span class="line">		p = &amp;v[0];//用来计算开辟了多少次内存,如果没有预留内存，则每次vector容量不够会重新分配，即&amp;v[0]会改变</span><br><span class="line">		num++;</span><br><span class="line">	&#125;</span><br><span class="line">	cout&lt;&lt;&quot;num=&quot;&lt;&lt;num&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结:如果数据量较大，可以一开始利用reserve预留空间</p>
-<h2 id="C-中resize和reserve的区别"><a href="#C-中resize和reserve的区别" class="headerlink" title="C++中resize和reserve的区别"></a>C++中resize和reserve的区别</h2><p>reserve是设置了capacity的值，比如reserve(20)，表示该容器最大容量为20，但此时容器内还没有任何对象，也<strong>不能通过下标访问</strong>。会发生问题。<br>resize既分配了空间，也创建了对象，可以通过下标访问。<br>reserve只修改capacity大小，不修改size大小，resize既修改capacity大小，也修改size大小。</p>
-<p>所以以后访问string容器的值不够用什么方法都需要resize来初始化默认值防止出现错误。</p>
-<h2 id="deque容器"><a href="#deque容器" class="headerlink" title="deque容器"></a>deque容器</h2><h3 id="deque容器基本概念"><a href="#deque容器基本概念" class="headerlink" title="deque容器基本概念"></a>deque容器基本概念</h3><p>功能:</p>
-<ul>
-<li>双端数组，可以对头端进行插入删除操作</li>
-</ul>
-<p>deque与vector区别:</p>
-<ul>
-<li>vector对于头部的插入删除效率低，数据量越大，效率越低.</li>
-<li>deque相对而言，对头部的插入删除速度比vector快</li>
-<li>vector访问元素时的速度会比deque快,这和两者内部实现有关</li>
-</ul>
-<p>deque内部工作原理:</p>
-<p>deque内部有个中控器，维护每段缓冲区中的内容，缓冲区中存放真实数据</p>
-<p>中控器维护的是每个缓冲区的地址，使得使用deque时像—片连续的内存空间</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void printDeque(const deque&lt;int&gt;&amp; d)&#123;//限制不允许修改，只读，则 const_iterator</span><br><span class="line">	for (deque&lt;int&gt; :: const_iterator it = d.begin(); it != d.end(); it++)&#123;</span><br><span class="line">		cout &lt;&lt;*it&lt;&lt;&quot;&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	cout &lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line">// deque构造</span><br><span class="line">void teste1()&#123;</span><br><span class="line">	deque&lt;int&gt; d1;//无参构造函数</span><br><span class="line">	for (int i = e; i &lt; 10; i++)&#123;</span><br><span class="line">		d1.push_back(i);</span><br><span class="line">	&#125;</span><br><span class="line">	printDeque(d1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>总结: deque容器和vector容器的构造方式几乎一致，灵活使用即可</p>
-<h3 id="deque赋值操作"><a href="#deque赋值操作" class="headerlink" title="deque赋值操作"></a>deque赋值操作</h3><p>函数原型:</p>
-<ul>
-<li>deque&amp; operator&#x3D;(const deque &amp;deq);&#x2F;&#x2F;重载等号操作符</li>
-<li>assign(beg, end) ;&#x2F;&#x2F;将[beg, end)区间中的数据拷贝赋值给本身。</li>
-<li>assign(n, elem);&#x2F;&#x2F;将n个elem拷贝赋值给本身。</li>
-</ul>
-<p>函数原型:</p>
-<ul>
-<li><p>deque.empty();&#x2F;&#x2F;判断容器是否为空</p>
-</li>
-<li><p>deque.size();&#x2F;&#x2F;返回容器中元素的个数,deque没有容量概念（cap）</p>
-</li>
-<li><p>deque.resize(num );&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以默认值0填充新位置。&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
-</li>
-<li><p>deque.resize(num，elem);&#x2F;&#x2F;重新指定容器的长度为num,若容器变长，则以elem值填充新位置</p>
-<p>&#x2F;&#x2F;如果容器变短，则末尾超出容器长度的元素被删除。</p>
-</li>
-</ul>
-<p>总结:</p>
-<ul>
-<li>deque没有容量的概念</li>
-<li>判断是否为空— empty</li>
-<li>返回元素个数— size</li>
-<li>重新指定个数— resize</li>
-</ul>
-<h3 id="3-3-5-deque插入和删除"><a href="#3-3-5-deque插入和删除" class="headerlink" title="3.3.5 deque插入和删除"></a>3.3.5 deque插入和删除</h3><p>功能描述:</p>
-<ul>
-<li>向deque容器中插入和删除数据</li>
-</ul>
-<p>函数原型:</p>
-<p>​	两端插入操作:</p>
-<ul>
-<li>push_back(elem);&#x2F;&#x2F;在容器尾部添加一个数据</li>
-<li>push_front(elem);&#x2F;&#x2F;在容器头部插入一个数据</li>
-<li>pop_back();&#x2F;&#x2F;删除容器最后一个数据</li>
-<li>pop_front( );&#x2F;&#x2F;删除容器第一个数据</li>
-</ul>
-<p>指定位置操作:</p>
-<ul>
-<li>insert(pos,elem) ;&#x2F;&#x2F;在pos位置插入一个elem元素的拷贝，返回新数据的位置。</li>
-<li>insert( pos,n,elem);&#x2F;&#x2F;在pos位置插入n个elem数据，无返回值。</li>
-<li>insert(pos ,beg,end);&#x2F;&#x2F;在pos位置插入[beg,end)区间的数据，无返回值。</li>
-<li>clear();清空容器的所有数据</li>
-<li>erase(beg,end);&#x2F;&#x2F;删除[beg,end)区间的数据，返回下一个数据的位置。</li>
-<li>erase(pos);&#x2F;&#x2F;删除pos位置的数据，返回下一个数据的位置。</li>
-</ul>
-<p>总结:</p>
-<p>插入和删除提供的位置是迭代器!(如d.begin()),还可以</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">deque&lt;int&gt;::iterator it = d1.begin() ;</span><br><span class="line">it++;</span><br><span class="line">d1.erase(it);</span><br></pre></td></tr></table></figure>
-
-<p>尾插— push_back</p>
-<p>尾删— pop_back</p>
-<p>头插— push_front</p>
-<p>头删— pop_front</p>
-<hr>
-<p>函数原型:</p>
-<ul>
-<li>at(int idx);&#x2F;&#x2F;返回索引idx所指的数据</li>
-<li>operator[]; &#x2F;&#x2F;返回索引idx所指的数据</li>
-<li>front( );&#x2F;&#x2F;返回容器中第一个数据元素</li>
-<li>back();&#x2F;&#x2F;返回容器中最后一个数据元素</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2735,7 +2620,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
