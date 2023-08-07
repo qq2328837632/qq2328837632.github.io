@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-19 20:17:21" itemprop="dateModified" datetime="2023-06-19T20:17:21+08:00">2023-06-19</time>
+                <time title="修改时间：2023-08-07 15:22:17" itemprop="dateModified" datetime="2023-08-07T15:22:17+08:00">2023-08-07</time>
               </span>
 
           
@@ -317,6 +317,7 @@
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">用sb.st_mode &amp; SIFMT前4位就是SIFMT与上文件得出的mode</span><br><span class="line">switch (sb.st_mode &amp; S_IFMT) &#123;</span><br><span class="line">           case S_IFBLK:  printf(&quot;block device\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFCHR:  printf(&quot;character device\n&quot;);        br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFDIR:  printf(&quot;directory\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFIFO:  printf(&quot;FIFO/pipe\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFLNK:  printf(&quot;symlink\n&quot;);                 br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFREG:  printf(&quot;regular file\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFSOCK: printf(&quot;socket\n&quot;);                  br</span><br><span class="line">eak;</span><br><span class="line">           default:       printf(&quot;unknown?\n&quot;);                br</span><br><span class="line">eak;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
 
+<h2 id="fstat"><a href="#fstat" class="headerlink" title="fstat"></a>fstat</h2><p>一样的用法，可以用来读取文件描述符</p>
 <h2 id="link-和-Unlink-隐式回收"><a href="#link-和-Unlink-隐式回收" class="headerlink" title="link 和 Unlink 隐式回收"></a>link 和 Unlink 隐式回收</h2><p>硬链接数就是 dentry 数目 </p>
 <p>link 就是用来创建硬链接的 （硬链接的作用是允许一个文件拥有多个有效路径名，这样用户就可以建立硬链接到重要文件,以防止“误删”的功能假设我们删除了原始的<code>foo.txt</code>文件：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="built_in">rm</span> -f foo.txt </span><br><span class="line">➜  <span class="built_in">cat</span> bar.txt </span><br><span class="line">LeetCode</span><br></pre></td></tr></table></figure>
