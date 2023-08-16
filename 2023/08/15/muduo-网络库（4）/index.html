@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="TcpServer&#x2F;TcpConnection Acceptor类的主要功能是socket、bind、listen 一般来说，在上层应用程序中，我们不直接使用Acceptor，而是把它作为TcpServer的成员 TcpServer还包含了一个TcpConnection列表 TcpConnection与Acceptor类似，有两个重要的数据成员，Socket与Channel,Channe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-网络库（4）">
+<meta property="og:url" content="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="TcpServer&#x2F;TcpConnection Acceptor类的主要功能是socket、bind、listen 一般来说，在上层应用程序中，我们不直接使用Acceptor，而是把它作为TcpServer的成员 TcpServer还包含了一个TcpConnection列表 TcpConnection与Acceptor类似，有两个重要的数据成员，Socket与Channel,Channe">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815112907646.png">
+<meta property="og:image" content="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815112907646.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155937436.png">
+<meta property="og:image" content="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155937436.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155828886.png">
+<meta property="og:image" content="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155828886.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230816112443369.png">
+<meta property="og:image" content="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230816112443369.png">
+<meta property="article:published_time" content="2023-08-15T03:25:01.000Z">
+<meta property="article:modified_time" content="2023-08-16T08:31:41.372Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815112907646.png">
+
+<link rel="canonical" href="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-网络库（4） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-网络库（4）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-15 11:25:01" itemprop="dateCreated datePublished" datetime="2023-08-15T11:25:01+08:00">2023-08-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-16 16:31:41" itemprop="dateModified" datetime="2023-08-16T16:31:41+08:00">2023-08-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="TcpServer-x2F-TcpConnection"><a href="#TcpServer-x2F-TcpConnection" class="headerlink" title="TcpServer&#x2F;TcpConnection"></a>TcpServer&#x2F;TcpConnection</h1><ul>
+<li>Acceptor类的主要功能是socket、bind、listen</li>
+<li>一般来说，在上层应用程序中，我们不直接使用Acceptor，而是把它作为TcpServer的成员</li>
+<li>TcpServer还包含了一个TcpConnection列表</li>
+<li>TcpConnection与Acceptor类似，有两个重要的数据成员，Socket与Channel,Channel关注Socket的可读可写事件</li>
+</ul>
+<h2 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h2><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815112907646.png" alt="image-20230815112907646"></p>
+<img src="/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815112907646.png" class title="This is an test image">
+
+<h2 id="测试文件"><a href="#测试文件" class="headerlink" title="测试文件"></a>测试文件</h2><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155937436.png" alt="image-20230815155937436"></p>
+<img src="/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155937436.png" class title="This is an test image">
+
+<p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155828886.png" alt="image-20230815155828886"></p>
+<img src="/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230815155828886.png" class title="This is an test image">
+
+<p>在TcpServer.cc中，TcpServer类通过监听指定的IP地址和端口号，接受客户端的连接，并管理多个TcpConnection对象。下面是对TcpServer类对连接客户端的一步步操作的总结：</p>
+<ol>
+<li><p>在构造函数中创建一个Acceptor对象，并设置新连接回调函数<code>newConnectionCallback</code>。Acceptor负责监听并接受新的客户端连接。</p>
+</li>
+<li><p>在<code>start()</code>函数中启动服务器，包括启动EventLoop线程池、绑定地址、开始监听等操作。</p>
+</li>
+<li><p>当Acceptor接受到新的客户端连接时，在<code>TcpServer</code>类中的私有成员函数<code>newConnection()</code>被回调。在<code>newConnection()</code>函数中，会创建一个新的TcpConnection对象，并将其添加到连接管理字典<code>connections_</code>中。</p>
+</li>
+<li><p>在创建TcpConnection对象时，会设置相应的回调函数，包括连接建立回调函数、消息到达回调函数、写操作完成回调函数以及连接关闭回调函数。</p>
+</li>
+<li><p>创建TcpConnection后，通过调用<code>connectEstablished()</code>函数通知TcpConnection所属的EventLoop连接已经建立完毕，并触发用户设置的连接建立回调函数。（<code>connectEstablished()</code>函数会在TcpConnection对象所属的EventLoop线程中被回调，具体发生的时机是在新的客户端连接建立完成后。</p>
+<p>当TcpServer监听到新的连接请求并接受连接时，会在<code>TcpServer::newConnection()</code>函数中创建一个新的TcpConnection对象，并通过<code>ioLoop-&gt;runInLoop()</code>将<code>TcpConnection::connectEstablished()</code>函数添加到所属的EventLoop线程的任务队列中。</p>
+<p>随后，在EventLoop线程的下一个事件循环周期中，会从任务队列中取出<code>TcpConnection::connectEstablished()</code>函数并执行。这时，会触发用户设置的连接建立回调函数，并通知用户连接已经建立完毕。</p>
+<p>因此，<code>connectEstablished()</code>函数的回调时机是在新的客户端连接建立完成后，即连接建立时机已经稳定，可以进行后续数据收发操作。）</p>
+</li>
+<li><p>在TcpConnection中，会监听连接的读事件，当有数据到达时，会调用用户设置的消息到达回调函数。</p>
+</li>
+<li><p>用户可以通过TcpConnection对象发送消息给客户端，TcpConnection内部会处理发送缓冲区，并通过调用底层的Socket API发送数据。</p>
+</li>
+<li><p>当连接关闭时，会触发连接关闭回调函数，并将TcpConnection从连接管理字典<code>connections_</code>中移除。</p>
+</li>
+</ol>
+<p>这样，TcpServer实现了对连接客户端的一步步操作，包括接受连接、创建TcpConnection对象、监听事件、处理数据收发等过程。</p>
+<p>以下是一个简单的例子来说明TcpServer的使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">void onConnection(const TcpConnectionPtr&amp; conn) &#123;</span><br><span class="line">    if (conn-&gt;connected()) &#123;</span><br><span class="line">        printf(&quot;New connection from %s\n&quot;, conn-&gt;peerAddress().toIpPort().c_str());</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;Connection %s is closed\n&quot;, conn-&gt;peerAddress().toIpPort().c_str());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void onMessage(const TcpConnectionPtr&amp; conn, Buffer* buffer) &#123;</span><br><span class="line">    std::string message = buffer-&gt;retrieveAllAsString();</span><br><span class="line">    printf(&quot;Received message from %s: %s\n&quot;, conn-&gt;peerAddress().toIpPort().c_str(), message.c_str());</span><br><span class="line">    conn-&gt;send(message); // Echo back the received message to the client</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    EventLoop loop;</span><br><span class="line">    TcpServer server(&amp;loop, InetAddress(1234), &quot;TestServer&quot;);</span><br><span class="line">    server.setConnectionCallback(onConnection);</span><br><span class="line">    server.setMessageCallback(onMessage);</span><br><span class="line"></span><br><span class="line">    server.start();</span><br><span class="line"></span><br><span class="line">    loop.loop();</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，我们首先创建一个EventLoop对象和一个TcpServer对象。然后，我们设置了连接建立回调函数<code>onConnection</code>和消息到达回调函数<code>onMessage</code>。最后，我们启动服务器并运行事件循环。</p>
+<p>当有新的客户端连接时，会调用<code>onConnection</code>函数进行处理，输出连接建立信息。当有消息到达时，会调用<code>onMessage</code>函数进行处理，输出接收到的消息，并将该消息回传给客户端。</p>
+<h2 id="TcpServer-h"><a href="#TcpServer-h" class="headerlink" title="TcpServer.h"></a>TcpServer.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">class TcpServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void(EventLoop*)&gt; ThreadInitCallback;</span><br><span class="line">  enum Option</span><br><span class="line">  &#123;</span><br><span class="line">    kNoReusePort,</span><br><span class="line">    kReusePort,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  //TcpServer(EventLoop* loop, const InetAddress&amp; listenAddr);</span><br><span class="line">  TcpServer(EventLoop* loop,</span><br><span class="line">            const InetAddress&amp; listenAddr,</span><br><span class="line">            const string&amp; nameArg,</span><br><span class="line">            Option option = kNoReusePort);</span><br><span class="line">  ~TcpServer();  // force out-line dtor, for std::unique_ptr members.</span><br><span class="line"></span><br><span class="line">  const string&amp; ipPort() const &#123; return ipPort_; &#125;</span><br><span class="line">  const string&amp; name() const &#123; return name_; &#125;</span><br><span class="line">  EventLoop* getLoop() const &#123; return loop_; &#125;</span><br><span class="line"></span><br><span class="line">  void setThreadNum(int numThreads);</span><br><span class="line">  void setThreadInitCallback(const ThreadInitCallback&amp; cb)</span><br><span class="line">  &#123; threadInitCallback_ = cb; &#125;</span><br><span class="line">  /// valid after calling start()</span><br><span class="line">  std::shared_ptr&lt;EventLoopThreadPool&gt; threadPool()</span><br><span class="line">  &#123; return threadPool_; &#125;</span><br><span class="line"></span><br><span class="line">  /// Starts the server if it&#x27;s not listening.</span><br><span class="line">  ///</span><br><span class="line">  /// It&#x27;s harmless to call it multiple times.</span><br><span class="line">  /// Thread safe.</span><br><span class="line">  void start();</span><br><span class="line"></span><br><span class="line">  /// Set connection callback.</span><br><span class="line">  /// Not thread safe.</span><br><span class="line">  //设置连接到来或者连接关闭回调函数</span><br><span class="line">  void setConnectionCallback(const ConnectionCallback&amp; cb)</span><br><span class="line">  &#123; connectionCallback_ = cb; &#125;</span><br><span class="line"></span><br><span class="line">  /// Set message callback.</span><br><span class="line">  /// Not thread safe.</span><br><span class="line">  //设置消息到来回调函数</span><br><span class="line">  void setMessageCallback(const MessageCallback&amp; cb)</span><br><span class="line">  &#123; messageCallback_ = cb; &#125;</span><br><span class="line"></span><br><span class="line">  /// Set write complete callback.</span><br><span class="line">  /// Not thread safe.</span><br><span class="line">  void setWriteCompleteCallback(const WriteCompleteCallback&amp; cb)</span><br><span class="line">  &#123; writeCompleteCallback_ = cb; &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  /// Not thread safe, but in loop</span><br><span class="line">  void newConnection(int sockfd, const InetAddress&amp; peerAddr);</span><br><span class="line">  /// Thread safe.</span><br><span class="line">  void removeConnection(const TcpConnectionPtr&amp; conn);</span><br><span class="line">  /// Not thread safe, but in loop</span><br><span class="line">  void removeConnectionInLoop(const TcpConnectionPtr&amp; conn);</span><br><span class="line"></span><br><span class="line">  typedef std::map&lt;string, TcpConnectionPtr&gt; ConnectionMap;//typedef std::shared_ptr&lt;TcpConnection&gt; TcpConnectionPtr;</span><br><span class="line"></span><br><span class="line">  EventLoop* loop_;  // the acceptor loop</span><br><span class="line">  const string ipPort_;//服务端口</span><br><span class="line">  const string name_;//服务名</span><br><span class="line">  std::unique_ptr&lt;Acceptor&gt; acceptor_; // avoid revealing Acceptor</span><br><span class="line">  std::shared_ptr&lt;EventLoopThreadPool&gt; threadPool_;</span><br><span class="line">  ConnectionCallback connectionCallback_;</span><br><span class="line">  MessageCallback messageCallback_;</span><br><span class="line">  WriteCompleteCallback writeCompleteCallback_;</span><br><span class="line">  ThreadInitCallback threadInitCallback_;</span><br><span class="line">  AtomicInt32 started_;</span><br><span class="line">  </span><br><span class="line">  ConnectionMap connections_;//连接列表</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TcpServer-cc"><a href="#TcpServer-cc" class="headerlink" title="TcpServer.cc"></a>TcpServer.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/net/Acceptor.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoopThreadPool.h&quot;</span><br><span class="line">#include &quot;muduo/net/SocketsOps.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;  // snprintf</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">TcpServer::TcpServer(EventLoop* loop,</span><br><span class="line">                     const InetAddress&amp; listenAddr,</span><br><span class="line">                     const string&amp; nameArg,</span><br><span class="line">                     Option option)</span><br><span class="line">  : loop_(CHECK_NOTNULL(loop)),//是Logging.h定义的CHECK_NOTNULL</span><br><span class="line">    ipPort_(listenAddr.toIpPort()),</span><br><span class="line">    name_(nameArg),</span><br><span class="line">    acceptor_(new Acceptor(loop, listenAddr, option == kReusePort)),</span><br><span class="line">    threadPool_(new EventLoopThreadPool(loop, name_)),</span><br><span class="line">    connectionCallback_(defaultConnectionCallback),</span><br><span class="line">    messageCallback_(defaultMessageCallback),</span><br><span class="line">    nextConnId_(1)</span><br><span class="line">&#123;</span><br><span class="line">  //Acceptor: :handleRead函数中会回调用TcpSeruer::newConnection</span><br><span class="line">  //_1对应的是socket文件描述符，2对应的是对等方的地址( InetAddress)</span><br><span class="line">  acceptor_-&gt;setNewConnectionCallback(</span><br><span class="line">      std::bind(&amp;TcpServer::newConnection, this, _1, _2));</span><br><span class="line">&#125;</span><br><span class="line">//该函数多次调用是无害的</span><br><span class="line">//该函数可改跨线程调用</span><br><span class="line">void TcpServer::start()</span><br><span class="line">&#123;</span><br><span class="line">  if (started_.getAndSet(1) == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    threadPool_-&gt;start(threadInitCallback_);</span><br><span class="line"></span><br><span class="line">    assert(!acceptor_-&gt;listening());</span><br><span class="line">    //get_pointer返回原生指针</span><br><span class="line">    loop_-&gt;runInLoop(</span><br><span class="line">        std::bind(&amp;Acceptor::listen, get_pointer(acceptor_)));//ptr.get();裸指针是为了将对象指针传递给 std::bind，从而在可调用对象中使用</span><br><span class="line">  &#125;//acceptor_.get() 是 std::unique_ptr 类提供的成员函数 get() 的调用，它用于获取被智能指针管理的对象的原始裸指针</span><br><span class="line">  //智能指针不能直接传递对象，是因为智能指针对对象进行了所有权管理</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpServer::newConnection(int sockfd, const InetAddress&amp; peerAddr)</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  EventLoop* ioLoop = threadPool_-&gt;getNextLoop();</span><br><span class="line">  char buf[64];</span><br><span class="line">  snprintf(buf, sizeof buf, &quot;-%s#%d&quot;, ipPort_.c_str(), nextConnId_);</span><br><span class="line">  ++nextConnId_;</span><br><span class="line">  string connName = name_ + buf;</span><br><span class="line"></span><br><span class="line">  LOG_INFO &lt;&lt; &quot;TcpServer::newConnection [&quot; &lt;&lt; name_</span><br><span class="line">           &lt;&lt; &quot;] - new connection [&quot; &lt;&lt; connName</span><br><span class="line">           &lt;&lt; &quot;] from &quot; &lt;&lt; peerAddr.toIpPort();</span><br><span class="line">  InetAddress localAddr(sockets::getLocalAddr(sockfd));</span><br><span class="line">  // FIXME poll with zero timeout to double confirm the new connection</span><br><span class="line">  // FIXME use make_shared if necessary</span><br><span class="line">  TcpConnectionPtr conn(new TcpConnection(ioLoop,</span><br><span class="line">                                          connName,</span><br><span class="line">                                          sockfd,</span><br><span class="line">                                          localAddr,</span><br><span class="line">                                          peerAddr));</span><br><span class="line">  connections_[connName] = conn;</span><br><span class="line">  conn-&gt;setConnectionCallback(connectionCallback_);</span><br><span class="line">  conn-&gt;setMessageCallback(messageCallback_);</span><br><span class="line">  conn-&gt;setWriteCompleteCallback(writeCompleteCallback_);</span><br><span class="line">  conn-&gt;setCloseCallback(</span><br><span class="line">      std::bind(&amp;TcpServer::removeConnection, this, _1)); // FIXME: unsafe</span><br><span class="line">  ioLoop-&gt;runInLoop(std::bind(&amp;TcpConnection::connectEstablished, conn));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>当服务器监听到新的客户端连接请求时，Acceptor类会调用<code>handleRead</code>函数，在<code>handleRead</code>函数中会回调<code>TcpServer</code>类的<code>newConnection</code>函数来处理新的连接。</p>
+<p>无论是第一个连接还是后续的连接，都会通过调用<code>newConnection</code>函数来创建相应的TcpConnection对象，并进行必要的初始化和设置。</p>
+<h2 id="TcpConnection-h"><a href="#TcpConnection-h" class="headerlink" title="TcpConnection.h"></a>TcpConnection.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void setConnectionCallback(const ConnectionCallback&amp; cb)</span><br><span class="line">  &#123; connectionCallback_ = cb; &#125;</span><br><span class="line"></span><br><span class="line">  void setMessageCallback(const MessageCallback&amp; cb)</span><br><span class="line">  &#123; messageCallback_ = cb; &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TcpConnection-cc"><a href="#TcpConnection-cc" class="headerlink" title="TcpConnection.cc"></a>TcpConnection.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">TcpConnection::TcpConnection(EventLoop* loop,</span><br><span class="line">                             const string&amp; nameArg,</span><br><span class="line">                             int sockfd,</span><br><span class="line">                             const InetAddress&amp; localAddr,</span><br><span class="line">                             const InetAddress&amp; peerAddr)</span><br><span class="line">  : loop_(CHECK_NOTNULL(loop)),</span><br><span class="line">    name_(nameArg),</span><br><span class="line">    state_(kConnecting),</span><br><span class="line">    reading_(true),</span><br><span class="line">    socket_(new Socket(sockfd)),</span><br><span class="line">    channel_(new Channel(loop, sockfd)),</span><br><span class="line">    localAddr_(localAddr),</span><br><span class="line">    peerAddr_(peerAddr),</span><br><span class="line">    highWaterMark_(64*1024*1024)</span><br><span class="line">&#123;</span><br><span class="line">  //通道可读事件到来的时候，回调TcpConnection::handleRead，_1是事件发生时间</span><br><span class="line">  channel_-&gt;setReadCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleRead, this, _1));</span><br><span class="line">  channel_-&gt;setWriteCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleWrite, this));</span><br><span class="line">  channel_-&gt;setCloseCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleClose, this));</span><br><span class="line">  channel_-&gt;setErrorCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleError, this));</span><br><span class="line">  LOG_DEBUG &lt;&lt; &quot;TcpConnection::ctor[&quot; &lt;&lt;  name_ &lt;&lt; &quot;] at &quot; &lt;&lt; this</span><br><span class="line">            &lt;&lt; &quot; fd=&quot; &lt;&lt; sockfd;</span><br><span class="line">  socket_-&gt;setKeepAlive(true);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::connectEstablished()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  assert(state_ == kConnecting);</span><br><span class="line">  setState(kConnected);</span><br><span class="line">  channel_-&gt;tie(shared_from_this());</span><br><span class="line">  channel_-&gt;enableReading();//Tcpconnection所对应的通道加入到Poller关注</span><br><span class="line"></span><br><span class="line">  connectionCallback_(shared_from_this());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::handleRead(Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  int savedErrno = 0;</span><br><span class="line">  ssize_t n = inputBuffer_.readFd(channel_-&gt;fd(), &amp;savedErrno);</span><br><span class="line">  if (n &gt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    messageCallback_(shared_from_this(), &amp;inputBuffer_, receiveTime);//shared_from_this()将当前对象转换成shared_ptr，而不是裸指针</span><br><span class="line">  &#125;</span><br><span class="line">  else if (n == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    handleClose();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    errno = savedErrno;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;TcpConnection::handleRead&quot;;</span><br><span class="line">    handleError();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>TcpConnection::connectEstablished()</code>函数是TcpConnection类的成员函数，用于在连接成功建立后进行相应的处理。</p>
+<p>首先，使用<code>loop_-&gt;assertInLoopThread()</code>断言当前函数被调用的线程是所属的EventLoop线程，以确保函数只能在正确的线程中被调用。</p>
+<p>然后，通过<code>assert(state_ == kConnecting)</code>断言当前连接状态<code>state_</code>为正在连接状态，以确保该函数只能在连接状态为正在连接时被调用。</p>
+<p>接下来，通过调用<code>setState(kConnected)</code>将连接状态更新为已连接状态。</p>
+<p>然后，将TcpConnection所对应的通道<code>channel_</code>与TcpConnection对象自身进行绑定，即调用<code>channel_-&gt;tie(shared_from_this())</code>。这个操作是为了在通道回调函数中可以安全地使用TcpConnection对象。</p>
+<p>接着，调用<code>channel_-&gt;enableReading()</code>，将TcpConnection所对应的通道加入到Poller中进行读事件的监听。</p>
+<p>最后，调用<code>connectionCallback_(shared_from_this())</code>，即用户设置的连接回调函数，通知用户连接已经建立成功，并将TcpConnection对象作为参数传递给回调函数。</p>
+<p>总之，<code>connectEstablished</code>函数在连接成功建立后，会进行一系列的操作，包括更新连接状态、关联通道并进行事件监听，并触发连接回调函数以通知用户连接建立成功。</p>
+<h2 id="TcpConnection生存期管理"><a href="#TcpConnection生存期管理" class="headerlink" title="TcpConnection生存期管理"></a>TcpConnection生存期管理</h2><p>当连接到来，创建一个TcpConnection对象，立刻用shared_ptr来管理，引用计数为1<br>在Channel中维护一个<code>weak_ptr(tie_)</code>，将这个<code>shared_ptr</code>对象赋值给<code>tie_</code>引用计数仍为1</p>
+<p>当连接关闭，在handleEvent，将<code>tie_</code>提升，得到一个<code>shared_ptr</code>对象，引用计数就变成了2</p>
+<p><code>shared_ptr</code> 是 C++ 标准库中的一个智能指针（Smart Pointer）类模板，用于管理动态分配的对象的生命周期。它允许多个 <code>shared_ptr</code> 实例共享同一个堆上的对象，当没有引用指向对象时，对象会自动被销毁，从而避免了内存泄漏。</p>
+<p><code>shared_ptr</code> 提供了一种自动引用计数机制，它会跟踪有多少个 <code>shared_ptr</code> 实例指向相同的对象。每当创建一个新的 <code>shared_ptr</code> 指向对象，引用计数会增加；当 <code>shared_ptr</code> 被销毁或重置时，引用计数会减少。当引用计数减少到零时，表示没有 <code>shared_ptr</code> 实例再指向该对象，对象将会被自动删除。</p>
+<p>以下是 <code>shared_ptr</code> 的一些重要特性和用法：</p>
+<ol>
+<li><strong>共享所有权：</strong> 多个 <code>shared_ptr</code> 实例可以共享相同的对象所有权，从而避免了手动管理内存释放。</li>
+<li><strong>循环引用问题：</strong> 尽管 <code>shared_ptr</code> 可以有效地管理内存，但如果存在循环引用（两个或多个对象相互引用），可能会导致内存泄漏。为了解决这个问题，可以使用 <code>weak_ptr</code> 来解除循环引用。</li>
+<li><strong>自定义删除器：</strong> 可以使用自定义的删除器函数或函数对象来控制对象的销毁过程。</li>
+<li><strong>线程安全：</strong> <code>shared_ptr</code> 本身不提供线程安全的保证。多个线程同时修改引用计数可能导致竞态条件。在多线程环境中，需要额外的同步机制来确保安全使用。</li>
+<li><strong>使用方便：</strong> <code>shared_ptr</code> 的使用方式类似于常规指针，可以通过 <code>-&gt;</code> 和 <code>*</code> 运算符访问对象的成员。</li>
+</ol>
+<h3 id="连接关闭时序图"><a href="#连接关闭时序图" class="headerlink" title="连接关闭时序图"></a>连接关闭时序图</h3><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230816112443369.png" alt="image-20230816112443369"></p>
+<img src="/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/image-20230816112443369.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> &#123; /// Internal use only.</span><br><span class="line">  void setCloseCallback(const CloseCallback&amp; cb)</span><br><span class="line">  &#123; closeCallback_ = cb; &#125;</span><br><span class="line">private:</span><br><span class="line">  void connectDestroyed();  // should be called only once</span><br><span class="line">  CloseCallback closeCallback_;//用户内部的连接关闭回调函数</span><br><span class="line">  void handleError();</span><br><span class="line">  void handleClose();</span><br><span class="line"> &#125;; </span><br><span class="line">  typedef std::shared_ptr&lt;TcpConnection&gt; TcpConnectionPtr;</span><br><span class="line">  </span><br><span class="line">  构造函数：</span><br><span class="line">  channel_-&gt;setCloseCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleClose, this));</span><br><span class="line">  channel_-&gt;setErrorCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleError, this));</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line">void TcpConnection::handleRead(Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  int savedErrno = 0;</span><br><span class="line">  ssize_t n = inputBuffer_.readFd(channel_-&gt;fd(), &amp;savedErrno);</span><br><span class="line">  if (n &gt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    messageCallback_(shared_from_this(), &amp;inputBuffer_, receiveTime);//shared_from_this()将当前对象转换成shared_ptr，而不是裸指针</span><br><span class="line">  &#125;</span><br><span class="line">  else if (n == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    handleClose();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    errno = savedErrno;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;TcpConnection::handleRead&quot;;</span><br><span class="line">    handleError();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::handleClose()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  LOG_TRACE &lt;&lt; &quot;fd = &quot; &lt;&lt; channel_-&gt;fd() &lt;&lt; &quot; state = &quot; &lt;&lt; stateToString();</span><br><span class="line">  assert(state_ == kConnected || state_ == kDisconnecting);</span><br><span class="line">  // we don&#x27;t close fd, leave it to dtor, so we can find leaks easily.</span><br><span class="line">  setState(kDisconnected);</span><br><span class="line">  channel_-&gt;disableAll();</span><br><span class="line"></span><br><span class="line">  TcpConnectionPtr guardThis(shared_from_this());</span><br><span class="line">  connectionCallback_(guardThis);//这一行可以不调用</span><br><span class="line">  // must be the last line</span><br><span class="line">  closeCallback_(guardThis);//调用TcpServer::removeConnection</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::handleError()</span><br><span class="line">&#123;</span><br><span class="line">  int err = sockets::getSocketError(channel_-&gt;fd());</span><br><span class="line">  LOG_ERROR &lt;&lt; &quot;TcpConnection::handleError [&quot; &lt;&lt; name_</span><br><span class="line">            &lt;&lt; &quot;] - SO_ERROR = &quot; &lt;&lt; err &lt;&lt; &quot; &quot; &lt;&lt; strerror_tl(err);</span><br><span class="line">&#125;</span><br><span class="line">void TcpConnection::connectEstablished()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  assert(state_ == kConnecting);</span><br><span class="line">  setState(kConnected);</span><br><span class="line">  channel_-&gt;tie(shared_from_this());//void tie(const std::shared_ptr&lt;void&gt;&amp;);</span><br><span class="line">  //但是tie_不会更改计数，还是shared_from_this()加一后的，因为它是弱引用，但是shared_from_this()是临死对象，加1后会减1</span><br><span class="line">  //shared_from_this()继承自std::enable_shared_from_this&lt;TcpConnection&gt;，返回一个shared_ptr类型的TcpConnection对象</span><br><span class="line">  channel_-&gt;enableReading();//Tcpconnection所对应的通道加入到Poller关注</span><br><span class="line"></span><br><span class="line">  connectionCallback_(shared_from_this());</span><br><span class="line">&#125;</span><br><span class="line">void TcpServer::removeConnectionInLoop(const TcpConnectionPtr&amp; conn)</span><br><span class="line">// &#123;</span><br><span class="line">//   loop_-&gt;assertInLoopThread();</span><br><span class="line">//   LOG_INFO &lt;&lt; &quot;TcpServer::removeConnectionInLoop [&quot; &lt;&lt; name_</span><br><span class="line">//            &lt;&lt; &quot;] - connection &quot; &lt;&lt; conn-&gt;name();</span><br><span class="line">//   size_t n = connections_.erase(conn-&gt;name());//引用计数减一,从容器中删除相应的键值对</span><br><span class="line">//   (void)n;</span><br><span class="line">//   assert(n == 1);</span><br><span class="line">//   EventLoop* ioLoop = conn-&gt;getLoop();</span><br><span class="line">//   ioLoop-&gt;queueInLoop(//handEvent事件处理完毕后处理functors</span><br><span class="line">//       std::bind(&amp;TcpConnection::connectDestroyed, conn));//引用计数加一</span><br><span class="line">// &#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::connectDestroyed()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  if (state_ == kConnected)//如果handleClose中已调用回调函数，这里就不会再调用</span><br><span class="line">  &#123;</span><br><span class="line">    setState(kDisconnected);</span><br><span class="line">    channel_-&gt;disableAll();</span><br><span class="line"></span><br><span class="line">    connectionCallback_(shared_from_this());//shared_from_this()将当前对象转换成shared_ptr获取，会使shared_ptr引用计数加1，但是是临时对象，马上会销毁</span><br><span class="line">  &#125;</span><br><span class="line">  channel_-&gt;remove();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Channel::handleEvent(Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  std::shared_ptr&lt;void&gt; guard;</span><br><span class="line">  if (tied_)</span><br><span class="line">  &#123;</span><br><span class="line">    guard = tie_.lock();//如果 lock 成功，即 guard 不为空，那么表示资源仍然有效，可以安全地执行 handleEventWithGuard 函数</span><br><span class="line">    if (guard)</span><br><span class="line">    &#123;</span><br><span class="line">      handleEventWithGuard(receiveTime);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  else//如果 lock 失败，即 guard 为空，那么表示被 std::weak_ptr 管理的资源已经失效，不再存在</span><br><span class="line">  &#123;</span><br><span class="line">    handleEventWithGuard(receiveTime);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>tie_.lock()</code> 是 <code>std::weak_ptr</code> 的一个方法，用于创建一个有效的 <code>std::shared_ptr</code>，以便在某个范围内使用这个资源。如果资源仍然有效，<code>lock()</code> 方法将返回一个非空的 <code>std::shared_ptr</code>；如果资源已经失效，它将返回一个空的 <code>std::shared_ptr</code>。</p>
+<p>因此，<code>tie_.lock()</code> 方法不是针对 <code>std::shared_ptr</code> 或 <code>std::weak_ptr</code> 类的全局方法，而是 <code>std::weak_ptr</code> 的成员方法，用于操作 <code>std::weak_ptr</code> 对象以检查被观察的资源是否仍然存在。</p>
+<p><code>std::shared_ptr</code> 和 <code>std::weak_ptr</code> 是 C++ 标准库中两种用于管理动态分配的对象的智能指针类型。它们之间有关联，主要用于解决循环引用问题以及确保动态分配对象的正确管理。</p>
+<p>下面是它们之间的关系：</p>
+<ol>
+<li><strong>std::shared_ptr</strong>：是一种强引用智能指针，它允许多个 <code>shared_ptr</code> 共享同一个对象，并且通过引用计数来追踪对象的生命周期。当最后一个 <code>shared_ptr</code> 对象释放其引用时，引用计数会降为零，从而释放对象并释放其分配的内存。<code>std::shared_ptr</code> 本身会增加对象的引用计数。</li>
+<li><strong>std::weak_ptr</strong>：是一种弱引用智能指针，它不会增加对象的引用计数。它允许观察由 <code>shared_ptr</code> 管理的对象，但不会影响对象的生命周期。最常见的用途是避免循环引用问题，其中两个对象彼此持有对方的 <code>shared_ptr</code>，导致对象无法被正确释放。通过使用 <code>std::weak_ptr</code>，可以解决循环引用问题，因为它不会增加引用计数，但仍然可以用于检查对象是否仍然存在。</li>
+</ol>
+<p>总结来说，<code>std::shared_ptr</code> 允许多个智能指针共享所有权，并且通过引用计数来管理对象的生命周期。<code>std::weak_ptr</code> 允许观察 <code>std::shared_ptr</code> 管理的对象，但不会影响其生命周期。这两种智能指针在一起使用，可以有效地解决资源管理和循环引用问题。</p>
+<p>如果 <code>p</code> 是一个 <code>std::shared_ptr</code> 对象，那么 <code>p.get()</code> 的含义是获取 <code>std::shared_ptr</code> 对象所管理的原始指针</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/" rel="prev" title="muduo-网络库（3）">
+      <i class="fa fa-chevron-left"></i> muduo-网络库（3）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/16/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/" rel="next" title="muduo-网络库（5）">
+      muduo-网络库（5） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TcpServer-x2F-TcpConnection"><span class="nav-number">1.</span> <span class="nav-text">TcpServer&#x2F;TcpConnection</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="nav-number">1.1.</span> <span class="nav-text">时序图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">测试文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpServer-h"><span class="nav-number">1.3.</span> <span class="nav-text">TcpServer.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpServer-cc"><span class="nav-number">1.4.</span> <span class="nav-text">TcpServer.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpConnection-h"><span class="nav-number">1.5.</span> <span class="nav-text">TcpConnection.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpConnection-cc"><span class="nav-number">1.6.</span> <span class="nav-text">TcpConnection.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpConnection%E7%94%9F%E5%AD%98%E6%9C%9F%E7%AE%A1%E7%90%86"><span class="nav-number">1.7.</span> <span class="nav-text">TcpConnection生存期管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%85%B3%E9%97%AD%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="nav-number">1.7.1.</span> <span class="nav-text">连接关闭时序图</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

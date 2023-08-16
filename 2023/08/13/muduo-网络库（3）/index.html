@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="进程(线程)wait&#x2F;notify pipe  单向通信   socketpair  双向通信   eventfd  eventfd是一个比 pipe更高效的线程间事件通知机制，一方面它比 pipe少用一个file descripor,节省了资源;另一方面，eventfd的缓冲区管理也简单得多，全部“buffer”只有定长8 bytes，不像pipe那样可能有不定长的真正 buffer。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-网络库（3）">
+<meta property="og:url" content="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="进程(线程)wait&#x2F;notify pipe  单向通信   socketpair  双向通信   eventfd  eventfd是一个比 pipe更高效的线程间事件通知机制，一方面它比 pipe少用一个file descripor,节省了资源;另一方面，eventfd的缓冲区管理也简单得多，全部“buffer”只有定长8 bytes，不像pipe那样可能有不定长的真正 buffer。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813163113214.png">
+<meta property="og:image" content="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813163113214.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813203826232.png">
+<meta property="og:image" content="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813203826232.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814161825526.png">
+<meta property="og:image" content="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814161825526.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814200106610.png">
+<meta property="og:image" content="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814200106610.png">
+<meta property="article:published_time" content="2023-08-13T07:37:10.000Z">
+<meta property="article:modified_time" content="2023-08-14T13:21:06.665Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813163113214.png">
+
+<link rel="canonical" href="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-网络库（3） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-网络库（3）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-13 15:37:10" itemprop="dateCreated datePublished" datetime="2023-08-13T15:37:10+08:00">2023-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-14 21:21:06" itemprop="dateModified" datetime="2023-08-14T21:21:06+08:00">2023-08-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="进程-线程-wait-x2F-notify"><a href="#进程-线程-wait-x2F-notify" class="headerlink" title="进程(线程)wait&#x2F;notify"></a>进程(线程)wait&#x2F;notify</h1><ul>
+<li><p>pipe</p>
+<ul>
+<li>单向通信</li>
+</ul>
+</li>
+<li><p>socketpair</p>
+<ul>
+<li>双向通信</li>
+</ul>
+</li>
+<li><p>eventfd</p>
+<ul>
+<li>eventfd是一个比 pipe更高效的线程间事件通知机制，一方面它比 pipe少用一个file descripor,节省了资源;另一方面，eventfd的缓冲区管理也简单得多，全部“buffer”只有定长8 bytes，不像pipe那样可能有不定长的真正 buffer。</li>
+</ul>
+</li>
+</ul>
+<p>线程间还多一个条件变量，但是上面三个有文件描述符，可以用IO复用，即poll&#x2F;epoll&#x2F;select,条件变量不行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">int wakeupFd_;//用于eventfd</span><br><span class="line">  // unlike in TimerQueue, which is an internal class,</span><br><span class="line">  // we don&#x27;t expose Channel to client.</span><br><span class="line"> std::unique_ptr&lt;Channel&gt; wakeupChannel_;//wakeupFd_通道的管理，将会纳入poller_管理,是一个智能指针</span><br><span class="line">  //这里EventLoop和Channel是组合关系，EventLoop销毁则channel也要销毁，也就是wakeupFd_销毁</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">wakeupFd_(createEventfd()),</span><br><span class="line">    wakeupChannel_(new Channel(this, wakeupFd_)),</span><br><span class="line"></span><br><span class="line">int createEventfd()</span><br><span class="line">&#123;</span><br><span class="line">  int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);</span><br><span class="line">  if (evtfd &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;Failed in eventfd&quot;;</span><br><span class="line">    abort();</span><br><span class="line">  &#125;</span><br><span class="line">  return evtfd;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="EventLoop-runInLoop"><a href="#EventLoop-runInLoop" class="headerlink" title="EventLoop::runInLoop"></a>EventLoop::runInLoop</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//在IO线程中执行某个回调函数，该函数可以跨线程调用，调用这个函数可以保证不用加锁</span><br><span class="line">void EventLoop::runInLoop(Functor cb)</span><br><span class="line">&#123;</span><br><span class="line">  if (isInLoopThread())</span><br><span class="line">  &#123;</span><br><span class="line">  	//如果是当前线程调用runInLoop，则同步调用cb</span><br><span class="line">    cb();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">  	//如果是其它线程调用，则异步地将cb添加到队列</span><br><span class="line">    queueInLoop(std::move(cb));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EventLoop-queueInLoop"><a href="#EventLoop-queueInLoop" class="headerlink" title="EventLoop::queueInLoop"></a>EventLoop::queueInLoop</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void EventLoop::queueInLoop(Functor cb)</span><br><span class="line">&#123;</span><br><span class="line">  &#123;</span><br><span class="line">  MutexLockGuard lock(mutex_);</span><br><span class="line">  pendingFunctors_.push_back(std::move(cb));</span><br><span class="line">  &#125;</span><br><span class="line">	</span><br><span class="line">//调用queuelnLoop的线程不是当前IO线程需要唤醒</span><br><span class="line">//或者调用queueInLoop的线程是当前IO线程，并且此时正在调用pending functor，需要唤醒</span><br><span class="line">//只有当前IO线程的事件回调中调用queuelnLoop才不需要唤醒</span><br><span class="line">  if (!isInLoopThread() || callingPendingFunctors_)</span><br><span class="line">  &#123;</span><br><span class="line">    wakeup();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EventLoop-loop"><a href="#EventLoop-loop" class="headerlink" title="EventLoop::loop"></a>EventLoop::loop</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">while (!quit_)</span><br><span class="line">  &#123;</span><br><span class="line">    activeChannels_.clear();</span><br><span class="line">    pollReturnTime_ = poller_-&gt;poll(kPollTimeMs, &amp;activeChannels_);</span><br><span class="line">    ++iteration_;</span><br><span class="line">    if (Logger::logLevel() &lt;= Logger::TRACE)</span><br><span class="line">    &#123;</span><br><span class="line">      printActiveChannels();</span><br><span class="line">    &#125;</span><br><span class="line">    // TODO sort channel by priority</span><br><span class="line">    eventHandling_ = true;</span><br><span class="line">    for (Channel* channel : activeChannels_)</span><br><span class="line">    &#123;</span><br><span class="line">      currentActiveChannel_ = channel;</span><br><span class="line">      currentActiveChannel_-&gt;handleEvent(pollReturnTime_);</span><br><span class="line">    &#125;</span><br><span class="line">    currentActiveChannel_ = NULL;</span><br><span class="line">    eventHandling_ = false;</span><br><span class="line">    doPendingFunctors();//让IO线程也能执行一些计算任务，即IO不繁忙的时候添加计算任务让他来处理</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h2><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813163113214.png" alt="image-20230813163113214"></p>
+<img src="/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813163113214.png" class title="This is an test image">
+
+<h2 id="EventLoop-doPendingFunctors"><a href="#EventLoop-doPendingFunctors" class="headerlink" title="EventLoop::doPendingFunctors"></a><strong>EventLoop</strong>::doPendingFunctors</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void EventLoop::doPendingFunctors()</span><br><span class="line">&#123;</span><br><span class="line">  std::vector&lt;Functor&gt; functors;</span><br><span class="line">  callingPendingFunctors_ = true;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">  MutexLockGuard lock(mutex_);//</span><br><span class="line">  functors.swap(pendingFunctors_);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  for (const Functor&amp; functor : functors)</span><br><span class="line">  &#123;</span><br><span class="line">    functor();</span><br><span class="line">  &#125;</span><br><span class="line">  callingPendingFunctors_ = false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，这样一方面减小了临界区的长度（意味着不会阻塞其它线程的queuelnLoop()），另一方面，也避免了死锁(因为Functor可能再次调用queuelnLoop())</li>
+<li>由于doPendingFunctors()调用的Functor可能再次调用queuelnLoop(cb)，这时，queuelnLoop()就必须wakeup(),否则新增的cb可能就不能及时调用了</li>
+<li>muduo没有反复执行doPendingFunctors()直到pendingFunctors为空，这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。</li>
+</ul>
+<h1 id="EventLoopThread"><a href="#EventLoopThread" class="headerlink" title="EventLoopThread"></a>EventLoopThread</h1><ul>
+<li>任何一个线程，只要创建并运行了EventLoop,都称之为IO线程</li>
+<li>IO线程不一定是主线程</li>
+<li>muduo并发模型one loop per thread + threadpool，(包括了IO线程池和计算线程池)</li>
+<li>为了方便今后使用，定义了EventLoopThread类，该类封装了IO线程<ul>
+<li>EventLoopThread创建了一个线程</li>
+<li>在线程函数中创建了一个EvenLoop对象并调用EventLoop:loop</li>
+</ul>
+</li>
+</ul>
+<p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813203826232.png" alt="image-20230813203826232"></p>
+<img src="/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230813203826232.png" class title="This is an test image">
+
+<p>在startLoop时会 thread_.<strong>start</strong>()，进入线程回调函数并绑定 <code>loop_ = &amp;loop;</code>再 <code>return loop;</code>，也就是说loop的runInLoop,runAfter都是同一个线程。</p>
+<h2 id="EventLoopThread-h"><a href="#EventLoopThread-h" class="headerlink" title="EventLoopThread.h"></a>EventLoopThread.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_EVENTLOOPTHREAD_H</span><br><span class="line">#define MUDUO_NET_EVENTLOOPTHREAD_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Condition.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/base/Thread.h&quot;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class EventLoop;</span><br><span class="line"></span><br><span class="line">class EventLoopThread : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void(EventLoop*)&gt; ThreadInitCallback;</span><br><span class="line"></span><br><span class="line">  EventLoopThread(const ThreadInitCallback&amp; cb = ThreadInitCallback(),</span><br><span class="line">                  const string&amp; name = string());</span><br><span class="line">  ~EventLoopThread();</span><br><span class="line">  EventLoop* startLoop();//启动线程，该线程就成为了IO线程</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void threadFunc();//线程函数</span><br><span class="line"></span><br><span class="line">  EventLoop* loop_ GUARDED_BY(mutex_);//loop指针指向了eventloop对象</span><br><span class="line">  bool exiting_;</span><br><span class="line">  Thread thread_;//因为是基于对象编程思想，所以包含了一个thread类</span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  Condition cond_ GUARDED_BY(mutex_);</span><br><span class="line">  ThreadInitCallback callback_;//回调函数在EventLoop::loop事件循环之前被调用</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_EVENTLOOPTHREAD_H</span><br></pre></td></tr></table></figure>
+
+<h2 id="EventLoopThread-cc"><a href="#EventLoopThread-cc" class="headerlink" title="EventLoopThread.cc"></a>EventLoopThread.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/EventLoopThread.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">EventLoopThread::EventLoopThread(const ThreadInitCallback&amp; cb,</span><br><span class="line">                                 const string&amp; name)</span><br><span class="line">  : loop_(NULL),</span><br><span class="line">    exiting_(false),</span><br><span class="line">    thread_(std::bind(&amp;EventLoopThread::threadFunc, this), name),</span><br><span class="line">    mutex_(),</span><br><span class="line">    cond_(mutex_),</span><br><span class="line">    callback_(cb)</span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventLoopThread::~EventLoopThread()</span><br><span class="line">&#123;</span><br><span class="line">  exiting_ = true;</span><br><span class="line">  if (loop_ != NULL) // not 100% race-free, eg. threadFunc could be running callback_.</span><br><span class="line">  &#123;</span><br><span class="line">    // still a tiny chance to call destructed object, if threadFunc exits just now.</span><br><span class="line">    // but when EventLoopThread destructs, usually programming is exiting anyway.</span><br><span class="line">    loop_-&gt;quit();//退出IO线程，让IO线程的loop循环退出，从而退出了IO线程</span><br><span class="line">    thread_.join();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventLoop* EventLoopThread::startLoop()</span><br><span class="line">&#123;</span><br><span class="line">  assert(!thread_.started());//断言线程还未启动</span><br><span class="line">  thread_.start();//启动调用EventLoopThread::threadFunc</span><br><span class="line"></span><br><span class="line">  EventLoop* loop = NULL;</span><br><span class="line">  &#123;</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    while (loop_ == NULL)</span><br><span class="line">    &#123;</span><br><span class="line">      cond_.wait();</span><br><span class="line">    &#125;</span><br><span class="line">    loop = loop_;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return loop;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void EventLoopThread::threadFunc()</span><br><span class="line">&#123;</span><br><span class="line">  EventLoop loop;</span><br><span class="line"></span><br><span class="line">  if (callback_)//可以有选择的传递回调函数</span><br><span class="line">  &#123;</span><br><span class="line">    callback_(&amp;loop);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    //1oop_指针指向了一个栈上的对象，threadFunc函数退出之后，这个指针就失效了.</span><br><span class="line">    //threadFunc函教退出，就意味着线程退出了，EventLoopThread对象也就没有存在的价值了.</span><br><span class="line">    loop_ = &amp;loop;</span><br><span class="line">    cond_.notify();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  loop.loop();//退出了，也就相当于整个线程退出了</span><br><span class="line">  //assert(exiting_);</span><br><span class="line">  MutexLockGuard lock(mutex_);</span><br><span class="line">  loop_ = NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Socket封装"><a href="#Socket封装" class="headerlink" title="Socket封装"></a>Socket封装</h1><h2 id="Endian-h"><a href="#Endian-h" class="headerlink" title="Endian.h"></a>Endian.h</h2><ul>
+<li>封装了字节序转换函数（全局函数，位于muduo::net::sockets名称空间中）。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_ENDIAN_H</span><br><span class="line">#define MUDUO_NET_ENDIAN_H</span><br><span class="line"></span><br><span class="line">#include &lt;stdint.h&gt;</span><br><span class="line">#include &lt;endian.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line">namespace sockets</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">// the inline assembler code makes type blur,</span><br><span class="line">// so we disable warnings for a while.</span><br><span class="line">#pragma GCC diagnostic push//这个指令将当前的警告和错误状态入栈，保存起来，以便稍后可以使用 #pragma GCC diagnostic pop 恢复到先前的状态。在这个代码块中，它保存了当前的警告状态，以便可以在代码块结束后还原</span><br><span class="line">#pragma GCC diagnostic ignored &quot;-Wconversion&quot;//这个指令告诉编译器在接下来的代码块中忽略与隐式类型转换相关的警告（-Wconversion 警告）。这样，代码块内的类型转换不会触发编译器的警告信息</span><br><span class="line">#pragma GCC diagnostic ignored &quot;-Wold-style-cast&quot;//这个指令告诉编译器在接下来的代码块中忽略与旧式的C风格类型转换相关的警告。这种类型的转换在现代C++中被认为是不安全的，通过这个指令可以禁用与它相关的警告</span><br><span class="line">//#pragma GCC diagnostic push 和 #pragma GCC diagnostic pop 用于临时禁用编译器的警告，以便在进行字节序转换函数的实现时，不受 -Wconversion 和 -Wold-style-cast 这两种警告的干扰。这些警告与类型转换相关，可能在你的代码中的转换操作时触发</span><br><span class="line">inline uint64_t hostToNetwork64(uint64_t host64)</span><br><span class="line">&#123;</span><br><span class="line">  return htobe64(host64);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline uint32_t hostToNetwork32(uint32_t host32)</span><br><span class="line">&#123;</span><br><span class="line">  return htobe32(host32);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline uint16_t hostToNetwork16(uint16_t host16)</span><br><span class="line">&#123;</span><br><span class="line">  return htobe16(host16);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline uint64_t networkToHost64(uint64_t net64)</span><br><span class="line">&#123;</span><br><span class="line">  return be64toh(net64);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline uint32_t networkToHost32(uint32_t net32)</span><br><span class="line">&#123;</span><br><span class="line">  return be32toh(net32);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inline uint16_t networkToHost16(uint16_t net16)</span><br><span class="line">&#123;</span><br><span class="line">  return be16toh(net16);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#pragma GCC diagnostic pop</span><br><span class="line"></span><br><span class="line">&#125;  // namespace sockets</span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_ENDIAN_H</span><br></pre></td></tr></table></figure>
+
+<p>上面的方法只适用于Linux，不能跨平台。</p>
+<h2 id="SocketsOps-h-x2F-SocketsOps-cc"><a href="#SocketsOps-h-x2F-SocketsOps-cc" class="headerlink" title="SocketsOps.h&#x2F; SocketsOps.cc"></a>SocketsOps.h&#x2F; SocketsOps.cc</h2><ul>
+<li>封装了socket相关系统调用（全局函数，位于muduo::net::sockets名称空间中)。</li>
+</ul>
+<p>这些函数看起来是用于类型转换，主要是在Socket编程中对网络地址结构 <code>sockaddr</code> 及其 IPv4 (<code>sockaddr_in</code>) 和 IPv6 (<code>sockaddr_in6</code>) 版本之间的转换。让我们分析每个函数的区别和用途：</p>
+<ol>
+<li><strong><code>const struct sockaddr* sockets::sockaddr_cast(const struct sockaddr_in6* addr)</code></strong>:<ul>
+<li>参数类型：<code>sockaddr_in6</code> 指针</li>
+<li>返回类型：<code>const sockaddr*</code></li>
+<li>作用：将IPv6地址结构 (<code>sockaddr_in6</code>) 转换为通用的地址结构 (<code>sockaddr</code>) 的常量指针。</li>
+<li>使用场景：通常在需要操作IPv6地址的网络编程中，可能需要将 <code>sockaddr_in6</code> 类型的地址转换为通用的 <code>sockaddr</code> 类型。</li>
+</ul>
+</li>
+<li><strong><code>struct sockaddr* sockets::sockaddr_cast(struct sockaddr_in6* addr)</code></strong>:<ul>
+<li>参数类型：<code>sockaddr_in6</code> 指针</li>
+<li>返回类型：<code>sockaddr*</code></li>
+<li>作用：将IPv6地址结构 (<code>sockaddr_in6</code>) 转换为通用的地址结构 (<code>sockaddr</code>) 的指针。</li>
+<li>使用场景：类似于上一个函数，但这个函数返回的是非常量指针，可能用于修改地址结构。</li>
+</ul>
+</li>
+<li><strong><code>const struct sockaddr* sockets::sockaddr_cast(const struct sockaddr_in* addr)</code></strong>:<ul>
+<li>参数类型：<code>sockaddr_in</code> 指针</li>
+<li>返回类型：<code>const sockaddr*</code></li>
+<li>作用：将IPv4地址结构 (<code>sockaddr_in</code>) 转换为通用的地址结构 (<code>sockaddr</code>) 的常量指针。</li>
+<li>使用场景：类似于第一个函数，但这个函数针对IPv4地址结构。</li>
+</ul>
+</li>
+<li><strong><code>const struct sockaddr_in* sockets::sockaddr_in_cast(const struct sockaddr* addr)</code></strong>:<ul>
+<li>参数类型：<code>sockaddr</code> 指针</li>
+<li>返回类型：<code>const sockaddr_in*</code></li>
+<li>作用：将通用的地址结构 (<code>sockaddr</code>) 转换为IPv4地址结构 (<code>sockaddr_in</code>) 的常量指针。</li>
+<li>使用场景：通常在需要获取 <code>sockaddr</code> 类型的指针指向 IPv4 地址结构的情况下使用。</li>
+</ul>
+</li>
+<li><strong><code>const struct sockaddr_in6* sockets::sockaddr_in6_cast(const struct sockaddr* addr)</code></strong>:<ul>
+<li>参数类型：<code>sockaddr</code> 指针</li>
+<li>返回类型：<code>const sockaddr_in6*</code></li>
+<li>作用：将通用的地址结构 (<code>sockaddr</code>) 转换为IPv6地址结构 (<code>sockaddr_in6</code>) 的常量指针。</li>
+<li>使用场景：类似于第四个函数，但这个函数针对IPv6地址结构。</li>
+</ul>
+</li>
+</ol>
+<p>这些函数的主要目的是在不同类型的网络地址结构之间进行安全的类型转换，以便在网络编程中处理不同的地址类型。它们使用了 <code>implicit_cast</code>（隐式转换）来实现这些转换，确保了正确的指针类型。</p>
+<h3 id="SocketsOps-h"><a href="#SocketsOps-h" class="headerlink" title="SocketsOps.h"></a>SocketsOps.h</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_SOCKETSOPS_H</span><br><span class="line">#define MUDUO_NET_SOCKETSOPS_H</span><br><span class="line"></span><br><span class="line">#include &lt;arpa/inet.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line">namespace sockets</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">///</span><br><span class="line">/// Creates a non-blocking socket file descriptor,</span><br><span class="line">/// abort if any error.</span><br><span class="line">int createNonblockingOrDie(sa_family_t family);</span><br><span class="line"></span><br><span class="line">int  connect(int sockfd, const struct sockaddr* addr);</span><br><span class="line">void bindOrDie(int sockfd, const struct sockaddr* addr);</span><br><span class="line">void listenOrDie(int sockfd);</span><br><span class="line">int  accept(int sockfd, struct sockaddr_in6* addr);</span><br><span class="line">ssize_t read(int sockfd, void *buf, size_t count);</span><br><span class="line">ssize_t readv(int sockfd, const struct iovec *iov, int iovcnt);</span><br><span class="line">ssize_t write(int sockfd, const void *buf, size_t count);</span><br><span class="line">void close(int sockfd);</span><br><span class="line">void shutdownWrite(int sockfd);</span><br><span class="line"></span><br><span class="line">void toIpPort(char* buf, size_t size,</span><br><span class="line">              const struct sockaddr* addr);</span><br><span class="line">void toIp(char* buf, size_t size,</span><br><span class="line">          const struct sockaddr* addr);</span><br><span class="line"></span><br><span class="line">void fromIpPort(const char* ip, uint16_t port,</span><br><span class="line">                struct sockaddr_in* addr);</span><br><span class="line">void fromIpPort(const char* ip, uint16_t port,</span><br><span class="line">                struct sockaddr_in6* addr);</span><br><span class="line"></span><br><span class="line">int getSocketError(int sockfd);</span><br><span class="line"></span><br><span class="line">const struct sockaddr* sockaddr_cast(const struct sockaddr_in* addr);</span><br><span class="line">const struct sockaddr* sockaddr_cast(const struct sockaddr_in6* addr);</span><br><span class="line">struct sockaddr* sockaddr_cast(struct sockaddr_in6* addr);</span><br><span class="line">const struct sockaddr_in* sockaddr_in_cast(const struct sockaddr* addr);</span><br><span class="line">const struct sockaddr_in6* sockaddr_in6_cast(const struct sockaddr* addr);</span><br><span class="line"></span><br><span class="line">struct sockaddr_in6 getLocalAddr(int sockfd);</span><br><span class="line">struct sockaddr_in6 getPeerAddr(int sockfd);</span><br><span class="line">bool isSelfConnect(int sockfd);</span><br><span class="line"></span><br><span class="line">&#125;  // namespace sockets</span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_SOCKETSOPS_H</span><br></pre></td></tr></table></figure>
+
+<h3 id="SocketsOps-cc"><a href="#SocketsOps-cc" class="headerlink" title="SocketsOps.cc"></a>SocketsOps.cc</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br></pre></td><td class="code"><pre><span class="line">int sockets::createNonblockingOrDie(sa_family_t family)//创建非阻塞套接字，失败就终止</span><br><span class="line">&#123;</span><br><span class="line">#if VALGRIND//VALGRIND可以检测内存泄漏和文件描述符</span><br><span class="line">  int sockfd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">  if (sockfd &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;sockets::createNonblockingOrDie&quot;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  setNonBlockAndCloseOnExec(sockfd);</span><br><span class="line">#else</span><br><span class="line">  int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);</span><br><span class="line">  //IPPROTO_TCP 是一个常量，用于指定套接字选项或协议参数中的 TCP（Transmission Control Protocol）协议</span><br><span class="line">  if (sockfd &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;sockets::createNonblockingOrDie&quot;;//FATAL 终止</span><br><span class="line">  &#125;</span><br><span class="line">#endif</span><br><span class="line">  return sockfd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::bindOrDie(int sockfd, const struct sockaddr* addr)</span><br><span class="line">&#123;</span><br><span class="line">  int ret = ::bind(sockfd, addr, static_cast&lt;socklen_t&gt;(sizeof(struct sockaddr_in6)));</span><br><span class="line">  if (ret &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;sockets::bindOrDie&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::listenOrDie(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  int ret = ::listen(sockfd, SOMAXCONN);//SOMAXCONN 的值表示操作系统允许的监听队列的最大长度。这个值可能因操作系统而异，但通常是一个相对较大的数字。当连接请求超过这个队列长度时，客户端的连接请求可能会被拒绝。</span><br><span class="line">  if (ret &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSFATAL &lt;&lt; &quot;sockets::listenOrDie&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int sockets::accept(int sockfd, struct sockaddr_in6* addr)</span><br><span class="line">&#123;</span><br><span class="line">  socklen_t addrlen = static_cast&lt;socklen_t&gt;(sizeof *addr);</span><br><span class="line">#if VALGRIND || defined (NO_ACCEPT4)</span><br><span class="line">  int connfd = ::accept(sockfd, sockaddr_cast(addr), &amp;addrlen);</span><br><span class="line">  setNonBlockAndCloseOnExec(connfd);</span><br><span class="line">#else</span><br><span class="line">  int connfd = ::accept4(sockfd, sockaddr_cast(addr),</span><br><span class="line">                         &amp;addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);</span><br><span class="line">#endif</span><br><span class="line">  if (connfd &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    int savedErrno = errno;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;Socket::accept&quot;;</span><br><span class="line">    switch (savedErrno)</span><br><span class="line">    &#123;</span><br><span class="line">      case EAGAIN:</span><br><span class="line">      case ECONNABORTED:</span><br><span class="line">      case EINTR:</span><br><span class="line">      case EPROTO: // ???</span><br><span class="line">      case EPERM:</span><br><span class="line">      case EMFILE: // per-process lmit of open file desctiptor ???</span><br><span class="line">        // expected errors</span><br><span class="line">        errno = savedErrno;//上面的都不是致命错误</span><br><span class="line">        break;</span><br><span class="line">      case EBADF:</span><br><span class="line">      case EFAULT:</span><br><span class="line">      case EINVAL:</span><br><span class="line">      case ENFILE:</span><br><span class="line">      case ENOBUFS:</span><br><span class="line">      case ENOMEM:</span><br><span class="line">      case ENOTSOCK:</span><br><span class="line">      case EOPNOTSUPP:</span><br><span class="line">        // unexpected errors</span><br><span class="line">        LOG_FATAL &lt;&lt; &quot;unexpected error of ::accept &quot; &lt;&lt; savedErrno;</span><br><span class="line">        break;</span><br><span class="line">      default:</span><br><span class="line">        LOG_FATAL &lt;&lt; &quot;unknown error of ::accept &quot; &lt;&lt; savedErrno;</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return connfd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int sockets::connect(int sockfd, const struct sockaddr* addr)</span><br><span class="line">&#123;</span><br><span class="line">  return ::connect(sockfd, addr, static_cast&lt;socklen_t&gt;(sizeof(struct sockaddr_in6)));</span><br><span class="line">&#125;</span><br><span class="line">//read与readv不同之处在于</span><br><span class="line">ssize_t sockets::read(int sockfd, void *buf, size_t count)</span><br><span class="line">&#123;</span><br><span class="line">  return ::read(sockfd, buf, count);</span><br><span class="line">&#125;</span><br><span class="line">//readv与read不同之处在于，接受的数据可以填充到多个缓冲区中</span><br><span class="line">ssize_t sockets::readv(int sockfd, const struct iovec *iov, int iovcnt)</span><br><span class="line">&#123;</span><br><span class="line">  return ::readv(sockfd, iov, iovcnt);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ssize_t sockets::write(int sockfd, const void *buf, size_t count)//struct iovec 是一个结构体，用于描述一组分散的内存缓冲区</span><br><span class="line">&#123;</span><br><span class="line">  return ::write(sockfd, buf, count);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::close(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  if (::close(sockfd) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::close&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">//只关闭写的这一半</span><br><span class="line">void sockets::shutdownWrite(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  if (::shutdown(sockfd, SHUT_WR) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::shutdownWrite&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">//将addr转换成IP与端口的形式保存在buf中</span><br><span class="line">void sockets::toIpPort(char* buf, size_t size,</span><br><span class="line">                       const struct sockaddr* addr)</span><br><span class="line">&#123;</span><br><span class="line">  if (addr-&gt;sa_family == AF_INET6)</span><br><span class="line">  &#123;</span><br><span class="line">    buf[0] = &#x27;[&#x27;;</span><br><span class="line">    toIp(buf+1, size-1, addr);</span><br><span class="line">    size_t end = ::strlen(buf);</span><br><span class="line">    const struct sockaddr_in6* addr6 = sockaddr_in6_cast(addr);</span><br><span class="line">    uint16_t port = sockets::networkToHost16(addr6-&gt;sin6_port);</span><br><span class="line">    assert(size &gt; end);</span><br><span class="line">    snprintf(buf+end, size-end, &quot;]:%u&quot;, port);</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  toIp(buf, size, addr);</span><br><span class="line">  size_t end = ::strlen(buf);</span><br><span class="line">  const struct sockaddr_in* addr4 = sockaddr_in_cast(addr);</span><br><span class="line">  uint16_t port = sockets::networkToHost16(addr4-&gt;sin_port);</span><br><span class="line">  assert(size &gt; end);</span><br><span class="line">  snprintf(buf+end, size-end, &quot;:%u&quot;, port);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::toIp(char* buf, size_t size,</span><br><span class="line">                   const struct sockaddr* addr)</span><br><span class="line">&#123;</span><br><span class="line">  if (addr-&gt;sa_family == AF_INET)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(size &gt;= INET_ADDRSTRLEN);</span><br><span class="line">    const struct sockaddr_in* addr4 = sockaddr_in_cast(addr);</span><br><span class="line">    ::inet_ntop(AF_INET, &amp;addr4-&gt;sin_addr, buf, static_cast&lt;socklen_t&gt;(size));</span><br><span class="line">  &#125;</span><br><span class="line">  else if (addr-&gt;sa_family == AF_INET6)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(size &gt;= INET6_ADDRSTRLEN);</span><br><span class="line">    const struct sockaddr_in6* addr6 = sockaddr_in6_cast(addr);</span><br><span class="line">    ::inet_ntop(AF_INET6, &amp;addr6-&gt;sin6_addr, buf, static_cast&lt;socklen_t&gt;(size));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::fromIpPort(const char* ip, uint16_t port,</span><br><span class="line">                         struct sockaddr_in* addr)</span><br><span class="line">&#123;</span><br><span class="line">  addr-&gt;sin_family = AF_INET;</span><br><span class="line">  addr-&gt;sin_port = hostToNetwork16(port);</span><br><span class="line">  if (::inet_pton(AF_INET, ip, &amp;addr-&gt;sin_addr) &lt;= 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::fromIpPort&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void sockets::fromIpPort(const char* ip, uint16_t port,</span><br><span class="line">                         struct sockaddr_in6* addr)//从IP和port构造一个网际协议地址addr</span><br><span class="line">&#123;</span><br><span class="line">  addr-&gt;sin6_family = AF_INET6;</span><br><span class="line">  addr-&gt;sin6_port = hostToNetwork16(port);</span><br><span class="line">  if (::inet_pton(AF_INET6, ip, &amp;addr-&gt;sin6_addr) &lt;= 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::fromIpPort&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int sockets::getSocketError(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  int optval;</span><br><span class="line">  socklen_t optlen = static_cast&lt;socklen_t&gt;(sizeof optval);</span><br><span class="line"></span><br><span class="line">  if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &amp;optval, &amp;optlen) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    return errno;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    return optval;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct sockaddr_in6 sockets::getLocalAddr(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  struct sockaddr_in6 localaddr;</span><br><span class="line">  memZero(&amp;localaddr, sizeof localaddr);</span><br><span class="line">  socklen_t addrlen = static_cast&lt;socklen_t&gt;(sizeof localaddr);</span><br><span class="line">  if (::getsockname(sockfd, sockaddr_cast(&amp;localaddr), &amp;addrlen) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::getLocalAddr&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">  return localaddr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct sockaddr_in6 sockets::getPeerAddr(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  struct sockaddr_in6 peeraddr;</span><br><span class="line">  memZero(&amp;peeraddr, sizeof peeraddr);</span><br><span class="line">  socklen_t addrlen = static_cast&lt;socklen_t&gt;(sizeof peeraddr);</span><br><span class="line">  if (::getpeername(sockfd, sockaddr_cast(&amp;peeraddr), &amp;addrlen) &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::getPeerAddr&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">  return peeraddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Socket-h-x2F-Socket-cc-Socket类"><a href="#Socket-h-x2F-Socket-cc-Socket类" class="headerlink" title="Socket.h&#x2F;Socket.cc ( Socket类)"></a>Socket.h&#x2F;Socket.cc ( Socket类)</h2><ul>
+<li>用RAIl方法封装socket file descriptor</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">Socket::~Socket()</span><br><span class="line">&#123;</span><br><span class="line">  sockets::close(sockfd_);</span><br><span class="line">&#125;</span><br><span class="line">void Socket::bindAddress(const InetAddress&amp; addr)</span><br><span class="line">&#123;</span><br><span class="line">  sockets::bindOrDie(sockfd_, addr.getSockAddr());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Socket::listen()</span><br><span class="line">&#123;</span><br><span class="line">  sockets::listenOrDie(sockfd_);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int Socket::accept(InetAddress* peeraddr)</span><br><span class="line">&#123;</span><br><span class="line">  struct sockaddr_in6 addr;</span><br><span class="line">  memZero(&amp;addr, sizeof addr);</span><br><span class="line">  int connfd = sockets::accept(sockfd_, &amp;addr);</span><br><span class="line">  if (connfd &gt;= 0)</span><br><span class="line">  &#123;</span><br><span class="line">    peeraddr-&gt;setSockAddrInet6(addr);</span><br><span class="line">  &#125;</span><br><span class="line">  return connfd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Socket::shutdownWrite()</span><br><span class="line">&#123;</span><br><span class="line">  sockets::shutdownWrite(sockfd_);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="InetAddress-h-x2F-InetAddress-cc-InetAddress类）"><a href="#InetAddress-h-x2F-InetAddress-cc-InetAddress类）" class="headerlink" title="InetAddress.h&#x2F;InetAddress.cc (InetAddress类）"></a>InetAddress.h&#x2F;InetAddress.cc (InetAddress类）</h2><ul>
+<li>网际地址sockaddr_in封装,就不用关注底层</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">InetAddress::InetAddress(uint16_t portArg, bool loopbackOnly, bool ipv6)</span><br><span class="line">&#123;</span><br><span class="line">  static_assert(offsetof(InetAddress, addr6_) == 0, &quot;addr6_ offset 0&quot;);</span><br><span class="line">  static_assert(offsetof(InetAddress, addr_) == 0, &quot;addr_ offset 0&quot;);</span><br><span class="line">  if (ipv6)</span><br><span class="line">  &#123;</span><br><span class="line">    memZero(&amp;addr6_, sizeof addr6_);</span><br><span class="line">    addr6_.sin6_family = AF_INET6;</span><br><span class="line">    in6_addr ip = loopbackOnly ? in6addr_loopback : in6addr_any;</span><br><span class="line">    addr6_.sin6_addr = ip;</span><br><span class="line">    addr6_.sin6_port = sockets::hostToNetwork16(portArg);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    memZero(&amp;addr_, sizeof addr_);</span><br><span class="line">    addr_.sin_family = AF_INET;</span><br><span class="line">    in_addr_t ip = loopbackOnly ? kInaddrLoopback : kInaddrAny;</span><br><span class="line">    addr_.sin_addr.s_addr = sockets::hostToNetwork32(ip);</span><br><span class="line">    addr_.sin_port = sockets::hostToNetwork16(portArg);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">InetAddress::InetAddress(StringArg ip, uint16_t portArg, bool ipv6)</span><br><span class="line">&#123;</span><br><span class="line">  if (ipv6 || strchr(ip.c_str(), &#x27;:&#x27;))</span><br><span class="line">  &#123;</span><br><span class="line">    memZero(&amp;addr6_, sizeof addr6_);</span><br><span class="line">    sockets::fromIpPort(ip.c_str(), portArg, &amp;addr6_);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    memZero(&amp;addr_, sizeof addr_);</span><br><span class="line">    sockets::fromIpPort(ip.c_str(), portArg, &amp;addr_);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">string InetAddress::toIpPort() const</span><br><span class="line">&#123;</span><br><span class="line">  char buf[64] = &quot;&quot;;</span><br><span class="line">  sockets::toIpPort(buf, sizeof buf, getSockAddr());</span><br><span class="line">  return buf;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">string InetAddress::toIp() const</span><br><span class="line">&#123;</span><br><span class="line">  char buf[64] = &quot;&quot;;</span><br><span class="line">  sockets::toIp(buf, sizeof buf, getSockAddr());</span><br><span class="line">  return buf;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">uint32_t InetAddress::ipv4NetEndian() const</span><br><span class="line">&#123;</span><br><span class="line">  assert(family() == AF_INET);</span><br><span class="line">  return addr_.sin_addr.s_addr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">uint16_t InetAddress::port() const</span><br><span class="line">&#123;</span><br><span class="line">  return sockets::networkToHost16(portNetEndian());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个函数似乎是C++中用于创建网络地址（InetAddress）对象的构造函数。它们的功能是根据提供的参数（IP地址、端口等）创建网络地址对象，并根据需要支持IPv6和IPv4。</p>
+<p>下面是这两个函数的功能和区别的解释：</p>
+<h3 id="构造函数-1-InetAddress-InetAddress-uint16-t-portArg-bool-loopbackOnly-bool-ipv6"><a href="#构造函数-1-InetAddress-InetAddress-uint16-t-portArg-bool-loopbackOnly-bool-ipv6" class="headerlink" title="构造函数 1: InetAddress::InetAddress(uint16_t portArg, bool loopbackOnly, bool ipv6)"></a>构造函数 1: InetAddress::InetAddress(uint16_t portArg, bool loopbackOnly, bool ipv6)</h3><p>这个构造函数用于创建一个网络地址对象，参数包括：</p>
+<ul>
+<li><code>portArg</code>：端口号。</li>
+<li><code>loopbackOnly</code>：一个布尔值，指示是否只能在回环地址上监听。</li>
+<li><code>ipv6</code>：一个布尔值，指示是否使用IPv6。</li>
+</ul>
+<p>函数的功能如下：</p>
+<ol>
+<li>如果 <code>ipv6</code> 为 <code>true</code>，则会初始化IPv6地址结构 <code>addr6_</code>，并根据 <code>loopbackOnly</code> 的值设置IP地址为回环地址或任意地址，然后设置端口号。</li>
+<li>如果 <code>ipv6</code> 为 <code>false</code>，则会初始化IPv4地址结构 <code>addr_</code>，并根据 <code>loopbackOnly</code> 的值设置IP地址为回环地址或任意地址，然后设置端口号。</li>
+</ol>
+<h3 id="构造函数-2-InetAddress-InetAddress-StringArg-ip-uint16-t-portArg-bool-ipv6"><a href="#构造函数-2-InetAddress-InetAddress-StringArg-ip-uint16-t-portArg-bool-ipv6" class="headerlink" title="构造函数 2: InetAddress::InetAddress(StringArg ip, uint16_t portArg, bool ipv6)"></a>构造函数 2: InetAddress::InetAddress(StringArg ip, uint16_t portArg, bool ipv6)</h3><p>这个构造函数也用于创建一个网络地址对象，参数包括：</p>
+<ul>
+<li><code>ip</code>：一个字符串类型的IP地址。</li>
+<li><code>portArg</code>：端口号。</li>
+<li><code>ipv6</code>：一个布尔值，指示是否使用IPv6。</li>
+</ul>
+<p>函数的功能如下：</p>
+<ol>
+<li>如果 <code>ipv6</code> 为 <code>true</code> 或者 <code>ip</code> 中包含 <code>:</code>，则会初始化IPv6地址结构 <code>addr6_</code>，并通过调用 <code>sockets::fromIpPort</code> 函数从提供的IP地址和端口号解析填充 <code>addr6_</code>。</li>
+<li>如果 <code>ipv6</code> 为 <code>false</code> 且 <code>ip</code> 中不包含 <code>:</code>，则会初始化IPv4地址结构 <code>addr_</code>，并通过调用 <code>sockets::fromIpPort</code> 函数从提供的IP地址和端口号解析填充 <code>addr_</code>。</li>
+</ol>
+<p>总之，这两个构造函数都用于创建网络地址对象，根据提供的参数不同，可以支持IPv6和IPv4，并根据需要设置端口号和IP地址。区别在于第一个构造函数的参数直接指定了是否使用回环地址，而第二个构造函数根据提供的IP地址字符串判断是否使用IPv6。</p>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">bool InetAddress::resolve(StringArg hostname, InetAddress* out)</span><br><span class="line">&#123;</span><br><span class="line">  assert(out != NULL);</span><br><span class="line">  struct hostent hent;</span><br><span class="line">  struct hostent* he = NULL;</span><br><span class="line">  int herrno = 0;</span><br><span class="line">  memZero(&amp;hent, sizeof(hent));</span><br><span class="line"></span><br><span class="line">  int ret = gethostbyname_r(hostname.c_str(), &amp;hent, t_resolveBuffer, sizeof t_resolveBuffer, &amp;he, &amp;herrno);</span><br><span class="line">  if (ret == 0 &amp;&amp; he != NULL)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(he-&gt;h_addrtype == AF_INET &amp;&amp; he-&gt;h_length == sizeof(uint32_t));</span><br><span class="line">    out-&gt;addr_.sin_addr = *reinterpret_cast&lt;struct in_addr*&gt;(he-&gt;h_addr);</span><br><span class="line">    return true;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    if (ret)</span><br><span class="line">    &#123;</span><br><span class="line">      LOG_SYSERR &lt;&lt; &quot;InetAddress::resolve&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>函数是用于将主机名（hostname）解析为 IPv4 地址（InetAddress 对象）的功能。IPv4 地址结构在网络编程中用于表示 IP 地址。</p>
+<p>以下是这个函数的作用：</p>
+<ol>
+<li>接收一个主机名（hostname）作为输入参数，以及一个指向 InetAddress 对象的指针 <code>out</code>，用于存储解析后的结果。</li>
+<li>使用 <code>gethostbyname_r</code> 函数来解析主机名。该函数是线程安全的，它接受主机名、用于存储结果的结构体 <code>hent</code>、缓冲区 <code>t_resolveBuffer</code> 以及其他参数，然后尝试解析主机名并将结果存储在 <code>hent</code> 中。</li>
+<li>如果解析成功（<code>ret</code> 等于 0，并且 <code>he</code> 非空），则验证返回的结果确实是 IPv4 地址类型，并且地址长度是 <code>sizeof(uint32_t)</code>。</li>
+<li>将解析到的 IPv4 地址复制到 <code>out</code> 的 <code>addr_</code> 成员中，然后返回 <code>true</code> 表示解析成功。</li>
+<li>如果解析失败（<code>ret</code> 不等于 0，或者 <code>he</code> 为空），则根据情况输出错误日志，然后返回 <code>false</code> 表示解析失败。</li>
+</ol>
+<p>总之，这个函数是用于将主机名解析为 IPv4 地址的工具函数，如果解析成功，会将解析结果存储在 <code>out</code> 参数中，并返回 <code>true</code>，否则返回 <code>false</code>。</p>
+<h2 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/InetAddress.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line"></span><br><span class="line">//#define BOOST_TEST_MODULE InetAddressTest</span><br><span class="line">#define BOOST_TEST_MAIN</span><br><span class="line">#define BOOST_TEST_DYN_LINK</span><br><span class="line">#include &lt;boost/test/unit_test.hpp&gt;</span><br><span class="line"></span><br><span class="line">using muduo::string;</span><br><span class="line">using muduo::net::InetAddress;</span><br><span class="line"></span><br><span class="line">BOOST_AUTO_TEST_CASE(testInetAddress)</span><br><span class="line">&#123;</span><br><span class="line">  InetAddress addr0(1234);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.toIp(), string(&quot;0.0.0.0&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.toIpPort(), string(&quot;0.0.0.0:1234&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.port(), 1234);</span><br><span class="line"></span><br><span class="line">  InetAddress addr1(4321, true);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.toIp(), string(&quot;127.0.0.1&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.toIpPort(), string(&quot;127.0.0.1:4321&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.port(), 4321);</span><br><span class="line"></span><br><span class="line">  InetAddress addr2(&quot;1.2.3.4&quot;, 8888);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.toIp(), string(&quot;1.2.3.4&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.toIpPort(), string(&quot;1.2.3.4:8888&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.port(), 8888);</span><br><span class="line"></span><br><span class="line">  InetAddress addr3(&quot;255.254.253.252&quot;, 65535);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.toIp(), string(&quot;255.254.253.252&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.toIpPort(), string(&quot;255.254.253.252:65535&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.port(), 65535);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BOOST_AUTO_TEST_CASE(testInet6Address)</span><br><span class="line">&#123;</span><br><span class="line">  InetAddress addr0(1234, false, true);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.toIp(), string(&quot;::&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.toIpPort(), string(&quot;[::]:1234&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr0.port(), 1234);</span><br><span class="line"></span><br><span class="line">  InetAddress addr1(1234, true, true);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.toIp(), string(&quot;::1&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.toIpPort(), string(&quot;[::1]:1234&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr1.port(), 1234);</span><br><span class="line"></span><br><span class="line">  InetAddress addr2(&quot;2001:db8::1&quot;, 8888, true);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.toIp(), string(&quot;2001:db8::1&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.toIpPort(), string(&quot;[2001:db8::1]:8888&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr2.port(), 8888);</span><br><span class="line"></span><br><span class="line">  InetAddress addr3(&quot;fe80::1234:abcd:1&quot;, 8888);</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.toIp(), string(&quot;fe80::1234:abcd:1&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.toIpPort(), string(&quot;[fe80::1234:abcd:1]:8888&quot;));</span><br><span class="line">  BOOST_CHECK_EQUAL(addr3.port(), 8888);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BOOST_AUTO_TEST_CASE(testInetAddressResolve)</span><br><span class="line">&#123;</span><br><span class="line">  InetAddress addr(80);</span><br><span class="line">  if (InetAddress::resolve(&quot;google.com&quot;, &amp;addr))</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; &quot;google.com resolved to &quot; &lt;&lt; addr.toIpPort();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_ERROR &lt;&lt; &quot;Unable to resolve google.com&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814161825526.png" alt="image-20230814161825526"></p>
+<img src="/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814161825526.png" class title="This is an test image">
+
+<h1 id="Acceptor"><a href="#Acceptor" class="headerlink" title="Acceptor"></a>Acceptor</h1><p>Acceptor用于accept(2)接受TCP连接<br>Acceptor的数据成员包括Socket、Channel,Acceptor的socket是listening socket ( serversocket)。Channel用于观察此socket的readable事件，并回调Accptor:handleRead()，后者调用accept(2)来接受新连接，并回调用户callback.</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814200106610.png" alt="image-20230814200106610"></p>
+<img src="/2023/08/13/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/image-20230814200106610.png" class title="This is an test image">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_ACCEPTOR_H</span><br><span class="line">#define MUDUO_NET_ACCEPTOR_H</span><br><span class="line"></span><br><span class="line">#include &lt;functional&gt;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/Channel.h&quot;</span><br><span class="line">#include &quot;muduo/net/Socket.h&quot;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class EventLoop;</span><br><span class="line">class InetAddress;</span><br><span class="line"></span><br><span class="line">///</span><br><span class="line">/// Acceptor of incoming TCP connections.</span><br><span class="line">///</span><br><span class="line">class Acceptor : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void (int sockfd, const InetAddress&amp;)&gt; NewConnectionCallback;</span><br><span class="line"></span><br><span class="line">  Acceptor(EventLoop* loop, const InetAddress&amp; listenAddr, bool reuseport);</span><br><span class="line">  ~Acceptor();</span><br><span class="line"></span><br><span class="line">  void setNewConnectionCallback(const NewConnectionCallback&amp; cb)</span><br><span class="line">  &#123; newConnectionCallback_ = cb; &#125;</span><br><span class="line"></span><br><span class="line">  void listen();</span><br><span class="line"></span><br><span class="line">  bool listening() const &#123; return listening_; &#125;</span><br><span class="line"></span><br><span class="line">  // Deprecated, use the correct spelling one above.</span><br><span class="line">  // Leave the wrong spelling here in case one needs to grep it for error messages.</span><br><span class="line">  // bool listenning() const &#123; return listening(); &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void handleRead();</span><br><span class="line"></span><br><span class="line">  EventLoop* loop_;</span><br><span class="line">  Socket acceptSocket_;</span><br><span class="line">  Channel acceptChannel_;</span><br><span class="line">  NewConnectionCallback newConnectionCallback_;</span><br><span class="line">  bool listening_;</span><br><span class="line">  int idleFd_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_ACCEPTOR_H</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/Acceptor.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/InetAddress.h&quot;</span><br><span class="line">#include &quot;muduo/net/SocketsOps.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">//#include &lt;sys/types.h&gt;</span><br><span class="line">//#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">Acceptor::Acceptor(EventLoop* loop, const InetAddress&amp; listenAddr, bool reuseport)</span><br><span class="line">  : loop_(loop),</span><br><span class="line">    acceptSocket_(sockets::createNonblockingOrDie(listenAddr.family())),</span><br><span class="line">    acceptChannel_(loop, acceptSocket_.fd()),</span><br><span class="line">    listening_(false),</span><br><span class="line">    idleFd_(::open(&quot;/dev/null&quot;, O_RDONLY | O_CLOEXEC))</span><br><span class="line">&#123;</span><br><span class="line">  assert(idleFd_ &gt;= 0);</span><br><span class="line">  acceptSocket_.setReuseAddr(true);</span><br><span class="line">  acceptSocket_.setReusePort(reuseport);</span><br><span class="line">  acceptSocket_.bindAddress(listenAddr);</span><br><span class="line">  acceptChannel_.setReadCallback(</span><br><span class="line">      std::bind(&amp;Acceptor::handleRead, this));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Acceptor::~Acceptor()</span><br><span class="line">&#123;</span><br><span class="line">  acceptChannel_.disableAll();</span><br><span class="line">  acceptChannel_.remove();</span><br><span class="line">  ::close(idleFd_);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Acceptor::listen()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  listening_ = true;</span><br><span class="line">  acceptSocket_.listen();</span><br><span class="line">  acceptChannel_.enableReading();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Acceptor::handleRead()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  InetAddress peerAddr;</span><br><span class="line">  //FIXME loop until no more</span><br><span class="line">  int connfd = acceptSocket_.accept(&amp;peerAddr);</span><br><span class="line">  if (connfd &gt;= 0)</span><br><span class="line">  &#123;</span><br><span class="line">    // string hostport = peerAddr.toIpPort();</span><br><span class="line">    // LOG_TRACE &lt;&lt; &quot;Accepts of &quot; &lt;&lt; hostport;</span><br><span class="line">    if (newConnectionCallback_)</span><br><span class="line">    &#123;</span><br><span class="line">      newConnectionCallback_(connfd, peerAddr);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      sockets::close(connfd);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;in Acceptor::handleRead&quot;;</span><br><span class="line">    // Read the section named &quot;The special problem of</span><br><span class="line">    // accept()ing when you can&#x27;t&quot; in libev&#x27;s doc.</span><br><span class="line">    // By Marc Lehmann, author of libev.</span><br><span class="line">    if (errno == EMFILE)</span><br><span class="line">    &#123;</span><br><span class="line">      ::close(idleFd_);</span><br><span class="line">      idleFd_ = ::accept(acceptSocket_.fd(), NULL, NULL);</span><br><span class="line">      ::close(idleFd_);</span><br><span class="line">      idleFd_ = ::open(&quot;/dev/null&quot;, O_RDONLY | O_CLOEXEC);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>server:<br>    1. socket()	创建socket</p>
+<ol start="2">
+<li><p>bind()	绑定服务器地址结构</p>
+</li>
+<li><p>listen()	设置监听上限</p>
+</li>
+<li><p>accept()	阻塞监听客户端连接</p>
+</li>
+<li><p>read(fd)	读socket获取客户端数据</p>
+</li>
+<li><p>小–大写	toupper()</p>
+</li>
+<li><p>write(fd)，567回调函数</p>
+</li>
+<li><p>close();</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/10/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%882%EF%BC%89/" rel="prev" title="muduo-网络库（2）">
+      <i class="fa fa-chevron-left"></i> muduo-网络库（2）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/15/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/" rel="next" title="muduo-网络库（4）">
+      muduo-网络库（4） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B-%E7%BA%BF%E7%A8%8B-wait-x2F-notify"><span class="nav-number">1.</span> <span class="nav-text">进程(线程)wait&#x2F;notify</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoop-runInLoop"><span class="nav-number">1.1.</span> <span class="nav-text">EventLoop::runInLoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoop-queueInLoop"><span class="nav-number">1.2.</span> <span class="nav-text">EventLoop::queueInLoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoop-loop"><span class="nav-number">1.3.</span> <span class="nav-text">EventLoop::loop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">1.4.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoop-doPendingFunctors"><span class="nav-number">1.5.</span> <span class="nav-text">EventLoop::doPendingFunctors</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#EventLoopThread"><span class="nav-number">2.</span> <span class="nav-text">EventLoopThread</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoopThread-h"><span class="nav-number">2.1.</span> <span class="nav-text">EventLoopThread.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoopThread-cc"><span class="nav-number">2.2.</span> <span class="nav-text">EventLoopThread.cc</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Socket%E5%B0%81%E8%A3%85"><span class="nav-number">3.</span> <span class="nav-text">Socket封装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Endian-h"><span class="nav-number">3.1.</span> <span class="nav-text">Endian.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SocketsOps-h-x2F-SocketsOps-cc"><span class="nav-number">3.2.</span> <span class="nav-text">SocketsOps.h&#x2F; SocketsOps.cc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SocketsOps-h"><span class="nav-number">3.2.1.</span> <span class="nav-text">SocketsOps.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SocketsOps-cc"><span class="nav-number">3.2.2.</span> <span class="nav-text">SocketsOps.cc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket-h-x2F-Socket-cc-Socket%E7%B1%BB"><span class="nav-number">3.3.</span> <span class="nav-text">Socket.h&#x2F;Socket.cc ( Socket类)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InetAddress-h-x2F-InetAddress-cc-InetAddress%E7%B1%BB%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">InetAddress.h&#x2F;InetAddress.cc (InetAddress类）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0-1-InetAddress-InetAddress-uint16-t-portArg-bool-loopbackOnly-bool-ipv6"><span class="nav-number">3.4.1.</span> <span class="nav-text">构造函数 1: InetAddress::InetAddress(uint16_t portArg, bool loopbackOnly, bool ipv6)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0-2-InetAddress-InetAddress-StringArg-ip-uint16-t-portArg-bool-ipv6"><span class="nav-number">3.4.2.</span> <span class="nav-text">构造函数 2: InetAddress::InetAddress(StringArg ip, uint16_t portArg, bool ipv6)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">3.5.</span> <span class="nav-text">测试代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Acceptor"><span class="nav-number">4.</span> <span class="nav-text">Acceptor</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.1.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
