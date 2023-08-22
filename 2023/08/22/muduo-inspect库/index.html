@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="muduo_inspect库通过HTTP方式为服务器提供监控接口接受了多少个TCP连接当前有多少个活动连接 一共响应了多少次请求每次请求的平均响应时间多少毫秒 。。。 要实现这些可以模仿ProcessInspector设置回调函数 12345678910111213141516171819202122class ProcessInspector : noncopyable&amp;#123; public">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo_inspect库">
+<meta property="og:url" content="http://example.com/2023/08/22/muduo-inspect%E5%BA%93/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="muduo_inspect库通过HTTP方式为服务器提供监控接口接受了多少个TCP连接当前有多少个活动连接 一共响应了多少次请求每次请求的平均响应时间多少毫秒 。。。 要实现这些可以模仿ProcessInspector设置回调函数 12345678910111213141516171819202122class ProcessInspector : noncopyable&amp;#123; public">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-22T06:59:49.000Z">
+<meta property="article:modified_time" content="2023-08-22T09:50:24.620Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/08/22/muduo-inspect%E5%BA%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo_inspect库 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/22/muduo-inspect%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo_inspect库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-22 14:59:49 / 修改时间：17:50:24" itemprop="dateCreated datePublished" datetime="2023-08-22T14:59:49+08:00">2023-08-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="muduo-inspect库"><a href="#muduo-inspect库" class="headerlink" title="muduo_inspect库"></a>muduo_inspect库</h1><h2 id="通过HTTP方式为服务器提供监控接口"><a href="#通过HTTP方式为服务器提供监控接口" class="headerlink" title="通过HTTP方式为服务器提供监控接口"></a>通过HTTP方式为服务器提供监控接口</h2><p>接受了多少个TCP连接<br>当前有多少个活动连接</p>
+<p>一共响应了多少次请求<br>每次请求的平均响应时间多少毫秒</p>
+<p>。。。</p>
+<p>要实现这些可以模仿ProcessInspector设置回调函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class ProcessInspector : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  void registerCommands(Inspector* ins);//注册命令接口</span><br><span class="line"></span><br><span class="line">  static string overview(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string pid(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string procStatus(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string openedFiles(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string threads(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line"></span><br><span class="line">  static string username_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void ProcessInspector::registerCommands(Inspector* ins)</span><br><span class="line">&#123;</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;overview&quot;, ProcessInspector::overview, &quot;print basic overview&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;pid&quot;, ProcessInspector::pid, &quot;print pid&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;status&quot;, ProcessInspector::procStatus, &quot;print /proc/self/status&quot;);</span><br><span class="line">  // ins-&gt;add(&quot;proc&quot;, &quot;opened_files&quot;, ProcessInspector::openedFiles, &quot;count /proc/self/fd&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;threads&quot;, ProcessInspector::threads, &quot;list /proc/self/task&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Inspector"><a href="#Inspector" class="headerlink" title="Inspector"></a>Inspector</h2><p>包含了一个HttpServer对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//如add(&quot;proc&quot;,&quot;pid&quot;，ProcessInspector::pid,&quot;print pid&quot;);</span><br><span class="line">  //http://192.168.48.128:12345/proc/pid这个http请求就会相应的调用ProcessInspector::pid来处理</span><br><span class="line">  /// Add a Callback for handling the special uri : /mudule/command</span><br><span class="line">  void add(const string&amp; module,//模块，命令，回调函数，帮助文本</span><br><span class="line">           const string&amp; command,</span><br><span class="line">           const Callback&amp; cb,</span><br><span class="line">           const string&amp; help);</span><br><span class="line">           private:</span><br><span class="line">  typedef std::map&lt;string, Callback&gt; CommandList;</span><br><span class="line">  typedef std::map&lt;string, string&gt; HelpList;</span><br><span class="line"></span><br><span class="line">  void start();</span><br><span class="line">  void onRequest(const HttpRequest&amp; req, HttpResponse* resp);</span><br><span class="line"></span><br><span class="line">  HttpServer server_;//因为它是一个http服务器</span><br><span class="line">  std::unique_ptr&lt;ProcessInspector&gt; processInspector_;</span><br><span class="line">  std::unique_ptr&lt;PerformanceInspector&gt; performanceInspector_;</span><br><span class="line">  std::unique_ptr&lt;SystemInspector&gt; systemInspector_;</span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  std::map&lt;string, CommandList&gt; modules_ GUARDED_BY(mutex_);//module,command,Callback</span><br><span class="line">  std::map&lt;string, HelpList&gt; helps_ GUARDED_BY(mutex_);//module,conenand,hellp</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line">namespace</span><br><span class="line">&#123;</span><br><span class="line">Inspector* g_globalInspector = 0;</span><br><span class="line"></span><br><span class="line">// Looks buggy</span><br><span class="line">std::vector&lt;string&gt; split(const string&amp; str)</span><br><span class="line">&#123;</span><br><span class="line">  std::vector&lt;string&gt; result;</span><br><span class="line">  size_t start = 0;</span><br><span class="line">  size_t pos = str.find(&#x27;/&#x27;);</span><br><span class="line">  //在使用find()函数查找子字符串时，如果未找到匹配的子字符串，find()函数将返回string::npos作为索引位置，以指示没有找到匹配</span><br><span class="line">  while (pos != string::npos)</span><br><span class="line">  &#123;</span><br><span class="line">    if (pos &gt; start)</span><br><span class="line">    &#123;</span><br><span class="line">      result.push_back(str.substr(start, pos-start));</span><br><span class="line">    &#125;</span><br><span class="line">    start = pos+1;</span><br><span class="line">    pos = str.find(&#x27;/&#x27;, start);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (start &lt; str.length())//说明最后一个字符不是&#x27;/&#x27;</span><br><span class="line">  &#123;</span><br><span class="line">    result.push_back(str.substr(start));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace</span><br><span class="line"></span><br><span class="line">Inspector::Inspector(EventLoop* loop,</span><br><span class="line">                     const InetAddress&amp; httpAddr,</span><br><span class="line">                     const string&amp; name)</span><br><span class="line">    : server_(loop, httpAddr, &quot;Inspector:&quot;+name),</span><br><span class="line">      processInspector_(new ProcessInspector),</span><br><span class="line">      systemInspector_(new SystemInspector)</span><br><span class="line">&#123;</span><br><span class="line">  assert(CurrentThread::isMainThread());</span><br><span class="line">  assert(g_globalInspector == 0);</span><br><span class="line">  g_globalInspector = this;</span><br><span class="line">  server_.setHttpCallback(std::bind(&amp;Inspector::onRequest, this, _1, _2));</span><br><span class="line">  processInspector_-&gt;registerCommands(this);</span><br><span class="line"></span><br><span class="line">  systemInspector_-&gt;registerCommands(this);</span><br><span class="line">#ifdef HAVE_TCMALLOC</span><br><span class="line">  performanceInspector_.reset(new PerformanceInspector);</span><br><span class="line">  performanceInspector_-&gt;registerCommands(this);</span><br><span class="line">#endif</span><br><span class="line">  //这样子做法是为了防止竞态问题</span><br><span class="line">  //如果直接调用start,(当前线程不是IO线程，是主线程）那么有可能，当前构造函数还没返回，</span><br><span class="line">  //httpServer所在的IO线程可能已经收到了http客户端的请求了(因为这时候HttpServer已启动)，那么就会回调</span><br><span class="line">  //Inspector::onRequest，而这时候构造函数还没返回，也就是说对象还没完全构造好</span><br><span class="line">  loop-&gt;runAfter(0, std::bind(&amp;Inspector::start, this)); // little race condition，仍然有点问题，可以将时间改长一点</span><br><span class="line">&#125;</span><br><span class="line">void Inspector::add(const string&amp; module,</span><br><span class="line">                    const string&amp; command,</span><br><span class="line">                    const Callback&amp; cb,</span><br><span class="line">                    const string&amp; help)</span><br><span class="line">&#123;</span><br><span class="line">  MutexLockGuard lock(mutex_);</span><br><span class="line">  modules_[module][command] = cb;</span><br><span class="line">  helps_[module][command] = help;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Inspector::start()</span><br><span class="line">&#123;</span><br><span class="line">  server_.start();</span><br><span class="line">&#125;</span><br><span class="line">//一旦http请求就会回调这个函数</span><br><span class="line">void Inspector::onRequest(const HttpRequest&amp; req, HttpResponse* resp)</span><br><span class="line">&#123;</span><br><span class="line">  if (req.path() == &quot;/&quot;)</span><br><span class="line">  &#123;</span><br><span class="line">    string result;</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    //遍历helps</span><br><span class="line">    for (std::map&lt;string, HelpList&gt;::const_iterator helpListI = helps_.begin();</span><br><span class="line">         helpListI != helps_.end();</span><br><span class="line">         ++helpListI)</span><br><span class="line">    &#123;</span><br><span class="line">      const HelpList&amp; list = helpListI-&gt;second;</span><br><span class="line">      for (const auto&amp; it : list)</span><br><span class="line">      &#123;</span><br><span class="line">        //其中一条/proc/pid                  print pid</span><br><span class="line">        result += &quot;/&quot;;</span><br><span class="line">        result += helpListI-&gt;first;//module  eg:proc</span><br><span class="line">        result += &quot;/&quot;;</span><br><span class="line">        result += it.first;//command  eg:pid</span><br><span class="line">        size_t len = helpListI-&gt;first.size() + it.first.size();</span><br><span class="line">        result += string(len &gt;= 25 ? 1 : 25 - len, &#x27; &#x27;);</span><br><span class="line">        result += it.second;//help  eg: print pid</span><br><span class="line">        result += &quot;\n&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">    resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">    resp-&gt;setContentType(&quot;text/plain&quot;);</span><br><span class="line">    resp-&gt;setBody(result);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    //以&quot;/&quot;进行分割，将得到的字符串保存在result中</span><br><span class="line">    std::vector&lt;string&gt; result = split(req.path());</span><br><span class="line">    // boost::split(result, req.path(), boost::is_any_of(&quot;/&quot;));</span><br><span class="line">    //std::copy(result.begin(), result.end(), std::ostream_iterator&lt;string&gt;(std::cout, &quot;, &quot;));</span><br><span class="line">    //std::cout &lt;&lt; &quot;\n&quot;;</span><br><span class="line">    bool ok = false;</span><br><span class="line">    if (result.size() == 0)</span><br><span class="line">    &#123;</span><br><span class="line">      //这种情况是错误的，因此OK仍未false</span><br><span class="line">      LOG_DEBUG &lt;&lt; req.path();</span><br><span class="line">    &#125;</span><br><span class="line">    else if (result.size() == 1)</span><br><span class="line">    &#123;</span><br><span class="line">      //只有module，没有connand也是错的，因此ok仍为false,除了下面这种情况</span><br><span class="line">      string module = result[0];</span><br><span class="line">      if (module == &quot;favicon.ico&quot;)</span><br><span class="line">      &#123;</span><br><span class="line">        resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">        resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">        resp-&gt;setContentType(&quot;image/png&quot;);</span><br><span class="line">        resp-&gt;setBody(string(favicon, sizeof favicon));</span><br><span class="line"></span><br><span class="line">        ok = true;</span><br><span class="line">      &#125;</span><br><span class="line">      else</span><br><span class="line">      &#123;</span><br><span class="line">        LOG_ERROR &lt;&lt; &quot;Unimplemented &quot; &lt;&lt; module;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      string module = result[0];</span><br><span class="line">      MutexLockGuard lock(mutex_);</span><br><span class="line">      //查找module所对应的命令列表</span><br><span class="line">      std::map&lt;string, CommandList&gt;::const_iterator commListI = modules_.find(module);</span><br><span class="line">      if (commListI != modules_.end())</span><br><span class="line">      &#123;</span><br><span class="line">        string command = result[1];</span><br><span class="line">        const CommandList&amp; commList = commListI-&gt;second;</span><br><span class="line">        //查找command对应的命令</span><br><span class="line">        CommandList::const_iterator it = commList.find(command);</span><br><span class="line">        if (it != commList.end())</span><br><span class="line">        &#123;</span><br><span class="line">          ArgList args(result.begin()+2, result.end());//传递给回调函数的参数表</span><br><span class="line">          if (it-&gt;second)//callback</span><br><span class="line">          &#123;</span><br><span class="line">            resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">            resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">            resp-&gt;setContentType(&quot;text/plain&quot;);</span><br><span class="line">            const Callback&amp; cb = it-&gt;second;</span><br><span class="line">            resp-&gt;setBody(cb(req.method(), args));//调用cb将返回的字符串传给setBody</span><br><span class="line">            ok = true;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (!ok)</span><br><span class="line">    &#123;</span><br><span class="line">      resp-&gt;setStatusCode(HttpResponse::k404NotFound);</span><br><span class="line">      resp-&gt;setStatusMessage(&quot;Not Found&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    //resp-&gt;setCloseConnection(true);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="ProcessInspector"><a href="#ProcessInspector" class="headerlink" title="ProcessInspector"></a>ProcessInspector</h2><p>通过Processlnfo返回进程信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class ProcessInspector : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  void registerCommands(Inspector* ins);//注册命令接口</span><br><span class="line"></span><br><span class="line">  static string overview(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string pid(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string procStatus(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string openedFiles(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line">  static string threads(HttpRequest::Method, const Inspector::ArgList&amp;);</span><br><span class="line"></span><br><span class="line">  static string username_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void ProcessInspector::registerCommands(Inspector* ins)</span><br><span class="line">&#123;</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;overview&quot;, ProcessInspector::overview, &quot;print basic overview&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;pid&quot;, ProcessInspector::pid, &quot;print pid&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;status&quot;, ProcessInspector::procStatus, &quot;print /proc/self/status&quot;);</span><br><span class="line">  // ins-&gt;add(&quot;proc&quot;, &quot;opened_files&quot;, ProcessInspector::openedFiles, &quot;count /proc/self/fd&quot;);</span><br><span class="line">  ins-&gt;add(&quot;proc&quot;, &quot;threads&quot;, ProcessInspector::threads, &quot;list /proc/self/task&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Processlnfo"><a href="#Processlnfo" class="headerlink" title="Processlnfo"></a>Processlnfo</h2><p>获取进程相关信息</p>
+<h2 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/inspect/Inspector.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoopThread.h&quot;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  EventLoop loop;//两个线程，一个主线程，一个监控线程，构造函数在主线程调用</span><br><span class="line">  EventLoopThread t;//监控线程</span><br><span class="line">  Inspector ins(t.startLoop(), InetAddress(12345), &quot;test&quot;);</span><br><span class="line">  loop.loop();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.48.128:12345/</span><br></pre></td></tr></table></figure>
+
+<p>结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/proc/overview             print basic overview</span><br><span class="line">/proc/pid                  print pid</span><br><span class="line">/proc/status               print /proc/self/status</span><br><span class="line">/proc/threads              list /proc/self/task</span><br><span class="line">/sys/cpuinfo               print /proc/cpuinfo</span><br><span class="line">/sys/loadavg               print /proc/loadavg</span><br><span class="line">/sys/meminfo               print /proc/meminfo</span><br><span class="line">/sys/overview              print system overview</span><br><span class="line">/sys/stat                  print /proc/stat</span><br><span class="line">/sys/version               print /proc/version</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/21/muduo-http%E5%BA%93-1/" rel="prev" title="muduo-http库(1)">
+      <i class="fa fa-chevron-left"></i> muduo-http库(1)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/22/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1/" rel="next" title="muduo库使用示例-1">
+      muduo库使用示例-1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#muduo-inspect%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">muduo_inspect库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87HTTP%E6%96%B9%E5%BC%8F%E4%B8%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8F%90%E4%BE%9B%E7%9B%91%E6%8E%A7%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.1.</span> <span class="nav-text">通过HTTP方式为服务器提供监控接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Inspector"><span class="nav-number">1.2.</span> <span class="nav-text">Inspector</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ProcessInspector"><span class="nav-number">1.3.</span> <span class="nav-text">ProcessInspector</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Processlnfo"><span class="nav-number">1.4.</span> <span class="nav-text">Processlnfo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.5.</span> <span class="nav-text">测试程序</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
