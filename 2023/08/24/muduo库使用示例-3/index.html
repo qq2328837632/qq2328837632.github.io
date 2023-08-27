@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="聊天服务器消息格式消息分为包头与包体，每条消息有一个4字节的头部，以网络序存放字符串的长度。包体是一个字符串，字符串也不一定以’\0’结尾。比方说有两条消息”hello”和”chenshuo”，那么打包后的字节流是:0x00,0x00,0x00,0x05,’h’,’e’,’,’l’,’l’,’o’,0x00,0x00,0x00,0x08,’c’,’h’,’e’,’n’,’s’,’h’,’u’,’o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo库使用示例-3">
+<meta property="og:url" content="http://example.com/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="聊天服务器消息格式消息分为包头与包体，每条消息有一个4字节的头部，以网络序存放字符串的长度。包体是一个字符串，字符串也不一定以’\0’结尾。比方说有两条消息”hello”和”chenshuo”，那么打包后的字节流是:0x00,0x00,0x00,0x05,’h’,’e’,’,’l’,’l’,’o’,0x00,0x00,0x00,0x08,’c’,’h’,’e’,’n’,’s’,’h’,’u’,’o">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/image-20230824193437339.png">
+<meta property="og:image" content="http://example.com/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/image-20230824193437339.png">
+<meta property="article:published_time" content="2023-08-24T11:01:01.000Z">
+<meta property="article:modified_time" content="2023-08-27T08:02:29.413Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/image-20230824193437339.png">
+
+<link rel="canonical" href="http://example.com/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo库使用示例-3 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo库使用示例-3
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-24 19:01:01" itemprop="dateCreated datePublished" datetime="2023-08-24T19:01:01+08:00">2023-08-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-27 16:02:29" itemprop="dateModified" datetime="2023-08-27T16:02:29+08:00">2023-08-27</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="聊天服务器"><a href="#聊天服务器" class="headerlink" title="聊天服务器"></a>聊天服务器</h1><h2 id="消息格式"><a href="#消息格式" class="headerlink" title="消息格式"></a>消息格式</h2><p>消息分为包头与包体，每条消息有一个4字节的头部，以网络序存放字符串的长度。包体是一个字符串，字符串也不一定以’\0’结尾。比方说有两条消息”hello”和”chenshuo”，那么打包后的字节流是:0x00,0x00,0x00,0x05,’h’,’e’,’,’l’,’l’,’o’,0x00,0x00,0x00,0x08,’c’,’h’,’e’,’n’,’s’,’h’,’u’,’o’<br>共21字节。</p>
+<p>字符串不一定以’\0’结尾是因为在消息传输中，字符串的长度已经通过包头中的4字节进行了明确的指定，所以没有必要使用’\0’来表示字符串的结束。</p>
+<p>在网络通信中，消息传输往往使用二进制格式，而不是以C语言风格的以’\0’结尾的字符串。通过包头中的长度信息，接收方可以准确地知道要读取的字节数，从而正确解析出字符串。</p>
+<p>由于字符串的长度信息已经被明确传递并解析，没有必要依赖于’\0’作为字符串的结束标志。事实上，在一些特定的应用场景中，字符串内容本身可能会包含’\0’字符，如果字符串以’\0’结尾，则会导致字符串截断，丢失部分数据。</p>
+<p>因此，在消息传输中，字符串可以是任意字节的数据序列，并不依赖于’\0’来标识结束。接收方可以根据包头中指定的长度来正确处理和解析字符串</p>
+<h2 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h2><p><img src="/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/image-20230824193437339.png" alt="image-20230824193437339"></p>
+<img src="/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3/image-20230824193437339.png" class title="This is an test image">
+
+<p>LengthHeaderCodec是间接层，对消息进行编解码</p>
+<h2 id="codec-h"><a href="#codec-h" class="headerlink" title="codec.h"></a>codec.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_EXAMPLES_ASIO_CHAT_CODEC_H</span><br><span class="line">#define MUDUO_EXAMPLES_ASIO_CHAT_CODEC_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/net/Buffer.h&quot;</span><br><span class="line">#include &quot;muduo/net/Endian.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpConnection.h&quot;</span><br><span class="line"></span><br><span class="line">class LengthHeaderCodec : muduo::noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void (const muduo::net::TcpConnectionPtr&amp;,</span><br><span class="line">                                const muduo::string&amp; message,</span><br><span class="line">                                muduo::Timestamp)&gt; StringMessageCallback;</span><br><span class="line"></span><br><span class="line">  explicit LengthHeaderCodec(const StringMessageCallback&amp; cb)</span><br><span class="line">    : messageCallback_(cb)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void onMessage(const muduo::net::TcpConnectionPtr&amp; conn,</span><br><span class="line">                 muduo::net::Buffer* buf,</span><br><span class="line">                 muduo::Timestamp receiveTime)</span><br><span class="line">  &#123;</span><br><span class="line">    //用while而不用if，因为不止一条消息</span><br><span class="line">    //粘包问题的处理，TCP是字节流，是无边界的，传输层不处理边界，所以需要在应用层处理</span><br><span class="line">    while (buf-&gt;readableBytes() &gt;= kHeaderLen) // kHeaderLen == 4</span><br><span class="line">    &#123;</span><br><span class="line">      // FIXME: use Buffer::peekInt32()</span><br><span class="line">      const void* data = buf-&gt;peek();</span><br><span class="line">      int32_t be32 = *static_cast&lt;const int32_t*&gt;(data); // SIGBUS</span><br><span class="line">      const int32_t len = muduo::net::sockets::networkToHost32(be32);</span><br><span class="line">      if (len &gt; 65536 || len &lt; 0)//64k</span><br><span class="line">      &#123;</span><br><span class="line">        LOG_ERROR &lt;&lt; &quot;Invalid length &quot; &lt;&lt; len;</span><br><span class="line">        conn-&gt;shutdown();  // FIXME: disable reading</span><br><span class="line">        break;</span><br><span class="line">      &#125;</span><br><span class="line">      else if (buf-&gt;readableBytes() &gt;= len + kHeaderLen)//达到一条完整的消息</span><br><span class="line">      &#123;</span><br><span class="line">        buf-&gt;retrieve(kHeaderLen);</span><br><span class="line">        muduo::string message(buf-&gt;peek(), len);</span><br><span class="line">        messageCallback_(conn, message, receiveTime);</span><br><span class="line">        buf-&gt;retrieve(len);</span><br><span class="line">      &#125;</span><br><span class="line">      else//未达到一条完整的消息</span><br><span class="line">      &#123;</span><br><span class="line">        break;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // FIXME: TcpConnectionPtr</span><br><span class="line">  void send(muduo::net::TcpConnection* conn,</span><br><span class="line">            const muduo::StringPiece&amp; message)</span><br><span class="line">  &#123;</span><br><span class="line">    muduo::net::Buffer buf;</span><br><span class="line">    buf.append(message.data(), message.size());</span><br><span class="line">    int32_t len = static_cast&lt;int32_t&gt;(message.size());</span><br><span class="line">    int32_t be32 = muduo::net::sockets::hostToNetwork32(len);</span><br><span class="line">    buf.prepend(&amp;be32, sizeof be32);</span><br><span class="line">    conn-&gt;send(&amp;buf);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  StringMessageCallback messageCallback_;</span><br><span class="line">  const static size_t kHeaderLen = sizeof(int32_t);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_EXAMPLES_ASIO_CHAT_CODEC_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="server-cc"><a href="#server-cc" class="headerlink" title="server.cc"></a>server.cc</h2><p>单线程</p>
+<p>错误的消息。<br>服务端如何处理这个错误的消息呢。<br>还会带上一个应用层的校验信息的。比如说CRC32校验。<br>校验错误，这条消息就是错误的消息。</p>
+<p>第二种方式:<br>服务器端应该有空闲断开功能。在一定时间没有收到客户端的消息，就断开它。</p>
+<p>代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;examples/asio/chat/codec.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;set&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">class ChatServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ChatServer(EventLoop* loop,</span><br><span class="line">             const InetAddress&amp; listenAddr)</span><br><span class="line">  : server_(loop, listenAddr, &quot;ChatServer&quot;),</span><br><span class="line">    codec_(std::bind(&amp;ChatServer::onStringMessage, this, _1, _2, _3))</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setConnectionCallback(</span><br><span class="line">        std::bind(&amp;ChatServer::onConnection, this, _1));</span><br><span class="line">    server_.setMessageCallback(</span><br><span class="line">        std::bind(&amp;LengthHeaderCodec::onMessage, &amp;codec_, _1, _2, _3));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    server_.start();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">             &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">             &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line"></span><br><span class="line">    if (conn-&gt;connected())</span><br><span class="line">    &#123;</span><br><span class="line">      connections_.insert(conn);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      connections_.erase(conn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void onStringMessage(const TcpConnectionPtr&amp;,</span><br><span class="line">                       const string&amp; message,</span><br><span class="line">                       Timestamp)</span><br><span class="line">  &#123;</span><br><span class="line">    //只有一个IO线程，因而这里的connections_不需要用mutex保护</span><br><span class="line">    //转发消息给所有客户端</span><br><span class="line">    for (ConnectionList::iterator it = connections_.begin();</span><br><span class="line">        it != connections_.end();</span><br><span class="line">        ++it)</span><br><span class="line">    &#123;</span><br><span class="line">      codec_.send(get_pointer(*it), message);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  typedef std::set&lt;TcpConnectionPtr&gt; ConnectionList;</span><br><span class="line">  TcpServer server_;</span><br><span class="line">  LengthHeaderCodec codec_;//消息编解码</span><br><span class="line">  ConnectionList connections_;//连接列表，遍历连接列表来转发消息</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">  if (argc &gt; 1)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoop loop;</span><br><span class="line">    uint16_t port = static_cast&lt;uint16_t&gt;(atoi(argv[1]));</span><br><span class="line">    InetAddress serverAddr(port);</span><br><span class="line">    ChatServer server(&amp;loop, serverAddr);</span><br><span class="line">    server.start();</span><br><span class="line">    loop.loop();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Usage: %s port\n&quot;, argv[0]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="client-cc"><a href="#client-cc" class="headerlink" title="client.cc"></a>client.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;examples/asio/chat/codec.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoopThread.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpClient.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">class ChatClient : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ChatClient(EventLoop* loop, const InetAddress&amp; serverAddr)</span><br><span class="line">    : client_(loop, serverAddr, &quot;ChatClient&quot;),</span><br><span class="line">      codec_(std::bind(&amp;ChatClient::onStringMessage, this, _1, _2, _3))</span><br><span class="line">  &#123;</span><br><span class="line">    client_.setConnectionCallback(</span><br><span class="line">        std::bind(&amp;ChatClient::onConnection, this, _1));</span><br><span class="line">    client_.setMessageCallback(</span><br><span class="line">        std::bind(&amp;LengthHeaderCodec::onMessage, &amp;codec_, _1, _2, _3));</span><br><span class="line">    client_.enableRetry();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void connect()</span><br><span class="line">  &#123;</span><br><span class="line">    client_.connect();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void disconnect()</span><br><span class="line">  &#123;</span><br><span class="line">    client_.disconnect();</span><br><span class="line">  &#125;</span><br><span class="line">  //该函数在主线程中执行,因为connection_主线程和IO线程都要访问，所以onConnection中需要保护</span><br><span class="line">  void write(const StringPiece&amp; message)</span><br><span class="line">  &#123;</span><br><span class="line">    //nutex用来保护connection_这个shared_ptr</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    if (connection_)</span><br><span class="line">    &#123;</span><br><span class="line">      codec_.send(get_pointer(connection_), message);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line"> //该函数在IO线程中执行，IO线程与主线程不在同一个线程</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">             &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">             &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line"></span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    if (conn-&gt;connected())</span><br><span class="line">    &#123;</span><br><span class="line">      connection_ = conn;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      connection_.reset();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void onStringMessage(const TcpConnectionPtr&amp;,</span><br><span class="line">                       const string&amp; message,</span><br><span class="line">                       Timestamp)</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;&lt;&lt;&lt; %s\n&quot;, message.c_str());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  TcpClient client_;</span><br><span class="line">  LengthHeaderCodec codec_;</span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  TcpConnectionPtr connection_ GUARDED_BY(mutex_);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">  if (argc &gt; 2)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoopThread loopThread;</span><br><span class="line">    uint16_t port = static_cast&lt;uint16_t&gt;(atoi(argv[2]));</span><br><span class="line">    InetAddress serverAddr(argv[1], port);</span><br><span class="line"></span><br><span class="line">    ChatClient client(loopThread.startLoop(), serverAddr);</span><br><span class="line">    client.connect();</span><br><span class="line">    std::string line;</span><br><span class="line">    while (std::getline(std::cin, line))</span><br><span class="line">    &#123;</span><br><span class="line">      client.write(line);</span><br><span class="line">    &#125;</span><br><span class="line">    client.disconnect();</span><br><span class="line">    CurrentThread::sleepUsec(1000*1000);  // wait for disconnect, see ace/logging/client.cc</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Usage: %s host_ip port\n&quot;, argv[0]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="server-threaded-cc"><a href="#server-threaded-cc" class="headerlink" title="server_threaded.cc"></a>server_threaded.cc</h2><p>多线程TcpServer，并用mutex来保护共享数据mutex</p>
+<p>由于mutex的存在，多线程并不能并发执行，而是串行的。</p>
+<p>因而存在较高的锁竞争。效率比较低。<br>C1向服务器端发送一条消息hello,服务器通过一个IO线程转发给所有客户端，与此同时C2向服务器端发送—条消息hello2，服务器端通过另一个IO线程<br>转发给所有客户端，由于锁的在存在，这两个线程并不能并发执行，而是串行的。这个时候，客户端数目比较大，第二条消息hello2到达各个客户端的延迟也比较大。</p>
+<p>代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;examples/asio/chat/codec.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;set&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">class ChatServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ChatServer(EventLoop* loop,</span><br><span class="line">             const InetAddress&amp; listenAddr)</span><br><span class="line">  : server_(loop, listenAddr, &quot;ChatServer&quot;),</span><br><span class="line">    codec_(std::bind(&amp;ChatServer::onStringMessage, this, _1, _2, _3))</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setConnectionCallback(</span><br><span class="line">        std::bind(&amp;ChatServer::onConnection, this, _1));</span><br><span class="line">    server_.setMessageCallback(</span><br><span class="line">        std::bind(&amp;LengthHeaderCodec::onMessage, &amp;codec_, _1, _2, _3));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setThreadNum(int numThreads)</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setThreadNum(numThreads);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    server_.start();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">        &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">        &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line">    //有多个IO线程，因而这里的connections_需要用mutex保护</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    if (conn-&gt;connected())</span><br><span class="line">    &#123;</span><br><span class="line">      connections_.insert(conn);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      connections_.erase(conn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void onStringMessage(const TcpConnectionPtr&amp;,</span><br><span class="line">                       const string&amp; message,</span><br><span class="line">                       Timestamp)</span><br><span class="line">  &#123;</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    for (ConnectionList::iterator it = connections_.begin();</span><br><span class="line">        it != connections_.end();</span><br><span class="line">        ++it)</span><br><span class="line">    &#123;</span><br><span class="line">      codec_.send(get_pointer(*it), message);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  typedef std::set&lt;TcpConnectionPtr&gt; ConnectionList;</span><br><span class="line">  TcpServer server_;</span><br><span class="line">  LengthHeaderCodec codec_;</span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  ConnectionList connections_ GUARDED_BY(mutex_);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">  if (argc &gt; 1)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoop loop;</span><br><span class="line">    uint16_t port = static_cast&lt;uint16_t&gt;(atoi(argv[1]));</span><br><span class="line">    InetAddress serverAddr(port);</span><br><span class="line">    ChatServer server(&amp;loop, serverAddr);</span><br><span class="line">    if (argc &gt; 2)</span><br><span class="line">    &#123;</span><br><span class="line">      server.setThreadNum(atoi(argv[2]));</span><br><span class="line">    &#125;</span><br><span class="line">    server.start();</span><br><span class="line">    loop.loop();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Usage: %s port [thread_num]\n&quot;, argv[0]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="server-threaded-efficient-cc"><a href="#server-threaded-efficient-cc" class="headerlink" title="server_threaded_efficient.cc"></a>server_threaded_efficient.cc</h2><p>借shared_ptr实现copy-on-write的手法来降低锁竞争</p>
+<ul>
+<li>shared_ptr是引用计数智能指针，如果当前只有一个观察者，那么引用计数为1,可以用shared_ptr::unique()来判断</li>
+<li>对于write端，如果发现引用计数为1，这时可以安全地修改对象,不必担心有人在读它。</li>
+<li>对于read端，在读之前把引用计数加1，读完之后减1，这样可以保证在读的期间其引用计数大于1，可以阻止并发写。</li>
+<li>比较难的是，对于write端，如果发现引用计数大于1，该如何处理，既然要更新数据，肯定要加锁，如果这时候其他线程正在读，那么不能在原来的数据上修改，得创建一个副本，在副本上修改，修改完了再替换。如果没有用户在读，那么可以直接修改。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;examples/asio/chat/codec.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;set&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">class ChatServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ChatServer(EventLoop* loop,</span><br><span class="line">             const InetAddress&amp; listenAddr)</span><br><span class="line">  : server_(loop, listenAddr, &quot;ChatServer&quot;),</span><br><span class="line">    codec_(std::bind(&amp;ChatServer::onStringMessage, this, _1, _2, _3)),</span><br><span class="line">    connections_(new ConnectionList)</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setConnectionCallback(</span><br><span class="line">        std::bind(&amp;ChatServer::onConnection, this, _1));</span><br><span class="line">    server_.setMessageCallback(</span><br><span class="line">        std::bind(&amp;LengthHeaderCodec::onMessage, &amp;codec_, _1, _2, _3));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setThreadNum(int numThreads)</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setThreadNum(numThreads);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    server_.start();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">        &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">        &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line"></span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    if (!connections_.unique())//说明引用计数大于1</span><br><span class="line">    &#123;</span><br><span class="line">      //reset()函数的作用是用新的对象替换原来的对象，并更新智能指针的引用计数</span><br><span class="line">      //使用一个新的ConnectionList对象的副本替换原来的连接列表对象，并更新智能指针connections_的引用计数为1</span><br><span class="line">      connections_.reset(new ConnectionList(*connections_));</span><br><span class="line">    &#125;</span><br><span class="line">    assert(connections_.unique());</span><br><span class="line">    //在复本上修改，不会影响读者，所以读者在遍历列表的时候，不需要用mutex保护</span><br><span class="line">    if (conn-&gt;connected())</span><br><span class="line">    &#123;</span><br><span class="line">      connections_-&gt;insert(conn);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      connections_-&gt;erase(conn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  typedef std::set&lt;TcpConnectionPtr&gt; ConnectionList;</span><br><span class="line">  typedef std::shared_ptr&lt;ConnectionList&gt; ConnectionListPtr;</span><br><span class="line"></span><br><span class="line">  void onStringMessage(const TcpConnectionPtr&amp;,</span><br><span class="line">                       const string&amp; message,</span><br><span class="line">                       Timestamp)</span><br><span class="line">  &#123;</span><br><span class="line">    //引用计数加1，mutex保护的临界区大大缩短</span><br><span class="line">    //锁竞争大大减小，提高了并发</span><br><span class="line">    ConnectionListPtr connections = getConnectionList();</span><br><span class="line">    for (ConnectionList::iterator it = connections-&gt;begin();</span><br><span class="line">        it != connections-&gt;end();</span><br><span class="line">        ++it)</span><br><span class="line">    &#123;</span><br><span class="line">      //读端指的是在onStringMessage函数中遍历connections_集合中的每个连接，将消息发送给对应的连接</span><br><span class="line">      //写端指的是在不同的地方通过codec_.send函数向连接写入消息</span><br><span class="line">      codec_.send(get_pointer(*it), message);</span><br><span class="line">    &#125;</span><br><span class="line">    //这个断言不一定成立</span><br><span class="line">    //assert(!connections_.unique());</span><br><span class="line">    //当connections这个栈上的变量销毁的时候，引用计数减1</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ConnectionListPtr getConnectionList()</span><br><span class="line">  &#123;</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    return connections_;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  TcpServer server_;</span><br><span class="line">  LengthHeaderCodec codec_;</span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  ConnectionListPtr connections_ GUARDED_BY(mutex_);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">  if (argc &gt; 1)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoop loop;</span><br><span class="line">    uint16_t port = static_cast&lt;uint16_t&gt;(atoi(argv[1]));</span><br><span class="line">    InetAddress serverAddr(port);</span><br><span class="line">    ChatServer server(&amp;loop, serverAddr);</span><br><span class="line">    if (argc &gt; 2)</span><br><span class="line">    &#123;</span><br><span class="line">      server.setThreadNum(atoi(argv[2]));</span><br><span class="line">    &#125;</span><br><span class="line">    server.start();</span><br><span class="line">    loop.loop();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Usage: %s port [thread_num]\n&quot;, argv[0]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>对于读端（即在<code>onStringMessage</code>函数中遍历连接并发送消息），在读之前会先将引用计数加1，表示有其他线程正在访问这个对象。这样做的目的是为了在读取期间阻止其他线程对该对象进行并发写操作，保证数据的一致性和安全性。</p>
+<p>而对于写端（即修改对象），只有在发现引用计数为1时，才可以安全地修改该对象。如果引用计数为1，意味着当前线程是唯一一个访问该对象的，不存在其他并发的读操作，因此可以安全地对对象进行修改，不需要担心其他线程正在读取它。</p>
+<p>通过对引用计数的控制和判断，可以实现对读写操作的同步和互斥，确保在读操作期间不会发生并发写操作，避免了数据的竞争和冲突。这种方式可以提高并发性能，并保证数据的正确性。</p>
+<p>在发现引用计数大于1时：</p>
+<ol>
+<li>使用<code>MutexLockGuard</code>对临界区进行加锁，以确保并发访问的安全性。</li>
+<li>检查<code>connections_</code>的引用计数是否大于1，即通过<code>!connections_.unique()</code>判断。</li>
+<li>如果引用计数大于1，说明有其他线程正在读取数据，此时需要创建一个副本，并在副本上进行修改。</li>
+<li>使用<code>connections_.reset(new ConnectionList(*connections_))</code>将原始的连接列表对象替换为副本，同时更新智能指针<code>connections_</code>的引用计数为1。</li>
+<li>在副本上进行修改操作，确保不会影响到正在读取数据的其他线程。</li>
+<li>修改完成后，在<code>onConnection</code>函数中，根据连接的状态（连接建立或断开），更新副本并触发其他操作。</li>
+</ol>
+<p>这样做可以避免在读取期间对原始对象进行修改，确保数据的一致性和安全性，同时减小了锁的粒度，提高了并发性能。</p>
+<p>通过<code>connections_.reset(new ConnectionList(*connections_))</code>操作，实际上是将原始的连接列表对象进行了一次拷贝，并用拷贝后的对象替换了原始对象。这样做的目的是在修改连接列表时操作副本，而保持原始对象不变，以防止其他线程正在读取该对象时的并发冲突。</p>
+<h2 id="server-threaded-highperformance-cc"><a href="#server-threaded-highperformance-cc" class="headerlink" title="server_threaded_highperformance.cc"></a>server_threaded_highperformance.cc</h2><p>采用thread local变量实现多线程高效转发</p>
+<p>调用 <code>LocalConnections::instance()</code> 函数获取当前线程的线程局部单例对象时，并没有特定的接收者。这个调用的目的是为了在当前线程中创建和获取一个独立的连接列表对象。</p>
+<p>线程局部单例模式允许每个线程都有自己独立的实例，这个实例可以在当前线程的任何地方使用，而不需要传递给其他对象或函数。因此，<code>LocalConnections::instance()</code> 的返回值可以直接在当前线程的代码中使用并进行操作，而不需要显式地给一个特定的接收者。</p>
+<p>在使用线程局部单例对象时，它的实例可以在当前线程的任何地方使用，主要通过以下两种方式来体现：</p>
+<ol>
+<li>在当前线程的任意位置直接调用静态成员函数或成员方法：由于线程局部单例对象是针对每个线程独立存在的，因此在当前线程的任意位置都可以直接调用该线程局部单例对象的静态成员函数或成员方法，而无需传递对象的引用或指针。</li>
+<li>通过操纵符号 <code>::</code> 访问静态成员：如果线程局部单例对象的静态成员是公有的，可以使用 <code>::</code> 操纵符号直接访问静态成员。这样，在当前线程的任何位置都可以通过线程局部单例类名称和静态成员名称来访问对应的静态成员函数或变量。</li>
+</ol>
+<p>这种设计模式的好处是，每个线程都有自己独立的实例，不需要显式地传递对象引用或指针给其他对象或函数。这样可以避免多线程环境下的同步和互斥问题，以及减少参数传递的复杂性。线程局部单例对象在当前线程的任何地方都可以使用，并提供了一种方便的方式来共享和访问线程相关的资源或状态。</p>
+<p>如果线程局部单例对象的静态成员和静态成员函数是私有的，则无法直接使用 <code>::</code> 操纵符号来访问这些私有成员。<code>::</code> 操纵符号只能用于访问公有的静态成员。</p>
+<p>对于私有的静态成员和静态成员函数，只能在线程局部单例类的内部或友元类中进行访问。如果需要在当前线程的任何地方使用这些私有成员，可以考虑提供公有的接口函数或方法来间接访问这些成员，这样其他代码就可以通过调用接口来间接操作线程局部单例对象中的私有静态成员</p>
+<p>代码如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;examples/asio/chat/codec.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/base/ThreadLocalSingleton.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/TcpServer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;set&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">class ChatServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  ChatServer(EventLoop* loop,</span><br><span class="line">             const InetAddress&amp; listenAddr)</span><br><span class="line">  : server_(loop, listenAddr, &quot;ChatServer&quot;),</span><br><span class="line">    codec_(std::bind(&amp;ChatServer::onStringMessage, this, _1, _2, _3))</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setConnectionCallback(</span><br><span class="line">        std::bind(&amp;ChatServer::onConnection, this, _1));</span><br><span class="line">    server_.setMessageCallback(</span><br><span class="line">        std::bind(&amp;LengthHeaderCodec::onMessage, &amp;codec_, _1, _2, _3));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setThreadNum(int numThreads)</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setThreadNum(numThreads);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setThreadInitCallback(std::bind(&amp;ChatServer::threadInit, this, _1));</span><br><span class="line">    server_.start();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_INFO &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">             &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">             &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line">    //由于每一个线程都有一个LocalConnections实例，所以不需要锁</span><br><span class="line">    if (conn-&gt;connected())</span><br><span class="line">    &#123;</span><br><span class="line">      LocalConnections::instance().insert(conn);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      LocalConnections::instance().erase(conn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void onStringMessage(const TcpConnectionPtr&amp;,</span><br><span class="line">                       const string&amp; message,</span><br><span class="line">                       Timestamp)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoop::Functor f = std::bind(&amp;ChatServer::distributeMessage, this, message);</span><br><span class="line">    LOG_DEBUG;</span><br><span class="line"></span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    //转发消息给所有客户端，高效转发(多线程来转发)</span><br><span class="line">    for (std::set&lt;EventLoop*&gt;::iterator it = loops_.begin();</span><br><span class="line">        it != loops_.end();</span><br><span class="line">        ++it)</span><br><span class="line">    &#123;</span><br><span class="line">      //让对应的IO线程来执行distributeMessage</span><br><span class="line">      //distributeMessage放到IO线程队列中执行，因此，这里的mutex_锁竞争大大减小</span><br><span class="line">      //distributeMessage不受mutex_保护</span><br><span class="line">      (*it)-&gt;queueInLoop(f);</span><br><span class="line">    &#125;</span><br><span class="line">    LOG_DEBUG;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  typedef std::set&lt;TcpConnectionPtr&gt; ConnectionList;</span><br><span class="line"></span><br><span class="line">  void distributeMessage(const string&amp; message)</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_DEBUG &lt;&lt; &quot;begin&quot;;</span><br><span class="line">    //connections_是thread local变量，所以不需要保护</span><br><span class="line">    for (ConnectionList::iterator it = LocalConnections::instance().begin();</span><br><span class="line">        it != LocalConnections::instance().end();</span><br><span class="line">        ++it)</span><br><span class="line">    &#123;</span><br><span class="line">      codec_.send(get_pointer(*it), message);</span><br><span class="line">    &#125;</span><br><span class="line">    LOG_DEBUG &lt;&lt; &quot;end&quot;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void threadInit(EventLoop* loop)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(LocalConnections::pointer() == NULL);</span><br><span class="line">    //线程局部单例模式允许每个线程都有自己独立的实例，这个实例可以在当前线程的任何地方使用，而不需要传递给其他对象或函数</span><br><span class="line">    LocalConnections::instance();</span><br><span class="line">    assert(LocalConnections::pointer() != NULL);</span><br><span class="line">    MutexLockGuard lock(mutex_);</span><br><span class="line">    loops_.insert(loop);//将IO线程所对应的EventLoop插入进去</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  TcpServer server_;</span><br><span class="line">  LengthHeaderCodec codec_;</span><br><span class="line">  //线程局部单例变量，每个线程都有一个connections_实例</span><br><span class="line">  typedef ThreadLocalSingleton&lt;ConnectionList&gt; LocalConnections;</span><br><span class="line"></span><br><span class="line">  MutexLock mutex_;</span><br><span class="line">  std::set&lt;EventLoop*&gt; loops_ GUARDED_BY(mutex_);//EventLoop列表</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">  if (argc &gt; 1)</span><br><span class="line">  &#123;</span><br><span class="line">    EventLoop loop;</span><br><span class="line">    uint16_t port = static_cast&lt;uint16_t&gt;(atoi(argv[1]));</span><br><span class="line">    InetAddress serverAddr(port);</span><br><span class="line">    ChatServer server(&amp;loop, serverAddr);</span><br><span class="line">    if (argc &gt; 2)</span><br><span class="line">    &#123;</span><br><span class="line">      server.setThreadNum(atoi(argv[2]));</span><br><span class="line">    &#125;</span><br><span class="line">    server.start();</span><br><span class="line">    loop.loop();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Usage: %s port [thread_num]\n&quot;, argv[0]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-2/" rel="prev" title="muduo库使用示例_2">
+      <i class="fa fa-chevron-left"></i> muduo库使用示例_2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/27/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-%E4%BA%94/" rel="next" title="muduo库使用示例_五">
+      muduo库使用示例_五 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%81%8A%E5%A4%A9%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">聊天服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">消息格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="nav-number">1.2.</span> <span class="nav-text">时序图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#codec-h"><span class="nav-number">1.3.</span> <span class="nav-text">codec.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server-cc"><span class="nav-number">1.4.</span> <span class="nav-text">server.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#client-cc"><span class="nav-number">1.5.</span> <span class="nav-text">client.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server-threaded-cc"><span class="nav-number">1.6.</span> <span class="nav-text">server_threaded.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server-threaded-efficient-cc"><span class="nav-number">1.7.</span> <span class="nav-text">server_threaded_efficient.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server-threaded-highperformance-cc"><span class="nav-number">1.8.</span> <span class="nav-text">server_threaded_highperformance.cc</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

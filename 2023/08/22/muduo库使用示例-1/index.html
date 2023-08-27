@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="五个简单TCP协议 discard -丢弃所有收到的数据; daytime -服务端accept连接之后，以字符串形式发送当前时间，然后主动断开连接; time -服务端accept连接之后，以二进制形式发送当前时间(从Epoch到现在的秒数)，然后主动断开连接;我们需要一个客户程序来把收到的时间转换为字符串。 echo-回显服务，把收到的数据发回客户端; chargen-服务端accept连接之">
+  <meta name="description" content="五个简单TCP协议discard discard -丢弃所有收到的数据;  相比echo少了回显 12345678void DiscardServer::onMessage(const TcpConnectionPtr&amp; conn,                              Buffer* buf,                              Timestam">
 <meta property="og:type" content="article">
 <meta property="og:title" content="muduo库使用示例-1">
 <meta property="og:url" content="http://example.com/2023/08/22/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1/index.html">
 <meta property="og:site_name" content="肖汇林的博客">
-<meta property="og:description" content="五个简单TCP协议 discard -丢弃所有收到的数据; daytime -服务端accept连接之后，以字符串形式发送当前时间，然后主动断开连接; time -服务端accept连接之后，以二进制形式发送当前时间(从Epoch到现在的秒数)，然后主动断开连接;我们需要一个客户程序来把收到的时间转换为字符串。 echo-回显服务，把收到的数据发回客户端; chargen-服务端accept连接之">
+<meta property="og:description" content="五个简单TCP协议discard discard -丢弃所有收到的数据;  相比echo少了回显 12345678void DiscardServer::onMessage(const TcpConnectionPtr&amp; conn,                              Buffer* buf,                              Timestam">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-08-22T12:40:33.000Z">
-<meta property="article:modified_time" content="2023-08-22T13:37:02.723Z">
+<meta property="article:modified_time" content="2023-08-24T13:16:57.931Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 
@@ -172,10 +172,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-08-22 20:40:33 / 修改时间：21:37:02" itemprop="dateCreated datePublished" datetime="2023-08-22T20:40:33+08:00">2023-08-22</time>
+              <time title="创建时间：2023-08-22 20:40:33" itemprop="dateCreated datePublished" datetime="2023-08-22T20:40:33+08:00">2023-08-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-24 21:16:57" itemprop="dateModified" datetime="2023-08-24T21:16:57+08:00">2023-08-24</time>
+              </span>
 
           
 
@@ -188,22 +194,211 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="五个简单TCP协议"><a href="#五个简单TCP协议" class="headerlink" title="五个简单TCP协议"></a>五个简单TCP协议</h1><ul>
-<li>discard -丢弃所有收到的数据;</li>
-<li>daytime -服务端accept连接之后，以字符串形式发送当前时间，然后主动断开连接;</li>
-<li>time -服务端accept连接之后，以二进制形式发送当前时间(从Epoch到现在的秒数)，然后主动断开连接;我们需要一个客户程序来把收到的时间转换为字符串。</li>
-<li>echo-回显服务，把收到的数据发回客户端;</li>
-<li>chargen-服务端accept连接之后，不停地发送测试数据。</li>
-</ul>
-<p>网络编程关注三个半事件:</p>
+        <h1 id="五个简单TCP协议"><a href="#五个简单TCP协议" class="headerlink" title="五个简单TCP协议"></a>五个简单TCP协议</h1><h2 id="discard"><a href="#discard" class="headerlink" title="discard"></a>discard</h2><ul>
+<li><p>discard -丢弃所有收到的数据;</p>
 <ul>
-<li>连接建立</li>
-<li>连接断开</li>
-<li>消息到达</li>
-<li>消息发送完毕（对于低流量的服务来说，通常不需要关注该事件)</li>
+<li><p>相比echo少了回显</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void DiscardServer::onMessage(const TcpConnectionPtr&amp; conn,</span><br><span class="line">                              Buffer* buf,</span><br><span class="line">                              Timestamp time)</span><br><span class="line">&#123;</span><br><span class="line">  string msg(buf-&gt;retrieveAllAsString());</span><br><span class="line">  LOG_INFO &lt;&lt; conn-&gt;name() &lt;&lt; &quot; discards &quot; &lt;&lt; msg.size()</span><br><span class="line">           &lt;&lt; &quot; bytes received at &quot; &lt;&lt; time.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p>提供一个XXXServer类<br>在该类中包含一个Tcpserver对象,和三个半事件，就说明该类是一个TCP服务器了。</p>
-<p>muduo库网络模型使用示例(sudoku求解服务器	MuduoManual.pdf P35 )<br>    reactor (一个IO线程)<br>    multiple reactor（多个IO线程)<br>    one loop per thread + thread pool（多个IO线程＋计算线程池）</p>
+</li>
+</ul>
+<h2 id="daytime"><a href="#daytime" class="headerlink" title="daytime"></a>daytime</h2><ul>
+<li><p>daytime -服务端accept连接之后，以字符串形式发送当前时间，然后主动断开连接;</p>
+<ul>
+<li>&#96;&#96;&#96;<br>void DaytimeServer::onConnection(const TcpConnectionPtr&amp; conn)<br>{<br>  LOG_INFO &lt;&lt; “DaytimeServer - “ &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; “ -&gt; “<br>       &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; “ is “<br>       &lt;&lt; (conn-&gt;connected() ? “UP” : “DOWN”);<br>  if (conn-&gt;connected())<br>  {<br>conn-&gt;send(Timestamp::now().toFormattedString() + “\n”);<br>conn-&gt;shutdown();&#x2F;&#x2F;发送完毕，只关闭写入这一半，主动断开连接<br>  }<br>}<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">## time </span><br><span class="line"></span><br><span class="line">- time -服务端accept连接之后，以二进制形式发送当前时间(从Epoch到现在的秒数)，然后主动断开连接;我们需要一个客户程序来把收到的时间转换为字符串。</span><br><span class="line"></span><br><span class="line">  - ```</span><br><span class="line">    void TimeServer::onConnection(const muduo::net::TcpConnectionPtr&amp; conn)</span><br><span class="line">    &#123;</span><br><span class="line">      LOG_INFO &lt;&lt; &quot;TimeServer - &quot; &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">               &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">               &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line">      if (conn-&gt;connected())</span><br><span class="line">      &#123;</span><br><span class="line">        time_t now = ::time(NULL);</span><br><span class="line">        int32_t be32 = sockets::hostToNetwork32(static_cast&lt;int32_t&gt;(now));</span><br><span class="line">        conn-&gt;send(&amp;be32, sizeof be32);</span><br><span class="line">        conn-&gt;shutdown();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    客户程序timeclient</span><br><span class="line">    #include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">    #include &quot;muduo/net/Endian.h&quot;</span><br><span class="line">    #include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">    #include &quot;muduo/net/InetAddress.h&quot;</span><br><span class="line">    #include &quot;muduo/net/TcpClient.h&quot;</span><br><span class="line">    </span><br><span class="line">    #include &lt;utility&gt;</span><br><span class="line">    </span><br><span class="line">    #include &lt;stdio.h&gt;</span><br><span class="line">    #include &lt;unistd.h&gt;</span><br><span class="line">    </span><br><span class="line">    using namespace muduo;</span><br><span class="line">    using namespace muduo::net;</span><br><span class="line">    </span><br><span class="line">    class TimeClient : noncopyable</span><br><span class="line">    &#123;</span><br><span class="line">     public:</span><br><span class="line">      TimeClient(EventLoop* loop, const InetAddress&amp; serverAddr)</span><br><span class="line">        : loop_(loop),</span><br><span class="line">          client_(loop, serverAddr, &quot;TimeClient&quot;)</span><br><span class="line">      &#123;</span><br><span class="line">        client_.setConnectionCallback(</span><br><span class="line">            std::bind(&amp;TimeClient::onConnection, this, _1));</span><br><span class="line">        client_.setMessageCallback(</span><br><span class="line">            std::bind(&amp;TimeClient::onMessage, this, _1, _2, _3));</span><br><span class="line">        // client_.enableRetry();</span><br><span class="line">      &#125;</span><br><span class="line">    </span><br><span class="line">      void connect()</span><br><span class="line">      &#123;</span><br><span class="line">        client_.connect();</span><br><span class="line">      &#125;</span><br><span class="line">    </span><br><span class="line">     private:</span><br><span class="line">    </span><br><span class="line">      EventLoop* loop_;</span><br><span class="line">      TcpClient client_;</span><br><span class="line">    </span><br><span class="line">      void onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">      &#123;</span><br><span class="line">        LOG_INFO &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; &quot; -&gt; &quot;</span><br><span class="line">                 &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; &quot; is &quot;</span><br><span class="line">                 &lt;&lt; (conn-&gt;connected() ? &quot;UP&quot; : &quot;DOWN&quot;);</span><br><span class="line">    </span><br><span class="line">        if (!conn-&gt;connected())</span><br><span class="line">        &#123;</span><br><span class="line">          loop_-&gt;quit();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    </span><br><span class="line">      void onMessage(const TcpConnectionPtr&amp; conn, Buffer* buf, Timestamp receiveTime)</span><br><span class="line">      &#123;</span><br><span class="line">        if (buf-&gt;readableBytes() &gt;= sizeof(int32_t))</span><br><span class="line">        &#123;</span><br><span class="line">          const void* data = buf-&gt;peek();</span><br><span class="line">          //使用 *static_cast&lt;const int32_t*&gt;(data) 主要是为了将 void* 类型的指针转换为 int32_t 类型。</span><br><span class="line">          //由于 data 是一个指向 void 类型的指针，不能直接进行解引用操作。</span><br><span class="line">          //因此，我们需要先通过 static_cast 进行类型转换，将 data 转换为 int32_t* 类型的指针，</span><br><span class="line">          //然后再使用 * 运算符进行解引用操作，获取指针所指向的具体数值</span><br><span class="line">          int32_t be32 = *static_cast&lt;const int32_t*&gt;(data);</span><br><span class="line">          buf-&gt;retrieve(sizeof(int32_t));</span><br><span class="line">          time_t time = sockets::networkToHost32(be32);</span><br><span class="line">          Timestamp ts(implicit_cast&lt;uint64_t&gt;(time) * Timestamp::kMicroSecondsPerSecond);</span><br><span class="line">          LOG_INFO &lt;&lt; &quot;Server time = &quot; &lt;&lt; time &lt;&lt; &quot;, &quot; &lt;&lt; ts.toFormattedString();</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">          LOG_INFO &lt;&lt; conn-&gt;name() &lt;&lt; &quot; no enough data &quot; &lt;&lt; buf-&gt;readableBytes()</span><br><span class="line">                   &lt;&lt; &quot; at &quot; &lt;&lt; receiveTime.toFormattedString();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    int main(int argc, char* argv[])</span><br><span class="line">    &#123;</span><br><span class="line">      LOG_INFO &lt;&lt; &quot;pid = &quot; &lt;&lt; getpid();</span><br><span class="line">      if (argc &gt; 1)</span><br><span class="line">      &#123;</span><br><span class="line">        EventLoop loop;</span><br><span class="line">        InetAddress serverAddr(argv[1], 2037);</span><br><span class="line">    </span><br><span class="line">        TimeClient timeClient(&amp;loop, serverAddr);</span><br><span class="line">        timeClient.connect();</span><br><span class="line">        loop.loop();</span><br><span class="line">      &#125;</span><br><span class="line">      else</span><br><span class="line">      &#123;</span><br><span class="line">        printf(&quot;Usage: %s host_ip\n&quot;, argv[0]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h2><ul>
+<li><p>echo-回显服务，把收到的数据发回客户端;</p>
+<ul>
+<li><p>&#96;&#96;&#96;<br>echo.h<br>#ifndef MUDUO_EXAMPLES_SIMPLE_ECHO_ECHO_H<br>#define MUDUO_EXAMPLES_SIMPLE_ECHO_ECHO_H</p>
+<p>#include “muduo&#x2F;net&#x2F;TcpServer.h”</p>
+<p>&#x2F;&#x2F; RFC 862<br>class EchoServer<br>{<br> public:<br>  EchoServer(muduo::net::EventLoop* loop,<br>         const muduo::net::InetAddress&amp; listenAddr);<br>  void start();  &#x2F;&#x2F; calls server_.start();</p>
+<p> private:<br>  void onConnection(const muduo::net::TcpConnectionPtr&amp; conn);</p>
+<p>  void onMessage(const muduo::net::TcpConnectionPtr&amp; conn,<br>             muduo::net::Buffer* buf,<br>             muduo::Timestamp time);<br>  muduo::net::TcpServer server_;<br>};</p>
+<p>#endif  &#x2F;&#x2F; MUDUO_EXAMPLES_SIMPLE_ECHO_ECHO_H</p>
+<p>echo.cc<br>#include “examples&#x2F;simple&#x2F;echo&#x2F;echo.h”</p>
+<p>#include “muduo&#x2F;base&#x2F;Logging.h”</p>
+<p>using std::placeholders::_1;<br>using std::placeholders::_2;<br>using std::placeholders::_3;</p>
+<p>&#x2F;&#x2F; using namespace muduo;<br>&#x2F;&#x2F; using namespace muduo::net;</p>
+<p>EchoServer::EchoServer(muduo::net::EventLoop* loop,<br>                   const muduo::net::InetAddress&amp; listenAddr)<br>  : server_(loop, listenAddr, “EchoServer”)<br>{<br>  server_.setConnectionCallback(<br>  std::bind(&amp;EchoServer::onConnection, this, <em>1));<br>  server</em>.setMessageCallback(<br>  std::bind(&amp;EchoServer::onMessage, this, _1, _2, _3));<br>}</p>
+<p>void EchoServer::start()<br>{<br>  server_.start();<br>}</p>
+<p>void EchoServer::onConnection(const muduo::net::TcpConnectionPtr&amp; conn)<br>{<br>  LOG_INFO &lt;&lt; “EchoServer - “ &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; “ -&gt; “<br>       &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; “ is “<br>       &lt;&lt; (conn-&gt;connected() ? “UP” : “DOWN”);<br>}</p>
+<p>void EchoServer::onMessage(const muduo::net::TcpConnectionPtr&amp; conn,<br>                       muduo::net::Buffer* buf,<br>                       muduo::Timestamp time)<br>{<br>  muduo::string msg(buf-&gt;retrieveAllAsString());<br>  LOG_INFO &lt;&lt; conn-&gt;name() &lt;&lt; “ echo “ &lt;&lt; msg.size() &lt;&lt; “ bytes, “<br>       &lt;&lt; “data received at “ &lt;&lt; time.toString();<br>  conn-&gt;send(msg);&#x2F;&#x2F;回显<br>}</p>
+<p>main.cc<br>#include “examples&#x2F;simple&#x2F;echo&#x2F;echo.h”</p>
+<p>#include “muduo&#x2F;base&#x2F;Logging.h”<br>#include “muduo&#x2F;net&#x2F;EventLoop.h”</p>
+<p>#include &lt;unistd.h&gt;</p>
+<p>&#x2F;&#x2F; using namespace muduo;<br>&#x2F;&#x2F; using namespace muduo::net;</p>
+<p>int main()<br>{<br>  LOG_INFO &lt;&lt; “pid &#x3D; “ &lt;&lt; getpid();<br>  muduo::net::EventLoop loop;<br>  muduo::net::InetAddress listenAddr(2007);<br>  EchoServer server(&amp;loop, listenAddr);<br>  server.start();<br>  loop.loop();<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">## chargen</span><br><span class="line"></span><br><span class="line">- chargen-服务端accept连接之后，不停地发送测试数据。测试服务器吞吐量</span><br><span class="line"></span><br><span class="line">  - TCP流量调节的功能    即使服务端生成数据很快但是客户端接收或处理数据慢，所以可以自己创建客户端使接受到的数据不打印到输出</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>ChargenServer::ChargenServer(EventLoop* loop,<br>                         const InetAddress&amp; listenAddr,<br>                         bool print)<br>  : server_(loop, listenAddr, “ChargenServer”),<br>transferred_(0),<br>startTime_(Timestamp::now())<br>{<br>  server_.setConnectionCallback(<br>  std::bind(&amp;ChargenServer::onConnection, this, <em>1));<br>  server</em>.setMessageCallback(<br>  std::bind(&amp;ChargenServer::onMessage, this, _1, _2, <em>3));<br>  server</em>.setWriteCompleteCallback(<br>  std::bind(&amp;ChargenServer::onWriteComplete, this, _1));<br>  if (print)<br>  {<br>&#x2F;&#x2F;每隔3秒打印一下吞吐量<br>loop-&gt;runEvery(3.0, std::bind(&amp;ChargenServer::printThroughput, this));<br>  }</p>
+<p>  string line;<br>  for (int i &#x3D; 33; i &lt; 127; ++i)<br>  {<br>line.push_back(char(i));<br>  }<br>  line +&#x3D; line;</p>
+<p>  for (size_t i &#x3D; 0; i &lt; 127-33; ++i)<br>  {<br>message_ +&#x3D; line.substr(i, 72) + ‘\n’;<br>  }<br>}</p>
+<p>void ChargenServer::start()<br>{<br>  server_.start();<br>}</p>
+<p>void ChargenServer::onConnection(const TcpConnectionPtr&amp; conn)<br>{<br>  LOG_INFO &lt;&lt; “ChargenServer - “ &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; “ -&gt; “<br>       &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; “ is “<br>       &lt;&lt; (conn-&gt;connected() ? “UP” : “DOWN”);<br>  if (conn-&gt;connected())<br>  {<br>conn-&gt;setTcpNoDelay(true);&#x2F;&#x2F;有数据立刻发送，不需要等待<br>conn-&gt;send(message_);<br>  }<br>}</p>
+<p>void ChargenServer::onMessage(const TcpConnectionPtr&amp; conn,<br>                          Buffer* buf,<br>                          Timestamp time)<br>{<br>  string msg(buf-&gt;retrieveAllAsString());<br>  LOG_INFO &lt;&lt; conn-&gt;name() &lt;&lt; “ discards “ &lt;&lt; msg.size()<br>       &lt;&lt; “ bytes received at “ &lt;&lt; time.toString();<br>}</p>
+<p>void ChargenServer::onWriteComplete(const TcpConnectionPtr&amp; conn)<br>{<br>  transferred_ +&#x3D; message_.size();&#x2F;&#x2F; transferred_已经发送的数据<br>  conn-&gt;send(message_);&#x2F;&#x2F;发送完又会调用onWriteComplete，相当于循环<br>}</p>
+<p>void ChargenServer::printThroughput()<br>{<br>  Timestamp endTime &#x3D; Timestamp::now();<br>  double time &#x3D; timeDifference(endTime, startTime_);<br>  printf(“%4.3f MiB&#x2F;s\n”, static_cast<double>(transferred_)&#x2F;time&#x2F;1024&#x2F;1024);&#x2F;&#x2F;每秒多少兆<br>  transferred_ &#x3D; 0;<br>  startTime_ &#x3D; endTime;<br>}</double></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">网络编程关注三个半事件:</span><br><span class="line"></span><br><span class="line">- 连接建立</span><br><span class="line">- 连接断开</span><br><span class="line">- 消息到达</span><br><span class="line">- 消息发送完毕（对于低流量的服务来说，通常不需要关注该事件)</span><br><span class="line"></span><br><span class="line">提供一个XXXServer类</span><br><span class="line">在该类中包含一个Tcpserver对象,和三个半事件，就说明该类是一个TCP服务器了。</span><br><span class="line"></span><br><span class="line"># muduo库网络模型使用示例(sudoku求解服务器)</span><br><span class="line"></span><br><span class="line">## 	reactor (一个IO线程)</span><br><span class="line"></span><br><span class="line">这个IO线程既负责listenfd也负责connfd</span><br><span class="line"></span><br><span class="line">server_basic.cc</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p> void onMessage(const TcpConnectionPtr&amp; conn, Buffer* buf, Timestamp)<br>  {<br>    LOG_DEBUG &lt;&lt; conn-&gt;name();<br>    size_t len &#x3D; buf-&gt;readableBytes();<br>    while (len &gt;&#x3D; kCells + 2)&#x2F;&#x2F;9<em>9&#x3D;81+\r\n,id可能没有<br>    {<br>      const char</em> crlf &#x3D; buf-&gt;findCRLF();&#x2F;&#x2F;返回匹配的第一个位置<br>      if (crlf)<br>      {<br>        string request(buf-&gt;peek(), crlf);&#x2F;&#x2F;不包括\r\n<br>        buf-&gt;retrieveUntil(crlf + 2);&#x2F;&#x2F;将数据从buf中取回，包括\r\n<br>        len &#x3D; buf-&gt;readableBytes();<br>        if (!processRequest(conn, request))<br>        {<br>          conn-&gt;send(“Bad Request!\r\n”);<br>          conn-&gt;shutdown();<br>          break;<br>        }<br>      }<br>      else if (len &gt; 100) &#x2F;&#x2F; id + “:” + kCells + “\r\n”<br>      {<br>        conn-&gt;send(“Id too long!\r\n”);<br>        conn-&gt;shutdown();<br>        break;<br>      }<br>      else<br>      {<br>        break;<br>      }<br>    }<br>  }</p>
+<p>  bool processRequest(const TcpConnectionPtr&amp; conn, const string&amp; request)<br>  {<br>    string id;<br>    string puzzle;&#x2F;&#x2F;求解的数字<br>    bool goodRequest &#x3D; true;</p>
+<pre><code>string::const_iterator colon = find(request.begin(), request.end(), &#39;:&#39;);
+if (colon != request.end())
+&#123;
+  id.assign(request.begin(), colon);
+  puzzle.assign(colon+1, request.end());
+&#125;
+else
+&#123;
+  puzzle = request;
+&#125;
+
+if (puzzle.size() == implicit_cast&lt;size_t&gt;(kCells))
+&#123;
+  LOG_DEBUG &lt;&lt; conn-&gt;name();
+  string result = solveSudoku(puzzle);//求解的函数
+  if (id.empty())
+  &#123;
+    conn-&gt;send(result+&quot;\r\n&quot;);
+  &#125;
+  else
+  &#123;
+    conn-&gt;send(id+&quot;:&quot;+result+&quot;\r\n&quot;);
+  &#125;
+&#125;
+else
+&#123;
+  goodRequest = false;
+&#125;
+return goodRequest;
+</code></pre>
+<p>  }</p>
+<p>  int main(int argc, char* argv[])<br>{<br>  LOG_INFO &lt;&lt; “pid &#x3D; “ &lt;&lt; getpid() &lt;&lt; “, tid &#x3D; “ &lt;&lt; CurrentThread::tid();<br>  EventLoop loop;<br>  InetAddress listenAddr(9981);<br>  SudokuServer server(&amp;loop, listenAddr);</p>
+<p>  server.start();</p>
+<p>  loop.loop();<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 	multiple reactor（多个IO线程)</span><br><span class="line"></span><br><span class="line">main reactor		负责listenfdaccept</span><br><span class="line">sub reactor			负责connfd</span><br><span class="line"></span><br><span class="line">roundbin轮叫</span><br><span class="line">来一个连接，就选择下一个EventLoop，对应一个IO线程</span><br><span class="line">这样就让多个连接分配给若干个EventLoop来处理，而每个EventLoop属于一个IO线程也就意味着,多个连接分配给若干个IO线程来处理。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在构造函数添加<br>server_.setThreadNum(numThreads);&#x2F;&#x2F;IO线程池EventLoopThreadPool::setThreadNum的调用<br>&#x2F;&#x2F;调用ThreadPool::run()函数添加一个任务到线程池中</p>
+<p>int main(int argc, char* argv[])<br>{<br>  LOG_INFO &lt;&lt; “pid &#x3D; “ &lt;&lt; getpid() &lt;&lt; “, tid &#x3D; “ &lt;&lt; CurrentThread::tid();<br>  int numThreads &#x3D; 0;<br>  if (argc &gt; 1)<br>  {<br>    numThreads &#x3D; atoi(argv[1]);&#x2F;&#x2F;多少个IO线程<br>  }<br>  EventLoop loop;<br>  InetAddress listenAddr(9981);<br>  SudokuServer server(&amp;loop, listenAddr, numThreads);</p>
+<p>  server.start();</p>
+<p>  loop.loop();<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 	one loop per thread + thread pool（多个IO线程＋计算线程池）</span><br><span class="line"></span><br><span class="line">多个IO线程处理并发的连接，因为计算时间比较久，容易使IO线程阻塞，IO线程很快就用完了，就不能处理大量的并发连接了。</span><br><span class="line"></span><br><span class="line">这个程序目前是一个线程加计算线程池，如果需要加多个IO线程，只需要添加</span><br><span class="line"></span><br><span class="line">`server_.setThreadNum(numThreads);//IO线程池EventLoopThreadPool::setThreadNum的调用`</span><br><span class="line"></span><br><span class="line">计算线程池的添加主要是</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>threadPool_.start(numThreads_);&#x2F;&#x2F;启动计算线程池<br>threadPool_.run(std::bind(&amp;solve, conn, puzzle, id));&#x2F;&#x2F;没有直接调用，而是通过线程池来运行<br>ThreadPool threadPool_;&#x2F;&#x2F;计算线程池</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">完整代码</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include “examples&#x2F;sudoku&#x2F;sudoku.h”</p>
+<p>#include “muduo&#x2F;base&#x2F;Atomic.h”<br>#include “muduo&#x2F;base&#x2F;Logging.h”<br>#include “muduo&#x2F;base&#x2F;Thread.h”<br>#include “muduo&#x2F;base&#x2F;ThreadPool.h”<br>#include “muduo&#x2F;net&#x2F;EventLoop.h”<br>#include “muduo&#x2F;net&#x2F;InetAddress.h”<br>#include “muduo&#x2F;net&#x2F;TcpServer.h”</p>
+<p>#include <utility></utility></p>
+<p>#include &lt;stdio.h&gt;<br>#include &lt;unistd.h&gt;</p>
+<p>using namespace muduo;<br>using namespace muduo::net;</p>
+<p>class SudokuServer<br>{<br> public:<br>  SudokuServer(EventLoop* loop, const InetAddress&amp; listenAddr, int numThreads)<br>    : server_(loop, listenAddr, “SudokuServer”),<br>      numThreads_(numThreads),<br>      startTime_(Timestamp::now())<br>  {<br>    server_.setConnectionCallback(<br>        std::bind(&amp;SudokuServer::onConnection, this, <em>1));<br>    server</em>.setMessageCallback(<br>        std::bind(&amp;SudokuServer::onMessage, this, _1, _2, _3));<br>  }</p>
+<p>  void start()<br>  {<br>    LOG_INFO &lt;&lt; “starting “ &lt;&lt; numThreads_ &lt;&lt; “ threads.”;<br>    threadPool_.start(numThreads_);&#x2F;&#x2F;启动计算线程池<br>    server_.start();<br>  }</p>
+<p> private:<br>  void onConnection(const TcpConnectionPtr&amp; conn)<br>  {<br>    LOG_TRACE &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; “ -&gt; “<br>        &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; “ is “<br>        &lt;&lt; (conn-&gt;connected() ? “UP” : “DOWN”);<br>  }</p>
+<p>  void onMessage(const TcpConnectionPtr&amp; conn, Buffer* buf, Timestamp)<br>  {<br>    LOG_DEBUG &lt;&lt; conn-&gt;name();<br>    size_t len &#x3D; buf-&gt;readableBytes();<br>    while (len &gt;&#x3D; kCells + 2)<br>    {<br>      const char* crlf &#x3D; buf-&gt;findCRLF();<br>      if (crlf)<br>      {<br>        string request(buf-&gt;peek(), crlf);<br>        buf-&gt;retrieveUntil(crlf + 2);<br>        len &#x3D; buf-&gt;readableBytes();<br>        if (!processRequest(conn, request))<br>        {<br>          conn-&gt;send(“Bad Request!\r\n”);<br>          conn-&gt;shutdown();<br>          break;<br>        }<br>      }<br>      else if (len &gt; 100) &#x2F;&#x2F; id + “:” + kCells + “\r\n”<br>      {<br>        conn-&gt;send(“Id too long!\r\n”);<br>        conn-&gt;shutdown();<br>        break;<br>      }<br>      else<br>      {<br>        break;<br>      }<br>    }<br>  }</p>
+<p>  bool processRequest(const TcpConnectionPtr&amp; conn, const string&amp; request)<br>  {<br>    string id;<br>    string puzzle;<br>    bool goodRequest &#x3D; true;</p>
+<pre><code>string::const_iterator colon = find(request.begin(), request.end(), &#39;:&#39;);
+if (colon != request.end())
+&#123;
+  id.assign(request.begin(), colon);
+  puzzle.assign(colon+1, request.end());
+&#125;
+else
+&#123;
+  puzzle = request;
+&#125;
+
+if (puzzle.size() == implicit_cast&lt;size_t&gt;(kCells))
+&#123;
+  threadPool_.run(std::bind(&amp;solve, conn, puzzle, id));//没有直接调用，而是通过线程池来运行，将计算添加到队列
+&#125;
+else
+&#123;
+  goodRequest = false;
+&#125;
+return goodRequest;
+</code></pre>
+<p>  }</p>
+<p>  static void solve(const TcpConnectionPtr&amp; conn,<br>                    const string&amp; puzzle,<br>                    const string&amp; id)<br>  {<br>    LOG_DEBUG &lt;&lt; conn-&gt;name();<br>    string result &#x3D; solveSudoku(puzzle);<br>    if (id.empty())<br>    {<br>      conn-&gt;send(result+”\r\n”);&#x2F;&#x2F;IO线程发送<br>    }<br>    else<br>    {<br>      conn-&gt;send(id+”:”+result+”\r\n”);<br>    }<br>  }</p>
+<p>  TcpServer server_;<br>  ThreadPool threadPool_;&#x2F;&#x2F;计算线程池<br>  int numThreads_;<br>  Timestamp startTime_;<br>};</p>
+<p>int main(int argc, char* argv[])<br>{<br>  LOG_INFO &lt;&lt; “pid &#x3D; “ &lt;&lt; getpid() &lt;&lt; “, tid &#x3D; “ &lt;&lt; CurrentThread::tid();<br>  int numThreads &#x3D; 0;<br>  if (argc &gt; 1)<br>  {<br>    numThreads &#x3D; atoi(argv[1]);&#x2F;&#x2F;计算线程池的个数<br>  }<br>  EventLoop loop;&#x2F;&#x2F;一个IO线程<br>  InetAddress listenAddr(9981);<br>  SudokuServer server(&amp;loop, listenAddr, numThreads);</p>
+<p>  server.start();</p>
+<p>  loop.loop();<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 包含inspect库</span><br><span class="line"></span><br><span class="line">含有通过HTTP方式为服务器提供监控接口</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include “examples&#x2F;sudoku&#x2F;sudoku.h”</p>
+<p>#include “muduo&#x2F;base&#x2F;Atomic.h”<br>#include “muduo&#x2F;base&#x2F;Logging.h”<br>#include “muduo&#x2F;base&#x2F;Thread.h”<br>#include “muduo&#x2F;base&#x2F;ThreadPool.h”<br>#include “muduo&#x2F;net&#x2F;EventLoop.h”<br>#include “muduo&#x2F;net&#x2F;EventLoopThread.h”<br>#include “muduo&#x2F;net&#x2F;InetAddress.h”<br>#include “muduo&#x2F;net&#x2F;TcpServer.h”<br>#include “muduo&#x2F;net&#x2F;inspect&#x2F;Inspector.h”</p>
+<p>#include &lt;boost&#x2F;circular_buffer.hpp&gt;</p>
+<p>&#x2F;&#x2F;#include &lt;stdio.h&gt;<br>&#x2F;&#x2F;#include &lt;unistd.h&gt;</p>
+<p>using namespace muduo;<br>using namespace muduo::net;</p>
+<p>#include “examples&#x2F;sudoku&#x2F;stat.h”</p>
+<p>class SudokuServer : noncopyable<br>{<br> public:<br>  SudokuServer(EventLoop* loop,<br>               const InetAddress&amp; listenAddr,<br>               int numEventLoops,<br>               int numThreads,<br>               bool nodelay)<br>    : server_(loop, listenAddr, “SudokuServer”),<br>      threadPool_(),<br>      numThreads_(numThreads),<br>      tcpNoDelay_(nodelay),<br>      startTime_(Timestamp::now()),<br>      stat_(threadPool_),<br>      inspectThread_(),<br>      inspector_(inspectThread_.startLoop(), InetAddress(9982), “sudoku-solver”)<br>  {<br>    LOG_INFO &lt;&lt; “Use “ &lt;&lt; numEventLoops &lt;&lt; “ IO threads.”;<br>    LOG_INFO &lt;&lt; “TCP no delay “ &lt;&lt; nodelay;</p>
+<pre><code>server_.setConnectionCallback(
+    std::bind(&amp;SudokuServer::onConnection, this, _1));
+server_.setMessageCallback(
+    std::bind(&amp;SudokuServer::onMessage, this, _1, _2, _3));
+server_.setThreadNum(numEventLoops);
+
+inspector_.add(&quot;sudoku&quot;, &quot;stats&quot;, std::bind(&amp;SudokuStat::report, &amp;stat_),
+               &quot;statistics of sudoku solver&quot;);
+inspector_.add(&quot;sudoku&quot;, &quot;reset&quot;, std::bind(&amp;SudokuStat::reset, &amp;stat_),
+               &quot;reset statistics of sudoku solver&quot;);
+</code></pre>
+<p>  }</p>
+<p>  void start()<br>  {<br>    LOG_INFO &lt;&lt; “Starting “ &lt;&lt; numThreads_ &lt;&lt; “ computing threads.”;<br>    threadPool_.start(numThreads_);<br>    server_.start();<br>  }</p>
+<p> private:<br>  void onConnection(const TcpConnectionPtr&amp; conn)<br>  {<br>    LOG_TRACE &lt;&lt; conn-&gt;peerAddress().toIpPort() &lt;&lt; “ -&gt; “<br>        &lt;&lt; conn-&gt;localAddress().toIpPort() &lt;&lt; “ is “<br>        &lt;&lt; (conn-&gt;connected() ? “UP” : “DOWN”);<br>    if (conn-&gt;connected())<br>    {<br>      if (tcpNoDelay_)<br>        conn-&gt;setTcpNoDelay(true);<br>      conn-&gt;setHighWaterMarkCallback(<br>          std::bind(&amp;SudokuServer::highWaterMark, this, _1, _2), 5 * 1024 * 1024);<br>      bool throttle &#x3D; false;<br>      conn-&gt;setContext(throttle);<br>    }<br>  }</p>
+<p>  void highWaterMark(const TcpConnectionPtr&amp; conn, size_t tosend)<br>  {<br>    LOG_WARN &lt;&lt; conn-&gt;name() &lt;&lt; “ high water mark “ &lt;&lt; tosend;<br>    if (tosend &lt; 10 * 1024 * 1024)<br>    {<br>      conn-&gt;setHighWaterMarkCallback(<br>          std::bind(&amp;SudokuServer::highWaterMark, this, _1, _2), 10 * 1024 * 1024);<br>      conn-&gt;setWriteCompleteCallback(std::bind(&amp;SudokuServer::writeComplete, this, <em>1));<br>      bool throttle &#x3D; true;<br>      conn-&gt;setContext(throttle);<br>    }<br>    else<br>    {<br>      conn-&gt;send(“Bad Request!\r\n”);<br>      conn-&gt;shutdown();  &#x2F;&#x2F; FIXME: forceClose() ?<br>      stat</em>.recordBadRequest();<br>    }<br>  }</p>
+<p>  void writeComplete(const TcpConnectionPtr&amp; conn)<br>  {<br>    LOG_INFO &lt;&lt; conn-&gt;name() &lt;&lt; “ write complete”;<br>    conn-&gt;setHighWaterMarkCallback(<br>        std::bind(&amp;SudokuServer::highWaterMark, this, _1, _2), 5 * 1024 * 1024);<br>    conn-&gt;setWriteCompleteCallback(WriteCompleteCallback());<br>    bool throttle &#x3D; false;<br>    conn-&gt;setContext(throttle);<br>  }</p>
+<p>  void onMessage(const TcpConnectionPtr&amp; conn, Buffer* buf, Timestamp receiveTime)<br>  {<br>    size_t len &#x3D; buf-&gt;readableBytes();<br>    while (len &gt;&#x3D; kCells + 2)<br>    {<br>      const char* crlf &#x3D; buf-&gt;findCRLF();<br>      if (crlf)<br>      {<br>        string request(buf-&gt;peek(), crlf);<br>        buf-&gt;retrieveUntil(crlf + 2);<br>        len &#x3D; buf-&gt;readableBytes();<br>        stat_.recordRequest();<br>        if (!processRequest(conn, request, receiveTime))<br>        {<br>          conn-&gt;send(“Bad Request!\r\n”);<br>          conn-&gt;shutdown();<br>          stat_.recordBadRequest();<br>          break;<br>        }<br>      }<br>      else if (len &gt; 100) &#x2F;&#x2F; id + “:” + kCells + “\r\n”<br>      {<br>        conn-&gt;send(“Id too long!\r\n”);<br>        conn-&gt;shutdown();<br>        stat_.recordBadRequest();<br>        break;<br>      }<br>      else<br>      {<br>        break;<br>      }<br>    }<br>  }</p>
+<p>  struct Request<br>  {<br>    string id;<br>    string puzzle;<br>    Timestamp receiveTime;<br>  };</p>
+<p>  bool processRequest(const TcpConnectionPtr&amp; conn, const string&amp; request, Timestamp receiveTime)<br>  {<br>    Request req;<br>    req.receiveTime &#x3D; receiveTime;</p>
+<pre><code>string::const_iterator colon = find(request.begin(), request.end(), &#39;:&#39;);
+if (colon != request.end())
+&#123;
+  req.id.assign(request.begin(), colon);
+  req.puzzle.assign(colon+1, request.end());
+&#125;
+else
+&#123;
+  // when using thread pool, an id must be provided in the request.
+  if (numThreads_ &gt; 1)
+    return false;
+  req.puzzle = request;
+&#125;
+
+if (req.puzzle.size() == implicit_cast&lt;size_t&gt;(kCells))
+&#123;
+  bool throttle = boost::any_cast&lt;bool&gt;(conn-&gt;getContext());
+  if (threadPool_.queueSize() &lt; 1000 * 1000 &amp;&amp; !throttle)
+  &#123;
+    threadPool_.run(std::bind(&amp;SudokuServer::solve, this, conn, req));
+  &#125;
+  else
+  &#123;
+    if (req.id.empty())
+    &#123;
+      conn-&gt;send(&quot;ServerTooBusy\r\n&quot;);
+    &#125;
+    else
+    &#123;
+      conn-&gt;send(req.id + &quot;:ServerTooBusy\r\n&quot;);
+    &#125;
+    stat_.recordDroppedRequest();
+  &#125;
+  return true;
+&#125;
+return false;
+</code></pre>
+<p>  }</p>
+<p>  void solve(const TcpConnectionPtr&amp; conn, const Request&amp; req)<br>  {<br>    LOG_DEBUG &lt;&lt; conn-&gt;name();<br>    string result &#x3D; solveSudoku(req.puzzle);<br>    if (req.id.empty())<br>    {<br>      conn-&gt;send(result + “\r\n”);<br>    }<br>    else<br>    {<br>      conn-&gt;send(req.id + “:” + result + “\r\n”);<br>    }<br>    stat_.recordResponse(Timestamp::now(), req.receiveTime, result !&#x3D; kNoSolution);<br>  }</p>
+<p>  TcpServer server_;<br>  ThreadPool threadPool_;<br>  const int numThreads_;<br>  const bool tcpNoDelay_;<br>  const Timestamp startTime_;</p>
+<p>  SudokuStat stat_;<br>  EventLoopThread inspectThread_;<br>  Inspector inspector_;<br>};</p>
+<p>int main(int argc, char* argv[])<br>{<br>  LOG_INFO &lt;&lt; argv[0] &lt;&lt; “ [number of IO threads] [number of worker threads] [-n]”;<br>  LOG_INFO &lt;&lt; “pid &#x3D; “ &lt;&lt; getpid() &lt;&lt; “, tid &#x3D; “ &lt;&lt; CurrentThread::tid();<br>  int numEventLoops &#x3D; 0;<br>  int numThreads &#x3D; 0;<br>  bool nodelay &#x3D; false;<br>  if (argc &gt; 1)<br>  {<br>    numEventLoops &#x3D; atoi(argv[1]);<br>  }<br>  if (argc &gt; 2)<br>  {<br>    numThreads &#x3D; atoi(argv[2]);<br>  }<br>  if (argc &gt; 3 &amp;&amp; string(argv[3]) &#x3D;&#x3D; “-n”)<br>  {<br>    nodelay &#x3D; true;<br>  }</p>
+<p>  EventLoop loop;<br>  InetAddress listenAddr(9981);<br>  SudokuServer server(&amp;loop, listenAddr, numEventLoops, numThreads, nodelay);</p>
+<p>  server.start();</p>
+<p>  loop.loop();<br>}</p>
+<pre><code>
+</code></pre>
 
     </div>
 
@@ -222,7 +417,10 @@
     <a href="/2023/08/22/muduo-inspect%E5%BA%93/" rel="prev" title="muduo_inspect库">
       <i class="fa fa-chevron-left"></i> muduo_inspect库
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/24/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-2/" rel="next" title="muduo库使用示例_2">
+      muduo库使用示例_2 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -281,7 +479,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E4%B8%AA%E7%AE%80%E5%8D%95TCP%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.</span> <span class="nav-text">五个简单TCP协议</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E4%B8%AA%E7%AE%80%E5%8D%95TCP%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.</span> <span class="nav-text">五个简单TCP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#discard"><span class="nav-number">1.1.</span> <span class="nav-text">discard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#daytime"><span class="nav-number">1.2.</span> <span class="nav-text">daytime</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#echo"><span class="nav-number">1.3.</span> <span class="nav-text">echo</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -295,7 +493,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-count">66</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
