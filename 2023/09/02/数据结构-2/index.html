@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="左旋字符串字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字 符串左旋转操作的功能。比如，输入字符串”abcdefg”和数字2，该函数将返回左旋转两位得到的结 果”cdefgab”。 1234567891011char* reverseLeftWords(char* s, int n)&amp;#123; 	int i&#x3D;0; 	int len&#x3D;strlen(s); 	ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构-2">
+<meta property="og:url" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="左旋字符串字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字 符串左旋转操作的功能。比如，输入字符串”abcdefg”和数字2，该函数将返回左旋转两位得到的结 果”cdefgab”。 1234567891011char* reverseLeftWords(char* s, int n)&amp;#123; 	int i&#x3D;0; 	int len&#x3D;strlen(s); 	ch">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png">
+<meta property="og:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png">
+<meta property="og:image" content="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png">
+<meta property="article:published_time" content="2023-09-02T02:52:11.000Z">
+<meta property="article:modified_time" content="2023-09-03T13:38:03.268Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png">
+
+<link rel="canonical" href="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数据结构-2 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-02 10:52:11" itemprop="dateCreated datePublished" datetime="2023-09-02T10:52:11+08:00">2023-09-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-03 21:38:03" itemprop="dateModified" datetime="2023-09-03T21:38:03+08:00">2023-09-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="左旋字符串"><a href="#左旋字符串" class="headerlink" title="左旋字符串"></a>左旋字符串</h1><p>字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字 符串左旋转操作的功能。比如，输入字符串”abcdefg”和数字2，该函数将返回左旋转两位得到的结 果”cdefgab”。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">char* reverseLeftWords(char* s, int n)&#123;</span><br><span class="line"> 	int i=0;</span><br><span class="line"> 	int len=strlen(s);</span><br><span class="line"> 	char *t=malloc(sizeof(char)*(len+1));</span><br><span class="line"> 	while(i&lt;len)</span><br><span class="line"> 	&#123;</span><br><span class="line"> 		t[i++]=s[(n+(i))%len];</span><br><span class="line"> 	&#125;</span><br><span class="line"> 	t[len]=&#x27;\0&#x27;;</span><br><span class="line"> 	return t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="reverse反转解法"><a href="#reverse反转解法" class="headerlink" title="reverse反转解法"></a>reverse反转解法</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line"> 	string reverseLeftWords(string s, int n) &#123;</span><br><span class="line"> 		reverse(s.begin(),s.begin()+n);</span><br><span class="line"> 		reverse(s.begin()+n,s.end());</span><br><span class="line"> 		reverse(s.begin(),s.end());</span><br><span class="line"> 		return s;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="二叉树的镜像"><a href="#二叉树的镜像" class="headerlink" title="二叉树的镜像"></a>二叉树的镜像</h1><p>请完成一个函数，输入一个二叉树，该函数输出它的镜像。</p>
+<p>示例 1： 限制：0 &lt;&#x3D; 节点个数 &lt;&#x3D; 1000 </p>
+<h2 id="前序递归解法"><a href="#前序递归解法" class="headerlink" title="前序递归解法"></a>前序递归解法</h2><p>使用递归（前序遍历），让每一个节点的左右孩子互换位置 需要注意的是，这种方法必须要检查传入的二叉树是否合法，即该树不为空，否则无法执行。 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct TreeNode* mirrorTree(struct TreeNode* root)&#123;</span><br><span class="line"> 	if(root)</span><br><span class="line"> 	&#123;</span><br><span class="line"> 		struct TreeNode* temp=root-&gt;left;</span><br><span class="line"> 		root-&gt;left=root-&gt;right;</span><br><span class="line"> 		root-&gt;right=temp;</span><br><span class="line"> 		mirrorTree(root-&gt;left);</span><br><span class="line"> 		mirrorTree(root-&gt;right);</span><br><span class="line"> 	&#125;</span><br><span class="line"> 	return root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">struct TreeNode* mirrorTree(struct TreeNode* root)&#123;</span><br><span class="line"> 	if(root)</span><br><span class="line"> 	&#123;</span><br><span class="line"> 		struct TreeNode *temp=root-&gt;left;</span><br><span class="line"> 		root-&gt;left=mirrorTree(root-&gt;right);</span><br><span class="line"> 		root-&gt;right=mirrorTree(temp);</span><br><span class="line"> 	&#125;</span><br><span class="line"> 	return root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>代码简洁，而且可读性强</p>
+<h2 id="C-版"><a href="#C-版" class="headerlink" title="C++版"></a>C++版</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line"> 	TreeNode* mirrorTree(TreeNode* root) &#123;</span><br><span class="line"> 		if(root)</span><br><span class="line"> 		&#123;</span><br><span class="line"> 			TreeNode *temp=root-&gt;left;</span><br><span class="line"> 			root-&gt;left=mirrorTree(root-&gt;right);</span><br><span class="line"> 			root-&gt;right=mirrorTree(temp);</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		return root;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="哈希查找"><a href="#哈希查找" class="headerlink" title="哈希查找"></a>哈希查找</h1><p>哈希查找算法又称散列查找算法，是一种借助哈希表（散列表）查找目标元素的方法，查找效率最高时对应的时间复杂度为 O(1)。</p>
+<p>使用数组构建哈希表，最大的好处在于：可以直接将数组下标当作已存储元素的索引，不再需要为每个元素手动配置索引，极大得简化了构建哈希表的难度。</p>
+<p>我们知道，在数组中查找一个元素，除非提前知晓它存储位置处的下标，否则只能遍历整个数组。哈希表的解决方案是：各个元素并不从数组的起始位置依次存储，它们的存储位置由专门设计的函数计算得出，我们通常将这样的函数称为哈希函数。</p>
+<p>哈希函数类似于数学中的一次函数，我们给它传递一个元素，它反馈给我们一个结果值，这个值就是该元素对应的索引，也就是存储到哈希表中的位置。</p>
+<p>举个例子，将 {20, 30, 50, 70, 80} 存储到哈希表中，我们设计的哈希函数为 y&#x3D;x&#x2F;10，最终各个元素的存储位置如下图所示：</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png" alt="image-20230902155837486"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png" class title="This is an test image">
+
+<p>假设我们想查找元素 50，只需将它带入 y&#x3D;x&#x2F;10 这个哈希函数中，计算出它对应的索引值为 5，直接可以在数组中找到它。借助哈希函数，我们提高了数组中数据的查找效率，这就是哈希表存储结构。</p>
+<p>构建哈希表时，哈希函数的设计至关重要。假设将 {5, 20, 30, 50, 55} 存储到哈希表中，哈希函数是 y&#x3D;x%10，各个元素在数组中的存储位置如下图所示：</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png" alt="image-20230902155932936"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png" class title="This is an test image">
+
+<p>可以看到，5 和 55 以及 20、30 和 50 对应的索引值是相同的，它们的存储位置发生了冲突，我们习惯称为哈希冲突或者哈希碰撞。设计一个好的哈希函数，可以降低哈希冲突的出现次数。哈希表提供了很多解决哈希冲突的方案，比如线性探测法、再哈希法、链地址法等。</p>
+<p>本节我们使用线性探测法解决哈希冲突，解决方法是：当元素的索引值（存储位置）发生冲突时，从当前位置向后查找，直至找到一个空闲位置，作为冲突元素的存储位置。仍以图 3 中的哈希表为例，使用线性探测法解决哈希冲突的过程是：</p>
+<ul>
+<li>元素 5 最先存储到数组中下标为 5 的位置；</li>
+<li>元素 20 最先存储到数组中下标为 0 的位置；</li>
+<li>元素 30 的存储位置为 0，和 20 冲突，根据线性探测法，从下标为 0 的位置向后查找，下标为 1 的存储位置空闲，用来存储 30；</li>
+<li>元素 50 的存储位置为 0，和 20 冲突，根据线性探测法，从下标为 0 的位置向后查找，下标为 2 的存储位置空闲，用来存储 50；</li>
+<li>元素 55 的存储位置为 5，和 5 冲突，根据线性探测法，从下标为 5 的位置向后查找，下标为 6 的存储位置空闲，用来存储 55。</li>
+</ul>
+<p>借助线性探测法，最终 {5, 20, 30, 50, 55} 存储到哈希表中的状态为：</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png" alt="image-20230902160001791"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png" class title="This is an test image">
+
+<h1 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h1><p>给定N个权值作为N个叶子结点，构造一棵二叉树，若该树的带权路径长度达到最小，称这样的二叉树为最优二叉树，也称为哈夫曼树(Huffman Tree)。哈夫曼树是带权路径长度最短的树，权值较大的结点离根较近。</p>
+<p>在一棵树中，从一个结点往下可以达到的孩子或孙子结点之间的通路，称为路径。</p>
+<p>通路中分支的数目称为路径长度。若规定根结点的层数为1，则从根结点到第L层结点的路径长度为L-1。</p>
+<p>若将树中结点赋给一个有着某种含义的数值，则这个数值称为该结点的权。结点的带权路径长度为：从根结点到该结点之间的路径长度与该结点的权的乘积。树的根结点权值为其左、右子树根结点权值之和，相对于15，9，5是构造的，不参与权值计数</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png" alt="image-20230902162158683"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png" class title="This is an test image">
+
+<p>树的带权路径长度规定为所有叶子结点的带权路径长度之和，记为WPL。</p>
+<p>如上图：数的带权路径长度为：</p>
+<p>WPL &#x3D; (2+3) * 3 + 4 * 2 + 6 * 1 &#x3D; 29</p>
+<h1 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h1><p>若设二叉树的深度为h，除第 h 层外，其它各层 (1~h-1) 的结点数都达到最大个数，第 h 层所有的结点都连续集中在最左边，这就是完全二叉树。</p>
+<p>完全二叉树是由<strong>满二叉树</strong>而引出来的。对于深度为K的，有n个结点的二叉树，当且仅当其每一个结点都与深度为K的满二叉树中编号从1至n的结点一一对应时称之为完全二叉树。满二叉树是一种特殊类型的二叉树，其中每个节点都具有两个子节点，除了叶子节点。换句话说，如果一个二叉树的所有非叶子节点都有两个子节点，那么它就是一个满二叉树。</p>
+<p>一棵二叉树至多只有最下面的一层上的结点的度数可以小于2，并且最下层上的结点都集中在该层最左边的若干位置上，而在最后一层上，右边的若干结点缺失的二叉树，则此二叉树成为完全二叉树。</p>
+<p>有n个节点的完全二叉树的深度为？</p>
+<p>h(n) &#x3D; (log2n)+1计算以 2 为底的对数值，即 log2n</p>
+<p>深度为 k 的满二叉树的节点个数：</p>
+<p>总节点个数 &#x3D; 2^k - 1</p>
+<p>一个完全二叉树的节点为n，则该二叉树的叶子节点为多少？</p>
+<ul>
+<li><strong>当n为奇数时 n0&#x3D; (n+1)&#x2F;2</strong></li>
+<li><strong>当n为偶数</strong> <strong>n0&#x3D; n&#x2F;2</strong></li>
+</ul>
+<p>对任何一棵二叉树，叶子结点(度为0)的个数比度为2的结点数多一个,则no&#x3D;n2＋1</p>
+<h1 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h1><p>假设给定一个组无序数列{100,5,3,11,6,8,7}，带着问题，我们对其进行堆排序操作进行分步操作说明。</p>
+<h2 id="创建最大堆"><a href="#创建最大堆" class="headerlink" title="创建最大堆"></a>创建最大堆</h2><p>首先我们将数组我们将数组从上至下按顺序排列，转换成二叉树：一个无序堆。每一个三角关系都是一个堆，上面是父节点，下面两个分叉是子节点，两个子节点俗称左孩子、右孩子；</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png" alt="image-20230902171921919"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png" class title="This is an test image">
+
+<p>转换成无序堆之后，我们要努力让这个无序堆变成最大堆(或是最小堆)，即每个堆里都实现父节点的值都大于任何一个子节点的值</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png" alt="image-20230902171947417"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png" class title="This is an test image">
+
+<p>从最后一个堆开始，即左下角那个没有右孩子的那个堆开始；首先对比左右孩子，由于这个堆没有右孩子，所以只能用左孩子，左孩子的值比父节点的值小所以不需要交换。如果发生交换，要检测子节点是否为其他堆的父节点，如果是，递归进行同样的操作。</p>
+<p>第二次对比红色三角形内的堆，取较大的子节点，右孩子8胜出，和父节点比较，右孩子8大于父节点3，升级做父节点，与3交换位置，3的位置没有子节点，这个堆建成最大堆。</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png" alt="image-20230902172011780"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png" class title="This is an test image">
+
+<p>对黄色三角形内堆进行排序，过程和上面一样，最终是右孩子33升为父节点，被交换的右孩子下面也没有子节点，所以直接结束对比。</p>
+<p>最顶部绿色的堆，堆顶100比左右孩子都大，所以不用交换，至此最大堆创建完成</p>
+<p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png" alt="image-20230902172042297"></p>
+<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png" class title="This is an test image">
+
+<p>堆排序 （heapsort）— O(n log n)非稳定排序,空间复杂度O(1)</p>
+<p>按照数组顺序，当前节点i，它的parent&#x3D;(i-1)&#x2F;2，左子节点2i+1，右子节点2i+2</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">void heapify(vector&lt;int&gt; &amp;nums, int n, int i) // 对有一定顺序的堆，</span><br><span class="line">// 当前第i个结点取根左右的最大值（这个操作称heapfiy）</span><br><span class="line">&#123;</span><br><span class="line">	if(i&gt;=n)</span><br><span class="line">		return;</span><br><span class="line">    int l = i * 2 + 1, r = i * 2 + 2;</span><br><span class="line">    int max = i;</span><br><span class="line">    if (l &lt; n &amp;&amp; nums[l] &gt; nums[max])</span><br><span class="line">        max = l;</span><br><span class="line">    if (r &lt; n &amp;&amp; nums[r] &gt; nums[max])</span><br><span class="line">        max = r;</span><br><span class="line">    if (max != i)</span><br><span class="line">    &#123;</span><br><span class="line">        swap(nums[max], nums[i]);</span><br><span class="line">        heapify(nums, n, max);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">void heapify_build(vector&lt;int&gt; &amp;nums, int n) // 对无顺序的数组建立大根堆，从树的倒数第二层第一个结点开始，</span><br><span class="line">// 对每个结点进行heapify操作，然后向上走</span><br><span class="line">&#123;</span><br><span class="line">    int temp = (n - 2) / 2;</span><br><span class="line">    for (int i = temp; i &gt;= 0; i--)</span><br><span class="line">        heapify(nums, n, i);</span><br><span class="line">    for (int i = 0; i &lt; nums.size(); i++)</span><br><span class="line">        cout &lt;&lt; nums[i] &lt;&lt; &quot; &quot;;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void heapify_sort(vector&lt;int&gt; &amp;nums, int n) // 建立大根堆之后，每次交换最后一个结点和根节点（最大值），堆排序</span><br><span class="line">// 对交换后的根节点继续进行heapify（此时堆的最后一位是最大值，因此不用管他，n变为n-1）</span><br><span class="line">&#123;</span><br><span class="line">    heapify_build(nums, n);</span><br><span class="line">    for (int i = 0; i &lt; n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        swap(nums.front(), nums[n - i - 1]);</span><br><span class="line">        heapify(nums, n - i - 1, 0);//最后打印nums就是从小到大的顺序</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h1><ol>
+<li>比较相邻的元素。如果第一个比第二个大，就交换他们两个。</li>
+<li>对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。这步做完后，最后的元素会是最<br>大的数。</li>
+<li>针对所有的元素重复以上的步骤，除了最后一个。</li>
+<li>持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void bubbleSort(vector&lt;int&gt;&amp; a, int n) &#123;//使用引用（&amp;）可以避免进行值的拷贝</span><br><span class="line"> 	for (auto i = 0; i &lt; n; ++i) &#123;//auto根据右侧的赋值表达式自动推导出变量类型</span><br><span class="line"> 		for (int j = 0; j &lt; n - i - 1; ++j) &#123;</span><br><span class="line"> 			if (a[j] &gt; a[j + 1])</span><br><span class="line"> 			swap(a[j], a[j + 1]);</span><br><span class="line"> 		&#125;</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>时间复杂度 o(n^2) ，空间 o 1， 原地算法，稳定</strong></p>
+<p>假如从开始的第一对到结尾的最后一对，相邻的元素之间都没有发生交换的操作，这意味着右边的元素 总是大于等于左边的元素，此时的数组已经是有序的了，我们无需再对剩余的元素重复比较下去了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void bubbleSort2(vector&lt;int&gt;&amp; nums) &#123;</span><br><span class="line">    int len = nums.size();</span><br><span class="line">    bool flag = false;</span><br><span class="line">    </span><br><span class="line">    for (int i = 0; i &lt; len; ++i) &#123;</span><br><span class="line">        flag = false;</span><br><span class="line">        </span><br><span class="line">        for (int j = 0; j &lt; len - 1 - i; ++j) &#123;</span><br><span class="line">            if (nums[j] &gt; nums[j + 1]) &#123; </span><br><span class="line">                flag = true;</span><br><span class="line">                swap(nums[j], nums[j + 1]); </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        if (!flag)////说明没有交换，则表明[0,len-i-1]已经是有序的了</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述两个冒泡排序（包括优化版本），均存在一定问题： 1、两种冒泡排序（包括优化版本）都是循环了n次，虽然不影响结果的正确性，但对于n个元素的冒泡 排序躺数， n - 1躺更符合规范理解一些； 2、对于冒泡排序优化版本中，if（!flag）break；这个语句，我觉得有一些疏漏。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">void bubbleSort(vector&lt;int&gt;&amp; nums) &#123;</span><br><span class="line"> 	int n = nums.size();</span><br><span class="line"> 	bool flag = false;</span><br><span class="line"> 	for (int i = 0; i &lt; n - 1; ++i) &#123;//i = 0 起，循环了n - 1趟，更符合规范理解</span><br><span class="line"> 	//for (int i = 0; i &lt; n; ++i) &#123;//i = 0 起，循环了n 趟，不影响结果</span><br><span class="line"> 		flag = false;</span><br><span class="line"> 		for (int j = 0; j &lt; n - 1 - i; ++j) &#123;</span><br><span class="line"> 			if (nums[j] &gt; nums[j + 1]) &#123;</span><br><span class="line"> 			//某一趟排序中，只要发生一次元素交换，flag就从false变为了true</span><br><span class="line"> 			//也即表示这一趟排序还不能确定所剩待排序列是否已经有序，应继续下一趟循环</span><br><span class="line"> 				swap(nums[j], nums[j + 1]);</span><br><span class="line"> 				flag = true;</span><br><span class="line"> 			&#125;</span><br><span class="line"> 		&#125;</span><br><span class="line"> 	//但若某一趟中一次元素交换都没有，即依然为flag = false</span><br><span class="line"> 	//那么表明所剩待排序列已经有序</span><br><span class="line"> 	//不必再进行趟数比较，外层循环应该结束，即此时if (!flag) break; 跳出循环</span><br><span class="line"> 	/* if (flag) &#123; break; &#125; */</span><br><span class="line"> 	if (!flag) &#123; break; &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h1><p><strong>时间复杂度：O(n^2)，空间O（1），非稳定排序，原地排序</strong></p>
+<p>选择排序是给每个位置选择当前元素最小的，比如给第一个位置选择最小的，在剩余元素里面给&gt;二个 元素选择第二小的，依次类推，直到第n-1个元素，第n个 元素不用选择了，因为只剩下它一个最大的元 素了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void selectionSort(vector&lt;int&gt;&amp; a, int n) &#123;</span><br><span class="line"> 	int minIndex;</span><br><span class="line"> 	for (int i = 0; i &lt; n; ++i) &#123;</span><br><span class="line"> 		minIndex = i;</span><br><span class="line"> 		for (int j = i + 1; j &lt; n; ++j) &#123;</span><br><span class="line"> 			if (a[j] &lt; a[minIndex]) minIndex = j;</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		swap(a[i], a[minIndex]); </span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h1><p>插入排序是在一个已经有序的小序列的基础上，一次插入一个元素。 当然，刚开始这个有序的小序列只有1个元素，就是第一个元素。比较是从有序序列的末尾开 始，也就是想要插入的元素和已经有序的最大者开始比起，如果比它大则直接插入在其后面，否则一直往前找直 到找到它该插入的位置。 如果碰见一个和插入元素相 等的，那么插入元素把想插入的元素放在相等元素的后面。</p>
+<p>所以，相等元素的前后顺序没有改变，从原无序序列出去的顺序就是排好序后的顺序，所以插入排序是 <strong>稳定的</strong>。</p>
+<ol>
+<li>从第一个元素开始，该元素可以认为已经被排序</li>
+<li>取出下一个元素，在已经排序的元素序列中从后向前扫描</li>
+<li>如果该元素（已排序）大于新元素，将该元素移到下一位置</li>
+<li>重复步骤3，直到找到已排序的元素小于或者等于新元素的位置</li>
+<li>将新元素插入到该位置后</li>
+<li>重复步骤2~5<br><strong>时间复杂度 on^2 空间 o1，稳定排序，原地排序</strong></li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void insertionSort(vector&lt;int&gt;&amp; a, int n) &#123;//&#123; 9,1,5,6,2,3 &#125;</span><br><span class="line"> 	for (int i = 1; i &lt; n; ++i) &#123;</span><br><span class="line"> 		if (a[i] &lt; a[i - 1]) &#123; //若第i个元素大于i-1元素，直接插入。小于的话，移动有序表后插入</span><br><span class="line"> 			int j = i - 1;</span><br><span class="line"> 			int x = a[i]; //复制为哨兵，即存储待排序元素</span><br><span class="line"> 			//a[i] = a[i - 1]; //先后移一个元素，可以不要这一句，跟循环里面的功能重复了</span><br><span class="line"> 			while (j &gt;= 0 &amp;&amp; x &lt; a[j]) &#123; //查找在有序表的插入位置,还必须要保证j是&gt;=0的因为a[j]要合法</span><br><span class="line"> 				a[j + 1] = a[j];</span><br><span class="line"> 				j--; //元素后移</span><br><span class="line"> 			&#125;</span><br><span class="line"> 			a[j + 1] = x; //插入到正确位置</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		</span><br><span class="line"> 		print(a, n, i); //打印每趟排序的结果</span><br><span class="line"> 	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码实现了插入排序算法，可以对给定数组进行排序。如果你传入的数组已经包含了所有需要排序的元素，那么你可以直接调用这段代码进行排序，不需要再进行插入操作。</p>
+<h1 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h1><p>快速排序 （quicksort）— O(n log n)，非稳定排序</p>
+<p>算法思想<br>1、选取第一个数为基准<br>2、将比基准小的数交换到前面，比基准大的数交换到后面<br>3、对左右区间重复第二步，直到各区间只有一个数</p>
+<p>我们从数组中选择一个元素，我们把这个元素称之为中轴元素吧，然后把数组中所有小于中轴元素的元 素放在其左边，所有大于或等于中轴元素的元素放在其右边，显然，此时中轴元素所处的位置的是有序 的。也就是说，我们无需再移动中轴元素的位置。 </p>
+<p>从中轴元素那里开始把大的数组切割成两个小的数组(两个数组都不包含中轴元素)，接着我们通过递归 的方式，让中轴元素左边的数组和右边的数组也重复同样的操作，直到数组的大小为1，此时每个元素 都处于有序的位置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">// quick函数实现</span><br><span class="line">void quick_sort(int *arr, int start, int end)</span><br><span class="line">&#123;</span><br><span class="line">    int i = start;</span><br><span class="line">    int j = end;</span><br><span class="line">    int temp = arr[start]; // 默认将数组第一个元素作为基准值</span><br><span class="line">    if (i &lt; j)</span><br><span class="line">    &#123;</span><br><span class="line">        while (i &lt; j)</span><br><span class="line">        &#123;</span><br><span class="line">            // 从end向start筛选比temp更小的数</span><br><span class="line">            while (i &lt; j &amp;&amp; arr[j] &gt;= temp)</span><br><span class="line">            &#123;</span><br><span class="line">                j--;</span><br><span class="line">            &#125;</span><br><span class="line">            if (i &lt; j)</span><br><span class="line">            &#123;</span><br><span class="line">                arr[i] = arr[j]; // 把这个数放到基准值的左边</span><br><span class="line">            &#125;</span><br><span class="line">            // 从start向end筛选比temp更大的数</span><br><span class="line">            while (i &lt; j &amp;&amp; arr[i] &lt; temp)</span><br><span class="line">            &#123;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            if (i &lt; j)</span><br><span class="line">            &#123;</span><br><span class="line">                arr[j] = arr[i]; // 把这个数放到基准值的右边</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[i] = temp; // 将基准值放到正确位置</span><br><span class="line"></span><br><span class="line">        printf(&quot;\n&quot;);</span><br><span class="line">        quick_sort(arr, start, i - 1);</span><br><span class="line">        quick_sort(arr, i + 1, end);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h1><p>希尔排序的思想是采用插入排序的方法，先让数组中任意间隔为 h 的元素有序，刚开始 h 的大小可以是 h &#x3D; n &#x2F; 2,接着让 h &#x3D; n &#x2F; 4，让 h 一直缩小，当 h &#x3D; 1 时，也就是此时数组中任意间隔为1的元素有序，此时 的数组就是有序的了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">void shellSortCore(vector&lt;int&gt; &amp;nums, int gap, int i)</span><br><span class="line">&#123;</span><br><span class="line">    int inserted = nums[i];</span><br><span class="line">    int j;</span><br><span class="line">    // 插入的时候按组进行插入</span><br><span class="line">    for (j = i - gap; j &gt;= 0 &amp;&amp; inserted &lt; nums[j]; j -= gap)</span><br><span class="line">    &#123;</span><br><span class="line">        nums[j + gap] = nums[j];</span><br><span class="line">    &#125;</span><br><span class="line">    nums[j + gap] = inserted;</span><br><span class="line">&#125;</span><br><span class="line">void shellSort(vector&lt;int&gt; &amp;nums)</span><br><span class="line">&#123;</span><br><span class="line">    int len = nums.size();</span><br><span class="line">    // 进行分组，最开始的时候，gap为数组长度一半</span><br><span class="line">    for (int gap = len / 2; gap &gt; 0; gap /= 2)</span><br><span class="line">    &#123;</span><br><span class="line">        // 对各个分组进行插入分组</span><br><span class="line">        for (int i = gap; i &lt; len; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            // 将nums[i]插入到所在分组正确的位置上</span><br><span class="line">            shellSortCore(nums, gap, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for (auto a : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; a &lt;&lt; &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h1><p>归并排序 （merge sort）— O(n log n)稳定排序，空间复杂度O(n)</p>
+<p>将一个大的无序数组有序，我们可以把大的数组分成两个，然后对这两个数组分别进行排序，之后在把 这两个数组合并成一个有序的数组。由于两个小的数组都是有序的，所以在合并的时候是很快的。 </p>
+<p>通过递归的方式将大的数组一直分割，直到数组的大小为 1，此时只有一个元素，那么该数组就是有序 的了，之后再把两个数组大小为1的合并成一个大小为2的，再把两个大小为2的合并成4的 … 直到全部 小的数组合并起来。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">void mergeSortCore(vector&lt;int&gt; &amp;nums, vector&lt;int&gt; &amp;copy, int begin, int end)</span><br><span class="line">&#123;</span><br><span class="line">    if (begin &gt;= end)</span><br><span class="line">        return;</span><br><span class="line">    int mid = begin + (end - begin) / 2;</span><br><span class="line">    int low1 = begin, high1 = mid, low2 = mid + 1, high2 = end;</span><br><span class="line">    mergeSortCore(copy, nums, low1, high1); // 这里减少了copy向nums的赋值部分，千万注意不要把copy 和 nums赋值反了</span><br><span class="line">    mergeSortCore(copy, nums, low2, high2);</span><br><span class="line">    int copyIndex = low1;</span><br><span class="line">    while (low1 &lt;= high1 &amp;&amp; low2 &lt;= high2)//将两个子数组中的元素按顺序进行了比较和合并，并放入了 copy 数组</span><br><span class="line">    &#123;//第一个子数组中还有剩余的元素，而第二个子数组已经全部比较完毕。</span><br><span class="line">	//第二个子数组中还有剩余的元素，而第一个子数组已经全部比较完毕。</span><br><span class="line">	//接下来的两个 while 循环用于处理这种情况，将剩余的元素放入 copy 数组</span><br><span class="line">        copy[copyIndex++] = nums[low1] &lt; nums[low2] ? nums[low1++] : nums[low2++];</span><br><span class="line">    &#125;</span><br><span class="line">    while (low1 &lt;= high1)</span><br><span class="line">    &#123;</span><br><span class="line">        copy[copyIndex++] = nums[low1++];</span><br><span class="line">    &#125;</span><br><span class="line">    while (low2 &lt;= high2)</span><br><span class="line">    &#123;</span><br><span class="line">        copy[copyIndex++] = nums[low2++];</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; begin &lt;&lt; &quot; &quot; &lt;&lt; end &lt;&lt; endl;</span><br><span class="line">    for (auto a : copy)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; a &lt;&lt; &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line">void mergeSort(vector&lt;int&gt; nums)</span><br><span class="line">&#123;</span><br><span class="line">    for (auto a : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; a &lt;&lt; &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    vector&lt;int&gt; copyNums(nums); // 这里要借助一个一模一样的数组的</span><br><span class="line">    mergeSortCore(nums, copyNums, 0, nums.size() - 1);</span><br><span class="line">    nums.assign(copyNums.begin(), copyNums.end()); // 到最后copy数组是排序好的，记得要赋值一下</span><br><span class="line"></span><br><span class="line">    for (auto a : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; a &lt;&lt; &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="计数排序"><a href="#计数排序" class="headerlink" title="计数排序"></a>计数排序</h1><p>计数排序统计小于等于该元素值的元素的个数i，于是该元素就放在目标数组的索引i位（i≥0）。</p>
+<ul>
+<li>计数排序基于一个假设，待排序数列的所有数均为整数，且出现在（0，k）的区间之内。</li>
+<li>如果 k（待排数组的最大值） 过大则会引起较大的空间复杂度，一般是用来排序 0 到 100 之间的数字的最好的算法，但是它不适合按字母顺序排序人名。</li>
+<li>计数排序不是比较排序，排序的速度快于任何比较排序算法。</li>
+</ul>
+<p>算法思想：</p>
+<ol>
+<li>找出待排序的数组中最大和最小的元素；</li>
+<li>统计数组中每个值为 i 的元素出现的次数，存入数组 C 的第 i 项；</li>
+<li>对所有的计数累加（从 C 中的第一个元素开始，每一项和前一项相加）；</li>
+<li>向填充目标数组：将每个元素 i 放在新数组的第 C[i] 项，每放一个元素就将 C[i] 减去 1；</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// 计数排序</span><br><span class="line">void CountSort(vector&lt;int&gt; &amp;vecRaw, vector&lt;int&gt; &amp;vecObj)</span><br><span class="line">&#123;</span><br><span class="line">    // 确保待排序容器非空</span><br><span class="line">    if (vecRaw.size() == 0)</span><br><span class="line">        return;</span><br><span class="line">    // 使用 vecRaw 的最大值 + 1 作为计数容器 countVec 的大小</span><br><span class="line">    int vecCountLength = (*max_element(begin(vecRaw), end(vecRaw))) + 1;</span><br><span class="line">    vector&lt;int&gt; vecCount(vecCountLength, 0);</span><br><span class="line">    // 统计每个键值出现的次数</span><br><span class="line">    for (int i = 0; i &lt; vecRaw.size(); i++)</span><br><span class="line">        vecCount[vecRaw[i]]++;</span><br><span class="line"></span><br><span class="line">    // 后面的键值出现的位置为前面所有键值出现的次数之和</span><br><span class="line">    for (int i = 1; i &lt; vecCountLength; i++)</span><br><span class="line">        vecCount[i] += vecCount[i - 1];</span><br><span class="line">    // 将键值放到目标位置</span><br><span class="line">    for (int i = vecRaw.size(); i &gt; 0; i--) // 此处逆序是为了保持相同键值的稳定性</span><br><span class="line">        vecObj[--vecCount[vecRaw[i - 1]]] = vecRaw[i - 1];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果没有逆序累加操作（即 <code>vecCount[i] += vecCount[i - 1]</code>），则按照键值从小到大的顺序进行累加，最终得到的是每个键值在排序后的结果数组中的起始位置索引。这将会导致在相同键值的情况下，它们的相对顺序被打乱，即不再保持稳定性。</p>
+<h1 id="桶排序"><a href="#桶排序" class="headerlink" title="桶排序"></a>桶排序</h1><p>桶排序的核心:使数组的下标具有意义</p>
+<p>将值为i的元素放入i号桶，最后依次把桶里的元素倒出来。<br>算法思想：</p>
+<ol>
+<li>设置一个定量的数组当作空桶子。</li>
+<li>寻访序列，并且把项目一个一个放到对应的桶子去。</li>
+<li>对每个不是空的桶子进行排序。</li>
+<li>从不是空的桶子里把项目再放回原来的序列中。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">using namespace std;</span><br><span class="line">int a[11]; // 下标代表考试的等级int main()</span><br><span class="line">&#123;</span><br><span class="line">    int n, tmp;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    for (int i = 1; i &lt;= n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        cin &gt;&gt; tmp;</span><br><span class="line">        a[tmp]++;</span><br><span class="line">    &#125;</span><br><span class="line">    for (int i = 1; i &lt;= 10; i++) // i代表等级i</span><br><span class="line">        if (a[i])</span><br><span class="line">            cout &lt;&lt; i &lt;&lt; &quot;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">return;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="基数排序"><a href="#基数排序" class="headerlink" title="基数排序"></a>基数排序</h1><p>一种多关键字的排序算法，可用桶排序实现。<br>算法思想：</p>
+<ol>
+<li>取得数组中的最大数，并取得位数；</li>
+<li>arr为原始数组，从最低位开始取每个位组成radix数组；</li>
+<li>对radix进行计数排序（利用计数排序适用于小范围数的特点）</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">int maxbit(int data[], int n) // 辅助函数，求数据的最大位数</span><br><span class="line">&#123;</span><br><span class="line">    int maxData = data[0]; ///&lt; 最大数</span><br><span class="line">    /// 先求出最大数，再求其位数，这样有原先依次每个数判断其位数，稍微优化点。</span><br><span class="line">    for (int i = 1; i &lt; n; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        if (maxData &lt; data[i])</span><br><span class="line">            maxData = data[i];</span><br><span class="line">    &#125;</span><br><span class="line">    int d = 1;</span><br><span class="line">    int p = 10;</span><br><span class="line">    while (maxData &gt;= p)</span><br><span class="line">    &#123;</span><br><span class="line">        // p *= 10; // Maybe overflow</span><br><span class="line">        maxData /= 10;</span><br><span class="line">        ++d;</span><br><span class="line">    &#125;</span><br><span class="line">    return d;</span><br><span class="line">    /* int d = 1; //保存最大的位数</span><br><span class="line">     int p = 10;</span><br><span class="line">     for(int i = 0; i &lt; n; ++i)</span><br><span class="line">     &#123;</span><br><span class="line">    	 while(data[i] &gt;= p)</span><br><span class="line">     	&#123;</span><br><span class="line">    		 p *= 10;</span><br><span class="line">     		 ++d;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     return d;*/</span><br><span class="line">&#125;</span><br><span class="line">void radixsort(int data[], int n) // 基数排序</span><br><span class="line">&#123;</span><br><span class="line">    int d = maxbit(data, n);</span><br><span class="line">    int *tmp = new int[n];</span><br><span class="line">    int *count = new int[10]; // 计数器</span><br><span class="line">    int i, j, k;</span><br><span class="line">    int radix = 1;</span><br><span class="line">    for (i = 1; i &lt;= d; i++) // 进行d次排序</span><br><span class="line">    &#123;</span><br><span class="line">        for (j = 0; j &lt; 10; j++)</span><br><span class="line">            count[j] = 0; // 每次分配前清空计数器</span><br><span class="line">        for (j = 0; j &lt; n; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            k = (data[j] / radix) % 10; // 统计每个桶中的记录数</span><br><span class="line">            count[k]++;</span><br><span class="line">        &#125;</span><br><span class="line">        for (j = 1; j &lt; 10; j++)</span><br><span class="line">            count[j] = count[j - 1] + count[j]; // 将tmp中的位置依次分配给每个桶</span><br><span class="line">        for (j = n - 1; j &gt;= 0; j--)            // 将所有桶中记录依次收集到tmp中</span><br><span class="line">        &#123;</span><br><span class="line">            k = (data[j] / radix) % 10;//k是元素最大位所代表的count位置</span><br><span class="line">            tmp[count[k] - 1] = data[j];//count[k] - 1代表第多少个位置的元素，有序的</span><br><span class="line">            count[k]--;//最大位一样个数的元素减一</span><br><span class="line">        &#125;</span><br><span class="line">        for (j = 0; j &lt; n; j++) // 将临时数组的内容复制到data中</span><br><span class="line">            data[j] = tmp[j];</span><br><span class="line">        radix = radix * 10;//可以看出i++代表的是位数，即最大数是两位那么d是2</span><br><span class="line">    &#125;</span><br><span class="line">    delete[] tmp;</span><br><span class="line">    delete[] count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/29/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="prev" title="Redis基本操作">
+      <i class="fa fa-chevron-left"></i> Redis基本操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/02/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/" rel="next" title="对面试题的补充">
+      对面试题的补充 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A6%E6%97%8B%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.</span> <span class="nav-text">左旋字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#reverse%E5%8F%8D%E8%BD%AC%E8%A7%A3%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">reverse反转解法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%95%9C%E5%83%8F"><span class="nav-number">2.</span> <span class="nav-text">二叉树的镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E5%BA%8F%E9%80%92%E5%BD%92%E8%A7%A3%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">前序递归解法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E7%89%88"><span class="nav-number">2.2.</span> <span class="nav-text">C++版</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%9F%A5%E6%89%BE"><span class="nav-number">3.</span> <span class="nav-text">哈希查找</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%A4%AB%E6%9B%BC%E6%A0%91"><span class="nav-number">4.</span> <span class="nav-text">哈夫曼树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">完全二叉树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="nav-number">6.</span> <span class="nav-text">堆排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%9C%80%E5%A4%A7%E5%A0%86"><span class="nav-number">6.1.</span> <span class="nav-text">创建最大堆</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F"><span class="nav-number">7.</span> <span class="nav-text">冒泡排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F"><span class="nav-number">8.</span> <span class="nav-text">选择排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F"><span class="nav-number">9.</span> <span class="nav-text">插入排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F"><span class="nav-number">10.</span> <span class="nav-text">快速排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F"><span class="nav-number">11.</span> <span class="nav-text">希尔排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">12.</span> <span class="nav-text">归并排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-number">13.</span> <span class="nav-text">计数排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">14.</span> <span class="nav-text">桶排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F"><span class="nav-number">15.</span> <span class="nav-text">基数排序</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
