@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://example.com/2023/04/02/c%E5%92%8Cc++/%E7%AC%AC%E5%9B%9B%E5%A4%A9-c/Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230402164555514.png">
 <meta property="og:image" content="http://example.com/2023/04/02/c%E5%92%8Cc++/%E7%AC%AC%E5%9B%9B%E5%A4%A9-c/Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230402175305513.png">
 <meta property="article:published_time" content="2023-04-02T02:18:27.000Z">
-<meta property="article:modified_time" content="2023-07-25T14:36:57.599Z">
+<meta property="article:modified_time" content="2023-09-14T03:01:27.709Z">
 <meta property="article:author" content="肖汇林">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2023/04/02/c%E5%92%8Cc++/%E7%AC%AC%E5%9B%9B%E5%A4%A9-c/Users/86191/AppData/Roaming/Typora/typora-user-images/image-20230402164555514.png">
@@ -183,7 +183,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-25 22:36:57" itemprop="dateModified" datetime="2023-07-25T22:36:57+08:00">2023-07-25</time>
+                <time title="修改时间：2023-09-14 11:01:27" itemprop="dateModified" datetime="2023-09-14T11:01:27+08:00">2023-09-14</time>
               </span>
 
           
@@ -329,7 +329,7 @@
 <li><p><code>private</code> 继承：当派生类以 <code>private</code> 方式继承基类时，基类的公有和保护成员都将变为派生类的私有成员，基类的私有成员无法访问，无法通过派生类对象直接访问。这意味着，派生类的成员函数可以访问基类的成员，但派生类对象不能。</p>
 </li>
 </ol>
-<h3 id="菱形继承"><a href="#菱形继承" class="headerlink" title="菱形继承"></a>菱形继承</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	int m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//继承前加virtual关键字后，变为虚继承//此时公共的父类Animal称为虚基类</span><br><span class="line">class sheep : virtual public Animal&#123;&#125;;</span><br><span class="line">class Tuo: virtual public Animal &#123;&#125;;</span><br><span class="line">class SheepTuo : public Sheep，public Tuo &#123;&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	sheepTuo st;</span><br><span class="line">	st.Sheep::m_Age = 100;</span><br><span class="line">	st.Tuo::m_Age = 200;//指向的是一样的地址，第二个是后改变的，用后面的数据</span><br><span class="line">	cout &lt;&lt; &quot;st.Sheep::m_Age = &quot;&lt;&lt; st.sheep:: m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.Tuo : :m_Age = &quot;&lt;&lt;st.Tuo::m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.m_Age =&quot; &lt;&lt; st.m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="菱形继承"><a href="#菱形继承" class="headerlink" title="菱形继承"></a>菱形继承</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Animal&#123;</span><br><span class="line">public:</span><br><span class="line">	int m_Age;</span><br><span class="line">&#125;;</span><br><span class="line">//继承前加virtual关键字后，变为虚继承</span><br><span class="line">//此时公共的父类Animal称为虚基类</span><br><span class="line">class sheep : virtual public Animal&#123;&#125;;</span><br><span class="line">class Tuo: virtual public Animal &#123;&#125;;</span><br><span class="line">class SheepTuo : public Sheep，public Tuo &#123;&#125;;</span><br><span class="line">void test01()</span><br><span class="line">&#123;</span><br><span class="line">	sheepTuo st;</span><br><span class="line">	st.Sheep::m_Age = 100;</span><br><span class="line">	st.Tuo::m_Age = 200;//指向的是一样的地址，第二个是后改变的，用后面的数据</span><br><span class="line">	cout &lt;&lt; &quot;st.Sheep::m_Age = &quot;&lt;&lt; st.sheep:: m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.Tuo : :m_Age = &quot;&lt;&lt;st.Tuo::m_Age &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &quot;st.m_Age =&quot; &lt;&lt; st.m_Age &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>总结:<br>菱形继承带来的主要问题是子类继承两份相同的数据，导致资源浪费以及毫无意义</p>
 <p>利用虚继承可以解决菱形继承问题</p>
@@ -430,7 +430,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-count">76</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
