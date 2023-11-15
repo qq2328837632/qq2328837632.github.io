@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="定时器函数选择定时函数，用于让程序等待一段时间或安排计划任务: sleep alarm usleep nanosleepclock_nanosleep getitimer &#x2F; setitimer timer_create &#x2F; timer_settime &#x2F; timer_gettime &#x2F; timer_delete timerfd_create &#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-网络库（2）">
+<meta property="og:url" content="http://example.com/2023/08/10/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%882%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="定时器函数选择定时函数，用于让程序等待一段时间或安排计划任务: sleep alarm usleep nanosleepclock_nanosleep getitimer &#x2F; setitimer timer_create &#x2F; timer_settime &#x2F; timer_gettime &#x2F; timer_delete timerfd_create &#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-10T02:48:35.000Z">
+<meta property="article:modified_time" content="2023-08-13T09:36:31.391Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/08/10/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%882%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-网络库（2） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/10/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%882%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-网络库（2）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-10 10:48:35" itemprop="dateCreated datePublished" datetime="2023-08-10T10:48:35+08:00">2023-08-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-13 17:36:31" itemprop="dateModified" datetime="2023-08-13T17:36:31+08:00">2023-08-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="定时器函数选择"><a href="#定时器函数选择" class="headerlink" title="定时器函数选择"></a>定时器函数选择</h1><p>定时函数，用于让程序等待一段时间或安排计划任务:</p>
+<p>sleep</p>
+<p>alarm</p>
+<p>usleep</p>
+<p>nanosleep<br>clock_nanosleep</p>
+<p>getitimer &#x2F; setitimer</p>
+<p>timer_create &#x2F; timer_settime &#x2F; timer_gettime &#x2F; timer_delete</p>
+<p>timerfd_create &#x2F; timerfd_gettime &#x2F; timerfd_settime</p>
+<h2 id="timerfd-入选的原因"><a href="#timerfd-入选的原因" class="headerlink" title="timerfd_入选的原因:"></a>timerfd_入选的原因:</h2><ul>
+<li>sleep &#x2F; alarm &#x2F; usleep在实现时有可能用了信号SIGALRM，在多线程程序中处理信号是个相当麻烦的事情，应当尽量避免</li>
+<li>nanosleep和 clock_nanosleep是线程安全的，但是在非阻塞网络编程中，绝对不能用让线程挂起的方式来等待一段时间，程序会失去响应。正确的做法是注册一个时间回调函数。</li>
+<li>getitimer和l timer_create 也是用信号来deliver 超时，在多线程程序中也会有麻烦。</li>
+<li>timer_create 可以指定信号的接收方是进程还是线程，算是一个进步，不过在信号处理函数(signal handler)能做的事情实在很受限。</li>
+<li>timerfd_create <strong>把时间变成了一个文件描述符</strong>，该“文件”在定时器超时的那一刻变得可读，这样就能很方便地融入到select&#x2F;poll框架中，用统一的方式来处理IO事件和超时事件，这也正是 Reactor模式的长处。</li>
+</ul>
+<h3 id="函数签名："><a href="#函数签名：" class="headerlink" title="函数签名："></a>函数签名：</h3><p><code>int signalfd(int fd,const sigset_t *mask, int flags);</code></p>
+<h3 id="参数："><a href="#参数：" class="headerlink" title="参数："></a>参数：</h3><ul>
+<li><p><code>fd</code>：一个整数，表示文件描述符。通常设置为 <code>-1</code>，这将导致内核创建一个新的文件描述符。</p>
+</li>
+<li><p><code>mask</code>：一个指向 <code>sigset_t</code> 类型的指针，表示要监视的信号集。通过将感兴趣的信号添加到这个集合中，您可以选择性地监控特定信号。</p>
+</li>
+<li><p>&#96;&#96;&#96;<br>flags</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  ：整数标志，可以使用以下标志进行按位或运算：</span><br><span class="line"></span><br><span class="line">  - `SFD_CLOEXEC`：在执行 `exec` 系统调用时关闭文件描述符。</span><br><span class="line">  - `SFD_NONBLOCK`：以非阻塞模式打开文件描述符。</span><br><span class="line"></span><br><span class="line">### 返回值：</span><br><span class="line"></span><br><span class="line">- 如果函数调用成功，它将返回一个非负整数，表示新创建的文件描述符。如果失败，它将返回 `-1` 并设置 `errno` 来指示错误类型。</span><br><span class="line"></span><br><span class="line">### 示例用法：</span><br><span class="line"></span><br><span class="line">下面是一个详细的示例，演示了如何使用 `signalfd` 函数来监视 `SIGINT` 信号的到来：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>c复制代码#include &lt;stdio.h&gt;</p>
+</li>
+</ul>
+<p>#include &lt;stdlib.h&gt;<br>#include &lt;signal.h&gt;<br>#include &lt;sys&#x2F;signalfd.h&gt;<br>#include &lt;unistd.h&gt;</p>
+<p>int main() {<br>    sigset_t mask;<br>    sigemptyset(&amp;mask);<br>    sigaddset(&amp;mask, SIGINT);  &#x2F;&#x2F; 监控 SIGINT 信号</p>
+<pre><code>int sfd = signalfd(-1, &amp;mask, 0);  // 创建 signalfd
+if (sfd == -1) &#123;
+    perror(&quot;signalfd&quot;);
+    exit(EXIT_FAILURE);
+&#125;
+
+// 使用 select 或 epoll 监视 sfd
+
+printf(&quot;Waiting for SIGINT...\n&quot;);
+
+// 在此处执行 I/O 多路复用等待
+
+// 当 SIGINT 信号到达时，处理逻辑会在此处触发
+
+close(sfd);
+return 0;
+</code></pre>
+<p>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在此示例中，我们创建了一个新的 signalfd 文件描述符以监视 `SIGINT` 信号的到来。然后，您可以使用适当的多路复用机制（如 `select`、`poll`、`epoll` 等）来监视该文件描述符，并在信号到达时触发相应的处理逻辑。</span><br><span class="line"></span><br><span class="line">这个方法可以起到timerfd_create同样作用</span><br><span class="line"></span><br><span class="line">------</span><br><span class="line"></span><br><span class="line">下面是 `timerfd_create`、`timerfd_gettime` 和 `timerfd_settime` 函数的原型和简要说明。这些函数是用于创建和操作定时器事件的 Linux 系统调用。</span><br><span class="line"></span><br><span class="line">1. **timerfd_create**：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include &lt;sys&#x2F;timerfd.h&gt;</p>
+<p>int timerfd_create(int clockid, int flags);</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- **参数**：</span><br><span class="line">  - `clockid`：用于指定定时器的时钟类型，可以是 `CLOCK_REALTIME` 或 `CLOCK_MONOTONIC`。一般使用 `CLOCK_MONOTONIC` 以避免受系统时间的影响。</span><br><span class="line">  - `flags`：额外的选项标志，通常设置为 0。</span><br><span class="line">- **返回值**：</span><br><span class="line">  - 成功：返回一个新的文件描述符，用于访问创建的定时器。</span><br><span class="line">  - 失败：返回 -1，并设置 `errno` 表示错误原因。</span><br><span class="line"></span><br><span class="line">1. **timerfd_gettime**：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include &lt;sys&#x2F;timerfd.h&gt;</p>
+<p>int timerfd_gettime(int fd, struct itimerspec *curr_value);</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- **参数**：</span><br><span class="line">  - `fd`：定时器的文件描述符。</span><br><span class="line">  - `curr_value`：指向 `struct itimerspec` 的指针，用于存储当前定时器的配置信息。</span><br><span class="line">- **返回值**：</span><br><span class="line">  - 成功：返回 0，`curr_value` 结构体被填充为当前定时器的配置信息。</span><br><span class="line">  - 失败：返回 -1，并设置 `errno` 表示错误原因。</span><br><span class="line"></span><br><span class="line">1. **timerfd_settime**：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include &lt;sys&#x2F;timerfd.h&gt;</p>
+<p>int timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- **参数**：</span><br><span class="line">  - `fd`：定时器的文件描述符。</span><br><span class="line">  - `flags`：设置定时器的选项标志，一般设置为 0。</span><br><span class="line">  - `new_value`：指向 `struct itimerspec` 的指针，用于设置新的定时器配置。</span><br><span class="line">  - `old_value`：指向 `struct itimerspec` 的指针，用于存储之前的定时器配置（如果不需要，可以传递 NULL）。</span><br><span class="line">- **返回值**：</span><br><span class="line">  - 成功：返回 0，`old_value` 结构体被填充为之前的定时器配置。</span><br><span class="line">  - 失败：返回 -1，并设置 `errno` 表示错误原因。</span><br><span class="line"></span><br><span class="line">这些函数主要用于创建定时器、获取定时器配置和修改定时器配置，通常用于实现高精度的定时操作，例如事件循环中的定时器管理。请注意，这里的结构体 `struct itimerspec` 包含了定时器的详细配置信息。</span><br><span class="line"></span><br><span class="line">## 示例</span><br><span class="line"></span><br><span class="line">![image-20230810112723867](muduo-网络库（2）/image-20230810112723867.png)</span><br><span class="line"></span><br><span class="line">&#123;% asset_img image-20230810112723867.png This is an test image %&#125;</span><br><span class="line"></span><br><span class="line">因为howlong.it_interval=0，所以间隔时间为0，这是一次性的。enableReading将通道注册到poll或epoll当中。</span><br><span class="line"></span><br><span class="line">loop.loop(),处于事件循环状态，一旦可读事件产生，也就是定时器超时，1秒，EventLoop调用poll（`poller_-&gt;**poll**(kPollTimeMs, &amp;activeChannels_);`）返回activeChannels，再调用handleEvent（`currentActiveChannel_-&gt;**handleEvent**(pollReturnTime_);`）。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>&#x2F;&#x2F;该函数可以跨线程调用<br>void EventLoop::quit()<br>{<br>  quit_ &#x3D; true;&#x2F;&#x2F;多个线程都有quit_变量，因为它是bool类型，因为在Linux下bool是原子类型<br>  &#x2F;&#x2F; There is a chance that loop() just executes while(!quit_) and exits,<br>  &#x2F;&#x2F; then EventLoop destructs, then we are accessing an invalid object.<br>  &#x2F;&#x2F; Can be fixed using mutex_ in both places.<br>  if (!isInLoopThread())<br>  {<br>    wakeup();&#x2F;&#x2F;如果不是再当前线程，还需要唤醒，因为线程本身在loop循环阻塞poll<br>  }<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 定时器</span><br><span class="line"></span><br><span class="line">muduo的定时器由三个类实现，Timerld、Timer、TimerQueue,用户只能看到第一个类，其它两个都是内部实现细节</span><br><span class="line"></span><br><span class="line">TimerQueue的接口很简单，只有两个函数addTimer和cancel</span><br><span class="line"></span><br><span class="line">EventLoop</span><br><span class="line"></span><br><span class="line">- ​	runAt								在某个时刻运行定时器</span><br><span class="line">- ​	runAfter							过一段时间运行定时器</span><br><span class="line">- ​	runEvery							每隔一段时间运行定时器</span><br><span class="line">- ​	cancel								取消定时器</span><br><span class="line"></span><br><span class="line">TimerQueue数据结构的选择，能快速根据当前时间找到已到期的定时器，也要高效的添加和删除Timer，因而可以用二叉搜索树，用</span><br><span class="line"></span><br><span class="line">map或者set</span><br><span class="line"></span><br><span class="line">- ​	`typedef std:pair&lt;Timestamp, Timer*&gt; Entry;`</span><br><span class="line"></span><br><span class="line">- ​	`typedef std:set&lt;Entry&gt; TimerList;``std::set` 是 C++ 标准库中的一个关联容器，它会对存储的元素自动排序，以保持有序状态</span><br><span class="line"></span><br><span class="line">## 时序图</span><br><span class="line"></span><br><span class="line">![image-20230811105332742](muduo-网络库（2）/image-20230811105332742.png)</span><br><span class="line"></span><br><span class="line">&#123;% asset_img image-20230811105332742.png This is an test image %&#125;</span><br><span class="line"></span><br><span class="line">## EventLoop.cc部分调用</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>std::unique_ptr<TimerQueue> timerQueue_;<br>TimerId EventLoop::runAt(Timestamp time, TimerCallback cb)&#x2F;&#x2F;某个时刻调用，一次性定时器<br>{<br>  return timerQueue_-&gt;addTimer(std::move(cb), time, 0.0);<br>}</TimerQueue></p>
+<p>TimerId EventLoop::runAfter(double delay, TimerCallback cb)&#x2F;&#x2F;延迟一会调用，一次性定时器<br>{<br>  Timestamp time(addTime(Timestamp::now(), delay));<br>  return runAt(time, std::move(cb));<br>}</p>
+<p>TimerId EventLoop::runEvery(double interval, TimerCallback cb)&#x2F;&#x2F;间隔性定时器，interval大于0，repeat就是true，就是重复的定时器，也就可以Timer::restart<br>{<br>  Timestamp time(addTime(Timestamp::now(), interval));<br>  return timerQueue_-&gt;addTimer(std::move(cb), time, interval);<br>}</p>
+<p>void EventLoop::cancel(TimerId timerId)<br>{<br>  return timerQueue_-&gt;cancel(timerId);<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## TimerId.h</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#ifndef MUDUO_NET_TIMERID_H<br>#define MUDUO_NET_TIMERID_H</p>
+<p>#include “muduo&#x2F;base&#x2F;copyable.h”</p>
+<p>namespace muduo<br>{<br>namespace net<br>{</p>
+<p>class Timer;</p>
+<p>&#x2F;&#x2F;&#x2F;<br>&#x2F;&#x2F;&#x2F; An opaque identifier, for canceling Timer.<br>&#x2F;&#x2F;&#x2F;<br>class TimerId : public muduo::copyable<br>{<br> public:<br>  TimerId()<br>    : timer_(NULL),<br>      sequence_(0)<br>  {<br>  }</p>
+<p>  TimerId(Timer* timer, int64_t seq)<br>    : timer_(timer),<br>      sequence_(seq)<br>  {<br>  }</p>
+<p>  &#x2F;&#x2F; default copy-ctor, dtor and assignment are okay</p>
+<p>  friend class TimerQueue;</p>
+<p> private:<br>  Timer* timer_;&#x2F;&#x2F;定时器地址<br>  int64_t sequence_;&#x2F;&#x2F;定时器序号<br>};</p>
+<p>}  &#x2F;&#x2F; namespace net<br>}  &#x2F;&#x2F; namespace muduo</p>
+<p>#endif  &#x2F;&#x2F; MUDUO_NET_TIMERID_H</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## Timer.h</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#ifndef MUDUO_NET_TIMER_H<br>#define MUDUO_NET_TIMER_H</p>
+<p>#include “muduo&#x2F;base&#x2F;Atomic.h”<br>#include “muduo&#x2F;base&#x2F;Timestamp.h”<br>#include “muduo&#x2F;net&#x2F;Callbacks.h”</p>
+<p>namespace muduo<br>{<br>namespace net<br>{</p>
+<p>&#x2F;&#x2F;&#x2F;<br>&#x2F;&#x2F;&#x2F; Internal class for timer event.<br>&#x2F;&#x2F;&#x2F;<br>class Timer : noncopyable<br>{<br> public:<br>  Timer(TimerCallback cb, Timestamp when, double interval)<br>    : callback_(std::move(cb)),<br>      expiration_(when),<br>      interval_(interval),<br>      repeat_(interval &gt; 0.0),<br>      sequence_(s_numCreated_.incrementAndGet())&#x2F;&#x2F;sequence唯一的<br>  { }</p>
+<p>  void run() const<br>  {<br>    callback_();<br>  }</p>
+<p>  Timestamp expiration() const  { return expiration_; }<br>  bool repeat() const { return repeat_; }<br>  int64_t sequence() const { return sequence_; }</p>
+<p>  void restart(Timestamp now);</p>
+<p>  static int64_t numCreated() { return s_numCreated_.get(); }</p>
+<p> private:<br>  const TimerCallback callback_;&#x2F;&#x2F;定时器回调函数<br>  Timestamp expiration_;&#x2F;&#x2F;下一次的超时时刻<br>  const double interval_;&#x2F;&#x2F;超时时间间隔，如果是一次性定时器，该值为0<br>  const bool repeat_;&#x2F;&#x2F;是否重复<br>  const int64_t sequence_;&#x2F;&#x2F;定时器序号</p>
+<p>  static AtomicInt64 s_numCreated_;&#x2F;&#x2F;定时器计数，当前已经创建的定时器数量<br>};</p>
+<p>}  &#x2F;&#x2F; namespace net<br>}  &#x2F;&#x2F; namespace muduo</p>
+<p>#endif  &#x2F;&#x2F; MUDUO_NET_TIMER_H</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## Timer.cc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include “muduo&#x2F;net&#x2F;Timer.h”</p>
+<p>using namespace muduo;<br>using namespace muduo::net;</p>
+<p>AtomicInt64 Timer::s_numCreated_;</p>
+<p>void Timer::restart(Timestamp now)&#x2F;&#x2F;重启<br>{<br>  &#x2F;&#x2F;如果是重复的计时器，则重新计算下一个超时时刻<br>  if (repeat_)<br>  {<br>    expiration_ &#x3D; addTime(now, interval_);<br>    &#x2F;&#x2F;全局函数，因为Timestamp相当于一个整数，所以是值传递，不是类传递都是引用传递<br>  }<br>  else<br>  {<br>    expiration_ &#x3D; Timestamp::invalid();&#x2F;&#x2F;非法的时间<br>  }<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## TimerQueue.h</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>#ifndef MUDUO_NET_TIMERQUEUE_H<br>#define MUDUO_NET_TIMERQUEUE_H</p>
+<p>#include <set><br>#include <vector></vector></set></p>
+<p>#include “muduo&#x2F;base&#x2F;Mutex.h”<br>#include “muduo&#x2F;base&#x2F;Timestamp.h”<br>#include “muduo&#x2F;net&#x2F;Callbacks.h”<br>#include “muduo&#x2F;net&#x2F;Channel.h”</p>
+<p>namespace muduo<br>{<br>namespace net<br>{</p>
+<p>class EventLoop;<br>class Timer;<br>class TimerId;</p>
+<p>&#x2F;&#x2F;&#x2F;<br>&#x2F;&#x2F;&#x2F; A best efforts timer queue.<br>&#x2F;&#x2F;&#x2F; No guarantee that the callback will be on time.<br>&#x2F;&#x2F;&#x2F;<br>class TimerQueue : noncopyable<br>{<br> public:<br>  explicit TimerQueue(EventLoop* loop);&#x2F;&#x2F;一个TimerQueue属于EventLoop对象<br>  ~TimerQueue();</p>
+<p>  &#x2F;&#x2F;&#x2F;<br>  &#x2F;&#x2F;&#x2F; Schedules the callback to be run at given time,<br>  &#x2F;&#x2F;&#x2F; repeats if @c interval &gt; 0.0.<br>  &#x2F;&#x2F;&#x2F;<br>  &#x2F;&#x2F;&#x2F; Must be thread safe. Usually be called from other threads.<br>  &#x2F;&#x2F;一定是线程安全的，可以跨线程调用。通常情况下被其它线程调用<br>  TimerId addTimer(TimerCallback cb,<br>                   Timestamp when,<br>                   double interval);<br>  &#x2F;&#x2F;也可以跨线程调用<br>  void cancel(TimerId timerId);</p>
+<p> private:</p>
+<p>  &#x2F;&#x2F; FIXME: use unique_ptr<Timer> instead of raw pointers.<br>  &#x2F;&#x2F; This requires heterogeneous comparison lookup (N3465) from C++14<br>  &#x2F;&#x2F; so that we can find an T* in a set&lt;unique_ptr<T>&gt;.<br>  &#x2F;&#x2F;unique_ptr是c++11标准的一个独享所有权的智能指针<br>  &#x2F;&#x2F;无法得到指向同一对象的两个unique_ptr指针<br>  &#x2F;&#x2F;但可以进行移动构造与移动赋值操作，即所有权可以移动到另一个对象（而非拷贝构造)<br>  typedef std::pair&lt;Timestamp, Timer*&gt; Entry;<br>  typedef std::set<Entry> TimerList;<br>  typedef std::pair&lt;Timer*, int64_t&gt; ActiveTimer;<br>  typedef std::set<ActiveTimer> ActiveTimerSet;<br>  &#x2F;&#x2F;事实上 TimerList和 ActiveTimerSet表示的是同一样东西定时器列表，只是一个是地址排序，一个是按时间排序<br>  &#x2F;&#x2F;以下成员函数只可能在其所属的IO线程中调用，因而不必加锁<br>  &#x2F;&#x2F;服务器性能杀手之一是锁竞争，所以尽量减少锁的使用<br>  void addTimerInLoop(Timer* timer);<br>  void cancelInLoop(TimerId timerId);<br>  &#x2F;&#x2F; called when timerfd alarms<br>  void handleRead();&#x2F;&#x2F;定时器事件到来，调用回调函数handleRead()<br>  &#x2F;&#x2F; move out all expired timers</ActiveTimer></Entry></T></Timer></p>
+<p>  &#x2F;&#x2F;返回超时的定时器列表<br>  std::vector<Entry> getExpired(Timestamp now);<br>  &#x2F;&#x2F;对于重复的定时器我们需要重置<br>  void reset(const std::vector<Entry>&amp; expired, Timestamp now);<br>  &#x2F;&#x2F;插入定时器<br>  bool insert(Timer* timer);</Entry></Entry></p>
+<p>  EventLoop* loop_;&#x2F;&#x2F;所属EventLoop<br>  const int timerfd_;&#x2F;&#x2F;定时器文件描述符<br>  Channel timerfdChannel_;&#x2F;&#x2F;定时器通道<br>  &#x2F;&#x2F; Timer list sorted by expiration<br>  TimerList timers_;&#x2F;&#x2F;是按到期时间排序的</p>
+<p>  &#x2F;&#x2F; for cancel()<br>  &#x2F;&#x2F;事实上 TimerList和 ActiveTimerSet表示的是同一样东西定时器列表，只是一个是地址排序，一个是按时间排序<br>  ActiveTimerSet activeTimers_;<br>  bool callingExpiredTimers_; &#x2F;* atomic *&#x2F;<br>  &#x2F;&#x2F;是否处于调用那些超时定时器处理当中<br>  ActiveTimerSet cancelingTimers_;&#x2F;&#x2F;保存的是被取消的定时器<br>};</p>
+<p>}  &#x2F;&#x2F; namespace net<br>}  &#x2F;&#x2F; namespace muduo<br>#endif  &#x2F;&#x2F; MUDUO_NET_TIMERQUEUE_H</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## TimerQueue.cc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#ifndef __STDC_LIMIT_MACROS<br>#define __STDC_LIMIT_MACROS<br>#endif</p>
+<p>#include “muduo&#x2F;net&#x2F;TimerQueue.h”</p>
+<p>#include “muduo&#x2F;base&#x2F;Logging.h”<br>#include “muduo&#x2F;net&#x2F;EventLoop.h”<br>#include “muduo&#x2F;net&#x2F;Timer.h”<br>#include “muduo&#x2F;net&#x2F;TimerId.h”</p>
+<p>#include &lt;sys&#x2F;timerfd.h&gt;<br>#include &lt;unistd.h&gt;</p>
+<p>namespace muduo<br>{<br>namespace net<br>{<br>namespace detail<br>{</p>
+<p>int createTimerfd()<br>{<br>  int timerfd &#x3D; ::timerfd_create(CLOCK_MONOTONIC,<br>                                 TFD_NONBLOCK | TFD_CLOEXEC);<br>  if (timerfd &lt; 0)<br>  {<br>    LOG_SYSFATAL &lt;&lt; “Failed in timerfd_create”;<br>  }<br>  return timerfd;<br>}</p>
+<p>struct timespec howMuchTimeFromNow(Timestamp when)<br>{<br>  int64_t microseconds &#x3D; when.microSecondsSinceEpoch()<br>                         - Timestamp::now().microSecondsSinceEpoch();<br>  if (microseconds &lt; 100)<br>  {<br>    microseconds &#x3D; 100;<br>  }<br>  struct timespec ts;<br>  ts.tv_sec &#x3D; static_cast<time_t>(<br>      microseconds &#x2F; Timestamp::kMicroSecondsPerSecond);<br>  ts.tv_nsec &#x3D; static_cast<long>(<br>      (microseconds % Timestamp::kMicroSecondsPerSecond) * 1000);<br>  return ts;<br>}</long></time_t></p>
+<p>void readTimerfd(int timerfd, Timestamp now)<br>{<br>  uint64_t howmany;<br>  ssize_t n &#x3D; ::read(timerfd, &amp;howmany, sizeof howmany);<br>  LOG_TRACE &lt;&lt; “TimerQueue::handleRead() “ &lt;&lt; howmany &lt;&lt; “ at “ &lt;&lt; now.toString();<br>  if (n !&#x3D; sizeof howmany)<br>  {<br>    LOG_ERROR &lt;&lt; “TimerQueue::handleRead() reads “ &lt;&lt; n &lt;&lt; “ bytes instead of 8”;<br>  }<br>}<br>&#x2F;&#x2F;重置定时器的超时时间<br>void resetTimerfd(int timerfd, Timestamp expiration)<br>{<br>  &#x2F;&#x2F; wake up loop by timerfd_settime()<br>  struct itimerspec newValue;<br>  struct itimerspec oldValue;<br>  memZero(&amp;newValue, sizeof newValue);<br>  memZero(&amp;oldValue, sizeof oldValue);<br>  newValue.it_value &#x3D; howMuchTimeFromNow(expiration);<br>  int ret &#x3D; ::timerfd_settime(timerfd, 0, &amp;newValue, &amp;oldValue);<br>  if (ret)<br>  {<br>    LOG_SYSERR &lt;&lt; “timerfd_settime()”;<br>  }<br>}</p>
+<p>}  &#x2F;&#x2F; namespace detail<br>}  &#x2F;&#x2F; namespace net<br>}  &#x2F;&#x2F; namespace muduo</p>
+<p>using namespace muduo;<br>using namespace muduo::net;<br>using namespace muduo::net::detail;</p>
+<p>TimerQueue::TimerQueue(EventLoop* loop)<br>  : loop_(loop),<br>    timerfd_(createTimerfd()),<br>    timerfdChannel_(loop, timerfd_),<br>    timers_(),<br>    callingExpiredTimers_(false)<br>{<br>  timerfdChannel_.setReadCallback(<br>      std::bind(&amp;TimerQueue::handleRead, this));<br>  &#x2F;&#x2F; we are always reading the timerfd, we disarm it with timerfd_settime.<br>  timerfdChannel_.enableReading();&#x2F;&#x2F;把timerfdChannel_这个通道加入poll关注<br>}</p>
+<p>TimerQueue::~TimerQueue()<br>{<br>  timerfdChannel_.disableAll();<br>  timerfdChannel_.remove();<br>  ::close(timerfd_);<br>  &#x2F;&#x2F; do not remove channel, since we’re in EventLoop::dtor();<br>  for (const Entry&amp; timer : timers_)<br>  {<br>    delete timer.second;&#x2F;&#x2F;只需要删除其中一个的原因是因为Timer 对象同时被 timers_ 集合和 activeTimers_ 集合所拥有<br>  }<br>}</p>
+<p>TimerId TimerQueue::addTimer(TimerCallback cb,<br>                             Timestamp when,&#x2F;&#x2F;超时时间<br>                             double interval)<br>{<br>  Timer* timer &#x3D; new Timer(std::move(cb), when, interval);&#x2F;&#x2F;每隔interval就会产生定时事件，回调cb<br>  loop_-&gt;runInLoop(<br>      std::bind(&amp;TimerQueue::addTimerInLoop, this, timer));&#x2F;&#x2F;用来保证跨线程调用，并且保证线程安全<br>  return TimerId(timer, timer-&gt;sequence());<br>}</p>
+<p>void TimerQueue::cancel(TimerId timerId)<br>{<br>  loop_-&gt;runInLoop(<br>      std::bind(&amp;TimerQueue::cancelInLoop, this, timerId));<br>}</p>
+<p>void TimerQueue::addTimerInLoop(Timer* timer)<br>{<br>  loop_-&gt;assertInLoopThread();<br>  &#x2F;&#x2F;插入一个定时器，有可能会使得最早到期的定时器发生改变<br>  bool earliestChanged &#x3D; insert(timer);&#x2F;&#x2F;不用加锁，因为loop_-&gt;runInLoop异步有加锁这一步</p>
+<p>  if (earliestChanged)&#x2F;&#x2F;最早的定时器会到期<br>  {<br>    &#x2F;&#x2F;重置定时器的超时时刻（timerfd_settime）<br>    resetTimerfd(timerfd_, timer-&gt;expiration());<br>  }<br>}</p>
+<p>void TimerQueue::cancelInLoop(TimerId timerId)<br>{<br>  loop_-&gt;assertInLoopThread();<br>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  ActiveTimer timer(timerId.timer_, timerId.sequence_);<br>  &#x2F;&#x2F;查找该定时器<br>  ActiveTimerSet::iterator it &#x3D; activeTimers_.find(timer);<br>  if (it !&#x3D; activeTimers_.end())<br>  {<br>    size_t n &#x3D; timers_.erase(Entry(it-&gt;first-&gt;expiration(), it-&gt;first));<br>    assert(n &#x3D;&#x3D; 1); (void)n;<br>    delete it-&gt;first; &#x2F;&#x2F; FIXME: no delete please，如果用了unique_ptr就不用手动删除了，typedef std::pair&lt;Timestamp, std::unique_ptr<Timer>&gt; Entry;<br>    activeTimers_.erase(it);<br>  }<br>  else if (callingExpiredTimers_)<br>  {<br>    &#x2F;&#x2F;已经到期，并且正在调用回调函数的定时器<br>    cancelingTimers_.insert(timer);<br>  }<br>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>}</Timer></p>
+<p>void TimerQueue::handleRead()<br>{<br>  loop_-&gt;assertInLoopThread();<br>  Timestamp now(Timestamp::now());<br>  readTimerfd(timerfd_, now);&#x2F;&#x2F;清除该事件，避免一直触发<br>  &#x2F;&#x2F;获取该时刻之前所以的定时器列表（即超时定时器列表）<br>  std::vector<Entry> expired &#x3D; getExpired(now);</Entry></p>
+<p>  callingExpiredTimers_ &#x3D; true;<br>  cancelingTimers_.clear();<br>  &#x2F;&#x2F; safe to callback outside critical section<br>  for (const Entry&amp; it : expired)<br>  {<br>    &#x2F;&#x2F;这里回调定时器处理函数<br>    it.second-&gt;run();<br>  }<br>  callingExpiredTimers_ &#x3D; false;<br>  &#x2F;&#x2F;不是一次性定时器，需要重启<br>  reset(expired, now);<br>}<br>&#x2F;&#x2F;不会对expired拷贝构造，rvo<br>std::vector<a href="TimerQueue::Entry">TimerQueue::Entry</a> TimerQueue::getExpired(Timestamp now)<br>{<br>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  std::vector<Entry> expired;<br>  Entry sentry(now, reinterpret_cast&lt;Timer*&gt;(UINTPTR_MAX));&#x2F;&#x2F;将机器指针的最大值（UINTPTR_MAX）转换为 Timer* 类型的指针<br>  &#x2F;&#x2F;返回第一个未到期timer迭代器<br>  &#x2F;&#x2F;lower_bound表示返回第一个大于等于sentry的元素的iterator<br>  &#x2F;&#x2F;即*end&gt;&#x3D;sentry,从而end-&gt;first&gt;now</Entry></p>
+<p>  TimerList::iterator end &#x3D; timers_.lower_bound(sentry);<br>  assert(end &#x3D;&#x3D; timers_.end() || now &lt; end-&gt;first);<br>  &#x2F;&#x2F;将到期的定时器插入到expired<br>  std::copy(timers_.begin(), end, back_inserter(expired));<br>  timers_.erase(timers_.begin(), end);&#x2F;&#x2F;删除timers_到期的定时器<br>  &#x2F;&#x2F;移除ActiveTimer到期的定时器<br>  for (const Entry&amp; it : expired)<br>  {<br>    ActiveTimer timer(it.second, it.second-&gt;sequence());<br>    size_t n &#x3D; activeTimers_.erase(timer);<br>    assert(n &#x3D;&#x3D; 1); (void)n;<br>  }</p>
+<p>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  return expired;<br>}</p>
+<p>void TimerQueue::reset(const std::vector<Entry>&amp; expired, Timestamp now)<br>{<br>  Timestamp nextExpire;</Entry></p>
+<p>  for (const Entry&amp; it : expired)<br>  {<br>    ActiveTimer timer(it.second, it.second-&gt;sequence());<br>    &#x2F;&#x2F;如果是重复的定时器并且是未取消的定时器，则重启该定时器<br>    if (it.second-&gt;repeat()<br>        &amp;&amp; cancelingTimers_.find(timer) &#x3D;&#x3D; cancelingTimers_.end())<br>    {<br>      &#x2F;&#x2F;一次性定时器或者被取消的定时器是不能重置的，因此删除该定时器<br>      it.second-&gt;restart(now);<br>      insert(it.second);<br>    }<br>    else<br>    {<br>      &#x2F;&#x2F; FIXME move to a free list<br>      delete it.second; &#x2F;&#x2F; FIXME: no delete please<br>    }<br>  }</p>
+<p>  if (!timers_.empty())<br>  {<br>    nextExpire &#x3D; timers_.begin()-&gt;second-&gt;expiration();<br>  }</p>
+<p>  if (nextExpire.valid())<br>  {<br>    resetTimerfd(timerfd_, nextExpire);<br>  }<br>}</p>
+<p>bool TimerQueue::insert(Timer* timer)<br>{<br>  loop_-&gt;assertInLoopThread();<br>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  &#x2F;&#x2F;最早到期时间是否改变<br>  bool earliestChanged &#x3D; false;<br>  Timestamp when &#x3D; timer-&gt;expiration();&#x2F;&#x2F;timer的到期时间取出来<br>  TimerList::iterator it &#x3D; timers_.begin();&#x2F;&#x2F;时间最早的定时器<br>  &#x2F;&#x2F;如果timers_为空或者when小于timers_最早到期时间<br>  if (it &#x3D;&#x3D; timers_.end() || when &lt; it-&gt;first)<br>  {<br>    earliestChanged &#x3D; true;<br>  }<br>  {<br>    &#x2F;&#x2F;插入到timers_<br>    std::pair&lt;TimerList::iterator, bool&gt; result<br>      &#x3D; timers_.insert(Entry(when, timer));&#x2F;&#x2F;Entry是一个pair,when是到期时间，timer是地址<br>    assert(result.second); (void)result;<br>  }<br>  {<br>    &#x2F;&#x2F;插入到activeTimers_<br>    std::pair&lt;ActiveTimerSet::iterator, bool&gt; result<br>      &#x3D; activeTimers_.insert(ActiveTimer(timer, timer-&gt;sequence()));<br>    assert(result.second); (void)result;<br>  }</p>
+<p>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  return earliestChanged;<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### RVO优化</span><br><span class="line"></span><br><span class="line">在C++中，RVO（Return Value Optimization）是一种优化技术，旨在减少函数返回对象时的不必要拷贝构造或移动构造操作，从而提高程序的性能和效率。</span><br><span class="line"></span><br><span class="line">通常情况下，当一个函数返回一个临时对象时，编译器会生成一个临时对象的副本，然后将这个副本返回给调用者。这可能会导致额外的开销，特别是对于大型对象。RVO优化的目标是避免这种额外的拷贝操作。</span><br><span class="line"></span><br><span class="line">RVO优化的原理是在编译器级别进行优化，使得函数返回的临时对象直接构造在调用者提供的内存空间中，从而避免了中间的拷贝步骤。这样可以显著提高程序的性能，减少内存和时间开销。</span><br><span class="line"></span><br><span class="line">以下是一个简单的示例，说明RVO优化是如何工作的：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>#include <iostream></iostream></p>
+<p>&#x2F;&#x2F; 返回一个临时对象的函数<br>std::string createString() {<br>    std::string str &#x3D; “Hello, RVO!”;<br>    return str; &#x2F;&#x2F; 在RVO优化下，str将直接构造在调用者提供的内存中<br>}</p>
+<p>int main() {<br>    std::string result &#x3D; createString();<br>    std::cout &lt;&lt; result &lt;&lt; std::endl;<br>    return 0;<br>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在上述示例中，当RVO优化启用时，函数`createString`返回的临时对象将直接构造在`main`函数中的`result`对象所占用的内存中，而不会发生额外的拷贝操作。</span><br><span class="line"></span><br><span class="line">需要注意的是，RVO并非在所有编译器和所有情况下都会发生。在某些情况下，由于编译器的实现或代码的复杂性，RVO可能无法进行。然而，现代的编译器通常都会支持RVO优化，以提高程序的性能和效率。</span><br><span class="line"></span><br><span class="line">## 测试文件Timerqueue_unittest.cc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>using namespace muduo;<br>using namespace muduo::net;</p>
+<p>int cnt &#x3D; 0;<br>EventLoop* g_loop;</p>
+<p>void printTid()<br>{<br>  printf(“pid &#x3D; %d, tid &#x3D; %d\n”, getpid(), CurrentThread::tid());<br>  printf(“now %s\n”, Timestamp::now().toString().c_str());<br>}</p>
+<p>void print(const char* msg)<br>{<br>  printf(“msg %s %s\n”, Timestamp::now().toString().c_str(), msg);<br>  if (++cnt &#x3D;&#x3D; 20)<br>  {<br>    g_loop-&gt;quit();<br>  }<br>}</p>
+<p>void cancel(TimerId timer)<br>{<br>  g_loop-&gt;cancel(timer);<br>  printf(“cancelled at %s\n”, Timestamp::now().toString().c_str());<br>}</p>
+<p>int main()<br>{<br>  printTid();<br>  sleep(1);<br>  {<br>    EventLoop loop;<br>    g_loop &#x3D; &amp;loop;</p>
+<pre><code>print(&quot;main&quot;);
+loop.runAfter(1, std::bind(print, &quot;once1&quot;));
+loop.runAfter(1.5, std::bind(print, &quot;once1.5&quot;));
+loop.runAfter(2.5, std::bind(print, &quot;once2.5&quot;));
+loop.runAfter(3.5, std::bind(print, &quot;once3.5&quot;));
+TimerId t45 = loop.runAfter(4.5, std::bind(print, &quot;once4.5&quot;));
+loop.runAfter(4.2, std::bind(cancel, t45));//在4.2秒提前取消
+loop.runAfter(4.8, std::bind(cancel, t45));//没有意义
+loop.runEvery(2, std::bind(print, &quot;every2&quot;));//每隔2秒运行一下
+TimerId t3 = loop.runEvery(3, std::bind(print, &quot;every3&quot;));
+loop.runAfter(9.001, std::bind(cancel, t3));
+
+loop.loop();
+print(&quot;main loop exits&quot;);
+</code></pre>
+<p>  }</p>
+<p>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![image-20230811182546845](muduo-网络库（2）/image-20230811182546845.png)</span><br><span class="line"></span><br><span class="line">&#123;% asset_img image-20230811182546845.png This is an test image %&#125;</span><br><span class="line"></span><br><span class="line">只有TimerId对外可见，其余两个都是内部封装的。</span><br><span class="line"></span><br><span class="line">这段代码实现了一个定时器队列 `TimerQueue`，用于在事件循环中管理定时器的触发和处理。以下是它是如何添加定时器的过程：</span><br><span class="line"></span><br><span class="line">1. 在 `TimerQueue` 的构造函数中，创建了一个 `timerfd`，用于实现定时器的底层计时。</span><br><span class="line">2. 当需要添加一个定时器时，调用 `addTimer` 函数，传递定时器的回调函数 `cb`、超时时间 `when` 和重复间隔 `interval`。</span><br><span class="line">3. 在 `addTimer` 函数中，创建一个新的 `Timer` 对象，将回调函数 `cb`、超时时间 `when` 和重复间隔 `interval` 存储在该定时器对象中。</span><br><span class="line">4. 调用 `loop_-&gt;runInLoop`，将添加定时器的操作安排在事件循环线程中执行，以确保跨线程调用的安全性。</span><br><span class="line">5. 在 `addTimerInLoop` 函数中，首先调用 `insert` 函数将定时器插入到定时器列表 `timers_` 和活跃定时器集合 `activeTimers_` 中。</span><br><span class="line">6. 如果插入定时器后，它成为了最早到期的定时器（即 `earliestChanged` 为 `true`），那么需要调用 `resetTimerfd` 函数来重置 `timerfd` 的超时时间为该定时器的到期时间。</span><br><span class="line">7. 在 `handleRead` 函数中，会处理 `timerfd` 的读事件，即定时器到期事件。它首先获取已到期的定时器列表，然后依次调用它们的回调函数。</span><br><span class="line">8. 如果定时器是重复定时器且没有被取消，它会被重新插入定时器列表，以便下一次触发。否则，被取消的定时器将会被删除。</span><br><span class="line"></span><br><span class="line">总之，通过调用 `addTimer`，代码会创建一个 `Timer` 对象，并将其插入到定时器列表和活跃定时器集合中。在每个事件循环迭代中，会检查定时器列表中是否有已到期的定时器，并触发它们的回调函数。如果定时器是重复定时器且未被取消，它将被重新插入列表中，以便下次触发。</span><br><span class="line"></span><br><span class="line">------</span><br><span class="line"></span><br><span class="line">当插入一个定时器时，可能会导致最早到期的定时器发生改变。这是因为新插入的定时器有可能比当前最早到期的定时器更早到期，从而改变了整个定时器队列的顺序。</span><br><span class="line"></span><br><span class="line">具体地，以下是插入定时器可能引起的操作：</span><br><span class="line"></span><br><span class="line">1. 首先，插入定时器操作将定时器对象插入到定时器列表 `timers_` 和活跃定时器集合 `activeTimers_` 中。</span><br><span class="line">2. 然后，会检查插入的定时器是否比当前最早到期的定时器更早到期。如果是，那么最早到期的定时器发生了改变，需要进行相应操作。</span><br><span class="line">3. 如果最早到期的定时器发生了改变，会调用 `resetTimerfd` 函数，将 `timerfd` 的超时时间设置为新的最早到期定时器的到期时间。这样做是为了确保 `timerfd` 在最早到期定时器到期时触发读事件。</span><br><span class="line"></span><br><span class="line">总之，插入定时器可能会改变最早到期的定时器，如果发生了这种改变，代码会通过 `resetTimerfd` 函数更新 `timerfd` 的超时时间，以确保及时触发最早到期定时器的事件</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>TimerId TimerQueue::addTimer(TimerCallback cb,<br>                             Timestamp when,&#x2F;&#x2F;超时时间<br>                             double interval)<br>{<br>  Timer* timer &#x3D; new Timer(std::move(cb), when, interval);&#x2F;&#x2F;每隔interval就会产生定时事件，回调cb<br>  loop_-&gt;runInLoop(<br>      std::bind(&amp;TimerQueue::addTimerInLoop, this, timer));&#x2F;&#x2F;用来保证跨线程调用<br>  return TimerId(timer, timer-&gt;sequence());<br>}</p>
+<p>void TimerQueue::addTimerInLoop(Timer* timer)<br>{<br>  loop_-&gt;assertInLoopThread();<br>  &#x2F;&#x2F;插入一个定时器，有可能会使得最早到期的定时器发生改变<br>  bool earliestChanged &#x3D; insert(timer);</p>
+<p>  if (earliestChanged)&#x2F;&#x2F;最早到期的定时器会<br>  {<br>    &#x2F;&#x2F;重置定时器的超时时刻（timerfd_settime）<br>    resetTimerfd(timerfd_, timer-&gt;expiration());<br>  }<br>}<br>&#x2F;&#x2F;判断是否需要改变最早到期的定时器<br>bool TimerQueue::insert(Timer* timer)<br>{<br>  loop_-&gt;assertInLoopThread();<br>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  &#x2F;&#x2F;最早到期时间是否改变<br>  bool earliestChanged &#x3D; false;<br>  Timestamp when &#x3D; timer-&gt;expiration();&#x2F;&#x2F;timer的到期时间取出来<br>  TimerList::iterator it &#x3D; timers_.begin();&#x2F;&#x2F;时间最早的定时器<br>  &#x2F;&#x2F;如果timers_为空或者when小于timers_最早到期时间<br>  if (it &#x3D;&#x3D; timers_.end() || when &lt; it-&gt;first)<br>  {<br>    earliestChanged &#x3D; true;<br>  }<br>  {<br>    &#x2F;&#x2F;插入到timers_<br>    std::pair&lt;TimerList::iterator, bool&gt; result<br>      &#x3D; timers_.insert(Entry(when, timer));&#x2F;&#x2F;Entry是一个pair,when是到期时间，timer是地址<br>    assert(result.second); (void)result;<br>  }<br>  {<br>    &#x2F;&#x2F;插入到activeTimers_<br>    std::pair&lt;ActiveTimerSet::iterator, bool&gt; result<br>      &#x3D; activeTimers_.insert(ActiveTimer(timer, timer-&gt;sequence()));<br>    assert(result.second); (void)result;<br>  }</p>
+<p>  assert(timers_.size() &#x3D;&#x3D; activeTimers_.size());<br>  return earliestChanged;<br>}</p>
+<pre><code>
+函数 `resetTimerfd`，用于通过调用 `timerfd_settime` 函数来重置定时器的超时时间。以下是每个步骤的解释：
+
+1. `struct itimerspec newValue;` 和 `struct itimerspec oldValue;`：定义了两个 `itimerspec` 结构体，用于存储新旧定时器的超时时间信息。
+2. `memZero(&amp;newValue, sizeof newValue);` 和 `memZero(&amp;oldValue, sizeof oldValue);`：将 `newValue` 和 `oldValue` 结构体初始化为全零，以确保没有未初始化的内存数据。
+3. `newValue.it_value = howMuchTimeFromNow(expiration);`：计算从当前时间到目标到期时间 `expiration` 的时间间隔，并将其设置为 `newValue` 结构体的 `it_value` 字段。这将在定时器到期时触发定时器事件。
+4. `int ret = ::timerfd_settime(timerfd, 0, &amp;newValue, &amp;oldValue);`：调用 `timerfd_settime` 函数，将 `newValue` 结构体应用到指定的定时器文件描述符 `timerfd` 上，从而重置定时器的超时时间。第一个参数为定时器文件描述符，第二个参数为标志（此处为0，表示相对时间），第三个参数为新的定时器超时时间，第四个参数为旧的定时器超时时间。
+5. `if (ret)`：检查 `timerfd_settime` 函数的返回值，如果返回值非零，表示函数调用失败。
+6. `LOG_SYSERR &lt;&lt; &quot;timerfd_settime()&quot;;`：如果函数调用失败，通过日志记录错误信息。
+
+总之，这段代码通过计算时间间隔并调用 `timerfd_settime` 函数，实现了对定时器超时时间的重置，以便在定时器到期时触发相应的事件。
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/09/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-1/" rel="prev" title="数据结构-1">
+      <i class="fa fa-chevron-left"></i> 数据结构-1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/13/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%883%EF%BC%89/" rel="next" title="muduo-网络库（3）">
+      muduo-网络库（3） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E5%99%A8%E5%87%BD%E6%95%B0%E9%80%89%E6%8B%A9"><span class="nav-number">1.</span> <span class="nav-text">定时器函数选择</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#timerfd-%E5%85%A5%E9%80%89%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.1.</span> <span class="nav-text">timerfd_入选的原因:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A"><span class="nav-number">1.1.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%EF%BC%9A"><span class="nav-number">1.1.2.</span> <span class="nav-text">参数：</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="extern”C”的用法为了能够正确的在C++代码中调用C语言的代码：在程序中加上extern “C”后，相当于告诉编译器这部分代码是C语言写的，因此要按照C语言进行编译，而不是C++；哪些情况下使用extern “C”：（1）C++代码中调用C语言代码；（2）在C++中的头文件中使用；（3）在多个人协同开发时，可能有人擅长C语言，而有人擅长C++；综上，总结出使用方法，在C语言的头文件中，对其外">
+<meta property="og:type" content="article">
+<meta property="og:title" content="c++补充-2">
+<meta property="og:url" content="http://example.com/2023/09/10/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85-2/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="extern”C”的用法为了能够正确的在C++代码中调用C语言的代码：在程序中加上extern “C”后，相当于告诉编译器这部分代码是C语言写的，因此要按照C语言进行编译，而不是C++；哪些情况下使用extern “C”：（1）C++代码中调用C语言代码；（2）在C++中的头文件中使用；（3）在多个人协同开发时，可能有人擅长C语言，而有人擅长C++；综上，总结出使用方法，在C语言的头文件中，对其外">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-10T03:50:16.000Z">
+<meta property="article:modified_time" content="2023-09-19T08:21:56.831Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/09/10/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>c++补充-2 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/10/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          c++补充-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-10 11:50:16" itemprop="dateCreated datePublished" datetime="2023-09-10T11:50:16+08:00">2023-09-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-19 16:21:56" itemprop="dateModified" datetime="2023-09-19T16:21:56+08:00">2023-09-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="extern”C”的用法"><a href="#extern”C”的用法" class="headerlink" title="extern”C”的用法"></a>extern”C”的用法</h1><p>为了能够正确的在C++代码中调用C语言的代码：在程序中加上extern “C”后，相当于告诉编译器这部分<br>代码是C语言写的，因此要按照C语言进行编译，而不是C++；<br>哪些情况下使用extern “C”：<br>（1）C++代码中调用C语言代码；<br>（2）在C++中的头文件中使用；<br>（3）在多个人协同开发时，可能有人擅长C语言，而有人擅长C++；<br>综上，总结出使用方法，在C语言的头文件中，对其外部函数只能指定为extern类型，C语言中不支持 extern “C”声明，在.c文件中包含了extern “C”时会出现编译语法错误。所以使用extern “C”全部都放在 于cpp程序相关文件或其头文件中。</p>
+<p>（1）C++调用C函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//xx.h</span><br><span class="line">extern int add(...)</span><br><span class="line">//xx.c</span><br><span class="line">int add()&#123;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line">//xx.cpp</span><br><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line"> #include &quot;xx.h&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>（2）C调用C++函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//xx.h</span><br><span class="line">extern &quot;C&quot;&#123;</span><br><span class="line"> int add();</span><br><span class="line">&#125;</span><br><span class="line">//xx.cpp</span><br><span class="line">int add()&#123; </span><br><span class="line">&#125;</span><br><span class="line">//xx.c</span><br><span class="line">extern int add();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="野指针和悬空指针"><a href="#野指针和悬空指针" class="headerlink" title="野指针和悬空指针"></a>野指针和悬空指针</h1><p>都是是指向无效内存区域(这里的无效指的是”不安全不可控”)的指针，访问行为将会导致未定义行为。</p>
+<ul>
+<li>野指针，指的是没有被初始化过的指针</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main(void) &#123; </span><br><span class="line"> </span><br><span class="line"> 	int* p; // 未初始化</span><br><span class="line"> 	std::cout&lt;&lt; *p &lt;&lt; std::endl; // 未初始化就被使用</span><br><span class="line"> 	</span><br><span class="line"> 	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此，为了防止出错，对于指针初始化时都是赋值为 nullptr，这样在使用时编译器就会直接报错， 产生非法内存访问。</p>
+<ul>
+<li>悬空指针，指针最初指向的内存已经被释放了的一种指针。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main(void) &#123; </span><br><span class="line"> int * p = nullptr;</span><br><span class="line"> int* p2 = new int;</span><br><span class="line"> </span><br><span class="line"> p = p2;</span><br><span class="line"> delete p2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时 p和p2就是悬空指针，指向的内存已经被释放。继续使用这两个指针，行为不可预料。需要设置为 p&#x3D;p2&#x3D;nullptr。此时再使用，编译器会直接保错。 </p>
+<p>避免野指针比较简单，但悬空指针比较麻烦。c++引入了智能指针，C++智能指针的本质就是避免悬空指针的产生。</p>
+<p>产生原因及解决办法： </p>
+<ul>
+<li>野指针：指针变量未及时初始化 &#x3D;&gt; 定义指针变量及时初始化，要么置空。 </li>
+<li>悬空指针：指针free或delete之后没有及时置空 &#x3D;&gt; 释放操作后立即置空。</li>
+</ul>
+<h1 id="判断大小端存储"><a href="#判断大小端存储" class="headerlink" title="判断大小端存储"></a>判断大小端存储</h1><p>大端存储：字数据的高字节存储在低地址中</p>
+<p>小端存储：字数据的低字节存储在低地址中</p>
+<p>在Socket编程中，往往需要将操作系统所用的小端存储的IP地址转换为大端存储，这样才能进行网络传输</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"> int a = 0x1234;</span><br><span class="line"> //由于int和char的长度不同，借助int型转换成char型，只会留下低地址的部分</span><br><span class="line"> char c = (char)(a);</span><br><span class="line"> if (c == 0x12)</span><br><span class="line"> cout &lt;&lt; &quot;big endian&quot; &lt;&lt; endl;</span><br><span class="line"> else if(c == 0x34)</span><br><span class="line"> cout &lt;&lt; &quot;little endian&quot; &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">//union联合体的重叠式存储，endian联合体占用内存的空间为每个成员字节长度的最大值</span><br><span class="line">union endian</span><br><span class="line">&#123;</span><br><span class="line"> int a;</span><br><span class="line"> char ch;</span><br><span class="line">&#125;;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"> endian value;</span><br><span class="line"> value.a = 0x1234;</span><br><span class="line"> //a和ch共用4字节的内存空间</span><br><span class="line"> if (value.ch == 0x12)</span><br><span class="line"> cout &lt;&lt; &quot;big endian&quot;&lt;&lt;endl;</span><br><span class="line"> else if (value.ch == 0x34)</span><br><span class="line"> cout &lt;&lt; &quot;little endian&quot;&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="volatile、mutable和explicit关键字"><a href="#volatile、mutable和explicit关键字" class="headerlink" title="volatile、mutable和explicit关键字"></a>volatile、mutable和explicit关键字</h1><h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>volatile 关键字是一种类型修饰符，用它声明的类型变量表示可以被某些编译器未知的因素更改，比如： 操作系统、硬件或者其它线程等。</p>
+<p>遇到这个关键字声明的变量，编译器对访问该变量的代码就不再进行 优化，从而可以提供对特殊地址的稳定访问。 当要求使用 volatile 声明的变量的值的时候，<strong>系统总是重新从它所在的内存读取数据</strong>，即使它前面的指 令刚刚从该处读取过数据。</p>
+<p> <strong>volatile定义变量的值是易变的，每次用到这个变量的值的时候都要去重新读取这个变量的值，而不是读 寄存器内的备份。多线程中被几个任务共享的变量需要定义为volatile类型。</strong></p>
+<p>有些变量是用volatile关键字声明的。当两个线程都要用到某一个变量且该变量的值会被改变时，应该用 volatile声明，该关键字的作用是防止优化编译器把变量从内存装入CPU寄存器中。如果变量被装入寄存 器，那么两个线程有可能一个使用内存中的变量，一个使用寄存器中的变量，这会造成程序的错误执 行。volatile的意思是让编译器每次操作该变量时一定要从内存中真正取出，而不是使用已经存在寄存器 中的值。</p>
+<h2 id="mutable"><a href="#mutable" class="headerlink" title="mutable"></a>mutable</h2><p>mutable的中文意思是“可变的，易变的”，跟constant（既C++中的const）是反义词。在C++中，mutable 也是为了突破const的限制而设置的。被mutable修饰的变量，将永远处于可变的状态，即使在一个const 函数中。我们知道，如果类的成员函数不会改变对象的状态，那么这个成员函数一般会声明成const的。 但是，有些时候，我们<strong>需要在const函数里面修改一些跟类状态无关的数据成员，那么这个函数就应该被 mutable来修饰，并且放在函数后后面关键字位置。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">class person</span><br><span class="line">&#123;</span><br><span class="line">int m_A;</span><br><span class="line">mutable int m_B;//特殊变量 在常函数里值也可以被修改</span><br><span class="line">public:</span><br><span class="line"> void add() const//在函数里不可修改this指针指向的值 常量指针</span><br><span class="line"> &#123;</span><br><span class="line"> m_A=10;//错误 不可修改值，this已经被修饰为常量指针</span><br><span class="line"> m_B=20;//正确</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">class person</span><br><span class="line">&#123;</span><br><span class="line">int m_A;</span><br><span class="line">mutable int m_B;//特殊变量 在常函数里值也可以被修改</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">const person p;//修饰常对象 不可修改类成员的值</span><br><span class="line">p.m_A=10;//错误，被修饰了指针常量</span><br><span class="line">p.m_B=200;//正确，特殊变量，修饰了mutable</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="explicit"><a href="#explicit" class="headerlink" title="explicit"></a>explicit</h2><p>explicit关键字用来修饰类的构造函数，被修饰的构造函数的类，不能发生相应的隐式类型转换，只能以 显示的方式进行类型转换，注意以下几点： </p>
+<ul>
+<li>explicit 关键字只能用于类内部的构造函数声明上 </li>
+<li>explicit 关键字作用于单个参数的构造函数 </li>
+<li>被explicit修饰的构造函数的类，不能发生相应的隐式类型转换</li>
+</ul>
+<h1 id="C-的异常处理"><a href="#C-的异常处理" class="headerlink" title="C++的异常处理"></a>C++的异常处理</h1><h2 id="try、throw和catch关键字"><a href="#try、throw和catch关键字" class="headerlink" title="try、throw和catch关键字"></a>try、throw和catch关键字</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"> double m = 1, n = 0;</span><br><span class="line"> try &#123;</span><br><span class="line"> cout &lt;&lt; &quot;before dividing.&quot; &lt;&lt; endl;</span><br><span class="line"> if (n == 0)</span><br><span class="line"> throw - 1; //抛出int型异常</span><br><span class="line"> else if (m == 0)</span><br><span class="line"> throw - 1.0; //拋出 double 型异常</span><br><span class="line"> else</span><br><span class="line"> cout &lt;&lt; m / n &lt;&lt; endl;</span><br><span class="line"> cout &lt;&lt; &quot;after dividing.&quot; &lt;&lt; endl;</span><br><span class="line"> &#125;</span><br><span class="line"> catch (double d) &#123;</span><br><span class="line"> cout &lt;&lt; &quot;catch (double)&quot; &lt;&lt; d &lt;&lt; endl;</span><br><span class="line"> &#125;</span><br><span class="line"> catch (...) &#123;</span><br><span class="line"> cout &lt;&lt; &quot;catch (...)&quot; &lt;&lt; endl;</span><br><span class="line"> &#125;</span><br><span class="line"> cout &lt;&lt; &quot;finished&quot; &lt;&lt; endl;</span><br><span class="line"> return 0;</span><br><span class="line">&#125;</span><br><span class="line">//运行结果</span><br><span class="line">//before dividing.</span><br><span class="line"></span><br><span class="line">//catch (...)</span><br><span class="line">//finished</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>代码中，对两个数进行除法计算，其中除数为0。可以看到以上三个关键字，程序的执行流程是先执行try包裹的语句块，如果执行过程中没有异常发生，则不会进入任何catch包裹的语句块，如果发生异常，则使用throw进行异常抛出，再由catch进行捕获，throw可以抛出各种数据类型的信息，代码中使用的是数字，也可以自定义异常class。<strong>catch根据throw抛出的数据类型进行精确捕获（不会出现类型转换），如果匹配不到就直接报错，可以使用catch(…)的方式捕获任何异常（不推荐）</strong>。当然，如果catch了异常，当前函数如果不进行处理，或者已经处理了想通知上一层的调用者，可以在catch里面再throw异常。</p>
+<h2 id="函数的异常声明列表"><a href="#函数的异常声明列表" class="headerlink" title="函数的异常声明列表"></a>函数的异常声明列表</h2><p>有时候，程序员在定义函数的时候知道函数可能发生的异常，可以在函数声明和定义时，指出所能抛出异常的列表，写法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fun() throw(int,double,A,B,C)&#123;...&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法表名函数可能会抛出int,double型或者A、B、C三种类型的异常，如果throw中为空，表明不会抛出任何异常，如果没有throw则可能抛出任何异常</p>
+<h2 id="C-标准异常类-exception"><a href="#C-标准异常类-exception" class="headerlink" title="C++标准异常类 exception"></a>C++标准异常类 exception</h2><p>C++ 标准库中有一些类代表异常，这些类都是从 exception 类派生而来的</p>
+<p>bad_typeid：使用typeid运算符，如果其操作数是一个多态类的指针，而该指针的值为 NULL，则会拋出此异常，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;typeinfo&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">class A&#123;</span><br><span class="line">public:</span><br><span class="line"> virtual ~A();</span><br><span class="line">&#125;;</span><br><span class="line">using namespace std;</span><br><span class="line">int main() &#123;</span><br><span class="line"> A* a = NULL;</span><br><span class="line"> try &#123;</span><br><span class="line"> cout &lt;&lt; typeid(*a).name() &lt;&lt; endl; // Error condition</span><br><span class="line"> &#125;</span><br><span class="line"> catch (bad_typeid)&#123;</span><br><span class="line"> cout &lt;&lt; &quot;Object is NULL&quot; &lt;&lt; endl;</span><br><span class="line"> &#125;</span><br><span class="line"> return 0;</span><br><span class="line">&#125;</span><br><span class="line">//运行结果：bject is NULL</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>bad_cast：在用 dynamic_cast 进行从多态基类对象（或引用）到派生类的引用的强制类型转换时，如果转换是不安全的，则会拋出此异常 </li>
+<li>bad_alloc：在用 new 运算符进行动态内存分配时，如果没有足够的内存，则会引发此异常 </li>
+<li>out_of_range:用 vector 或 string的at 成员函数根据下标访问元素时，如果下标越界，则会拋出此异常</li>
+</ul>
+<h1 id="静态变量什么时候初始化"><a href="#静态变量什么时候初始化" class="headerlink" title="静态变量什么时候初始化"></a>静态变量什么时候初始化</h1><ol>
+<li>初始化只有一次，但是可以多次赋值，在主程序之前，编译器已经为其分配好了内存。</li>
+<li>静态局部变量和全局变量一样，数据都存放在全局区域，所以在主程序之前，编译器已经为其分配<br>好了内存，但在C和C++中静态局部变量的初始化节点又有点不太一样。在C中，初始化发生在代码执行<br>之前，编译阶段分配好内存之后，就会进行初始化，所以我们看到在C语言中<strong>无法使用变量对静态局部</strong><br><strong>变量进行初始化</strong>，在程序运行结束，变量所处的全局内存会被全部回收。</li>
+<li>而在C++中，初始化时在执行相关代码时才会进行初始化，主要是由于C++引入对象后，要进行初始<br>化必须执行相应构造函数和析构函数，在构造函数或析构函数中经常会需要进行某些程序中需要进行的<br>特定操作，并非简单地分配内存。所以C++标准定为全局或静态对象是有首次用到时才会进行构造，并<br>通过atexit()来管理。在程序结束，按照构造顺序反方向进行逐个析构。所以在C++中是可以使用变量对<br>静态局部变量进行初始化的。</li>
+</ol>
+<h1 id="i-和-i的左右值判断"><a href="#i-和-i的左右值判断" class="headerlink" title="i++和++i的左右值判断"></a>i++和++i的左右值判断</h1><p>左值就是出现在表达式左边的值（等号左边），可以被改变，他是存储数据值的那块内存的地址，也称为变量的地址；</p>
+<p>右值是指存储在某内存地址中的数据，也称为变量的数据。</p>
+<p>左值可以作为右值，但右值不可以是左值。</p>
+<p>因此也只有<strong>左值才能被取地址</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int i = 0;</span><br><span class="line"></span><br><span class="line">(i++)+=i; //错误</span><br><span class="line"></span><br><span class="line">(++i)+=i; //正确 </span><br><span class="line"></span><br><span class="line">int *ip = &amp;(i++); //错误</span><br><span class="line"></span><br><span class="line">int *ip = &amp;(++i); //正确</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么i++不能作左值</strong></p>
+<p>简单得到理解，就是i++返回的是一个临时变量，函数返回后不能被寻址得到，它只是一个数据值，而非地址，因此不能作为左值</p>
+<h1 id="关于二维数组例题"><a href="#关于二维数组例题" class="headerlink" title="关于二维数组例题"></a>关于二维数组例题</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int arr[][3] = &#123; &#123;1, 2, 3&#125;, &#123;4, 5, 6&#125; &#125;;</span><br><span class="line">    int (*ptr)[3] = arr;</span><br><span class="line"></span><br><span class="line">    printf(&quot;%d %d \n&quot;, (*ptr)[0], (*ptr)[1]);</span><br><span class="line">    ptr++;</span><br><span class="line">    printf(&quot;%d %d \n&quot;, (*ptr)[0], (*ptr)[1]);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1 2 </span><br><span class="line">4 5 </span><br></pre></td></tr></table></figure>
+
+<p>请注意，<code>int (*ptr)[3] = arr;</code> 定义了一个指向包含3个整数元素的数组的指针，初始指向二维数组的第一行。通过 <code>(*ptr)[0]</code> 和 <code>(*ptr)[1]</code> 的方式访问了指针所指向的数组的元素。在 <code>ptr++</code> 后，指针指向了二维数组的第二行，再次访问元素时，输出了第二行的前两个元素。</p>
+<p><code>int (*ptr)[3] = arr;</code> 定义了一个指向包含3个整数元素的数组的指针，初始化指向二维数组的第一行。</p>
+<p>在 C&#x2F;C++ 中，数组名表示数组首元素的地址，而指针的加法运算实际上是将指针指向的地址加上一个偏移量，然后返回一个新的指针。因此，<code>ptr++</code> 将会使指针指向下一行的首元素。</p>
+<p>具体地说，在这个例子中，<code>ptr</code> 指向的是 <code>arr</code> 的第一行，类型为 <code>int (*)[3]</code>，指向一个包含3个整数元素的数组，即 <code>arr[0]</code>。执行 <code>ptr++</code> 后，<code>ptr</code> 指向了 <code>arr</code> 的第二行，即指向 <code>arr[1]</code>。</p>
+<p>因此，第二次输出中，<code>(*ptr)[0]</code> 和 <code>(*ptr)[1]</code> 分别对应了 <code>arr[1][0]</code> 和 <code>arr[1][1]</code> 两个元素的值。</p>
+<h1 id="从汇编层去解释一下引用"><a href="#从汇编层去解释一下引用" class="headerlink" title="从汇编层去解释一下引用"></a>从汇编层去解释一下引用</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">9: int x = 1;</span><br><span class="line">00401048 mov dword ptr [ebp-4],1</span><br><span class="line">10: int &amp;b = x;</span><br><span class="line">0040104F lea eax,[ebp-4]</span><br><span class="line">00401052 mov dword ptr [ebp-8],eax</span><br></pre></td></tr></table></figure>
+
+<p>x的地址为ebp-4，b的地址为ebp-8，因为栈内的变量内存是从高往低进行分配的，所以b的地址比x的 低。 </p>
+<p>lea eax,[ebp-4] 这条语句将x的地址ebp-4放入eax寄存器 </p>
+<p>mov dword ptr [ebp-8],eax 这条语句将eax的值放入b的地址 </p>
+<p>ebp-8中上面两条汇编的作用即：将x的地址存入变量b中，这不和将某个变量的地址存入指针变量是一样 的吗？<strong>所以从汇编层次来看，的确引用是通过指针来实现的</strong>。</p>
+<h1 id="malloc、realloc、calloc的区别"><a href="#malloc、realloc、calloc的区别" class="headerlink" title="malloc、realloc、calloc的区别"></a>malloc、realloc、calloc的区别</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1) malloc函数</span><br><span class="line">void* malloc(unsigned int num_size);</span><br><span class="line">int *p = malloc(20*sizeof(int));申请20个int类型的空间；</span><br><span class="line">2) calloc函数</span><br><span class="line">省去了人为空间计算；malloc申请的空间的值是随机初始化的，calloc申请的空间的值是初始化为0的；</span><br><span class="line">void* calloc(size_t n,size_t size);</span><br><span class="line">int *p = calloc(20, sizeof(int));</span><br><span class="line">3) realloc函数</span><br><span class="line">void realloc(void *p, size_t new_size);</span><br><span class="line">给动态分配的空间分配额外的空间，用于扩充容量。</span><br></pre></td></tr></table></figure>
+
+<h1 id="构造函数的执行顺序"><a href="#构造函数的执行顺序" class="headerlink" title="构造函数的执行顺序"></a>构造函数的执行顺序</h1><p>一个派生类构造函数的执行顺序如下：<br>① 虚拟基类的构造函数（多个虚拟基类则按照继承的顺序执行构造函数）。<br>② 基类的构造函数（多个普通基类也按照继承的顺序执行构造函数）。<br>③ 类类型的成员对象的构造函数（按照初始化顺序）<br>④ 派生类自己的构造函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">class A &#123;</span><br><span class="line">public:</span><br><span class="line">    A() &#123;</span><br><span class="line">        cout &lt;&lt; &quot;A&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">class B : public A &#123;</span><br><span class="line">public:</span><br><span class="line">    B() &#123;</span><br><span class="line">        cout &lt;&lt; &quot;B&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">class C : public A &#123;</span><br><span class="line">    B b;</span><br><span class="line">public:</span><br><span class="line">    C() &#123;</span><br><span class="line">        cout &lt;&lt; &quot;C&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    C *obj=new C();</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="什么是内存泄露，如何检测与避免"><a href="#什么是内存泄露，如何检测与避免" class="headerlink" title="什么是内存泄露，如何检测与避免"></a>什么是内存泄露，如何检测与避免</h1><p>内存泄露<br>一般我们常说的内存泄漏是指堆内存的泄漏。堆内存是指程序从堆中分配的，大小任意的(内存块的大小可以在程序运行期决定)内存块，使用完后必须显式释放的内存。应用程序般使用malloc,、realloc、new等函数从堆中分配到块内存，使用完后，程序必须负责相应的调用free或delete释放该内存块，否则，这块内存就不能被再次使用，我们就说这块内存泄漏了</p>
+<p>避免内存泄露的几种方式</p>
+<ul>
+<li>计数法：使用new或者malloc时，让该数+1，delete或free时，该数-1，程序执行完打印这个计数，如果不为0则表示存在内存泄露</li>
+<li>一定要将基类的析构函数声明为虚函数</li>
+<li>对象数组的释放一定要用delete []</li>
+<li>有new就有delete，有malloc就有free，保证它们一定成对出现</li>
+</ul>
+<p>检测工具</p>
+<ul>
+<li>Linux下可以使用Valgrind工具</li>
+<li>Windows下可以使用CRT库</li>
+</ul>
+<h1 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h1><p>零拷贝就是一种避免 CPU 将数据从一块存储拷贝到另外一块存储的技术。</p>
+<p>零拷贝技术可以减少数据拷贝和共享总线操作的次数。</p>
+<p>在C++中，vector的一个成员函数emplace_back()很好地体现了零拷贝技术，它跟push_back()函数一样可以将一个元素插入容器尾部，区别在于：使用push_back()函数需要调用拷贝构造函数和转移构造函数，而使用emplace_back()插入的元素原地构造，不需要触发拷贝构造和转移构造，效率更高。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">struct Person</span><br><span class="line">&#123;</span><br><span class="line">    string name;</span><br><span class="line">    int age;</span><br><span class="line">    // 初始构造函数</span><br><span class="line">    Person(string p_name, int p_age) : name(std::move(p_name)), age(p_age)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; &quot;I have been constructed&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    // 拷贝构造函数</span><br><span class="line">    Person(const Person &amp;other) : name(std::move(other.name)), age(other.age)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; &quot;I have been copy constructed&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    // 转移构造函数，</span><br><span class="line">    //移动构造函数（Move Constructor）用于将资源从一个对象转移到另一个对象，这通常用于提高性能，避免不必要的拷贝操作</span><br><span class="line">    //当编译器检测到可以使用移动构造函数时，它会优先选择移动构造函数而不是拷贝构造函数，以提高性能</span><br><span class="line">    //&amp;&amp; 是右值引用运算符的语法，表示一个右值引用类型</span><br><span class="line">    Person(Person &amp;&amp;other) : name(std::move(other.name)), age(other.age)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; &quot;I have been moved&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    vector&lt;Person&gt; e;</span><br><span class="line">    cout &lt;&lt; &quot;emplace_back:&quot; &lt;&lt; endl;</span><br><span class="line">    e.emplace_back(&quot;Jane&quot;, 23); // 不用构造类对象</span><br><span class="line">    vector&lt;Person&gt; p;</span><br><span class="line">    cout &lt;&lt; &quot;push_back:&quot; &lt;&lt; endl;</span><br><span class="line">    p.push_back(Person(&quot;Mike&quot;, 36));</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">emplace_back:</span><br><span class="line">I have been constructed   </span><br><span class="line">push_back:</span><br><span class="line">I have been constructed   </span><br><span class="line">I have been moved</span><br></pre></td></tr></table></figure>
+
+<h1 id="成员初始化列表的概念，为什么用它会快一些"><a href="#成员初始化列表的概念，为什么用它会快一些" class="headerlink" title="成员初始化列表的概念，为什么用它会快一些"></a>成员初始化列表的概念，为什么用它会快一些</h1><p>在类的构造函数中，不在函数体内对成员变量赋值，而是在构造函数的花括号前面使用冒号和初始化列 表赋值</p>
+<p>用初始化列表会快一些的原因是，对于类型，它少了一次调用构造函数的过程，而在函数体中赋值则会 多一次调用。而对于内置数据类型则没有差别。举个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">class A</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    A()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; &quot;默认构造函数A()&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    A(int a)</span><br><span class="line">    &#123;</span><br><span class="line">        value = a;</span><br><span class="line">        cout &lt;&lt; &quot;A(int &quot; &lt;&lt; value &lt;&lt; &quot;)&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    A(const A &amp;a)</span><br><span class="line">    &#123;</span><br><span class="line">        value = a.value;</span><br><span class="line">        cout &lt;&lt; &quot;拷贝构造函数A(A&amp; a): &quot; &lt;&lt; value &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    int value;</span><br><span class="line">&#125;;</span><br><span class="line">class B</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    B() : a(1)</span><br><span class="line">    &#123;</span><br><span class="line">        b = A(2);</span><br><span class="line">    &#125;</span><br><span class="line">    A a;</span><br><span class="line">    A b;</span><br><span class="line">&#125;;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    B b;</span><br><span class="line">&#125;</span><br><span class="line">// 输出结果：</span><br><span class="line">// A(int 1)</span><br><span class="line">// 默认构造函数A()</span><br><span class="line">// A(int 2)</span><br></pre></td></tr></table></figure>
+
+<p>从代码运行结果可以看出，在构造函数体内部初始化的对象b多了一次构造函数的调用过程，而对象a则 没有。由于对象成员变量的初始化动作发生在进入构造函数之前，对于内置类型没什么影响，但如果有 些成员是类，那么在进入构造函数之前，会先调用一次默认构造函数，进入构造函数后所做的事其实是 一次赋值操作(对象已存在)，<strong>所以如果是在构造函数体内进行赋值的话，等于是一次默认构造加一次赋 值，而初始化列表只做一次赋值操作。</strong></p>
+<h1 id="dynamic-cast"><a href="#dynamic-cast" class="headerlink" title="dynamic_cast"></a>dynamic_cast</h1><p>有类型检查，基类向派生类转换比较安全，但是派生类向基类转换则不太安全</p>
+<p><code>dynamic_cast</code> 是 C++ 中用于运行时类型识别的一种操作符。它可以将一个指向基类的指针或引用转换为指向派生类的指针或引用，也可以将一个指向派生类的指针或引用转换为指向基类的指针或引用。<code>dynamic_cast</code> 能够在类型转换过程中进行安全检查，以确保类型转换的正确性。</p>
+<p>在将基类指针或引用转换为派生类指针或引用时，<code>dynamic_cast</code> 可以在编译时检查类型信息，并确保类型转换的正确性。如果类型转换不正确，<code>dynamic_cast</code> 将返回一个空指针或引用。因此，这种类型转换比较安全。</p>
+<p>但是，将派生类指针或引用转换为基类指针或引用时，情况就不一样了。由于派生类包含了基类的所有成员和方法，因此派生类指针或引用可以随意地转换为基类指针或引用。但是，在将派生类指针或引用转换为基类指针或引用时，由于派生类可能包含不止一个基类，而且这些基类之间可能有重叠，所以在运行时无法确定要转换的基类指针或引用的确切类型。因此，如果转换的类型与实际类型不匹配，将会出现未定义的行为。</p>
+<h1 id="reinterpret-cast"><a href="#reinterpret-cast" class="headerlink" title="reinterpret_cast"></a>reinterpret_cast</h1><p><code>reinterpret_cast (expression)</code></p>
+<p> type-id 必须是一个指针、引用、算术类型、函数指针或者成员指针。它可以用于类型之间进行强制转 换。</p>
+<h1 id="const-cast"><a href="#const-cast" class="headerlink" title="const_cast"></a>const_cast</h1><p><code>const_cast&lt;type_id&gt; (expression)</code><br>该运算符用来修改类型的const或volatile属性。除了const 或volatile修饰之外， type_id和expression的类型<br>是一样的。用法如下：</p>
+<ul>
+<li>常量指针被转化成非常量的指针，并且仍然指向原来的对象</li>
+<li>常量引用被转换成非常量的引用，并且仍然指向原来的对象</li>
+<li>const_cast一般用于修改底指针。如const char *p形式</li>
+</ul>
+<h1 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h1><p>static_cast &lt; type-id &gt; (expression)<br>该运算符把expression转换为type-id类型，但没有运行时类型检查来保证转换的安全性。它主要有如下几<br>种用法：</p>
+<ul>
+<li>用于类层次结构中基类（父类）和派生类（子类）之间指针或引用引用的转换<ul>
+<li>进行上行转换（把派生类的指针或引用转换成基类表示）是安全的</li>
+<li>进行下行转换（把基类指针或引用转换成派生类表示）时，由于没有动态类型检查，所以是不安全的</li>
+</ul>
+</li>
+<li>用于基本数据类型之间的转换，如把int转换成char，把int转换成enum。这种转换的安全性也要开发人员来保证。</li>
+<li>把空指针转换成目标类型的空指针</li>
+<li>把任何类型的表达式转换成void类型</li>
+</ul>
+<p>注意：static_cast不能转换掉expression的const、volatile、或者__unaligned属性。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/09/06/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/" rel="prev" title="数据结构-3">
+      <i class="fa fa-chevron-left"></i> 数据结构-3
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/13/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%853/" rel="next" title="c++-补充3">
+      c++-补充3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#extern%E2%80%9DC%E2%80%9D%E7%9A%84%E7%94%A8%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">extern”C”的用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8E%E6%8C%87%E9%92%88%E5%92%8C%E6%82%AC%E7%A9%BA%E6%8C%87%E9%92%88"><span class="nav-number">2.</span> <span class="nav-text">野指针和悬空指针</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%A4%A7%E5%B0%8F%E7%AB%AF%E5%AD%98%E5%82%A8"><span class="nav-number">3.</span> <span class="nav-text">判断大小端存储</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#volatile%E3%80%81mutable%E5%92%8Cexplicit%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">4.</span> <span class="nav-text">volatile、mutable和explicit关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile"><span class="nav-number">4.1.</span> <span class="nav-text">volatile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mutable"><span class="nav-number">4.2.</span> <span class="nav-text">mutable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#explicit"><span class="nav-number">4.3.</span> <span class="nav-text">explicit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-%E7%9A%84%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">C++的异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#try%E3%80%81throw%E5%92%8Ccatch%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">5.1.</span> <span class="nav-text">try、throw和catch关键字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%82%E5%B8%B8%E5%A3%B0%E6%98%8E%E5%88%97%E8%A1%A8"><span class="nav-number">5.2.</span> <span class="nav-text">函数的异常声明列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BC%82%E5%B8%B8%E7%B1%BB-exception"><span class="nav-number">5.3.</span> <span class="nav-text">C++标准异常类 exception</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">静态变量什么时候初始化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#i-%E5%92%8C-i%E7%9A%84%E5%B7%A6%E5%8F%B3%E5%80%BC%E5%88%A4%E6%96%AD"><span class="nav-number">7.</span> <span class="nav-text">i++和++i的左右值判断</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%BE%8B%E9%A2%98"><span class="nav-number">8.</span> <span class="nav-text">关于二维数组例题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E6%B1%87%E7%BC%96%E5%B1%82%E5%8E%BB%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E5%BC%95%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">从汇编层去解释一下引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#malloc%E3%80%81realloc%E3%80%81calloc%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.</span> <span class="nav-text">malloc、realloc、calloc的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E7%9A%84%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-number">11.</span> <span class="nav-text">构造函数的执行顺序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%EF%BC%8C%E5%A6%82%E4%BD%95%E6%A3%80%E6%B5%8B%E4%B8%8E%E9%81%BF%E5%85%8D"><span class="nav-number">12.</span> <span class="nav-text">什么是内存泄露，如何检测与避免</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9B%B6%E6%8B%B7%E8%B4%9D"><span class="nav-number">13.</span> <span class="nav-text">零拷贝</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%90%E5%91%98%E5%88%9D%E5%A7%8B%E5%8C%96%E5%88%97%E8%A1%A8%E7%9A%84%E6%A6%82%E5%BF%B5%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8%E5%AE%83%E4%BC%9A%E5%BF%AB%E4%B8%80%E4%BA%9B"><span class="nav-number">14.</span> <span class="nav-text">成员初始化列表的概念，为什么用它会快一些</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dynamic-cast"><span class="nav-number">15.</span> <span class="nav-text">dynamic_cast</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#reinterpret-cast"><span class="nav-number">16.</span> <span class="nav-text">reinterpret_cast</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#const-cast"><span class="nav-number">17.</span> <span class="nav-text">const_cast</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#static-cast"><span class="nav-number">18.</span> <span class="nav-text">static_cast</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -147,7 +147,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -161,7 +161,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/" class="post-title-link" itemprop="url">Linux-信号</a>
+            <a href="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/" class="post-title-link" itemprop="url">Linux-信号</a>
         </h2>
 
         <div class="post-meta">
@@ -203,7 +203,7 @@
 </ol>
 <p>概念：<br>    未决：产生与递达之间状态。<br>    递达：产生并且送达到进程。直接被内核处理掉。<br>    信号处理方式： 执行默认处理动作、忽略、捕捉（自定义）<br>    阻塞信号集（信号屏蔽字）： 本质：位图。用来记录信号的屏蔽状态。一旦被屏蔽的信号，在解除屏蔽前，一直处于未决态。<br>    未决信号集：本质：位图。用来记录信号的处理状态。该信号集中的信号，表示，已经产生，但尚未被处理。</p>
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230615210105991.png" alt="image-20230615210105991"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230615210105991.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230615210105991.png" class title="This is an test image">
 
 <p>默认2号为0.一旦有信号要2，则2处于未决变为1，如果信号屏蔽字为1一直处于未决态，未阻塞状态默认为0，则0变1会阻塞，默认下没阻塞这个过程很快。</p>
 <h2 id="信号四要素和常规信号一览"><a href="#信号四要素和常规信号一览" class="headerlink" title="信号四要素和常规信号一览"></a>信号四要素和常规信号一览</h2><p>变量三要素：变量类型，变量名，变量值</p>
@@ -213,7 +213,7 @@
 <h2 id="kill-函数和-kill-命令"><a href="#kill-函数和-kill-命令" class="headerlink" title="kill 函数和 kill 命令"></a>kill 函数和 kill 命令</h2><p>kill 命令 和 kill 函数：<br>    <code>int kill（pid_t pid, int signum）</code><br>    参数：<br>    pid: &gt; 0:发送信号给指定进程<br>            &#x3D; 0：发送信号给跟调用 kill 函数的那个进程处于同一进程组的进程。<br>            &lt; -1: 取绝对值，发送信号给该绝对值所对应的进程组的所有组员。<br>            &#x3D; -1：发送信号给，有权限发送的所有进程。<br>    signum：待发送的信号<br>返回值：<br>        成功： 0<br>        失败： -1 errno</p>
 <p>子进程发送信号 kill 父进程</p>
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230615211148166.png" alt="image-20230615211148166"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230615211148166.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230615211148166.png" class title="This is an test image">
 
 <p>这里子进程不发送 kill 信号，发其他信号也行，比如段错误什么的。 </p>
 <p><code>kill -9 -groupname</code> 杀一个进程组</p>
@@ -222,16 +222,16 @@
 
 <p>使用 setitimer 定时，向屏幕打印信息：</p>
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230615212147397.png" alt="image-20230615212147397"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230615212147397.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230615212147397.png" class title="This is an test image">
 
 <p>第一次信息打印是两秒间隔，之后都是 5 秒间隔打印一次。可以理解为第一次是有个定时器，什么时候触发打印，之后就是间隔时间。</p>
 <h2 id="信号集操作函数"><a href="#信号集操作函数" class="headerlink" title="信号集操作函数"></a>信号集操作函数</h2><p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616164625460.png" alt="image-20230616164625460"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616164625460.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616164625460.png" class title="This is an test image">
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">信号集操作函数：</span><br><span class="line">    sigset_t set; 自定义信号集。</span><br><span class="line">    sigemptyset(sigset_t *set); 清空信号集</span><br><span class="line">    sigfillset(sigset_t *set); 全部置 1</span><br><span class="line">    sigaddset(sigset_t *set, int signum); 将一个信号添加到集合中</span><br><span class="line">    sigdelset(sigset_t *set, int signum); 将一个信号从集合中移除</span><br><span class="line">    sigismember（const sigset_t *set，int signum); 判断一个信号是否在集合中。 在--》1，不在--》0</span><br><span class="line">设置信号屏蔽字和解除屏蔽：</span><br><span class="line">    int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);</span><br><span class="line">    how: SIG_BLOCK: 设置阻塞</span><br><span class="line">        SIG_UNBLOCK: 取消阻塞</span><br><span class="line">        SIG_SETMASK: 用自定义 set 替换 mask。</span><br><span class="line">    set： 自定义 set</span><br><span class="line">    oldset：旧有的 mask。</span><br><span class="line">查看未决信号集：</span><br><span class="line">    int sigpending(sigset_t *set);</span><br><span class="line">    set： 传出的 未决信号集。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="信号集操作函数练习"><a href="#信号集操作函数练习" class="headerlink" title="信号集操作函数练习"></a>信号集操作函数练习</h2><p>信号列表：<img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165025942.png" alt="image-20230616165025942"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165025942.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165025942.png" class title="This is an test image">
 
 <p>其中 9 号和 19 号信号比较特殊，只能执行默认动作，不能忽略捕捉，不能设置阻塞。</p>
 <p>下面这个小例子，利用自定义集合，来设置信号阻塞，我们输入被设置阻塞的信号，可以看到未决信号集发生变化：</p>
@@ -239,17 +239,17 @@
 
 <p>编译运行，如下图所示：</p>
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165908670.png" alt="image-20230616165908670"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165908670.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616165908670.png" class title="This is an test image">
 
 <p>可以看到，在输入 Ctrl+C 之后，进程捕捉到信号，但由于设置阻塞，没有处理，未决信号集对应位 置变为 1.</p>
 <h2 id="signal-实现信号捕捉"><a href="#signal-实现信号捕捉" class="headerlink" title="signal 实现信号捕捉"></a>signal 实现信号捕捉</h2><p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170009398.png" alt="image-20230616170009398"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170009398.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170009398.png" class title="This is an test image">
 
 <p>参数： </p>
 <p>​	signum ：待捕捉信号 </p>
 <p>​	handler：捕捉信号后的操纵函数</p>
 <p>返回值：<img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170104431.png" alt="image-20230616170104431"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170104431.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170104431.png" class title="This is an test image">
 
 <p>信号捕捉特性：</p>
 <ol>
@@ -258,20 +258,20 @@
 <li>捕捉函数执行期间，被屏蔽信号多次发送，解除屏蔽后只处理一次！</li>
 </ol>
 <p>一个信号捕捉的小例子：<img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170159382.png" alt="image-20230616170159382"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170159382.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170159382.png" class title="This is an test image">
 
 <p>在上述代码中，函数<code>sig_cath</code>是一个信号处理函数，它被注册为了<code>SIGINT</code>信号的处理器。当程序接收到<code>SIGINT</code>信号（通常由终端按下Ctrl+C触发）时，该处理函数会被调用。在此处，参数<code>signo</code>代表接收到的信号编号，因此在函数定义中声明了参数<code>int signo</code>。</p>
 <p>在<code>main</code>函数中，通过调用<code>signal(SIGINT, sig_cath)</code>将<code>sig_cath</code>函数注册为<code>SIGINT</code>信号（终端中断信号）的处理函数。这样，当程序接收到<code>SIGINT</code>信号时，就会调用<code>sig_cath</code>函数进行相关处理。</p>
 <p>总结起来，参数<code>signo</code>是由系统自动传递给信号处理函数的，在这段代码中并不需要手动传入。</p>
 <h2 id="sigaction-实现信号捕捉"><a href="#sigaction-实现信号捕捉" class="headerlink" title="sigaction 实现信号捕捉"></a>sigaction 实现信号捕捉</h2><p>sigaction 也是注册一个信号捕捉函数</p>
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170313810.png" alt="image-20230616170313810"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170313810.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170313810.png" class title="This is an test image">
 
 <p>下面的小例子，使用 sigaction 捕捉两个信号：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;signal.h&gt;</span><br><span class="line">3. #include &lt;stdlib.h&gt;</span><br><span class="line">4. #include &lt;string.h&gt;</span><br><span class="line">5. #include &lt;unistd.h&gt;</span><br><span class="line">6. #include &lt;errno.h&gt;</span><br><span class="line">7. #include &lt;pthread.h&gt;</span><br><span class="line">8.</span><br><span class="line">9. void sys_err(const char *str)</span><br><span class="line">10. &#123;</span><br><span class="line">11. perror(str);</span><br><span class="line">12. exit(1);</span><br><span class="line">13. &#125;</span><br><span class="line">14.</span><br><span class="line">15. void sig_catch(int signo) // 回调函数</span><br><span class="line">16. &#123;</span><br><span class="line">17. if (signo == SIGINT) &#123;</span><br><span class="line">18. printf(&quot;catch you!! %d\n&quot;, signo);</span><br><span class="line">19. sleep(10);</span><br><span class="line">20. &#125;</span><br><span class="line">21.</span><br><span class="line">22. else if (signo == SIGQUIT)</span><br><span class="line">23. printf(&quot;-----------catch you!! %d\n&quot;, signo);</span><br><span class="line">24.</span><br><span class="line">25. return ;</span><br><span class="line">26. &#125;</span><br><span class="line">27.</span><br><span class="line">28. int main(int argc, char *argv[])</span><br><span class="line">29. &#123;</span><br><span class="line">30. struct sigaction act, oldact;</span><br><span class="line">31.</span><br><span class="line">32. act.sa_handler = sig_catch; // set callback function name 设置回调函数</span><br><span class="line">33. sigemptyset(&amp;(act.sa_mask)); // set mask when sig_catch working. 清空 sa_mask 屏蔽字, 只在sig_catch 工作时有效</span><br><span class="line">34. //sigaddset(&amp;act.sa_mask, SIGQUIT);</span><br><span class="line">35. act.sa_flags = 0; // usually use. 默认值</span><br><span class="line">36.</span><br><span class="line">37. int ret = sigaction(SIGINT, &amp;act, &amp;oldact); //注册信号捕捉函数</span><br><span class="line">38. if (ret == -1)</span><br><span class="line">39. sys_err(&quot;sigaction error&quot;);</span><br><span class="line">40. ret = sigaction(SIGQUIT, &amp;act, &amp;oldact); //注册信号捕捉函数</span><br><span class="line">41.</span><br><span class="line">42. while (1);</span><br><span class="line">43.</span><br><span class="line">44. return 0;</span><br><span class="line">45. &#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170558665.png" alt="image-20230616170558665"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170558665.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170558665.png" class title="This is an test image">
 
 <h2 id="信号捕捉的特性"><a href="#信号捕捉的特性" class="headerlink" title="信号捕捉的特性"></a>信号捕捉的特性</h2><p>信号捕捉特性：</p>
 <ol>
@@ -280,7 +280,7 @@
 <li>捕捉函数执行期间，被屏蔽信号多次发送，解除屏蔽后只处理一次！</li>
 </ol>
 <h2 id="内核实现信号捕捉简析"><a href="#内核实现信号捕捉简析" class="headerlink" title="内核实现信号捕捉简析"></a>内核实现信号捕捉简析</h2><p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170745748.png" alt="image-20230616170745748"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170745748.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616170745748.png" class title="This is an test image">
 
 <h2 id="借助信号捕捉回收子进程"><a href="#借助信号捕捉回收子进程" class="headerlink" title="借助信号捕捉回收子进程"></a>借助信号捕捉回收子进程</h2><p>SIGCHLD 的产生条件： </p>
 <p>​	子进程终止时 </p>
@@ -290,7 +290,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">1. #include &lt;stdio.h&gt;</span><br><span class="line">2. #include &lt;stdlib.h&gt;</span><br><span class="line">3. #include &lt;string.h&gt;</span><br><span class="line">4. #include &lt;unistd.h&gt;</span><br><span class="line">5. #include &lt;signal.h&gt;</span><br><span class="line">6. #include &lt;sys/wait.h&gt;</span><br><span class="line">7. #include &lt;errno.h&gt;</span><br><span class="line">8. #include &lt;pthread.h&gt;</span><br><span class="line">9.</span><br><span class="line">10. void sys_err(const char *str)</span><br><span class="line">11. &#123;</span><br><span class="line">12. perror(str);</span><br><span class="line">13. exit(1);</span><br><span class="line">14. &#125;</span><br><span class="line">15.</span><br><span class="line">16. void catch_child(int signo)// 有子进程终止，发送 SGCHLD 信号时，该函数会被内核回调</span><br><span class="line">17. &#123;</span><br><span class="line">18. pid_t wpid;</span><br><span class="line">19.</span><br><span class="line">20. wpid = wait(NULL);</span><br><span class="line">21. printf(&quot;-----------catch child id %d\n&quot;, wpid);</span><br><span class="line">22.</span><br><span class="line">23. return ;</span><br><span class="line">24. &#125;</span><br><span class="line">25.</span><br><span class="line">26. int main(int argc, char *argv[])</span><br><span class="line">27. &#123;</span><br><span class="line">28. pid_t pid;</span><br><span class="line">29. //阻塞,和解除阻塞一起用可以避免出现还未注册信号捕捉函数，子进程就直接接受信号默认过程，参考信号集操作函数</span><br><span class="line">	sigset_t set;</span><br><span class="line">	sigemptyset(&amp;set);</span><br><span class="line">	sigaddset(&amp;set, SIGCHLD);</span><br><span class="line">	sigprocmask(SIG_BLOCK, &amp;set, NULL);</span><br><span class="line">30. int i;</span><br><span class="line">31. for (i = 0; i &lt; 5; i++)</span><br><span class="line">32. if ((pid = fork()) == 0) // 创建多个子进程</span><br><span class="line">33. break;</span><br><span class="line">34.</span><br><span class="line">35. if (5 == i) &#123;</span><br><span class="line">36. struct sigaction act;</span><br><span class="line">37.</span><br><span class="line">38. act.sa_handler = catch_child; // 设置回调函数</span><br><span class="line">39. sigemptyset(&amp;act.sa_mask); // 设置捕捉函数执行期间屏蔽字</span><br><span class="line">40. act.sa_flags = 0; // 设置默认属性, 本信号自动屏蔽</span><br><span class="line">41.</span><br><span class="line">42. sigaction(SIGCHLD, &amp;act, NULL); // 注册信号捕捉函数</span><br><span class="line">43. //解除阻塞</span><br><span class="line">44.sigprocmask(SIG_UNBLOCK, &amp;set, NULL);</span><br><span class="line">45. printf(&quot;I&#x27;m parent, pid = %d\n&quot;, getpid());</span><br><span class="line">46.</span><br><span class="line">47. while (1);</span><br><span class="line">48.</span><br><span class="line">49. &#125; else &#123;</span><br><span class="line">50. printf(&quot;I&#x27;m child pid = %d\n&quot;, getpid());</span><br><span class="line">51. return i;</span><br><span class="line">52. &#125;</span><br><span class="line">53.</span><br><span class="line">54. return 0;</span><br><span class="line">55. &#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/Linux-%E4%BF%A1%E5%8F%B7/image-20230616171436271.png" alt="image-20230616171436271"></p>
-<img src="/2023/06/15/Linux-%E4%BF%A1%E5%8F%B7/image-20230616171436271.png" class title="This is an test image">
+<img src="/2023/06/15/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux-%E4%BF%A1%E5%8F%B7/image-20230616171436271.png" class title="This is an test image">
 
 <p>如图，只回收到 1 个子进程，多次执行，会发现回收到的子进程数量不是固定的。 原因分析： 问题出在，一次回调只回收一个子进程这里。同时出现多个子进程死亡时，其中一个子进程死亡 信号被捕捉，父进程去处理这个信号，此时其他子进程死亡信号发送过来，由于相同信号的不排队原 则，就只会回收累积信号中的一个子进程。</p>
 <p>修改代码，回调函数中添加循环，一次回调可以回收多个子进程：</p>
@@ -350,7 +350,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -364,7 +364,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/" class="post-title-link" itemprop="url">Linux进程相关</a>
+            <a href="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/" class="post-title-link" itemprop="url">Linux进程相关</a>
         </h2>
 
         <div class="post-meta">
@@ -397,15 +397,15 @@
       
           <h2 id="进程和程序以及-CPU-相关"><a href="#进程和程序以及-CPU-相关" class="headerlink" title="进程和程序以及 CPU 相关"></a>进程和程序以及 CPU 相关</h2><p>进程：<br>        程序：死的。只占用磁盘空间。 ——剧本。<br>        进程；活的。运行起来的程序。占用内存、cpu 等系统资源。 ——戏。<br>并发和并行：并行是宏观上并发，微观上串行</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601213825110.png" alt="image-20230601213825110"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601213825110.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601213825110.png" class title="This is an test image">
 
 <h2 id="虚拟内存和物理内存映射关系"><a href="#虚拟内存和物理内存映射关系" class="headerlink" title="虚拟内存和物理内存映射关系"></a>虚拟内存和物理内存映射关系</h2><p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" alt="image-20230601215722575"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230601215722575.png" class title="This is an test image">
 
 <p>Linux下只有两级。从用户空间到内核空间进的时候，需要借助mmu，帮助完成全级切换。</p>
 <h2 id="pcb-进程控制块"><a href="#pcb-进程控制块" class="headerlink" title="pcb 进程控制块"></a>pcb 进程控制块</h2><p>PCB 进程控制块：进程 id<br>文件描述符表<br>进程状态： 初始态、就绪态、运行态、挂起态、终止态。<br>进程工作目录位置<br>*umask 掩码 （进程的概念）<br>信号相关信息资源。<br>用户 id 和组 id<br>ps aux 返回结果里，第二列是进程 id</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212449400.png" alt="image-20230609212449400"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212449400.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212449400.png" class title="This is an test image">
 
 <h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">echo $PATH 查看环境变量</span><br><span class="line">path 环境变量里记录了一系列的值，当运行一个可执行文件时，系统会去环境变量记录的位置里查</span><br><span class="line">找这个文件并执行。</span><br><span class="line">echo $TERM 查看终端</span><br><span class="line">echo $LANG 查看语言</span><br><span class="line">env 查看所有环境变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
@@ -417,17 +417,17 @@
 <p>父子进程共享： 读时共享、写时复制。———————— 全局变量。 1. 文件描述符 2. mmap 映射区</p>
 <h2 id="fork-创建子进程"><a href="#fork-创建子进程" class="headerlink" title="fork 创建子进程"></a>fork 创建子进程</h2><p>下面是一个 fork 函数的例子，代码如下：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212838706.png" alt="image-20230609212838706"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212838706.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212838706.png" class title="This is an test image">
 
 <p>fork 之前的代码，父子进程都有，但是只有父进程执行了，子进程没有执行，fork 之后的代码，父子进程都有机会执行。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">两个函数：</span><br><span class="line">pid_t getpid() 获取当前进程 id</span><br><span class="line">pid_t getppid() 获取当前进程的父进程 id</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212951089.png" alt="image-20230609212951089"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212951089.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609212951089.png" class title="This is an test image">
 
 <h2 id="循环创建多个子进程"><a href="#循环创建多个子进程" class="headerlink" title="循环创建多个子进程"></a>循环创建多个子进程</h2><p>所以，直接用个 for 循环是要出事情的，因为子进程也会 fork 新的进程 这里，对调用 fork 的进程进行判定，只让父进程 fork 新的进程就行，代码如下：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609213428815.png" alt="image-20230609213428815"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609213428815.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230609213428815.png" class title="This is an test image">
 
 <p>出现了问题：进程多了一个，而且不是按顺序来的。这里多出的一个，是父进程，因为父进程才有 i&#x3D;5 跳出循环这一步。所以，对父进程进行判定并处理</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if(i=5)</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;parent&quot;);</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">	printf(&quot;..&quot;,i+1);</span><br></pre></td></tr></table></figure>
@@ -451,15 +451,15 @@
 
 <p>示例代码，通过 execlp 让子进程去执行 ls 命令：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215110094.png" alt="image-20230610215110094"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215110094.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215110094.png" class title="This is an test image">
 
 <p>只有父进程正确执行并输出了，子进程的 ls 输出有问题。 问题出在参数上，可变参数那里，是从 argv[0]开始计算的。 修改代码，就是将缺失的 argv[0]补上，然后让父进程延时 1 秒，保证终端提示符不和输出干扰。如 下：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215242121.png" alt="image-20230610215242121"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215242121.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215242121.png" class title="This is an test image">
 
 <p>下面使用 execl 来让子程序调用自定义的程序。 int execl(const char *path, const char *arg, …) 这里要注意，和 execlp 不同的是，第一个参数是路径，不是文件名。 这个路径用相对路径和绝对路径都行。</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215316774.png" alt="image-20230610215316774"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215316774.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215316774.png" class title="This is an test image">
 
 <p>用 execl 也能执行 ls 这些，把路径给出来就行，但是这样麻烦，所以对于系统指令一般还是用 execlp</p>
 <h2 id="exec-函数族特性"><a href="#exec-函数族特性" class="headerlink" title="exec 函数族特性"></a>exec 函数族特性</h2><p>写一个程序，使用 execlp 执行进程查看，并将结果输出到文件里。 要用到 open, execlp, dup2</p>
@@ -473,7 +473,7 @@
 
 <p>下面这个例子，使用 wait 来阻塞回收子进程</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215813155.png" alt="image-20230610215813155"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215813155.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230610215813155.png" class title="This is an test image">
 
 <h2 id="获取子进程退出值和异常终止信号"><a href="#获取子进程退出值和异常终止信号" class="headerlink" title="获取子进程退出值和异常终止信号"></a>获取子进程退出值和异常终止信号</h2><p>获取子进程正常终止值：<br>WIFEXITED(status) –》 为真 –》调用 WEXITSTATUS(status) –》 得到 子进程 退出值。<br>获取导致子进程异常终止信号：<br>WIFSIGNALED(status) –》 为真 –》调用 WTERMSIG(status) –》 得到 导致子进程异常<br>终止的信号编号。</p>
 <p>下面这个代码捕获程序异常终止的信号并打印：</p>
@@ -551,20 +551,20 @@
 <h2 id="命名管道-fifo-的创建和原理图"><a href="#命名管道-fifo-的创建和原理图" class="headerlink" title="命名管道 fifo 的创建和原理图"></a>命名管道 fifo 的创建和原理图</h2><p>管道的优劣：<br>优点：简单，相比信号，套接字实现进程通信，简单很多<br>缺点：1.只能单向通信，双向通信需建立两个管道<br> 2.只能用于有血缘关系的进程间通信。该问题后来使用 fifo 命名管道解决。</p>
 <p>fifo 管道：可以用于无血缘关系的进程间通信。<br>命名管道： mkfifo<br>无血缘关系进程间通信：<br>读端，open fifo O_RDONLY<br>写端，open fifo O_WRONLY<br>fifo 操作起来像文件<br>下面的代码创建一个 fifo：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214052445.png" alt="image-20230612214052445"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214052445.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214052445.png" class title="This is an test image">
 
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215028041.png" alt="image-20230612215028041"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215028041.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215028041.png" class title="This is an test image">
 
 <h2 id="fifo-实现非血缘关系进程间通信"><a href="#fifo-实现非血缘关系进程间通信" class="headerlink" title="fifo 实现非血缘关系进程间通信"></a>fifo 实现非血缘关系进程间通信</h2><p>下面这个例子，一个写 fifo，一个读 fifo，操作起来就像文件一样的：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214842946.png" alt="image-20230612214842946"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214842946.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214842946.png" class title="This is an test image">
 
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214916095.png" alt="image-20230612214916095"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214916095.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612214916095.png" class title="This is an test image">
 
 <p>编译执行，如图：<img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215107477.png" alt="image-20230612215107477"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215107477.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230612215107477.png" class title="This is an test image">
 
 <p>测试一个写端多个读端的时候，由于数据一旦被读走就没了，所以多个读端的并集才是写端的写 入数据。</p>
 <h2 id="文件用于进程间通信"><a href="#文件用于进程间通信" class="headerlink" title="文件用于进程间通信"></a>文件用于进程间通信</h2><p>文件实现进程间通信： 打开的文件是内核中的一块缓冲区。多个无血缘关系的进程，可以同时访问该文件。</p>
@@ -577,7 +577,7 @@
 <p>出现段错误，gdb然后run停止的地方就是段错误。</p>
 <h2 id="mmap-建立映射区"><a href="#mmap-建立映射区" class="headerlink" title="mmap 建立映射区"></a>mmap 建立映射区</h2><p>下面这个示例代码，使用 mmap 创建一个映射区（共享内存），并往映射区里写入内容：</p>
 <p><img src="/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230614113240142.png" alt="image-20230614113240142"></p>
-<img src="/2023/06/01/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230614113240142.png" class title="This is an test image">
+<img src="/2023/06/01/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3/image-20230614113240142.png" class title="This is an test image">
 
 <h2 id="mmap-使用注意事项"><a href="#mmap-使用注意事项" class="headerlink" title="mmap 使用注意事项"></a>mmap 使用注意事项</h2><p>使用注意事项：</p>
 <ol>
@@ -727,7 +727,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -741,7 +741,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/" class="post-title-link" itemprop="url">深入理解计算机系统-第五章</a>
+            <a href="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/" class="post-title-link" itemprop="url">深入理解计算机系统-第五章</a>
         </h2>
 
         <div class="post-meta">
@@ -787,7 +787,7 @@
 <p>最小化一个计算中的操作数量不一定会提高它的性能。</p>
 <p>CPE即是需要的时钟周期。</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230610161658961.png" alt="image-20230610161658961"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230610161658961.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230610161658961.png" class title="This is an test image">
 
 <p>延迟界限给出了任何必须按照严格顺序完成合并运算的函数所需要的最小CPE值。根据功能单元产生结果的最大速率，吞吐量界限给出了CPE的最小界限。例如，因为只有一个整数乘法器，它的发射时间为1个时钟周期，处理器不可能支持每个时钟周期大于1条乘法的速度。另-一方面，四个功能单元都可以执行整数加法，处理器就有可能持续每个周期执行4个操作的速率。不幸的是，因为需要从内存读数据，这造成了另一个吞吐量界限。两个加载单元限制了处理器每个时钟周期最多只能读取两个数据值，从而使得吞吐量界限为0.50。</p>
 <h2 id="让编译器展开循环"><a href="#让编译器展开循环" class="headerlink" title="让编译器展开循环"></a>让编译器展开循环</h2><p>编译器可以很容易地执行循环展开。只要优化级别设置得足够高，许多编译器都能例行公事地做到这一点。用优化等级3或更高等级调用GCC，它就会执行循环展开。</p>
@@ -807,20 +807,20 @@
 <p>我们新建了两个变量sum1和sum2用于存储循环展开时两个累加语句的累加结果，最后在循环体外将两部分结果相加得到最终结果。该代码中两个累加语句之间是互不相关的，所以CPU可以并行执行这两条指令，以达到性能的进一步提高。相较于只进行循环展开的代码速度又快了将近一倍。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>由上面三段代码的运行速度对比可以看出，循环展开对程序性能有着很重要的影响，可以减少分支预测错误次数，增加取消数据相关进一步利用并行执行提高速度的机会。但是，<strong>并不建议大家进行手动的循环展开</strong>，在代码中进行循环展开会导致程序的可读性下降，代码膨胀。为了直观感受循环展开对性能的影响，上述代码运行结果均是在不开编译器优化的情况下进行的测试，其实在我们<strong>开启了编译器优化</strong>的时候，编译器会自动对我们的循环代码进行循环展开，让我们可以在保持了代码可读性的同时，又能享受到循环展开对我们程序性能的提高。</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165045230.png" alt="image-20230613165045230"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165045230.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165045230.png" class title="This is an test image">
 
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165134725.png" alt="image-20230613165134725"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165134725.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165134725.png" class title="This is an test image">
 
 
 
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165149509.png" alt="image-20230613165149509"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165149509.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165149509.png" class title="This is an test image">
 
 
 
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165207581.png" alt="image-20230613165207581"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165207581.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230613165207581.png" class title="This is an test image">
 
 <h2 id="SIMD-用向量指令达到更高的并行度"><a href="#SIMD-用向量指令达到更高的并行度" class="headerlink" title="SIMD:用向量指令达到更高的并行度"></a>SIMD:用向量指令达到更高的并行度</h2><p><em>Single Instruction Multiple Data</em>，单指令多数据流，可以使用一条指令同时完成多个数据的运算操作。传统的指令架构是SISD就是单指令单数据流，每条指令只能对一个数据执行操作。</p>
 <p>单纯使用SIMD指令并没有什么技术含量，一般程序员也不太会使用 Intrinsics 函数来优化 SIMD，基本上都是靠编译器帮我们进行自动矢量化。想要代码能尽量的自动矢量化，以下几点需要多注意：</p>
@@ -841,19 +841,19 @@
 <p>讨论过，不是所有的条件行为都能用条件数据传送来实现，所以无可避免地在某些情况中，程序员不能避免写出会导致条件分支的代码，而对于这些条件分支，处理器用分支预测可能会处理得很糟糕。但是，正如我们讲过的，程序员方面用一点点聪明，有时就能使代码更容易被翻译成条件数据传送。这需要一些试验，写出函数的不同版本，然后检查产生的汇编代码，并测试性能。</p>
 <p>分支预测只对有规律的模式可行。程序中的许多测试是完全不可预测的，依赖于数据的任意特性，例如一个数是负数还是正数。对于这些测试，分支预测逻辑会处理得很糟糕。对于本质上无法预测的情况，如果编译器能够产生使用条件数据传送而不是使用条件控制转移的代码，可以极大地提高程序的性能。这不是C语言程序员可以直接控制的，但是有些表达条件行为的方法能够更直接地被翻译成条件传送，而不是其他操作。</p>
 <h2 id="理解内存性能"><a href="#理解内存性能" class="headerlink" title="理解内存性能"></a>理解内存性能</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114807883.png" alt="image-20230705114807883"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114807883.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114807883.png" class title="This is an test image">
 
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114829177.png" alt="image-20230705114829177"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114829177.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114829177.png" class title="This is an test image">
 
 <p>原代码</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705114934148.png" alt="image-20230705114934148"></p>
 <p>后者vmovss有内存读取，即有了写读相关，导致数据相关。每次需要pi就得先写再读取，导致CPE高，如果是上面就没有。</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115802949.png" alt="image-20230705115802949"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115802949.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115802949.png" class title="This is an test image">
 
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115942271.png" alt="image-20230705115942271"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115942271.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230705115942271.png" class title="This is an test image">
 
 <h2 id="确认和消除性能瓶颈"><a href="#确认和消除性能瓶颈" class="headerlink" title="确认和消除性能瓶颈"></a>确认和消除性能瓶颈</h2><p>至此，我们只考虑了优化小的程序，在这样的小程序中有一些很明显限制性能的地方，因此应该是集中注意力对它们进行优化。在处理大程序时，连知道应该优化什么地方都是很难的。本节会描述如何使用代码剖析程序(code profiler)，这是在程序执行时收集性能数据的分析工具。我们还展示了一个系统优化的通用原则，称为Amdahl定律。</p>
 <h3 id="程序剖析"><a href="#程序剖析" class="headerlink" title="程序剖析"></a>程序剖析</h3><p>程序剖析(profiling)运行程序的一个版本，其中插人了工具代码，以确定程序的各个部分需要多少时间。这对于确认程序中我们需要集中注意力优化的部分是很有用的。剖析的一个有力之处在于可以在现实的基准数据(benchmark data)上运行实际程序的同时，进行剖析。</p>
@@ -865,12 +865,12 @@
 <p><code>linux&gt; gprof prog</code></p>
 <p>剖析报告的第一部分列出了执行各个函数花费的时间，按照降序排列。作为一个示例，下面列出了报告的一部分，是关于程序中最耗费时间的三个函数的:</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706112821635.png" alt="image-20230706112821635"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706112821635.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706112821635.png" class title="This is an test image">
 
 <p>每一行代表对某个函数的所有调用所花费的时间。第一列表明花费在这个函数上的时间占整个时间的百分比。第二列显示的是直到这一行并包括这一行的函数所花费的累计时间。第三列显示的是花费在这个函数上的时间，而第四列显示的是它被调用的次数(递归调用不计算在内)。在例子中，函数sort_words只被调用了一次，但就是这一次调用需要203.66秒，而函数find ele_rec被调用了965 027次(递归调用不计算在内)，总共需要4.85秒。函数 strlen通过调用库函数strlen来计算字符串的长度。GPROF的结果中通常不显示库函数调用。库函数耗费的时间通常计算在调用它们的函数内。通过创建这个“包装函数( wrapper function)”strlen，我们可以可靠地跟踪对strlen的调用，表明它被调用了12511 031次，但是一共只需要0.30秒。</p>
 <p>剖析报告的第二部分是函数的调用历史。下面是一个递归函数find ele rec的历史:</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706113048681.png" alt="image-20230706113048681"></p>
-<img src="/2023/05/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706113048681.png" class title="This is an test image">
+<img src="/2023/05/29/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%BA%94%E7%AB%A0/image-20230706113048681.png" class title="This is an test image">
 
 <p>这个历史既显示了调用find_ele_rec的函数，也显示了它调用的函数。头两行显示的是对这个函数的调用:被它自身递归地调用了158655725次，被函数insert_string调用了965 027次(它本身被调用了965027次)。函数find_ele_rec也调用了另外两个函数save_string和 new_ele，每个函数总共被调用了363039次。<br>根据这个调用信息，我们通常可以推断出关于程序行为的有用信息。例如，函数find_ele_rec是一个递归过程，它扫描一个哈希桶(hash bucket)的链表，查找一个特殊的字符串。对于这个函数，比较递归调用的数量和顶层调用的数量，提供了关于遍历这些链表的长度的统计信息。这里递归与顶层调用的比率是164.4，我们可以推断出程序每次平均大约扫描164个元素。</p>
 <h2 id="使用剖析程序来指导优化"><a href="#使用剖析程序来指导优化" class="headerlink" title="使用剖析程序来指导优化"></a>使用剖析程序来指导优化</h2><p>迭代和递归是两种常见的函数调用方式，它们在实现方式和执行过程上有一些区别。</p>
@@ -902,7 +902,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -916,7 +916,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/" class="post-title-link" itemprop="url">Linux系统编程-文件IO</a>
+            <a href="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/" class="post-title-link" itemprop="url">Linux系统编程-文件IO</a>
         </h2>
 
         <div class="post-meta">
@@ -982,7 +982,7 @@
 <p>​    成功； 写入的字节数。</p>
 <p>​    失败： -1， 设置 errno</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" alt="image-20230523223219656"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230523223219656.png" class title="This is an test image">
 
 <p>可以在复制函数里加入错误检测：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(fd1 == -1)&#123;</span><br><span class="line"></span><br><span class="line">  perror(“open argv[1] error”);</span><br><span class="line"></span><br><span class="line">  exit(1);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -992,10 +992,10 @@
 
 <h2 id="系统调用和库函数比较—预读入缓输出"><a href="#系统调用和库函数比较—预读入缓输出" class="headerlink" title="系统调用和库函数比较—预读入缓输出"></a>系统调用和库函数比较—预读入缓输出</h2><p>所以系统函数并不是一定比库函数牛逼，能使用库函数的地方就使用库函数。 标准 IO 函数（如fputc&#x2F;fgetc）自带用户缓冲区（一般是4096，即4kb再向内核写入），系统调用（read&#x2F;write 这块，每次写一个字节，自己定义buf为1，会疯狂进行内核态和用户态的切换，所以非常耗时）无用户级缓冲。系统缓冲区是都有的。</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" alt="image-20230525171335770"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525171335770.png" class title="This is an test image">
 
 <h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" alt="image-20230525185325288"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230525185325288.png" class title="This is an test image">
 
 <p>文件描述符是指向一个文件结构体的指针 </p>
 <p>PCB 进程控制块：本质 结构体。</p>
@@ -1062,13 +1062,13 @@
 <p>符号穿透：stat 会。lstat 不会。</p>
 <p>下面这个例子是获取文件大小的正规军解法，用 stat：</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" alt="image-20230526211019247"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526211019247.png" class title="This is an test image">
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man 2 stat</span><br><span class="line">进入之后G</span><br><span class="line">一般比较大的函数或者是难度大的有example</span><br></pre></td></tr></table></figure>
 
 <p>stat 会拿到符号链接指向那个文件或目录的属性。 不想穿透符号就用 lstat（两个除了穿透符号这个性质以外就一样）</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" alt="image-20230526213815013"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230526213815013.png" class title="This is an test image">
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">用sb.st_mode &amp; SIFMT前4位就是SIFMT与上文件得出的mode</span><br><span class="line">switch (sb.st_mode &amp; S_IFMT) &#123;</span><br><span class="line">           case S_IFBLK:  printf(&quot;block device\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFCHR:  printf(&quot;character device\n&quot;);        br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFDIR:  printf(&quot;directory\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFIFO:  printf(&quot;FIFO/pipe\n&quot;);               br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFLNK:  printf(&quot;symlink\n&quot;);                 br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFREG:  printf(&quot;regular file\n&quot;);            br</span><br><span class="line">eak;</span><br><span class="line">           case S_IFSOCK: printf(&quot;socket\n&quot;);                  br</span><br><span class="line">eak;</span><br><span class="line">           default:       printf(&quot;unknown?\n&quot;);                br</span><br><span class="line">eak;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
 
@@ -1080,7 +1080,7 @@
 <p>此时文件的内容依然存在，所以只删除一个连接并不影响索引节点本身和其它的连接，只有当最后一个链接被删除后，文件的数据块及目录的连接才会被释放，也就是说，文件才会被真正删除）</p>
 <p>（软连接可以是任意文件或目录，可以链接不同文件系统的文件，在对符号文件进行读或写操作的时候，系统会自动把该操作转换为对源文件的操作，但删除链接文件时，系统仅仅删除链接文件，而不删除源文件本身，这一点类似于 Windows 操作系统下的快捷方式。）</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230619154914148.png" alt="image-20230619154914148"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230619154914148.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230619154914148.png" class title="This is an test image">
 
 <p>link 可以用来实现 mv 命令 </p>
 <p>函数原型： <code>int link(const char *oldpath, const char *newpath)</code> 用这个来实现 mv，用 oldpath 来创建 newpath，完事儿删除 oldpath 就行。 </p>
@@ -1099,7 +1099,7 @@
 <p><strong>文件描述符</strong>（file descriptor）就是内核为了高效管理这些已经被打开的文件所创建的索引，其是一个非负整数（通常是小整数），用于指代被打开的文件，所有执行I&#x2F;O操作的系统调用都通过文件描述符来实现。同时还规定系统刚刚启动的时候，0是标准输入，1是标准输出，2是标准错误。这意味着如果此时去打开一个新的文件，它的文件描述符会是3，再打开一个文件文件描述符就是4……</p>
 <h2 id="文件目录-rwx-权限差异"><a href="#文件目录-rwx-权限差异" class="headerlink" title="文件目录 rwx 权限差异"></a>文件目录 rwx 权限差异</h2><p>vi 目录 会得到目录项的列表</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" alt="image-20230527200057726"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200057726.png" class title="This is an test image">
 
 <h2 id="目录操作函数"><a href="#目录操作函数" class="headerlink" title="目录操作函数"></a>目录操作函数</h2><p>目录操作函数： <code>DIR * opendir(char *name);</code> </p>
 <p><code>int closedir(DIR *dp);</code></p>
@@ -1110,7 +1110,7 @@
 <p> 没有写目录操作，因为目录写操作就是创建文件。可以用 touch</p>
 <p>下面用目录操作函数实现一个 ls 操作：</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" alt="image-20230527200502344"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230527200502344.png" class title="This is an test image">
 
 <p>要隐藏这个.和..的话，在输出文件名的时候判定一下，只输出不是.和..的就行了</p>
 <h2 id="应用程序的系统调用过程"><a href="#应用程序的系统调用过程" class="headerlink" title="应用程序的系统调用过程"></a>应用程序的系统调用过程</h2><p>应用程序-&gt;标库函数-&gt;系统调用-&gt;驱动-&gt;硬件</p>
@@ -1122,12 +1122,12 @@
 <h2 id="dup-和-dup2"><a href="#dup-和-dup2" class="headerlink" title="dup 和 dup2"></a>dup 和 dup2</h2><p>用来做重定向，本质就是复制文件描述符：<br>dup 和 dup2：<br><code>int dup(int oldfd);</code> 文件描述符复制。<br>oldfd: 已有文件描述符<br>返回：新文件描述符，这个描述符和 oldfd 指向相同内容。<br><code>int dup2(int oldfd, int newfd);</code> 文件描述符复制，oldfd 拷贝给 newfd。返回 newfd</p>
 <p>下面讲 dup2（dupto）： 下面这个例子，将一个已有文件描述符 fd1 复制给另一个文件描述符 fd2，<strong>然后用 fd2 修改 fd1</strong> 指向 的文件：</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" alt="image-20230531192509565"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192509565.png" class title="This is an test image">
 
 <p>上面那个例子，fd1 是打开 hello.c 的文件描述符，fd2 是打开 hello2.c 的文件描述符 用 dup2 将 fd1 复制给了 fd2，于是在对 fd2 指向的文件进行写操作时，实际上就是对 fd1 指向的 hello.c 进行写操作。 这里需要注意一个问题，由于 hello.c 和 hello2.c 都是空文件，所以直接写进去没关系。但如果 hello.c 是非空的，写进去的内容默认从文件头部开始写，会覆盖原有内容。</p>
 <p>dup2 也可以用于标准输入输出的重定向。 下面这个例子，将输出到 STDOUT 的内容重定向到文件里：</p>
 <p><img src="/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" alt="image-20230531192739775"></p>
-<img src="/2023/05/21/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" class title="This is an test image">
+<img src="/2023/05/21/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B-%E6%96%87%E4%BB%B6IO/image-20230531192739775.png" class title="This is an test image">
 
 <p>这个程序，将 fd1 的内容复制给了 fd2，使得原来指向 hello2.c 的 fd2 也指向了 hello.c 并通过 fd2 向 hello.c 里写入了…。完事儿将标准输出重定向至 fd1，就是将要显示在标准输出的内容，写入了 fd1 指向的文件，就是 hello.c 中 这里有一点和上面程序不同，就是 hello.c 是处于打开状态的，连续写入两段话，写入… 的时候，读写指针在这句话末尾，就不会覆盖前面这句话。 这里再强调一下，打开一个文件，读写指针默认在文件头，如果文件本身有内容，直接写入会覆盖有内容。</p>
 <h2 id="fcntl-实现-dup-描述符"><a href="#fcntl-实现-dup-描述符" class="headerlink" title="fcntl 实现 dup 描述符"></a>fcntl 实现 dup 描述符</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fcntl 函数实现 dup：</span><br><span class="line">	int fcntl(int fd, int cmd, ....)</span><br><span class="line">	cmd: F_DUPFD</span><br><span class="line">	参 3: 被占用的，返回最小可用的。</span><br><span class="line">			未被占用的， 返回=该值的文件描述符。</span><br></pre></td></tr></table></figure>
@@ -1152,7 +1152,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/14/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1166,7 +1166,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/14/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/" class="post-title-link" itemprop="url">Linux上gcc编译</a>
+            <a href="/2023/05/14/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/Linux%E4%B8%8Agcc%E7%BC%96%E8%AF%91/" class="post-title-link" itemprop="url">Linux上gcc编译</a>
         </h2>
 
         <div class="post-meta">
@@ -1401,7 +1401,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1415,7 +1415,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/" class="post-title-link" itemprop="url">深入理解计算机系统 第三章</a>
+            <a href="/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/" class="post-title-link" itemprop="url">深入理解计算机系统 第三章</a>
         </h2>
 
         <div class="post-meta">
@@ -1510,7 +1510,7 @@
 </tr>
 </tbody></table>
 <h2 id="访问信息"><a href="#访问信息" class="headerlink" title="访问信息"></a>访问信息</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" alt="image-20230515185054534"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" class title="This is an test image">
+<img src="/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230515185054534.jpg" class title="This is an test image">
 
 <h3 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h3><p>MOV指令源和目的类型的组合。记住，<strong>第一个是源操作数，第二个是目的操作数。</strong></p>
 <p>源操作数指定的值是一个立即数，存储在寄存器中或者内存中。目的操作数指定一个位置，要么是一个寄存器或者，要么是一个内存地址。</p>
@@ -1562,17 +1562,17 @@
 <p>开始的跳转表的汇编代码声明在第2行包含下面这样的命令:<br>.align 8<br>这就保证了它后面的数据(在此，是跳转表的开始)的起始地址是8的倍数。因为每个表项长8个字节，后面的元素都会遵守8字节对齐的限制。</p>
 <h2 id="在机器级程序中将控制与数据结合起来"><a href="#在机器级程序中将控制与数据结合起来" class="headerlink" title="在机器级程序中将控制与数据结合起来"></a>在机器级程序中将控制与数据结合起来</h2><h3 id="理解指针"><a href="#理解指针" class="headerlink" title="理解指针"></a>理解指针</h3><p>leaq指令是设计用来计算内存引用的地址的，&amp;运算符的机器代码实现常常用这条指令来计算表达式的值。</p>
 <h3 id="GDB命令"><a href="#GDB命令" class="headerlink" title="GDB命令"></a>GDB命令</h3><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" alt="image-20230524151520753"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" class title="This is an test image">
+<img src="/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230524151520753.png" class title="This is an test image">
 
 <p>GDB的命令语法有点晦涩，但是在线帮助信息(用GDB的 help命令调用)能克服这些毛病。相对于使用命令行接口来访问GDB，许多程序员更愿意使用DDD，它是 GDB的一个扩展，提供了图形用户界面。</p>
 <h3 id="内存越界引用和缓冲区溢出"><a href="#内存越界引用和缓冲区溢出" class="headerlink" title="内存越界引用和缓冲区溢出"></a>内存越界引用和缓冲区溢出</h3><p>更好一点的版本是使用fgets函数，它包括一个参数，限制<strong>待读入的最大字节数</strong>。通常，使用gets或其他任何能导致存储溢出的函数，都是不好的编程习惯。不幸的是，很多常用的库函数，包括strcpy、strcat和 sprintf都有一个属性——不需要告诉它们目标缓冲区的大小，就产生一个字节序列[97]。超过待读入最大字节数就可能发生错误，这样的情况就会导致缓冲区溢出漏洞。</p>
 <p>如在栈上分配了24个字节，待读入最大字节为8</p>
 <p>echo执行时栈的组织。该程序把栈指针减去了24，在栈上分配了24个字节。字符数组buf位于栈顶，可以看到,%rsp被复制到%rdi作为调用gets和puts 的参数。这个调用的参数和存储的返回指针之间的16字节是未被使用的。只要用户输人不超过7个字符，gets返回的字符串(包括结尾的null)就能够放进为buf分配的空间里。不过，长一些的字符串就会导致gets覆盖栈上存储的某些信息。随着字符串变长，下面的信息会被破坏:</p>
 <p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" alt="image-20230525102612348"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" class title="This is an test image">
+<img src="/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230525102612348.png" class title="This is an test image">
 
 <h2 id="浮点代码"><a href="#浮点代码" class="headerlink" title="浮点代码"></a>浮点代码</h2><p><img src="/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230527153556717.png" alt="image-20230527153556717"></p>
-<img src="/2023/05/13/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230527153556717.png" class title="This is an test image">
+<img src="/2023/05/13/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-%E7%AC%AC%E4%B8%89%E7%AB%A0/image-20230527153556717.png" class title="This is an test image">
 
 <p>在x86-64 中，XMM寄存器用来向函数传递浮点参数，以及从函数返回浮点值。如图3-45所示，可以看到如下规则:</p>
 <ul>
@@ -1601,7 +1601,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/05/05/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1615,7 +1615,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解计算机系统</a>
+            <a href="/2023/05/05/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解计算机系统</a>
         </h2>
 
         <div class="post-meta">
@@ -1659,7 +1659,7 @@
 
 <p>不过这种行为对于C程序来说是没有保证的，所以应该保持位移量小于待移位值的位数。另一方面，Java 特别要求位移数量应该按照我们前面所讲的求模的方法来计算。</p>
 <h2 id="补码编码"><a href="#补码编码" class="headerlink" title="补码编码"></a>补码编码</h2><p>采用补码表示的32位大端法机器（符合习惯，先输出低地址的高位）上输出打印16进制时：是看补码来转换。</p>
-<p>原理:补码编码的定义<br><img src="/2023/05/05/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
+<p>原理:补码编码的定义<br><img src="/2023/05/05/%E4%B9%A6%E7%B1%8D%E7%9A%84%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/Users\86191\AppData\Roaming\Typora\typora-user-images\image-20230507151108343.png" alt="image-20230507151108343"></p>
 <p>例如1001（-1）的补码是1111可以根据上面计算-8+7&#x3D;-1</p>
 <p><strong>负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码</strong>。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的</p>
 <p>对于大多数C语言的实现，处理同样字长的有符号数和无符号数之间相互转换的一般规则是:数值可能会改变，但是<strong>位模式不变</strong>。</p>
@@ -1740,7 +1740,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/24/c-%E7%B1%BB/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/24/c%E5%92%8Cc++/c-%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1754,7 +1754,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/04/24/c-%E7%B1%BB/" class="post-title-link" itemprop="url">c++类</a>
+            <a href="/2023/04/24/c%E5%92%8Cc++/c-%E7%B1%BB/" class="post-title-link" itemprop="url">c++类</a>
         </h2>
 
         <div class="post-meta">
@@ -1826,7 +1826,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/23/linux%E5%9F%BA%E7%A1%80/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/23/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/linux%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1840,7 +1840,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/04/23/linux%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">linux基础</a>
+            <a href="/2023/04/23/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B%E5%92%8C%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E7%9A%84%E5%AD%A6%E4%B9%A0/linux%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">linux基础</a>
         </h2>
 
         <div class="post-meta">

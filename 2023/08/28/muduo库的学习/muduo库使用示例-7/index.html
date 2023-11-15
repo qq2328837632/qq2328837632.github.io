@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="高效率多线程异步日志线程安全，即多个线程可以并发写日志，两个线程的日志消息不会出现交织。  ​	用一个全局的mutex保护lO		前者造成全部线程抢占一个锁，就变成串行了 ​	每个线程单独写一个日志文件	后者有可能让业务线程阻塞在写磁盘操作上。 ​	muduo库的方法是用一个背景线程负责收集日志消息，并写入日志文件，其他业务线程只管往这个“日志线程”发送日志消息，这称为“异步日志”。不一定是实时的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo库使用示例_7">
+<meta property="og:url" content="http://example.com/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="高效率多线程异步日志线程安全，即多个线程可以并发写日志，两个线程的日志消息不会出现交织。  ​	用一个全局的mutex保护lO		前者造成全部线程抢占一个锁，就变成串行了 ​	每个线程单独写一个日志文件	后者有可能让业务线程阻塞在写磁盘操作上。 ​	muduo库的方法是用一个背景线程负责收集日志消息，并写入日志文件，其他业务线程只管往这个“日志线程”发送日志消息，这称为“异步日志”。不一定是实时的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png">
+<meta property="og:image" content="http://example.com/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png">
+<meta property="article:published_time" content="2023-08-28T03:22:54.000Z">
+<meta property="article:modified_time" content="2023-08-29T08:13:57.092Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png">
+
+<link rel="canonical" href="http://example.com/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo库使用示例_7 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo库使用示例_7
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-28 11:22:54" itemprop="dateCreated datePublished" datetime="2023-08-28T11:22:54+08:00">2023-08-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-29 16:13:57" itemprop="dateModified" datetime="2023-08-29T16:13:57+08:00">2023-08-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="高效率多线程异步日志"><a href="#高效率多线程异步日志" class="headerlink" title="高效率多线程异步日志"></a>高效率多线程异步日志</h1><p>线程安全，即多个线程可以并发写日志，两个线程的日志消息不会出现交织。</p>
+<ul>
+<li>​	用一个全局的mutex保护lO		前者造成全部线程抢占一个锁，就变成串行了</li>
+<li>​	每个线程单独写一个日志文件	后者有可能让业务线程阻塞在写磁盘操作上。</li>
+<li>​	muduo库的方法是用<strong>一个</strong>背景线程负责收集日志消息，并写入日志文件，其他业务线程只管往这个“日志线程”发送日志消息，这称为“异步日志”。不一定是实时的，但是不影响并发的写日志。非阻塞日志<ul>
+<li>使得前端的业务线程与后端的日志线程能够并发，并且，写日志不太频繁，提高了效率。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png" alt="image-20230828114049679"></p>
+<img src="/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png" class title="This is an test image">
+
+<h2 id="AsyncLogging-h"><a href="#AsyncLogging-h" class="headerlink" title="AsyncLogging.h"></a>AsyncLogging.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line">#define MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/BlockingQueue.h&quot;</span><br><span class="line">#include &quot;muduo/base/BoundedBlockingQueue.h&quot;</span><br><span class="line">#include &quot;muduo/base/CountDownLatch.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/base/Thread.h&quot;</span><br><span class="line">#include &quot;muduo/base/LogStream.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;atomic&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line">//异步日志</span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class AsyncLogging : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line"></span><br><span class="line">  AsyncLogging(const string&amp; basename,</span><br><span class="line">               off_t rollSize,</span><br><span class="line">               int flushInterval = 3);</span><br><span class="line"></span><br><span class="line">  ~AsyncLogging()</span><br><span class="line">  &#123;</span><br><span class="line">    if (running_)</span><br><span class="line">    &#123;</span><br><span class="line">      stop();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  //供前端生产者线程调用（日志数据写到缓冲区)</span><br><span class="line">  void append(const char* logline, int len);</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    running_ = true;</span><br><span class="line">    thread_.start();//日志线程启动，调用threadFunc</span><br><span class="line">    latch_.wait();//等待线程启动</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void stop() NO_THREAD_SAFETY_ANALYSIS</span><br><span class="line">  &#123;</span><br><span class="line">    running_ = false;</span><br><span class="line">    cond_.notify();</span><br><span class="line">    thread_.join();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  //供后端消费者线程调用（将数据写到日志文件)</span><br><span class="line">  void threadFunc();</span><br><span class="line">  //实例化 FixedBuffer 类模板，并指定模板参数的具体值</span><br><span class="line">  typedef muduo::detail::FixedBuffer&lt;muduo::detail::kLargeBuffer&gt; Buffer;</span><br><span class="line">  typedef std::vector&lt;std::unique_ptr&lt;Buffer&gt;&gt; BufferVector;</span><br><span class="line">  typedef BufferVector::value_type BufferPtr;//可理解为Buffer的智能指针，能管理BufFer的生存期</span><br><span class="line">                                             //BufferVector::value_type 表示 BufferVector 中的元素类型，也就是 std::unique_ptr&lt;Buffer&gt;类型,真备移动语义</span><br><span class="line">                                            //(两个unique_ptr不能指向一个对象，不能进行复制操作只能进行移动操作</span><br><span class="line"> </span><br><span class="line">  const int flushInterval_;//超时时间，在flushInterval_秒内，缓冲区没写满，仍将缓冲区中的数据写到文件中</span><br><span class="line">  std::atomic&lt;bool&gt; running_;</span><br><span class="line">  const string basename_;</span><br><span class="line">  const off_t rollSize_;//日志文件的滚动大小</span><br><span class="line">  muduo::Thread thread_;</span><br><span class="line">  muduo::CountDownLatch latch_;//用于等待线程启动</span><br><span class="line">  muduo::MutexLock mutex_;</span><br><span class="line">  muduo::Condition cond_ GUARDED_BY(mutex_);//条件变量与互斥量配合使用</span><br><span class="line">  BufferPtr currentBuffer_ GUARDED_BY(mutex_);//当前缓冲区，智能指针</span><br><span class="line">  BufferPtr nextBuffer_ GUARDED_BY(mutex_);//预备缓冲区</span><br><span class="line">  BufferVector buffers_ GUARDED_BY(mutex_);//待写入文件的已填满的缓冲区</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="AsyncLogging-cc"><a href="#AsyncLogging-cc" class="headerlink" title="AsyncLogging.cc"></a>AsyncLogging.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/AsyncLogging.h&quot;</span><br><span class="line">#include &quot;muduo/base/LogFile.h&quot;</span><br><span class="line">#include &quot;muduo/base/Timestamp.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line"></span><br><span class="line">AsyncLogging::AsyncLogging(const string&amp; basename,</span><br><span class="line">                           off_t rollSize,</span><br><span class="line">                           int flushInterval)</span><br><span class="line">  : flushInterval_(flushInterval),</span><br><span class="line">    running_(false),</span><br><span class="line">    basename_(basename),</span><br><span class="line">    rollSize_(rollSize),</span><br><span class="line">    thread_(std::bind(&amp;AsyncLogging::threadFunc, this), &quot;Logging&quot;),</span><br><span class="line">    latch_(1),</span><br><span class="line">    mutex_(),</span><br><span class="line">    cond_(mutex_),</span><br><span class="line">    currentBuffer_(new Buffer),</span><br><span class="line">    nextBuffer_(new Buffer),</span><br><span class="line">    buffers_()</span><br><span class="line">&#123;</span><br><span class="line">  currentBuffer_-&gt;bzero();//清空缓冲区内容</span><br><span class="line">  nextBuffer_-&gt;bzero();</span><br><span class="line">  buffers_.reserve(16);//预留</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void AsyncLogging::append(const char* logline, int len)</span><br><span class="line">&#123;</span><br><span class="line">  muduo::MutexLockGuard lock(mutex_);</span><br><span class="line">  if (currentBuffer_-&gt;avail() &gt; len)//当前可用空间</span><br><span class="line">  &#123;</span><br><span class="line">    //当前缓冲区未满，将数据追加到末尾</span><br><span class="line">    currentBuffer_-&gt;append(logline, len);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    //当前缓冲区已满，将当前缓冲区添加到待写入文件的已填满的缓冲区列表</span><br><span class="line">    buffers_.push_back(std::move(currentBuffer_));//currentBuffer_就没指向区域</span><br><span class="line">    //将当前缓冲区设置为预备缓冲区</span><br><span class="line">    if (nextBuffer_)</span><br><span class="line">    &#123;</span><br><span class="line">      currentBuffer_ = std::move(nextBuffer_);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      //这种情况，极少发生，前端写入速度太快，一下子把两块缓冲区都写完</span><br><span class="line">      //那么，只好分配一玦新的缓冲</span><br><span class="line">      currentBuffer_.reset(new Buffer); // Rarely happens</span><br><span class="line">    &#125;</span><br><span class="line">    currentBuffer_-&gt;append(logline, len);</span><br><span class="line">    cond_.notify();//通知后端开始写入日志</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void AsyncLogging::threadFunc()</span><br><span class="line">&#123;</span><br><span class="line">  assert(running_ == true);</span><br><span class="line">  latch_.countDown();</span><br><span class="line">  LogFile output(basename_, rollSize_, false);</span><br><span class="line">  BufferPtr newBuffer1(new Buffer);</span><br><span class="line">  BufferPtr newBuffer2(new Buffer);</span><br><span class="line">  newBuffer1-&gt;bzero();</span><br><span class="line">  newBuffer2-&gt;bzero();</span><br><span class="line">  BufferVector buffersToWrite;</span><br><span class="line">  buffersToWrite.reserve(16);</span><br><span class="line">  while (running_)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(newBuffer1 &amp;&amp; newBuffer1-&gt;length() == 0);</span><br><span class="line">    assert(newBuffer2 &amp;&amp; newBuffer2-&gt;length() == 0);</span><br><span class="line">    assert(buffersToWrite.empty());</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">      muduo::MutexLockGuard lock(mutex_);</span><br><span class="line">      if (buffers_.empty())  // unusual usage!(注意，这里是一个非常规用法,一般是while)</span><br><span class="line">      &#123;</span><br><span class="line">        //不能解决虚假唤醒spurious wakeup</span><br><span class="line">        //Linux网络编程、spurious wakeup可能是遇到了信号(signal)</span><br><span class="line">        //在多处理器中，pthread_cond_signal可能唤醒多个等待条件变量的线程。</span><br><span class="line">        cond_.waitForSeconds(flushInterval_);//等待前端写满了一个或者多个buffer ,或者一个超时时间到来</span><br><span class="line">      &#125;</span><br><span class="line">      buffers_.push_back(std::move(currentBuffer_));//将当前缓冲区移入buffers</span><br><span class="line">      currentBuffer_ = std::move(newBuffer1);//将空闲的newBuffer1置为当前缓冲区</span><br><span class="line">      buffersToWrite.swap(buffers_);//buffers_与buffersTowrite交换，这样后面的代码可以在临界区之外安全地访问buffersToWrite</span><br><span class="line">      if (!nextBuffer_)</span><br><span class="line">      &#123;</span><br><span class="line">        nextBuffer_ = std::move(newBuffer2);//确保前端始终有一个预备buffer可供调配，</span><br><span class="line">        //减少前端临界区分配内存的概率,缩短前端临界区长度。</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //buffersToWrite.swap这样可以保证前端和后端可以并发 </span><br><span class="line">    assert(!buffersToWrite.empty());</span><br><span class="line">    //消息堆积</span><br><span class="line">    //前端陷入死循环，拼命发送日志消息，超过后端的处理能力,这就是典型的生产速度</span><br><span class="line">    //超过消费速度问题,会造成数据在内存中堆积，严重时引发性能问题或程序崩溃(分配内存失败)</span><br><span class="line">    if (buffersToWrite.size() &gt; 25)</span><br><span class="line">    &#123;</span><br><span class="line">      char buf[256];</span><br><span class="line">      snprintf(buf, sizeof buf, &quot;Dropped log messages at %s, %zd larger buffers\n&quot;,</span><br><span class="line">               Timestamp::now().toFormattedString().c_str(),</span><br><span class="line">               buffersToWrite.size()-2);</span><br><span class="line">      fputs(buf, stderr);</span><br><span class="line">      output.append(buf, static_cast&lt;int&gt;(strlen(buf)));</span><br><span class="line">      buffersToWrite.erase(buffersToWrite.begin()+2, buffersToWrite.end());//丢掉多余日志,以腾出内存,仅保留两块缓冲区</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for (const auto&amp; buffer : buffersToWrite)</span><br><span class="line">    &#123;</span><br><span class="line">      // FIXME: use unbuffered stdio FILE ? or use ::writev ?</span><br><span class="line">      output.append(buffer-&gt;data(), buffer-&gt;length());//写入日志，是一个logfile</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (buffersToWrite.size() &gt; 2)</span><br><span class="line">    &#123;</span><br><span class="line">      // drop non-bzero-ed buffers, avoid trashing</span><br><span class="line">      buffersToWrite.resize(2);//buffersToWrite 向量会丢弃多余的元素，从而保持最多只有两个元素</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (!newBuffer1)</span><br><span class="line">    &#123;</span><br><span class="line">      assert(!buffersToWrite.empty());</span><br><span class="line">      newBuffer1 = std::move(buffersToWrite.back());//将 buffersToWrite 向量中最后一个元素的所有权转移到 newBuffer1</span><br><span class="line">      buffersToWrite.pop_back();//删除 buffersToWrite 向量中的最后一个元素，即移除已经被移动的缓冲区指针</span><br><span class="line">      newBuffer1-&gt;reset();//重置，只需要移动指针，覆盖就行了</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (!newBuffer2)</span><br><span class="line">    &#123;</span><br><span class="line">      assert(!buffersToWrite.empty());</span><br><span class="line">      newBuffer2 = std::move(buffersToWrite.back());</span><br><span class="line">      buffersToWrite.pop_back();</span><br><span class="line">      newBuffer2-&gt;reset();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    buffersToWrite.clear();</span><br><span class="line">    output.flush();</span><br><span class="line">  &#125;</span><br><span class="line">  output.flush();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>void <strong>AsyncLogging</strong>::<strong>threadFunc</strong>()中</p>
+<p>在给出的代码中，<code>currentBuffer_</code> 和 <code>nextBuffer_</code> 是智能指针对象，它们的类型是 <code>std::unique_ptr&lt;Buffer&gt;</code>。这些智能指针用于管理 <code>Buffer</code> 对象的生命周期。现在我们来解释 <code>currentBuffer_-&gt;append(logline, len)</code> 和 <code>currentBuffer_.reset(new Buffer)</code> 中箭头运算符 <code>-&gt;</code> 和点运算符 <code>.</code> 的用法。</p>
+<ol>
+<li>箭头运算符 <code>-&gt;</code> 当智能指针类型是指向类或结构体的指针时，我们使用箭头运算符 <code>-&gt;</code> 来访问其指向对象的成员。正如前面提到的，<code>currentBuffer_</code> 和 <code>nextBuffer_</code> 是智能指针对象，类型为 <code>std::unique_ptr&lt;Buffer&gt;</code>，它们指向 <code>Buffer</code> 类的对象。 因此，在 <code>currentBuffer_-&gt;append(logline, len)</code> 中，<code>currentBuffer_</code> 是一个指向 <code>Buffer</code> 对象的智能指针，通过箭头运算符 <code>-&gt;</code> 可以调用 <code>Buffer</code> 类的 <code>append</code> 成员函数。</li>
+<li>点运算符 <code>.</code> 当智能指针类型是实际对象（而不是指向对象的指针）时，我们使用点运算符 <code>.</code> 来访问成员。例如，<code>currentBuffer_.reset(new Buffer)</code> 中的 <code>currentBuffer_</code> 是一个 <code>std::unique_ptr&lt;Buffer&gt;</code> 的对象，我们通过使用点运算符来操作这个智能指针对象，调用 智能指针的<code>reset</code> 成员函数，并将其指向一个新的 <code>Buffer</code> 对象。</li>
+</ol>
+<p>总结一下，箭头运算符 <code>-&gt;</code> 用于访问智能指针所指向对象的成员函数和成员变量，而点运算符 <code>.</code> 则用于操作智能指针对象本身的成员函数。这样可以方便地在代码中使用智能指针来管理对象的生命周期，并访问其成员。</p>
+<h2 id="AsyncLogging-test-cc"><a href="#AsyncLogging-test-cc" class="headerlink" title="AsyncLogging_test.cc"></a>AsyncLogging_test.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/base/AsyncLogging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Logging.h&quot;</span><br><span class="line">#include &quot;muduo/base/Timestamp.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sys/resource.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">off_t kRollSize = 500*1000*1000;</span><br><span class="line"></span><br><span class="line">muduo::AsyncLogging* g_asyncLog = NULL;</span><br><span class="line"></span><br><span class="line">void asyncOutput(const char* msg, int len)</span><br><span class="line">&#123;</span><br><span class="line">  g_asyncLog-&gt;append(msg, len);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void bench(bool longLog)</span><br><span class="line">&#123;                                       //void Logger::setOutput(OutputFunc out)</span><br><span class="line">  muduo::Logger::setOutput(asyncOutput);//typedef void (*OutputFunc)(const char* msg, int len);</span><br><span class="line">  //通过这个函数写入日志</span><br><span class="line">  int cnt = 0;</span><br><span class="line">  const int kBatch = 1000;</span><br><span class="line">  muduo::string empty = &quot; &quot;;</span><br><span class="line">  muduo::string longStr(3000, &#x27;X&#x27;);</span><br><span class="line">  longStr += &quot; &quot;;</span><br><span class="line"></span><br><span class="line">  for (int t = 0; t &lt; 30; ++t)</span><br><span class="line">  &#123;</span><br><span class="line">    muduo::Timestamp start = muduo::Timestamp::now();</span><br><span class="line">    for (int i = 0; i &lt; kBatch; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">      //因为setOutput(asyncOutput)，所以添加到日志文件当中</span><br><span class="line">      LOG_INFO &lt;&lt; &quot;Hello 0123456789&quot; &lt;&lt; &quot; abcdefghijklmnopqrstuvwxyz &quot;</span><br><span class="line">               &lt;&lt; (longLog ? longStr : empty)</span><br><span class="line">               &lt;&lt; cnt;</span><br><span class="line">      ++cnt;</span><br><span class="line">    &#125;</span><br><span class="line">    muduo::Timestamp end = muduo::Timestamp::now();</span><br><span class="line">    printf(&quot;%f\n&quot;, timeDifference(end, start)*1000000/kBatch);</span><br><span class="line">    //下面两行注释掉，会加剧消息堆积，日志文件变小</span><br><span class="line">    struct timespec ts = &#123; 0, 500*1000*1000 &#125;;</span><br><span class="line">    nanosleep(&amp;ts, NULL);</span><br><span class="line">    //通过 nanosleep 函数进行延时，暂停程序执行一段时间，具体时间由 ts 中的值决定。这里的延时时间为 500 毫秒（即 50010001000 纳秒）</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;//设置分配最大虚拟内存大小为 2GB</span><br><span class="line">  &#123;//这个设置的目的是为了限制程序所能使用的虚拟内存大小，避免程序占用过多的虚拟内存导致系统资源耗尽或程序异常运行</span><br><span class="line">    // set max virtual memory to 2GB.</span><br><span class="line">    size_t kOneGB = 1000*1024*1024;</span><br><span class="line">    rlimit rl = &#123; 2*kOneGB, 2*kOneGB &#125;;</span><br><span class="line">    setrlimit(RLIMIT_AS, &amp;rl);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  printf(&quot;pid = %d\n&quot;, getpid());</span><br><span class="line"></span><br><span class="line">  char name[256] = &#123; &#x27;\0&#x27; &#125;;</span><br><span class="line">  strncpy(name, argv[0], sizeof name - 1);</span><br><span class="line">  muduo::AsyncLogging log(::basename(name), kRollSize);//滚动大小为500M</span><br><span class="line">  log.start();</span><br><span class="line">  g_asyncLog = &amp;log;</span><br><span class="line"></span><br><span class="line">  bool longLog = argc &gt; 1;//根据命令行参数设置是否使用长日志</span><br><span class="line">  bench(longLog);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="MySQL-配置"><a href="#MySQL-配置" class="headerlink" title="MySQL 配置"></a>MySQL 配置</h1><ol>
+<li><p>在 MySQL 控制台中，您可以执行各种 MySQL 相关的操作和命令。例如，您可以创建数据库、创建用户、授权等。下面是一些常用的命令示例：</p>
+<ul>
+<li><p>创建数据库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE database_name;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建用户并授权：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE USER &#x27;username&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;password&#x27;;</span><br><span class="line">//将 &#x27;username&#x27; 替换为您要创建的用户名，并将 &#x27;password&#x27; 替换为用户的密码。</span><br><span class="line">GRANT ALL PRIVILEGES ON database_name.* TO &#x27;username&#x27;@&#x27;localhost&#x27;;</span><br><span class="line">//将 &#x27;database_name&#x27; 替换为您要授权的数据库名称。</span><br><span class="line">//或者，如果您只想为用户授予特定的权限（例如 SELECT、INSERT 等），可以使用以下格式：</span><br><span class="line">//GRANT SELECT, INSERT ON database_name.* TO &#x27;username&#x27;@&#x27;localhost&#x27;;</span><br><span class="line">//如果需要远程访问，可以将 &#x27;localhost&#x27; 替换为允许访问的 IP 地址或主机名，或者使用 &#x27;%&#x27; 表示允许从任何主机进行访问。例如：</span><br><span class="line">//GRANT ALL PRIVILEGES ON database_name.* TO &#x27;username&#x27;@&#x27;%&#x27; IDENTIFIED BY &#x27;password&#x27;;</span><br><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示数据库列表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW DATABASES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示数据表列表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//刷新权限以使更改生效</span><br><span class="line">SHOW TABLES FROM database_name;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>当您完成 MySQL 的配置和操作后，可以使用以下命令退出 MySQL 控制台：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exit;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>Linux mysql表名称大小写敏感</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/27/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-6/" rel="prev" title="muduo库使用示例_6">
+      <i class="fa fa-chevron-left"></i> muduo库使用示例_6
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/29/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="next" title="Redis基本操作">
+      Redis基本操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E6%95%88%E7%8E%87%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%82%E6%AD%A5%E6%97%A5%E5%BF%97"><span class="nav-number">1.</span> <span class="nav-text">高效率多线程异步日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AsyncLogging-h"><span class="nav-number">1.1.</span> <span class="nav-text">AsyncLogging.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AsyncLogging-cc"><span class="nav-number">1.2.</span> <span class="nav-text">AsyncLogging.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AsyncLogging-test-cc"><span class="nav-number">1.3.</span> <span class="nav-text">AsyncLogging_test.cc</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">MySQL 配置</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="http requestrequest line + header + body ( header分为普通报头，请求报头与实体报头) header与body之间有一空行（CRLF：\r\n) 请求方法有:Get, Post, Head, Put,Delete等 协议版本1.0、1.1 常用请求头  Accept:浏览器可接受的媒体（MIME）类型; Accept-Language:浏览器所希望的语">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-http库(1)">
+<meta property="og:url" content="http://example.com/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="http requestrequest line + header + body ( header分为普通报头，请求报头与实体报头) header与body之间有一空行（CRLF：\r\n) 请求方法有:Get, Post, Head, Put,Delete等 协议版本1.0、1.1 常用请求头  Accept:浏览器可接受的媒体（MIME）类型; Accept-Language:浏览器所希望的语">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-http%E5%BA%93-1/image-20230821175548800.png">
+<meta property="og:image" content="http://example.com/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/image-20230821175548800.png">
+<meta property="og:image" content="http://example.com/muduo-http%E5%BA%93-1/image-20230821175626176.png">
+<meta property="og:image" content="http://example.com/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/image-20230821175626176.png">
+<meta property="article:published_time" content="2023-08-21T08:46:26.000Z">
+<meta property="article:modified_time" content="2023-09-09T07:05:34.561Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-http%E5%BA%93-1/image-20230821175548800.png">
+
+<link rel="canonical" href="http://example.com/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-http库(1) | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-http库(1)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-21 16:46:26" itemprop="dateCreated datePublished" datetime="2023-08-21T16:46:26+08:00">2023-08-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-09 15:05:34" itemprop="dateModified" datetime="2023-09-09T15:05:34+08:00">2023-09-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="http-request"><a href="#http-request" class="headerlink" title="http request"></a>http request</h1><p>request line + header + body ( header分为普通报头，请求报头与实体报头)</p>
+<p>header与body之间有一空行（CRLF：\r\n)</p>
+<p>请求方法有:<br>Get, Post, Head, Put,Delete等</p>
+<p>协议版本1.0、1.1</p>
+<p>常用请求头</p>
+<ul>
+<li>Accept:浏览器可接受的媒体（MIME）类型;</li>
+<li>Accept-Language:浏览器所希望的语言种类</li>
+<li>Accept-Encoding:浏览器能够解码的编码方法，如gzip，deflate等</li>
+<li>User-Agent:告诉HTTP服务器，客户端使用的操作系统和浏览器的名称和版本</li>
+<li>Connection:表示是否需要持久连接，Keep-Alive表示长连接，close表示短连接</li>
+</ul>
+<h2 id="一个典型的http请求"><a href="#一个典型的http请求" class="headerlink" title="一个典型的http请求"></a>一个典型的http请求</h2><p><img src="/muduo-http%E5%BA%93-1/image-20230821175548800.png" alt="image-20230821175548800"></p>
+<img src="/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/image-20230821175548800.png" class title="This is an test image">
+
+<h1 id="http-response"><a href="#http-response" class="headerlink" title="http response"></a>http response</h1><p>status line + header + body ( header分为普通报头，响应报头与实体报头)</p>
+<p>header与body之间有一空行（CRLF)</p>
+<p>状态响应码</p>
+<ul>
+<li>1XX提示信息-表示请求已被成功接收，继续处理</li>
+<li>2XX成功-表示请求已被成功接收，理解，接受</li>
+<li>3XX重定向-要完成请求必须进行更进一步的处理</li>
+<li>4XX客户端错误–请求有语法错误或请求无法实现</li>
+<li>5XX服务器端错误–服务器执行一个有效请求失败</li>
+</ul>
+<h2 id="一个典型的http应答"><a href="#一个典型的http应答" class="headerlink" title="一个典型的http应答"></a>一个典型的http应答</h2><p><img src="/muduo-http%E5%BA%93-1/image-20230821175626176.png" alt="image-20230821175626176"></p>
+<img src="/2023/08/21/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-http%E5%BA%93-1/image-20230821175626176.png" class title="This is an test image">
+
+<h1 id="muduo-http库涉及到的类"><a href="#muduo-http库涉及到的类" class="headerlink" title="muduo_http库涉及到的类"></a>muduo_http库涉及到的类</h1><h2 id="HttpRequest-http请求类封装"><a href="#HttpRequest-http请求类封装" class="headerlink" title="HttpRequest: http请求类封装"></a>HttpRequest: http请求类封装</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_HTTP_HTTPREQUEST_H</span><br><span class="line">#define MUDUO_NET_HTTP_HTTPREQUEST_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/copyable.h&quot;</span><br><span class="line">#include &quot;muduo/base/Timestamp.h&quot;</span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;map&gt;</span><br><span class="line">#include &lt;assert.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class HttpRequest : public muduo::copyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  enum Method//http支持的方法，不止这些方法</span><br><span class="line">  &#123;</span><br><span class="line">    kInvalid, kGet, kPost, kHead, kPut, kDelete</span><br><span class="line">  &#125;;</span><br><span class="line">  enum Version//http协议版本</span><br><span class="line">  &#123;</span><br><span class="line">    kUnknown, kHttp10, kHttp11</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  HttpRequest()</span><br><span class="line">    : method_(kInvalid),</span><br><span class="line">      version_(kUnknown)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setVersion(Version v)</span><br><span class="line">  &#123;</span><br><span class="line">    version_ = v;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Version getVersion() const</span><br><span class="line">  &#123; return version_; &#125;</span><br><span class="line"></span><br><span class="line">  bool setMethod(const char* start, const char* end)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(method_ == kInvalid);</span><br><span class="line">    string m(start, end);//迭代器的用法，获取start到end的字符串，不包括end</span><br><span class="line">    if (m == &quot;GET&quot;)</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kGet;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m == &quot;POST&quot;)</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kPost;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m == &quot;HEAD&quot;)</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kHead;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m == &quot;PUT&quot;)</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kPut;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (m == &quot;DELETE&quot;)</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kDelete;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      method_ = kInvalid;</span><br><span class="line">    &#125;</span><br><span class="line">    return method_ != kInvalid;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Method method() const</span><br><span class="line">  &#123; return method_; &#125;</span><br><span class="line">  //请求方法转换成字符串</span><br><span class="line">  const char* methodString() const</span><br><span class="line">  &#123;</span><br><span class="line">    const char* result = &quot;UNKNOWN&quot;;</span><br><span class="line">    switch(method_)</span><br><span class="line">    &#123;</span><br><span class="line">      case kGet:</span><br><span class="line">        result = &quot;GET&quot;;</span><br><span class="line">        break;</span><br><span class="line">      case kPost:</span><br><span class="line">        result = &quot;POST&quot;;</span><br><span class="line">        break;</span><br><span class="line">      case kHead:</span><br><span class="line">        result = &quot;HEAD&quot;;</span><br><span class="line">        break;</span><br><span class="line">      case kPut:</span><br><span class="line">        result = &quot;PUT&quot;;</span><br><span class="line">        break;</span><br><span class="line">      case kDelete:</span><br><span class="line">        result = &quot;DELETE&quot;;</span><br><span class="line">        break;</span><br><span class="line">      default:</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">    return result;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setPath(const char* start, const char* end)</span><br><span class="line">  &#123;</span><br><span class="line">    path_.assign(start, end);//字符串赋值操作，将从指针 start 指向的位置开始，到指针 end 指向的位置结束的字符序列赋值给 path_</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const string&amp; path() const</span><br><span class="line">  &#123; return path_; &#125;</span><br><span class="line"></span><br><span class="line">  void setQuery(const char* start, const char* end)</span><br><span class="line">  &#123;</span><br><span class="line">    query_.assign(start, end);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const string&amp; query() const</span><br><span class="line">  &#123; return query_; &#125;</span><br><span class="line"></span><br><span class="line">  void setReceiveTime(Timestamp t)</span><br><span class="line">  &#123; receiveTime_ = t; &#125;</span><br><span class="line"></span><br><span class="line">  Timestamp receiveTime() const</span><br><span class="line">  &#123; return receiveTime_; &#125;</span><br><span class="line"></span><br><span class="line">  void addHeader(const char* start, const char* colon, const char* end)//colon冒号</span><br><span class="line">  &#123;</span><br><span class="line">    string field(start, colon);//header域</span><br><span class="line">    ++colon;</span><br><span class="line">    //去除左空格</span><br><span class="line">    while (colon &lt; end &amp;&amp; isspace(*colon))</span><br><span class="line">    &#123;</span><br><span class="line">      ++colon;</span><br><span class="line">    &#125;</span><br><span class="line">    string value(colon, end);//header值</span><br><span class="line">    //去除右空格</span><br><span class="line">    while (!value.empty() &amp;&amp; isspace(value[value.size()-1]))</span><br><span class="line">    &#123;</span><br><span class="line">      value.resize(value.size()-1);</span><br><span class="line">    &#125;</span><br><span class="line">    headers_[field] = value;</span><br><span class="line">  &#125;</span><br><span class="line">  //根据头域返回它的值</span><br><span class="line">  string getHeader(const string&amp; field) const</span><br><span class="line">  &#123;</span><br><span class="line">    string result;</span><br><span class="line">    std::map&lt;string, string&gt;::const_iterator it = headers_.find(field);</span><br><span class="line">    if (it != headers_.end())</span><br><span class="line">    &#123;</span><br><span class="line">      result = it-&gt;second;</span><br><span class="line">    &#125;</span><br><span class="line">    return result;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const std::map&lt;string, string&gt;&amp; headers() const</span><br><span class="line">  &#123; return headers_; &#125;</span><br><span class="line"></span><br><span class="line">  void swap(HttpRequest&amp; that)</span><br><span class="line">  &#123;</span><br><span class="line">    std::swap(method_, that.method_);</span><br><span class="line">    std::swap(version_, that.version_);</span><br><span class="line">    path_.swap(that.path_);</span><br><span class="line">    query_.swap(that.query_);</span><br><span class="line">    receiveTime_.swap(that.receiveTime_);</span><br><span class="line">    headers_.swap(that.headers_);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  Method method_;//请求方法</span><br><span class="line">  Version version_;//协议版本1.0 1.1</span><br><span class="line">  string path_;//请求路径</span><br><span class="line">  string query_;</span><br><span class="line">  Timestamp receiveTime_;//请求时间</span><br><span class="line">  std::map&lt;string, string&gt; headers_;//header列表</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_HTTP_HTTPREQUEST_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">void addHeader(const char* start, const char* colon, const char* end)//colon冒号</span><br><span class="line">&#123;</span><br><span class="line">  string field(start, colon);//header域</span><br><span class="line">  ++colon;</span><br><span class="line">  //去除左空格</span><br><span class="line">  while (colon &lt; end &amp;&amp; isspace(*colon))</span><br><span class="line">  &#123;</span><br><span class="line">    ++colon;</span><br><span class="line">  &#125;</span><br><span class="line">  string value(colon, end);//header值</span><br><span class="line">  //去除右空格</span><br><span class="line">  while (!value.empty() &amp;&amp; isspace(value[value.size()-1]))</span><br><span class="line">  &#123;</span><br><span class="line">    value.resize(value.size()-1);</span><br><span class="line">  &#125;</span><br><span class="line">  headers_[field] = value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的作用是将从HTTP请求中解析出来的头部信息（header）添加到一个名为<code>headers_</code>的容器中。</p>
+<p>具体而言，该函数接受三个指针参数：<code>start</code>指向头部字段（field）的起始位置，<code>colon</code>指向冒号的位置，<code>end</code>指向头部值（value）的结束位置。</p>
+<p>首先，该函数通过将<code>start</code>和<code>colon</code>之间的字符创建一个<code>string</code>对象，即头部字段名。然后，它递增<code>colon</code>指针以跳过冒号，并在循环中去除<code>colon</code>及其后面的所有空格字符。</p>
+<p>接下来，函数通过将<code>colon</code>和<code>end</code>之间的字符创建一个<code>string</code>对象，即头部值。再次使用循环，它去除头部值的末尾空格字符，使得头部值不包含任何额外的空白。</p>
+<p>最后，函数将头部字段名和头部值作为键值对存储在<code>headers_</code>容器中，以便稍后使用。</p>
+<p>总而言之，该函数解析并提取了HTTP请求中的单个头部字段和值，并将它们存储在<code>headers_</code>容器中，方便后续对头部信息的访问和处理。</p>
+<h2 id="HttpResponse-http响应类封装"><a href="#HttpResponse-http响应类封装" class="headerlink" title="HttpResponse: http响应类封装"></a>HttpResponse: http响应类封装</h2><h3 id="HttpResponse-h"><a href="#HttpResponse-h" class="headerlink" title="HttpResponse.h"></a>HttpResponse.h</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">class HttpResponse : public muduo::copyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  enum HttpStatusCode//响应的状态码枚举类型，不全</span><br><span class="line">  &#123;</span><br><span class="line">    kUnknown,</span><br><span class="line">    k200Ok = 200,//成功</span><br><span class="line">    k301MovedPermanently = 301,//301重定向，请求的页面永久性地转移到另一个地址</span><br><span class="line">    k400BadRequest = 400,//错误的请求，语法格式有误，服务器无法处理此请求</span><br><span class="line">    k404NotFound = 404,//请求的网页不存在</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  explicit HttpResponse(bool close)</span><br><span class="line">    : statusCode_(kUnknown),</span><br><span class="line">      closeConnection_(close)</span><br><span class="line">  &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setStatusCode(HttpStatusCode code)</span><br><span class="line">  &#123; statusCode_ = code; &#125;</span><br><span class="line"></span><br><span class="line">  void setStatusMessage(const string&amp; message)</span><br><span class="line">  &#123; statusMessage_ = message; &#125;</span><br><span class="line"></span><br><span class="line">  void setCloseConnection(bool on)</span><br><span class="line">  &#123; closeConnection_ = on; &#125;</span><br><span class="line"></span><br><span class="line">  bool closeConnection() const</span><br><span class="line">  &#123; return closeConnection_; &#125;</span><br><span class="line">  //设置文档媒体类型(MIME)</span><br><span class="line">  void setContentType(const string&amp; contentType)</span><br><span class="line">  &#123; addHeader(&quot;Content-Type&quot;, contentType); &#125;</span><br><span class="line"></span><br><span class="line">  // FIXME: replace string with StringPiece</span><br><span class="line">  void addHeader(const string&amp; key, const string&amp; value)</span><br><span class="line">  &#123; headers_[key] = value; &#125;</span><br><span class="line"></span><br><span class="line">  void setBody(const string&amp; body)</span><br><span class="line">  &#123; body_ = body; &#125;</span><br><span class="line"></span><br><span class="line">  void appendToBuffer(Buffer* output) const;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  std::map&lt;string, string&gt; headers_;//header列表</span><br><span class="line">  HttpStatusCode statusCode_;//状态响应码</span><br><span class="line">  // FIXME: add http version</span><br><span class="line">  string statusMessage_;//状态响应码对应的文本信息</span><br><span class="line">  bool closeConnection_;//是否关闭连接</span><br><span class="line">  string body_;         //实体</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="HttpResponse-cc"><a href="#HttpResponse-cc" class="headerlink" title="HttpResponse.cc"></a>HttpResponse.cc</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">void HttpResponse::appendToBuffer(Buffer* output) const</span><br><span class="line">&#123;</span><br><span class="line">  char buf[32];</span><br><span class="line">  //添加响应头</span><br><span class="line">  snprintf(buf, sizeof buf, &quot;HTTP/1.1 %d &quot;, statusCode_);</span><br><span class="line">  output-&gt;append(buf);</span><br><span class="line">  output-&gt;append(statusMessage_);</span><br><span class="line">  output-&gt;append(&quot;\r\n&quot;);</span><br><span class="line"></span><br><span class="line">  if (closeConnection_)</span><br><span class="line">  &#123;</span><br><span class="line">    //如果是短连接，不存在粘包问题，不需要告诉浏览器Content-Length，浏览器也能正确处理</span><br><span class="line">    output-&gt;append(&quot;Connection: close\r\n&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    //长连接</span><br><span class="line">    snprintf(buf, sizeof buf, &quot;Content-Length: %zd\r\n&quot;, body_.size());//实体长度</span><br><span class="line">    output-&gt;append(buf);</span><br><span class="line">    output-&gt;append(&quot;Connection: Keep-Alive\r\n&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  //header列表</span><br><span class="line">  for (const auto&amp; header : headers_)</span><br><span class="line">  &#123;</span><br><span class="line">    output-&gt;append(header.first);</span><br><span class="line">    output-&gt;append(&quot;: &quot;);</span><br><span class="line">    output-&gt;append(header.second);</span><br><span class="line">    output-&gt;append(&quot;\r\n&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  output-&gt;append(&quot;\r\n&quot;);//header与body之间的空行</span><br><span class="line">  output-&gt;append(body_);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="HttpContext-http协议解析类"><a href="#HttpContext-http协议解析类" class="headerlink" title="HttpContext: http协议解析类"></a>HttpContext: http协议解析类</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br></pre></td><td class="code"><pre><span class="line">  enum HttpRequestParseState</span><br><span class="line">  &#123;</span><br><span class="line">    kExpectRequestLine,</span><br><span class="line">    kExpectHeaders,</span><br><span class="line">    kExpectBody,</span><br><span class="line">    kGotAll,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  bool gotAll() const</span><br><span class="line">  &#123; return state_ == kGotAll; &#125;</span><br><span class="line">  //重置HttpContext状态</span><br><span class="line">  HttpRequestParseState state_;//请求解析状态</span><br><span class="line">  HttpRequest request_;//http请求</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  //解析请求行</span><br><span class="line">  bool HttpContext::processRequestLine(const char* begin, const char* end)</span><br><span class="line">&#123;</span><br><span class="line">  bool succeed = false;</span><br><span class="line">  const char* start = begin;</span><br><span class="line">  const char* space = std::find(start, end, &#x27; &#x27;);</span><br><span class="line">  if (space != end &amp;&amp; request_.setMethod(start, space))//解析请求方法</span><br><span class="line">  &#123;</span><br><span class="line">    start = space+1;</span><br><span class="line">    space = std::find(start, end, &#x27; &#x27;);</span><br><span class="line">    if (space != end)</span><br><span class="line">    &#123;</span><br><span class="line">      const char* question = std::find(start, space, &#x27;?&#x27;);</span><br><span class="line">      if (question != space)</span><br><span class="line">      &#123;</span><br><span class="line">        request_.setPath(start, question);</span><br><span class="line">        request_.setQuery(question, space);</span><br><span class="line">      &#125;</span><br><span class="line">      else</span><br><span class="line">      &#123;</span><br><span class="line">        request_.setPath(start, space);//解析PATH</span><br><span class="line">      &#125;</span><br><span class="line">      start = space+1;</span><br><span class="line">      succeed = end-start == 8 &amp;&amp; std::equal(start, end-1, &quot;HTTP/1.&quot;);</span><br><span class="line">      if (succeed)</span><br><span class="line">      &#123;</span><br><span class="line">        if (*(end-1) == &#x27;1&#x27;)//HTTP/1.1</span><br><span class="line">        &#123;</span><br><span class="line">          request_.setVersion(HttpRequest::kHttp11);</span><br><span class="line">        &#125;</span><br><span class="line">        else if (*(end-1) == &#x27;0&#x27;)//HTTP/1.0</span><br><span class="line">        &#123;</span><br><span class="line">          request_.setVersion(HttpRequest::kHttp10);</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">          succeed = false;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return succeed;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// return false if any error</span><br><span class="line">bool HttpContext::parseRequest(Buffer* buf, Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  bool ok = true;</span><br><span class="line">  bool hasMore = true;</span><br><span class="line">  while (hasMore)//相当于一个状态机</span><br><span class="line">  &#123;</span><br><span class="line">    if (state_ == kExpectRequestLine)//处于解析请求行的状态</span><br><span class="line">    &#123;</span><br><span class="line">      const char* crlf = buf-&gt;findCRLF();</span><br><span class="line">      if (crlf)</span><br><span class="line">      &#123;</span><br><span class="line">        ok = processRequestLine(buf-&gt;peek(), crlf);//解析请求行</span><br><span class="line">        if (ok)</span><br><span class="line">        &#123;</span><br><span class="line">          request_.setReceiveTime(receiveTime);//设置请求时间</span><br><span class="line">          buf-&gt;retrieveUntil(crlf + 2);//将请求行从buf中取回，包括\r\n</span><br><span class="line">          state_ = kExpectHeaders;//HttpContext将状态改为kExpectHeaders</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">          hasMore = false;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      else</span><br><span class="line">      &#123;</span><br><span class="line">        hasMore = false;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (state_ == kExpectHeaders)//解析header</span><br><span class="line">    &#123;</span><br><span class="line">      const char* crlf = buf-&gt;findCRLF();</span><br><span class="line">      if (crlf)</span><br><span class="line">      &#123;</span><br><span class="line">        const char* colon = std::find(buf-&gt;peek(), crlf, &#x27;:&#x27;);//冒号所在位置</span><br><span class="line">        if (colon != crlf)</span><br><span class="line">        &#123;</span><br><span class="line">          request_.addHeader(buf-&gt;peek(), colon, crlf);//函数将头部字段名和头部值作为键值对存储在headers_容器中</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">          // empty line, end of header</span><br><span class="line">          // FIXME:</span><br><span class="line">          state_ = kGotAll;//HttpContext将状态改为 kGotAll</span><br><span class="line">          hasMore = false;</span><br><span class="line">        &#125;</span><br><span class="line">        buf-&gt;retrieveUntil(crlf + 2);//将header从buf中取回，包括\r\n</span><br><span class="line">      &#125;</span><br><span class="line">      else</span><br><span class="line">      &#123;</span><br><span class="line">        hasMore = false;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else if (state_ == kExpectBody)//当前还不支持请求中带body</span><br><span class="line">    &#123;</span><br><span class="line">      // FIXME:</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return ok;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码是一个基于muduo网络库的HTTP请求解析器，用于解析HTTP请求报文。</p>
+<p><code>HttpContext::processRequestLine</code> 函数用于解析请求行，该函数接受两个指针参数 <code>begin</code> 和 <code>end</code>，表示请求行的起始位置和结束位置。函数首先在请求行中寻找空格字符，将请求方法解析出来，并设置到 <code>request_</code> 对象中。然后再次寻找空格字符，解析出路径和查询字符串，并设置到 <code>request_</code> 对象中。最后判断请求的HTTP版本号，并设置到 <code>request_</code> 对象中。</p>
+<p><code>HttpContext::parseRequest</code> 函数用于解析完整的HTTP请求报文。该函数接受一个 <code>Buffer</code> 对象和一个时间戳参数。函数通过一个 while 循环来不断解析请求报文的各个部分。</p>
+<ul>
+<li>当 <code>state_</code> 的值为 <code>kExpectRequestLine</code> 时，表示正在解析请求行。函数调用 <code>buf-&gt;findCRLF()</code> 来查找请求行的结束位置，如果找到了 CRLF（回车换行）字符，则调用 <code>processRequestLine</code> 进行解析。解析成功后，设置请求时间并从 <code>buf</code> 中移除已解析的请求行，然后将 <code>state_</code> 设置为 <code>kExpectHeaders</code>，进入下一个状态。</li>
+<li>当 <code>state_</code> 的值为 <code>kExpectHeaders</code> 时，表示正在解析请求头部。函数调用 <code>buf-&gt;findCRLF()</code> 来查找头部的结束位置，如果找到了 CRLF 字符，则调用 <code>request_.addHeader</code> 函数将头部字段名和值存储到 <code>request_</code> 对象中。如果找不到 CRLF 字符，说明还没有解析完所有的头部字段，函数退出循环。</li>
+<li>当 <code>state_</code> 的值为 <code>kExpectBody</code> 时，表示请求中带有请求体部分。当前代码中并未实现对请求体的解析。</li>
+</ul>
+<p>这段代码主要是通过状态机的方式逐步解析HTTP请求报文的各个部分，并将解析结果存储在 <code>request_</code> 对象中。</p>
+<h2 id="HttpServer-http服务器类封装"><a href="#HttpServer-http服务器类封装" class="headerlink" title="HttpServer:http服务器类封装"></a>HttpServer:http服务器类封装</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line">//也是一个Tcp服务器</span><br><span class="line">class HttpServer : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void (const HttpRequest&amp;,</span><br><span class="line">                              HttpResponse*)&gt; HttpCallback;</span><br><span class="line"></span><br><span class="line">  HttpServer(EventLoop* loop,</span><br><span class="line">             const InetAddress&amp; listenAddr,</span><br><span class="line">             const string&amp; name,</span><br><span class="line">             TcpServer::Option option = TcpServer::kNoReusePort);</span><br><span class="line"></span><br><span class="line">  EventLoop* getLoop() const &#123; return server_.getLoop(); &#125;</span><br><span class="line"></span><br><span class="line">  /// Not thread safe, callback be registered before calling start().</span><br><span class="line">  void setHttpCallback(const HttpCallback&amp; cb)</span><br><span class="line">  &#123;</span><br><span class="line">    httpCallback_ = cb;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void setThreadNum(int numThreads)</span><br><span class="line">  &#123;</span><br><span class="line">    server_.setThreadNum(numThreads);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void start();</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  void onConnection(const TcpConnectionPtr&amp; conn);</span><br><span class="line">  void onMessage(const TcpConnectionPtr&amp; conn,</span><br><span class="line">                 Buffer* buf,</span><br><span class="line">                 Timestamp receiveTime);</span><br><span class="line">  void onRequest(const TcpConnectionPtr&amp;, const HttpRequest&amp;);</span><br><span class="line"></span><br><span class="line">  TcpServer server_;</span><br><span class="line">  HttpCallback httpCallback_;//在处理http请求(即调用onRequest)的过程中回调此函数，对请求进行具体的处理，boost::any context_;将这个绑定</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line">namespace detail</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">void defaultHttpCallback(const HttpRequest&amp;, HttpResponse* resp)</span><br><span class="line">&#123;</span><br><span class="line">  resp-&gt;setStatusCode(HttpResponse::k404NotFound);</span><br><span class="line">  resp-&gt;setStatusMessage(&quot;Not Found&quot;);</span><br><span class="line">  resp-&gt;setCloseConnection(true);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace detail</span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">HttpServer::HttpServer(EventLoop* loop,</span><br><span class="line">                       const InetAddress&amp; listenAddr,</span><br><span class="line">                       const string&amp; name,</span><br><span class="line">                       TcpServer::Option option)</span><br><span class="line">  : server_(loop, listenAddr, name, option),</span><br><span class="line">    httpCallback_(detail::defaultHttpCallback)</span><br><span class="line">&#123;</span><br><span class="line">  server_.setConnectionCallback(</span><br><span class="line">      std::bind(&amp;HttpServer::onConnection, this, _1));</span><br><span class="line">  server_.setMessageCallback(</span><br><span class="line">      std::bind(&amp;HttpServer::onMessage, this, _1, _2, _3));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void HttpServer::start()</span><br><span class="line">&#123;</span><br><span class="line">  LOG_WARN &lt;&lt; &quot;HttpServer[&quot; &lt;&lt; server_.name()</span><br><span class="line">    &lt;&lt; &quot;] starts listening on &quot; &lt;&lt; server_.ipPort();</span><br><span class="line">  server_.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void HttpServer::onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">&#123;</span><br><span class="line">  if (conn-&gt;connected())</span><br><span class="line">  &#123;</span><br><span class="line">    conn-&gt;setContext(HttpContext());//TcpConnection与一个HttpContext绑定</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void HttpServer::onMessage(const TcpConnectionPtr&amp; conn,</span><br><span class="line">                           Buffer* buf,</span><br><span class="line">                           Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  HttpContext* context = boost::any_cast&lt;HttpContext&gt;(conn-&gt;getMutableContext());</span><br><span class="line">  //解析请求包</span><br><span class="line">  if (!context-&gt;parseRequest(buf, receiveTime))</span><br><span class="line">  &#123;</span><br><span class="line">    conn-&gt;send(&quot;HTTP/1.1 400 Bad Request\r\n\r\n&quot;);</span><br><span class="line">    conn-&gt;shutdown();</span><br><span class="line">  &#125;</span><br><span class="line">  //请求解析完毕</span><br><span class="line">  if (context-&gt;gotAll())</span><br><span class="line">  &#123;</span><br><span class="line">    onRequest(conn, context-&gt;request());</span><br><span class="line">    context-&gt;reset();//本次请求处理完毕，重置Httpcontext，适用于长连接</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void HttpServer::onRequest(const TcpConnectionPtr&amp; conn, const HttpRequest&amp; req)</span><br><span class="line">&#123;</span><br><span class="line">  const string&amp; connection = req.getHeader(&quot;Connection&quot;);//根据头域返回它的值</span><br><span class="line">  bool close = connection == &quot;close&quot; ||</span><br><span class="line">    (req.getVersion() == HttpRequest::kHttp10 &amp;&amp; connection != &quot;Keep-Alive&quot;);//1.0版本只支持短连接</span><br><span class="line">  HttpResponse response(close);//处理完请求是否要关闭连接</span><br><span class="line">  httpCallback_(req, &amp;response);//回调用户的函数对HTTP进行相应的处理，处理完，会返回一个response对象</span><br><span class="line">  Buffer buf;</span><br><span class="line">  response.appendToBuffer(&amp;buf);</span><br><span class="line">  conn-&gt;send(&amp;buf);</span><br><span class="line">  if (response.closeConnection())</span><br><span class="line">  &#123;</span><br><span class="line">    conn-&gt;shutdown();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">extern char favicon[555];</span><br><span class="line">bool benchmark = false;</span><br><span class="line">//实际的请求处理，返回一个http应答</span><br><span class="line">void onRequest(const HttpRequest&amp; req, HttpResponse* resp)</span><br><span class="line">&#123;</span><br><span class="line">  std::cout &lt;&lt; &quot;Headers &quot; &lt;&lt; req.methodString() &lt;&lt; &quot; &quot; &lt;&lt; req.path() &lt;&lt; std::endl;</span><br><span class="line">  if (!benchmark)</span><br><span class="line">  &#123;</span><br><span class="line">    const std::map&lt;string, string&gt;&amp; headers = req.headers();</span><br><span class="line">    for (const auto&amp; header : headers)</span><br><span class="line">    &#123;</span><br><span class="line">      std::cout &lt;&lt; header.first &lt;&lt; &quot;: &quot; &lt;&lt; header.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (req.path() == &quot;/&quot;)</span><br><span class="line">  &#123;</span><br><span class="line">    resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">    resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">    resp-&gt;setContentType(&quot;text/html&quot;);</span><br><span class="line">    resp-&gt;addHeader(&quot;Server&quot;, &quot;Muduo&quot;);</span><br><span class="line">    string now = Timestamp::now().toFormattedString();</span><br><span class="line">    resp-&gt;setBody(&quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;This is title&lt;/title&gt;&lt;/head&gt;&quot;</span><br><span class="line">        &quot;&lt;body&gt;&lt;h1&gt;Hello&lt;/h1&gt;Now is &quot; + now +</span><br><span class="line">        &quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  else if (req.path() == &quot;/favicon.ico&quot;)</span><br><span class="line">  &#123;</span><br><span class="line">    resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">    resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">    resp-&gt;setContentType(&quot;image/png&quot;);</span><br><span class="line">    resp-&gt;setBody(string(favicon, sizeof favicon));</span><br><span class="line">  &#125;</span><br><span class="line">  else if (req.path() == &quot;/hello&quot;)</span><br><span class="line">  &#123;</span><br><span class="line">    resp-&gt;setStatusCode(HttpResponse::k200Ok);</span><br><span class="line">    resp-&gt;setStatusMessage(&quot;OK&quot;);</span><br><span class="line">    resp-&gt;setContentType(&quot;text/plain&quot;);</span><br><span class="line">    resp-&gt;addHeader(&quot;Server&quot;, &quot;Muduo&quot;);</span><br><span class="line">    resp-&gt;setBody(&quot;hello, world!\n&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    resp-&gt;setStatusCode(HttpResponse::k404NotFound);</span><br><span class="line">    resp-&gt;setStatusMessage(&quot;Not Found&quot;);</span><br><span class="line">    resp-&gt;setCloseConnection(true);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">  int numThreads = 0;</span><br><span class="line">  if (argc &gt; 1)</span><br><span class="line">  &#123;</span><br><span class="line">    benchmark = true;</span><br><span class="line">    Logger::setLogLevel(Logger::WARN);</span><br><span class="line">    numThreads = atoi(argv[1]);</span><br><span class="line">  &#125;</span><br><span class="line">  EventLoop loop;</span><br><span class="line">  HttpServer server(&amp;loop, InetAddress(8000), &quot;dummy&quot;);</span><br><span class="line">  server.setHttpCallback(onRequest);</span><br><span class="line">  server.setThreadNum(numThreads);</span><br><span class="line">  server.start();</span><br><span class="line">  loop.loop();</span><br><span class="line">&#125;</span><br><span class="line">//这是一个图片数据</span><br><span class="line">char favicon[555] = &#123;</span><br><span class="line">  &#x27;\x89&#x27;, &#x27;P&#x27;, &#x27;N&#x27;, &#x27;G&#x27;, &#x27;\xD&#x27;, &#x27;\xA&#x27;, &#x27;\x1A&#x27;, &#x27;\xA&#x27;,</span><br><span class="line">  &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\xD&#x27;, &#x27;I&#x27;, &#x27;H&#x27;, &#x27;D&#x27;, &#x27;R&#x27;,</span><br><span class="line">  &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x10&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x10&#x27;,</span><br><span class="line">  &#x27;\x8&#x27;, &#x27;\x6&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x1F&#x27;, &#x27;\xF3&#x27;, &#x27;\xFF&#x27;,</span><br><span class="line">  &#x27;a&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x19&#x27;, &#x27;t&#x27;, &#x27;E&#x27;, &#x27;X&#x27;,</span><br><span class="line">  &#x27;t&#x27;, &#x27;S&#x27;, &#x27;o&#x27;, &#x27;f&#x27;, &#x27;t&#x27;, &#x27;w&#x27;, &#x27;a&#x27;, &#x27;r&#x27;,</span><br><span class="line">  &#x27;e&#x27;, &#x27;\x0&#x27;, &#x27;A&#x27;, &#x27;d&#x27;, &#x27;o&#x27;, &#x27;b&#x27;, &#x27;e&#x27;, &#x27;\x20&#x27;,</span><br><span class="line">  &#x27;I&#x27;, &#x27;m&#x27;, &#x27;a&#x27;, &#x27;g&#x27;, &#x27;e&#x27;, &#x27;R&#x27;, &#x27;e&#x27;, &#x27;a&#x27;,</span><br><span class="line">  &#x27;d&#x27;, &#x27;y&#x27;, &#x27;q&#x27;, &#x27;\xC9&#x27;, &#x27;e&#x27;, &#x27;\x3C&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;,</span><br><span class="line">  &#x27;\x1&#x27;, &#x27;\xCD&#x27;, &#x27;I&#x27;, &#x27;D&#x27;, &#x27;A&#x27;, &#x27;T&#x27;, &#x27;x&#x27;, &#x27;\xDA&#x27;,</span><br><span class="line">  &#x27;\x94&#x27;, &#x27;\x93&#x27;, &#x27;9&#x27;, &#x27;H&#x27;, &#x27;\x3&#x27;, &#x27;A&#x27;, &#x27;\x14&#x27;, &#x27;\x86&#x27;,</span><br><span class="line">  &#x27;\xFF&#x27;, &#x27;\x5D&#x27;, &#x27;b&#x27;, &#x27;\xA7&#x27;, &#x27;\x4&#x27;, &#x27;R&#x27;, &#x27;\xC4&#x27;, &#x27;m&#x27;,</span><br><span class="line">  &#x27;\x22&#x27;, &#x27;\x1E&#x27;, &#x27;\xA0&#x27;, &#x27;F&#x27;, &#x27;\x24&#x27;, &#x27;\x8&#x27;, &#x27;\x16&#x27;, &#x27;\x16&#x27;,</span><br><span class="line">  &#x27;v&#x27;, &#x27;\xA&#x27;, &#x27;6&#x27;, &#x27;\xBA&#x27;, &#x27;J&#x27;, &#x27;\x9A&#x27;, &#x27;\x80&#x27;, &#x27;\x8&#x27;,</span><br><span class="line">  &#x27;A&#x27;, &#x27;\xB4&#x27;, &#x27;q&#x27;, &#x27;\x85&#x27;, &#x27;X&#x27;, &#x27;\x89&#x27;, &#x27;G&#x27;, &#x27;\xB0&#x27;,</span><br><span class="line">  &#x27;I&#x27;, &#x27;\xA9&#x27;, &#x27;Q&#x27;, &#x27;\x24&#x27;, &#x27;\xCD&#x27;, &#x27;\xA6&#x27;, &#x27;\x8&#x27;, &#x27;\xA4&#x27;,</span><br><span class="line">  &#x27;H&#x27;, &#x27;c&#x27;, &#x27;\x91&#x27;, &#x27;B&#x27;, &#x27;\xB&#x27;, &#x27;\xAF&#x27;, &#x27;V&#x27;, &#x27;\xC1&#x27;,</span><br><span class="line">  &#x27;F&#x27;, &#x27;\xB4&#x27;, &#x27;\x15&#x27;, &#x27;\xCF&#x27;, &#x27;\x22&#x27;, &#x27;X&#x27;, &#x27;\x98&#x27;, &#x27;\xB&#x27;,</span><br><span class="line">  &#x27;T&#x27;, &#x27;H&#x27;, &#x27;\x8A&#x27;, &#x27;d&#x27;, &#x27;\x93&#x27;, &#x27;\x8D&#x27;, &#x27;\xFB&#x27;, &#x27;F&#x27;,</span><br><span class="line">  &#x27;g&#x27;, &#x27;\xC9&#x27;, &#x27;\x1A&#x27;, &#x27;\x14&#x27;, &#x27;\x7D&#x27;, &#x27;\xF0&#x27;, &#x27;f&#x27;, &#x27;v&#x27;,</span><br><span class="line">  &#x27;f&#x27;, &#x27;\xDF&#x27;, &#x27;\x7C&#x27;, &#x27;\xEF&#x27;, &#x27;\xE7&#x27;, &#x27;g&#x27;, &#x27;F&#x27;, &#x27;\xA8&#x27;,</span><br><span class="line">  &#x27;\xD5&#x27;, &#x27;j&#x27;, &#x27;H&#x27;, &#x27;\x24&#x27;, &#x27;\x12&#x27;, &#x27;\x2A&#x27;, &#x27;\x0&#x27;, &#x27;\x5&#x27;,</span><br><span class="line">  &#x27;\xBF&#x27;, &#x27;G&#x27;, &#x27;\xD4&#x27;, &#x27;\xEF&#x27;, &#x27;\xF7&#x27;, &#x27;\x2F&#x27;, &#x27;6&#x27;, &#x27;\xEC&#x27;,</span><br><span class="line">  &#x27;\x12&#x27;, &#x27;\x20&#x27;, &#x27;\x1E&#x27;, &#x27;\x8F&#x27;, &#x27;\xD7&#x27;, &#x27;\xAA&#x27;, &#x27;\xD5&#x27;, &#x27;\xEA&#x27;,</span><br><span class="line">  &#x27;\xAF&#x27;, &#x27;I&#x27;, &#x27;5&#x27;, &#x27;F&#x27;, &#x27;\xAA&#x27;, &#x27;T&#x27;, &#x27;\x5F&#x27;, &#x27;\x9F&#x27;,</span><br><span class="line">  &#x27;\x22&#x27;, &#x27;A&#x27;, &#x27;\x2A&#x27;, &#x27;\x95&#x27;, &#x27;\xA&#x27;, &#x27;\x83&#x27;, &#x27;\xE5&#x27;, &#x27;r&#x27;,</span><br><span class="line">  &#x27;9&#x27;, &#x27;d&#x27;, &#x27;\xB3&#x27;, &#x27;Y&#x27;, &#x27;\x96&#x27;, &#x27;\x99&#x27;, &#x27;L&#x27;, &#x27;\x6&#x27;,</span><br><span class="line">  &#x27;\xE9&#x27;, &#x27;t&#x27;, &#x27;\x9A&#x27;, &#x27;\x25&#x27;, &#x27;\x85&#x27;, &#x27;\x2C&#x27;, &#x27;\xCB&#x27;, &#x27;T&#x27;,</span><br><span class="line">  &#x27;\xA7&#x27;, &#x27;\xC4&#x27;, &#x27;b&#x27;, &#x27;1&#x27;, &#x27;\xB5&#x27;, &#x27;\x5E&#x27;, &#x27;\x0&#x27;, &#x27;\x3&#x27;,</span><br><span class="line">  &#x27;h&#x27;, &#x27;\x9A&#x27;, &#x27;\xC6&#x27;, &#x27;\x16&#x27;, &#x27;\x82&#x27;, &#x27;\x20&#x27;, &#x27;X&#x27;, &#x27;R&#x27;,</span><br><span class="line">  &#x27;\x14&#x27;, &#x27;E&#x27;, &#x27;6&#x27;, &#x27;S&#x27;, &#x27;\x94&#x27;, &#x27;\xCB&#x27;, &#x27;e&#x27;, &#x27;x&#x27;,</span><br><span class="line">  &#x27;\xBD&#x27;, &#x27;\x5E&#x27;, &#x27;\xAA&#x27;, &#x27;U&#x27;, &#x27;T&#x27;, &#x27;\x23&#x27;, &#x27;L&#x27;, &#x27;\xC0&#x27;,</span><br><span class="line">  &#x27;\xE0&#x27;, &#x27;\xE2&#x27;, &#x27;\xC1&#x27;, &#x27;\x8F&#x27;, &#x27;\x0&#x27;, &#x27;\x9E&#x27;, &#x27;\xBC&#x27;, &#x27;\x9&#x27;,</span><br><span class="line">  &#x27;A&#x27;, &#x27;\x7C&#x27;, &#x27;\x3E&#x27;, &#x27;\x1F&#x27;, &#x27;\x83&#x27;, &#x27;D&#x27;, &#x27;\x22&#x27;, &#x27;\x11&#x27;,</span><br><span class="line">  &#x27;\xD5&#x27;, &#x27;T&#x27;, &#x27;\x40&#x27;, &#x27;\x3F&#x27;, &#x27;8&#x27;, &#x27;\x80&#x27;, &#x27;w&#x27;, &#x27;\xE5&#x27;,</span><br><span class="line">  &#x27;3&#x27;, &#x27;\x7&#x27;, &#x27;\xB8&#x27;, &#x27;\x5C&#x27;, &#x27;\x2E&#x27;, &#x27;H&#x27;, &#x27;\x92&#x27;, &#x27;\x4&#x27;,</span><br><span class="line">  &#x27;\x87&#x27;, &#x27;\xC3&#x27;, &#x27;\x81&#x27;, &#x27;\x40&#x27;, &#x27;\x20&#x27;, &#x27;\x40&#x27;, &#x27;g&#x27;, &#x27;\x98&#x27;,</span><br><span class="line">  &#x27;\xE9&#x27;, &#x27;6&#x27;, &#x27;\x1A&#x27;, &#x27;\xA6&#x27;, &#x27;g&#x27;, &#x27;\x15&#x27;, &#x27;\x4&#x27;, &#x27;\xE3&#x27;,</span><br><span class="line">  &#x27;\xD7&#x27;, &#x27;\xC8&#x27;, &#x27;\xBD&#x27;, &#x27;\x15&#x27;, &#x27;\xE1&#x27;, &#x27;i&#x27;, &#x27;\xB7&#x27;, &#x27;C&#x27;,</span><br><span class="line">  &#x27;\xAB&#x27;, &#x27;\xEA&#x27;, &#x27;x&#x27;, &#x27;\x2F&#x27;, &#x27;j&#x27;, &#x27;X&#x27;, &#x27;\x92&#x27;, &#x27;\xBB&#x27;,</span><br><span class="line">  &#x27;\x18&#x27;, &#x27;\x20&#x27;, &#x27;\x9F&#x27;, &#x27;\xCF&#x27;, &#x27;3&#x27;, &#x27;\xC3&#x27;, &#x27;\xB8&#x27;, &#x27;\xE9&#x27;,</span><br><span class="line">  &#x27;N&#x27;, &#x27;\xA7&#x27;, &#x27;\xD3&#x27;, &#x27;l&#x27;, &#x27;J&#x27;, &#x27;\x0&#x27;, &#x27;i&#x27;, &#x27;6&#x27;,</span><br><span class="line">  &#x27;\x7C&#x27;, &#x27;\x8E&#x27;, &#x27;\xE1&#x27;, &#x27;\xFE&#x27;, &#x27;V&#x27;, &#x27;\x84&#x27;, &#x27;\xE7&#x27;, &#x27;\x3C&#x27;,</span><br><span class="line">  &#x27;\x9F&#x27;, &#x27;r&#x27;, &#x27;\x2B&#x27;, &#x27;\x3A&#x27;, &#x27;B&#x27;, &#x27;\x7B&#x27;, &#x27;7&#x27;, &#x27;f&#x27;,</span><br><span class="line">  &#x27;w&#x27;, &#x27;\xAE&#x27;, &#x27;\x8E&#x27;, &#x27;\xE&#x27;, &#x27;\xF3&#x27;, &#x27;\xBD&#x27;, &#x27;R&#x27;, &#x27;\xA9&#x27;,</span><br><span class="line">  &#x27;d&#x27;, &#x27;\x2&#x27;, &#x27;B&#x27;, &#x27;\xAF&#x27;, &#x27;\x85&#x27;, &#x27;2&#x27;, &#x27;f&#x27;, &#x27;F&#x27;,</span><br><span class="line">  &#x27;\xBA&#x27;, &#x27;\xC&#x27;, &#x27;\xD9&#x27;, &#x27;\x9F&#x27;, &#x27;\x1D&#x27;, &#x27;\x9A&#x27;, &#x27;l&#x27;, &#x27;\x22&#x27;,</span><br><span class="line">  &#x27;\xE6&#x27;, &#x27;\xC7&#x27;, &#x27;\x3A&#x27;, &#x27;\x2C&#x27;, &#x27;\x80&#x27;, &#x27;\xEF&#x27;, &#x27;\xC1&#x27;, &#x27;\x15&#x27;,</span><br><span class="line">  &#x27;\x90&#x27;, &#x27;\x7&#x27;, &#x27;\x93&#x27;, &#x27;\xA2&#x27;, &#x27;\x28&#x27;, &#x27;\xA0&#x27;, &#x27;S&#x27;, &#x27;j&#x27;,</span><br><span class="line">  &#x27;\xB1&#x27;, &#x27;\xB8&#x27;, &#x27;\xDF&#x27;, &#x27;\x29&#x27;, &#x27;5&#x27;, &#x27;C&#x27;, &#x27;\xE&#x27;, &#x27;\x3F&#x27;,</span><br><span class="line">  &#x27;X&#x27;, &#x27;\xFC&#x27;, &#x27;\x98&#x27;, &#x27;\xDA&#x27;, &#x27;y&#x27;, &#x27;j&#x27;, &#x27;P&#x27;, &#x27;\x40&#x27;,</span><br><span class="line">  &#x27;\x0&#x27;, &#x27;\x87&#x27;, &#x27;\xAE&#x27;, &#x27;\x1B&#x27;, &#x27;\x17&#x27;, &#x27;B&#x27;, &#x27;\xB4&#x27;, &#x27;\x3A&#x27;,</span><br><span class="line">  &#x27;\x3F&#x27;, &#x27;\xBE&#x27;, &#x27;y&#x27;, &#x27;\xC7&#x27;, &#x27;\xA&#x27;, &#x27;\x26&#x27;, &#x27;\xB6&#x27;, &#x27;\xEE&#x27;,</span><br><span class="line">  &#x27;\xD9&#x27;, &#x27;\x9A&#x27;, &#x27;\x60&#x27;, &#x27;\x14&#x27;, &#x27;\x93&#x27;, &#x27;\xDB&#x27;, &#x27;\x8F&#x27;, &#x27;\xD&#x27;,</span><br><span class="line">  &#x27;\xA&#x27;, &#x27;\x2E&#x27;, &#x27;\xE9&#x27;, &#x27;\x23&#x27;, &#x27;\x95&#x27;, &#x27;\x29&#x27;, &#x27;X&#x27;, &#x27;\x0&#x27;,</span><br><span class="line">  &#x27;\x27&#x27;, &#x27;\xEB&#x27;, &#x27;n&#x27;, &#x27;V&#x27;, &#x27;p&#x27;, &#x27;\xBC&#x27;, &#x27;\xD6&#x27;, &#x27;\xCB&#x27;,</span><br><span class="line">  &#x27;\xD6&#x27;, &#x27;G&#x27;, &#x27;\xAB&#x27;, &#x27;\x3D&#x27;, &#x27;l&#x27;, &#x27;\x7D&#x27;, &#x27;\xB8&#x27;, &#x27;\xD2&#x27;,</span><br><span class="line">  &#x27;\xDD&#x27;, &#x27;\xA0&#x27;, &#x27;\x60&#x27;, &#x27;\x83&#x27;, &#x27;\xBA&#x27;, &#x27;\xEF&#x27;, &#x27;\x5F&#x27;, &#x27;\xA4&#x27;,</span><br><span class="line">  &#x27;\xEA&#x27;, &#x27;\xCC&#x27;, &#x27;\x2&#x27;, &#x27;N&#x27;, &#x27;\xAE&#x27;, &#x27;\x5E&#x27;, &#x27;p&#x27;, &#x27;\x1A&#x27;,</span><br><span class="line">  &#x27;\xEC&#x27;, &#x27;\xB3&#x27;, &#x27;\x40&#x27;, &#x27;9&#x27;, &#x27;\xAC&#x27;, &#x27;\xFE&#x27;, &#x27;\xF2&#x27;, &#x27;\x91&#x27;,</span><br><span class="line">  &#x27;\x89&#x27;, &#x27;g&#x27;, &#x27;\x91&#x27;, &#x27;\x85&#x27;, &#x27;\x21&#x27;, &#x27;\xA8&#x27;, &#x27;\x87&#x27;, &#x27;\xB7&#x27;,</span><br><span class="line">  &#x27;X&#x27;, &#x27;\x7E&#x27;, &#x27;\x7E&#x27;, &#x27;\x85&#x27;, &#x27;\xBB&#x27;, &#x27;\xCD&#x27;, &#x27;N&#x27;, &#x27;N&#x27;,</span><br><span class="line">  &#x27;b&#x27;, &#x27;t&#x27;, &#x27;\x40&#x27;, &#x27;\xFA&#x27;, &#x27;\x93&#x27;, &#x27;\x89&#x27;, &#x27;\xEC&#x27;, &#x27;\x1E&#x27;,</span><br><span class="line">  &#x27;\xEC&#x27;, &#x27;\x86&#x27;, &#x27;\x2&#x27;, &#x27;H&#x27;, &#x27;\x26&#x27;, &#x27;\x93&#x27;, &#x27;\xD0&#x27;, &#x27;u&#x27;,</span><br><span class="line">  &#x27;\x1D&#x27;, &#x27;\x7F&#x27;, &#x27;\x9&#x27;, &#x27;2&#x27;, &#x27;\x95&#x27;, &#x27;\xBF&#x27;, &#x27;\x1F&#x27;, &#x27;\xDB&#x27;,</span><br><span class="line">  &#x27;\xD7&#x27;, &#x27;c&#x27;, &#x27;\x8A&#x27;, &#x27;\x1A&#x27;, &#x27;\xF7&#x27;, &#x27;\x5C&#x27;, &#x27;\xC1&#x27;, &#x27;\xFF&#x27;,</span><br><span class="line">  &#x27;\x22&#x27;, &#x27;J&#x27;, &#x27;\xC3&#x27;, &#x27;\x87&#x27;, &#x27;\x0&#x27;, &#x27;\x3&#x27;, &#x27;\x0&#x27;, &#x27;K&#x27;,</span><br><span class="line">  &#x27;\xBB&#x27;, &#x27;\xF8&#x27;, &#x27;\xD6&#x27;, &#x27;\x2A&#x27;, &#x27;v&#x27;, &#x27;\x98&#x27;, &#x27;I&#x27;, &#x27;\x0&#x27;,</span><br><span class="line">  &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;\x0&#x27;, &#x27;I&#x27;, &#x27;E&#x27;, &#x27;N&#x27;, &#x27;D&#x27;, &#x27;\xAE&#x27;,</span><br><span class="line">  &#x27;B&#x27;, &#x27;\x60&#x27;, &#x27;\x82&#x27;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="网络库测压"><a href="#网络库测压" class="headerlink" title="网络库测压"></a>网络库测压</h1><p>在example中使用<code>./httpserver_test 4</code>实现了http服务器（只是简单的通过&#x2F;hello返回hello world），使用apache benchmark对此http服务器进行压力测试，可以测试网络库的并发处理能力 在本人笔记本上（CPU  i5-10300H）使用ab进行测压（setThreadNums &#x3D; 4）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">xiaohuilin@Ubuntu:~$ ab -n 1000000 -c 1000 -k http://0.0.0.0:8000/hello</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1843412 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 0.0.0.0 (be patient)</span><br><span class="line">Completed 100000 requests</span><br><span class="line">Completed 200000 requests</span><br><span class="line">Completed 300000 requests</span><br><span class="line">Completed 400000 requests</span><br><span class="line">Completed 500000 requests</span><br><span class="line">Completed 600000 requests</span><br><span class="line">Completed 700000 requests</span><br><span class="line">Completed 800000 requests</span><br><span class="line">Completed 900000 requests</span><br><span class="line">Completed 1000000 requests</span><br><span class="line">Finished 1000000 requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Server Software:        Muduo</span><br><span class="line">Server Hostname:        0.0.0.0</span><br><span class="line">Server Port:            8000</span><br><span class="line"></span><br><span class="line">Document Path:          /hello</span><br><span class="line">Document Length:        14 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      1000</span><br><span class="line">Time taken for tests:   57.306 seconds</span><br><span class="line">Complete requests:      1000000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Keep-Alive requests:    1000000</span><br><span class="line">Total transferred:      118000000 bytes</span><br><span class="line">HTML transferred:       14000000 bytes</span><br><span class="line">Requests per second:    17450.13 [#/sec] (mean)</span><br><span class="line">Time per request:       57.306 [ms] (mean)</span><br><span class="line">Time per request:       0.057 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          2010.86 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        0    0   1.0      0      46</span><br><span class="line">Processing:     1   49  18.6     48    8621</span><br><span class="line">Waiting:        1   49  18.6     48    8575</span><br><span class="line">Total:          1   49  18.6     48    8621</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%     48</span><br><span class="line">  66%     55</span><br><span class="line">  75%     59</span><br><span class="line">  80%     61</span><br><span class="line">  90%     68</span><br><span class="line">  95%     74</span><br><span class="line">  98%     87</span><br><span class="line">  99%     98</span><br><span class="line"> 100%   8621 (longest request)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>完成的请求数量：1000000</li>
+<li>失败的请求数量：0</li>
+<li>平均每秒处理请求数量：17450.13 [#&#x2F;sec]</li>
+<li>平均每个请求的响应时间：57.306毫秒</li>
+<li>数据传输速率：2010.86 Kbytes&#x2F;秒</li>
+</ul>
+<p>连接时间和处理时间：</p>
+<ul>
+<li>最小连接时间：0毫秒</li>
+<li>平均连接时间：0毫秒</li>
+<li>最大连接时间：46毫秒</li>
+<li>最小处理时间：1毫秒</li>
+<li>平均处理时间：49毫秒</li>
+<li>最大处理时间：8621毫秒</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/20/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%886%EF%BC%89/" rel="prev" title="muduo-网络库（6）">
+      <i class="fa fa-chevron-left"></i> muduo-网络库（6）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/22/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-inspect%E5%BA%93/" rel="next" title="muduo_inspect库">
+      muduo_inspect库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#http-request"><span class="nav-number">1.</span> <span class="nav-text">http request</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%85%B8%E5%9E%8B%E7%9A%84http%E8%AF%B7%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">一个典型的http请求</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-response"><span class="nav-number">2.</span> <span class="nav-text">http response</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%85%B8%E5%9E%8B%E7%9A%84http%E5%BA%94%E7%AD%94"><span class="nav-number">2.1.</span> <span class="nav-text">一个典型的http应答</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#muduo-http%E5%BA%93%E6%B6%89%E5%8F%8A%E5%88%B0%E7%9A%84%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">muduo_http库涉及到的类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HttpRequest-http%E8%AF%B7%E6%B1%82%E7%B1%BB%E5%B0%81%E8%A3%85"><span class="nav-number">3.1.</span> <span class="nav-text">HttpRequest: http请求类封装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HttpResponse-http%E5%93%8D%E5%BA%94%E7%B1%BB%E5%B0%81%E8%A3%85"><span class="nav-number">3.2.</span> <span class="nav-text">HttpResponse: http响应类封装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HttpResponse-h"><span class="nav-number">3.2.1.</span> <span class="nav-text">HttpResponse.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HttpResponse-cc"><span class="nav-number">3.2.2.</span> <span class="nav-text">HttpResponse.cc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HttpContext-http%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%B1%BB"><span class="nav-number">3.3.</span> <span class="nav-text">HttpContext: http协议解析类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HttpServer-http%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%B1%BB%E5%B0%81%E8%A3%85"><span class="nav-number">3.4.</span> <span class="nav-text">HttpServer:http服务器类封装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.5.</span> <span class="nav-text">测试程序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%BA%93%E6%B5%8B%E5%8E%8B"><span class="nav-number">4.</span> <span class="nav-text">网络库测压</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

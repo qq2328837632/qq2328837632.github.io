@@ -147,7 +147,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/17/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/17/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -161,7 +161,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/17/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/" class="post-title-link" itemprop="url">数据结构-4</a>
+            <a href="/2023/09/17/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/" class="post-title-link" itemprop="url">数据结构-4</a>
         </h2>
 
         <div class="post-meta">
@@ -189,7 +189,7 @@
           <h1 id="重建二叉树"><a href="#重建二叉树" class="headerlink" title="重建二叉树"></a>重建二叉树</h1><p>给定节点数为 n 的二叉树的前序遍历和中序遍历结果，请重建出该二叉树并返回它的头结点。</p>
 <p>例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建出如下图所示。</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/image-20230917153948200.png" alt="image-20230917153948200"></p>
-<img src="/2023/09/17/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/image-20230917153948200.png" class title="This is an test image">
+<img src="/2023/09/17/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/image-20230917153948200.png" class title="This is an test image">
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">TreeNode* reConstructBinaryTree(vector&lt;int&gt; pre,vector&lt;int&gt; vin) &#123;</span><br><span class="line">         if (pre.size() == 0 || vin.size() == 0) &#123;</span><br><span class="line">            return NULL;</span><br><span class="line">        &#125;</span><br><span class="line">        TreeNode* treeNode = new TreeNode(pre[0]);</span><br><span class="line">        int mid = distance(begin(vin), find(vin.begin(), vin.end(), pre[0]));</span><br><span class="line">        vector&lt;int&gt; left_pre(pre.begin() + 1, pre.begin() + mid + 1);</span><br><span class="line">        vector&lt;int&gt; right_pre(pre.begin() + mid + 1, pre.end());</span><br><span class="line">        vector&lt;int&gt; left_in(vin.begin(), vin.begin() + mid);</span><br><span class="line">        vector&lt;int&gt; right_in(vin.begin() + mid + 1, vin.end());</span><br><span class="line"></span><br><span class="line">        treeNode-&gt;left = reConstructBinaryTree(left_pre, left_in);</span><br><span class="line">        treeNode-&gt;right = reConstructBinaryTree(right_pre, right_in);</span><br><span class="line">        return treeNode;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
@@ -213,7 +213,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/13/c-%E8%A1%A5%E5%85%853/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/13/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%853/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -227,7 +227,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/13/c-%E8%A1%A5%E5%85%853/" class="post-title-link" itemprop="url">c++-补充3</a>
+            <a href="/2023/09/13/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%853/" class="post-title-link" itemprop="url">c++-补充3</a>
         </h2>
 
         <div class="post-meta">
@@ -503,7 +503,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/10/c-%E8%A1%A5%E5%85%85-2/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/10/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -517,7 +517,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/10/c-%E8%A1%A5%E5%85%85-2/" class="post-title-link" itemprop="url">c++补充-2</a>
+            <a href="/2023/09/10/c%E5%92%8Cc++/c-%E8%A1%A5%E5%85%85-2/" class="post-title-link" itemprop="url">c++补充-2</a>
         </h2>
 
         <div class="post-meta">
@@ -712,7 +712,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/06/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/06/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -726,7 +726,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/06/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/" class="post-title-link" itemprop="url">数据结构-3</a>
+            <a href="/2023/09/06/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/" class="post-title-link" itemprop="url">数据结构-3</a>
         </h2>
 
         <div class="post-meta">
@@ -761,7 +761,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;sstream&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;numeric&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">int main() &#123;</span><br><span class="line">    string line;</span><br><span class="line">    </span><br><span class="line">    // 读取输入行</span><br><span class="line">    getline(cin, line);</span><br><span class="line"></span><br><span class="line">    // 创建字符串流</span><br><span class="line">    stringstream ss(line);//std::string delimiter = &quot;,&quot;;  // 自定义分隔符</span><br><span class="line">    					  //std::getline(ss, token, delimiter[0]);</span><br><span class="line">    int num,sumA,sumB;</span><br><span class="line">    vector&lt;int&gt; resourcesA;</span><br><span class="line"></span><br><span class="line">    // 解析服务器A节点的资源数</span><br><span class="line">    while (ss &gt;&gt; num) &#123;</span><br><span class="line">        resourcesA.push_back(num);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 读取下一行输入</span><br><span class="line">    getline(cin, line);</span><br><span class="line">    stringstream ss2(line);//使用 std::stringstream 对象进行输入操作时，默认情况下，空格是被认为是分隔符的，即会被用来划分不同的变量值</span><br><span class="line">    vector&lt;int&gt; resourcesB;</span><br><span class="line"></span><br><span class="line">    // 解析服务器B节点的资源数</span><br><span class="line">    while (ss2 &gt;&gt; num) &#123;</span><br><span class="line">        //由于空格是默认的分隔符，因此 ss &gt;&gt; num 操作符会自动跳过空格，直到遇到一个整数，</span><br><span class="line">        //在这种情况下，它会将整数提取出来，并将其存储到 num 变量中。然后，我们将 num 添加到向量 vec 中</span><br><span class="line">        resourcesB.push_back(num);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 在此处添加你的交换逻辑和计算等操作</span><br><span class="line">    for (int i = 0; i &lt; resourcesA.size(); ++i) &#123;</span><br><span class="line">        for (int j = 0; j &lt; resourcesB.size(); ++j) &#123;</span><br><span class="line">            swap(resourcesA[i],resourcesB[j]);</span><br><span class="line">            sumA=accumulate(resourcesA.begin(), resourcesA.end(),0);</span><br><span class="line">            sumB=accumulate(resourcesB.begin(), resourcesB.end(),0);</span><br><span class="line">            if(sumA == sumB)</span><br><span class="line">                break;</span><br><span class="line">            swap(resourcesA[i],resourcesB[j]);</span><br><span class="line">         &#125;</span><br><span class="line">         if (sumA == sumB) &#123;</span><br><span class="line">            break;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">    // 输出结果</span><br><span class="line">    for (int i = 0; i &lt; resourcesA.size(); ++i) &#123;</span><br><span class="line">        cout &lt;&lt; resourcesA[i] &lt;&lt; &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    for (int i = 0; i &lt; resourcesB.size(); ++i) &#123;</span><br><span class="line">        cout &lt;&lt; resourcesB[i] &lt;&lt; &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/image-20230906222153192.png" alt="image-20230906222153192"></p>
-<img src="/2023/09/06/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/image-20230906222153192.png" class title="This is an test image">
+<img src="/2023/09/06/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-3/image-20230906222153192.png" class title="This is an test image">
 
 <p><code>std::getline</code> 函数的原型如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cppCopy Codetemplate&lt; class CharT, class Traits, class Allocator &gt;</span><br><span class="line">std::basic_istream&lt;CharT,Traits&gt;&amp; getline( std::basic_istream&lt;CharT,Traits&gt;&amp; input,</span><br><span class="line">                                           std::basic_string&lt;CharT,Traits,Allocator&gt;&amp; str,</span><br><span class="line">                                           CharT delim );</span><br></pre></td></tr></table></figure>
@@ -919,7 +919,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/05/Mysql/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/05/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Mysql/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -933,7 +933,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/05/Mysql/" class="post-title-link" itemprop="url">Mysql</a>
+            <a href="/2023/09/05/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Mysql/" class="post-title-link" itemprop="url">Mysql</a>
         </h2>
 
         <div class="post-meta">
@@ -976,7 +976,7 @@
 </ol>
 <p>简单概括：<br>连接器：管理连接、权限验证；<br>查询缓存：命中缓存则直接返回结果；<br>分析器：对SQL进行词法分析、语法分析；（判断查询的SQL字段是否存在也是在这步）<br>优化器：执行计划生成、选择索引；<br>执行器：操作引擎、返回结果；<br>存储引擎：存储数据、提供读写接口。</p>
 <p><img src="/Mysql/image-20230905150235233.png" alt="image-20230905150235233"></p>
-<img src="/2023/09/05/Mysql/image-20230905150235233.png" class title="This is an test image">
+<img src="/2023/09/05/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Mysql/image-20230905150235233.png" class title="This is an test image">
 
 <h2 id="数据库中的主键、超键、候选键、外键"><a href="#数据库中的主键、超键、候选键、外键" class="headerlink" title="数据库中的主键、超键、候选键、外键"></a>数据库中的主键、超键、候选键、外键</h2><ul>
 <li>超键：在关系中能唯一标识元组的属性集称为关系模式的超键 </li>
@@ -1186,7 +1186,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/03/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/03/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1200,7 +1200,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/03/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/" class="post-title-link" itemprop="url">数据结构-（3）</a>
+            <a href="/2023/09/03/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/" class="post-title-link" itemprop="url">数据结构-（3）</a>
         </h2>
 
         <div class="post-meta">
@@ -1229,7 +1229,7 @@
 <p> 而企业链表把 “挂钩” 放在了结构体的首地址，挂钩指向挂钩，从而把表了连接起来。 </p>
 <p>linux呢，则是把 ”挂钩“ 放在了底部，那么串的时候就需要自己计算偏移量。</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/image-20230903214441893.png" alt="image-20230903214441893"></p>
-<img src="/2023/09/03/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/image-20230903214441893.png" class title="This is an test image">
+<img src="/2023/09/03/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%EF%BC%883%EF%BC%89/image-20230903214441893.png" class title="This is an test image">
 
 <p>首先 ，按照传统的方式去写节点的结构体是这样子的，包含数据域和指针域。在企业链表中，我们定义的时候，仅仅保留指针域，相当于这只是 一个 ”挂钩“</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">typedef struct LINKNODE&#123;</span><br><span class="line">	struct LINKNODE* next;</span><br><span class="line">&#125; LinkNode;</span><br></pre></td></tr></table></figure>
@@ -1263,7 +1263,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/02/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/02/c%E5%92%8Cc++/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1277,7 +1277,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/02/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/" class="post-title-link" itemprop="url">对面试题的补充</a>
+            <a href="/2023/09/02/c%E5%92%8Cc++/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/" class="post-title-link" itemprop="url">对面试题的补充</a>
         </h2>
 
         <div class="post-meta">
@@ -1308,7 +1308,7 @@
 <p>先把IP地址转换成二进制，然后与二进制的子网掩码进行与运算，得到的就是网络地址。</p>
 <p>广播地址是在网络地址的基础上，将网络号右边的表示IP地址的主机部分的二进制全部填上1，再将得到的二进制转化为十进制就可以得到广播地址。</p>
 <p><img src="/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/image-20230902154859245.png" alt="image-20230902154859245"></p>
-<img src="/2023/09/02/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/image-20230902154859245.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E5%AF%B9%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9A%84%E8%A1%A5%E5%85%85/image-20230902154859245.png" class title="This is an test image">
 
       
     </div>
@@ -1328,7 +1328,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1342,7 +1342,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/" class="post-title-link" itemprop="url">数据结构-2</a>
+            <a href="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/" class="post-title-link" itemprop="url">数据结构-2</a>
         </h2>
 
         <div class="post-meta">
@@ -1359,7 +1359,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-22 16:27:28" itemprop="dateModified" datetime="2023-10-22T16:27:28+08:00">2023-10-22</time>
+                <time title="修改时间：2023-11-01 14:56:21" itemprop="dateModified" datetime="2023-11-01T14:56:21+08:00">2023-11-01</time>
               </span>
 
           
@@ -1394,12 +1394,12 @@
 <p>哈希函数类似于数学中的一次函数，我们给它传递一个元素，它反馈给我们一个结果值，这个值就是该元素对应的索引，也就是存储到哈希表中的位置。</p>
 <p>举个例子，将 {20, 30, 50, 70, 80} 存储到哈希表中，我们设计的哈希函数为 y&#x3D;x&#x2F;10，最终各个元素的存储位置如下图所示：</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png" alt="image-20230902155837486"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155837486.png" class title="This is an test image">
 
 <p>假设我们想查找元素 50，只需将它带入 y&#x3D;x&#x2F;10 这个哈希函数中，计算出它对应的索引值为 5，直接可以在数组中找到它。借助哈希函数，我们提高了数组中数据的查找效率，这就是哈希表存储结构。</p>
 <p>构建哈希表时，哈希函数的设计至关重要。假设将 {5, 20, 30, 50, 55} 存储到哈希表中，哈希函数是 y&#x3D;x%10，各个元素在数组中的存储位置如下图所示：</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png" alt="image-20230902155932936"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902155932936.png" class title="This is an test image">
 
 <p>可以看到，5 和 55 以及 20、30 和 50 对应的索引值是相同的，它们的存储位置发生了冲突，我们习惯称为哈希冲突或者哈希碰撞。设计一个好的哈希函数，可以降低哈希冲突的出现次数。哈希表提供了很多解决哈希冲突的方案，比如线性探测法、再哈希法、链地址法等。</p>
 <p>本节我们使用线性探测法解决哈希冲突，解决方法是：当元素的索引值（存储位置）发生冲突时，从当前位置向后查找，直至找到一个空闲位置，作为冲突元素的存储位置。仍以图 3 中的哈希表为例，使用线性探测法解决哈希冲突的过程是：</p>
@@ -1412,14 +1412,14 @@
 </ul>
 <p>借助线性探测法，最终 {5, 20, 30, 50, 55} 存储到哈希表中的状态为：</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png" alt="image-20230902160001791"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902160001791.png" class title="This is an test image">
 
 <h1 id="哈夫曼树"><a href="#哈夫曼树" class="headerlink" title="哈夫曼树"></a>哈夫曼树</h1><p>给定N个权值作为N个叶子结点，构造一棵二叉树，若该树的带权路径长度达到最小，称这样的二叉树为最优二叉树，也称为哈夫曼树(Huffman Tree)。哈夫曼树是带权路径长度最短的树，权值较大的结点离根较近。</p>
 <p>在一棵树中，从一个结点往下可以达到的孩子或孙子结点之间的通路，称为路径。</p>
 <p>通路中分支的数目称为路径长度。若规定根结点的层数为1，则从根结点到第L层结点的路径长度为L-1。</p>
 <p>若将树中结点赋给一个有着某种含义的数值，则这个数值称为该结点的权。结点的带权路径长度为：从根结点到该结点之间的路径长度与该结点的权的乘积。树的根结点权值为其左、右子树根结点权值之和，相对于15，9，5是构造的，不参与权值计数</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png" alt="image-20230902162158683"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902162158683.png" class title="This is an test image">
 
 <p>树的带权路径长度规定为所有叶子结点的带权路径长度之和，记为WPL。</p>
 <p>如上图：数的带权路径长度为：</p>
@@ -1440,21 +1440,21 @@
 <h1 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h1><p>假设给定一个组无序数列{100,5,3,11,6,8,7}，带着问题，我们对其进行堆排序操作进行分步操作说明。</p>
 <h2 id="创建最大堆"><a href="#创建最大堆" class="headerlink" title="创建最大堆"></a>创建最大堆</h2><p>首先我们将数组我们将数组从上至下按顺序排列，转换成二叉树：一个无序堆。每一个三角关系都是一个堆，上面是父节点，下面两个分叉是子节点，两个子节点俗称左孩子、右孩子；</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png" alt="image-20230902171921919"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171921919.png" class title="This is an test image">
 
 <p>转换成无序堆之后，我们要努力让这个无序堆变成最大堆(或是最小堆)，即每个堆里都实现父节点的值都大于任何一个子节点的值</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png" alt="image-20230902171947417"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902171947417.png" class title="This is an test image">
 
 <p>从最后一个堆开始，即左下角那个没有右孩子的那个堆开始；首先对比左右孩子，由于这个堆没有右孩子，所以只能用左孩子，左孩子的值比父节点的值小所以不需要交换。如果发生交换，要检测子节点是否为其他堆的父节点，如果是，递归进行同样的操作。</p>
 <p>第二次对比红色三角形内的堆，取较大的子节点，右孩子8胜出，和父节点比较，右孩子8大于父节点3，升级做父节点，与3交换位置，3的位置没有子节点，这个堆建成最大堆。</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png" alt="image-20230902172011780"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172011780.png" class title="This is an test image">
 
 <p>对黄色三角形内堆进行排序，过程和上面一样，最终是右孩子33升为父节点，被交换的右孩子下面也没有子节点，所以直接结束对比。</p>
 <p>最顶部绿色的堆，堆顶100比左右孩子都大，所以不用交换，至此最大堆创建完成</p>
 <p><img src="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png" alt="image-20230902172042297"></p>
-<img src="/2023/09/02/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png" class title="This is an test image">
+<img src="/2023/09/02/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2/image-20230902172042297.png" class title="This is an test image">
 
 <p>堆排序 （heapsort）— O(n log n)非稳定排序,空间复杂度O(1)</p>
 <p>按照数组顺序，当前节点i，它的parent&#x3D;(i-1)&#x2F;2，左子节点2i+1，右子节点2i+2</p>
@@ -1500,7 +1500,7 @@
 <p>从中轴元素那里开始把大的数组切割成两个小的数组(两个数组都不包含中轴元素)，接着我们通过递归 的方式，让中轴元素左边的数组和右边的数组也重复同样的操作，直到数组的大小为1，此时每个元素 都处于有序的位置。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">// quick函数实现</span><br><span class="line">void quick_sort(int *arr, int start, int end)</span><br><span class="line">&#123;</span><br><span class="line">    int i = start;</span><br><span class="line">    int j = end;</span><br><span class="line">    int temp = arr[start]; // 默认将数组第一个元素作为基准值</span><br><span class="line">    if (i &lt; j)</span><br><span class="line">    &#123;</span><br><span class="line">        while (i &lt; j)//每次只是将比基准大或小的放在两边，动或者不动，没有顺序</span><br><span class="line">        &#123;</span><br><span class="line">            // 从end向start筛选比temp更小的数</span><br><span class="line">            while (i &lt; j &amp;&amp; arr[j] &gt;= temp)</span><br><span class="line">            &#123;</span><br><span class="line">                j--;</span><br><span class="line">            &#125;</span><br><span class="line">            if (i &lt; j)</span><br><span class="line">            &#123;</span><br><span class="line">                arr[i] = arr[j]; // 把这个数放到基准值的左边</span><br><span class="line">            &#125;</span><br><span class="line">            // 从start向end筛选比temp更大的数</span><br><span class="line">            while (i &lt; j &amp;&amp; arr[i] &lt; temp)</span><br><span class="line">            &#123;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            if (i &lt; j)</span><br><span class="line">            &#123;</span><br><span class="line">                arr[j] = arr[i]; // 把这个数放到基准值的右边</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[i] = temp; // 将基准值放到正确位置</span><br><span class="line"></span><br><span class="line">        printf(&quot;\n&quot;);</span><br><span class="line">        quick_sort(arr, start, i - 1);</span><br><span class="line">        quick_sort(arr, i + 1, end);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h1><p>希尔排序的思想是采用插入排序的方法，先让数组中任意间隔为 h 的元素有序，刚开始 h 的大小可以是 h &#x3D; n &#x2F; 2,接着让 h &#x3D; n &#x2F; 4，让 h 一直缩小，当 h &#x3D; 1 时，也就是此时数组中任意间隔为1的元素有序，此时 的数组就是有序的了。</p>
+<h1 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h1><p>希尔排序的思想是采用插入排序的方法，先让数组中任意间隔为 h 的元素有序，刚开始 h 的大小可以是 h &#x3D; n &#x2F; 2,接着让 h &#x3D; n &#x2F; 4，让 h 一直缩小，当 h &#x3D; 1 时，也就是此时数组中任意间隔为1的元素有序，此时的数组就是有序的了。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">void shellSortCore(vector&lt;int&gt; &amp;nums, int gap, int i)</span><br><span class="line">&#123;</span><br><span class="line">    int inserted = nums[i];</span><br><span class="line">    int j;</span><br><span class="line">    // 插入的时候按组进行插入</span><br><span class="line">    for (j = i - gap; j &gt;= 0 &amp;&amp; inserted &lt; nums[j]; j -= gap)</span><br><span class="line">    &#123;</span><br><span class="line">        nums[j + gap] = nums[j];</span><br><span class="line">    &#125;</span><br><span class="line">    nums[j + gap] = inserted;</span><br><span class="line">&#125;</span><br><span class="line">void shellSort(vector&lt;int&gt; &amp;nums)</span><br><span class="line">&#123;</span><br><span class="line">    int len = nums.size();</span><br><span class="line">    // 进行分组，最开始的时候，gap为数组长度一半</span><br><span class="line">    for (int gap = len / 2; gap &gt; 0; gap /= 2)</span><br><span class="line">    &#123;</span><br><span class="line">        // 对各个分组进行插入分组</span><br><span class="line">        for (int i = gap; i &lt; len; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            // 将nums[i]插入到所在分组正确的位置上</span><br><span class="line">            shellSortCore(nums, gap, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for (auto a : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; a &lt;&lt; &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h1><p>归并排序 （merge sort）— O(n log n)稳定排序，空间复杂度O(n)</p>
@@ -1565,7 +1565,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/29/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/29/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1579,7 +1579,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/08/29/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">Redis基本操作</a>
+            <a href="/2023/08/29/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/Redis%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">Redis基本操作</a>
         </h2>
 
         <div class="post-meta">
@@ -1706,7 +1706,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/28/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1720,7 +1720,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/08/28/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/" class="post-title-link" itemprop="url">muduo库使用示例_7</a>
+            <a href="/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/" class="post-title-link" itemprop="url">muduo库使用示例_7</a>
         </h2>
 
         <div class="post-meta">
@@ -1761,7 +1761,7 @@
 </li>
 </ul>
 <p><img src="/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png" alt="image-20230828114049679"></p>
-<img src="/2023/08/28/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png" class title="This is an test image">
+<img src="/2023/08/28/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo%E5%BA%93%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7/image-20230828114049679.png" class title="This is an test image">
 
 <h2 id="AsyncLogging-h"><a href="#AsyncLogging-h" class="headerlink" title="AsyncLogging.h"></a>AsyncLogging.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line">#define MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/BlockingQueue.h&quot;</span><br><span class="line">#include &quot;muduo/base/BoundedBlockingQueue.h&quot;</span><br><span class="line">#include &quot;muduo/base/CountDownLatch.h&quot;</span><br><span class="line">#include &quot;muduo/base/Mutex.h&quot;</span><br><span class="line">#include &quot;muduo/base/Thread.h&quot;</span><br><span class="line">#include &quot;muduo/base/LogStream.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;atomic&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line">//异步日志</span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class AsyncLogging : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line"></span><br><span class="line">  AsyncLogging(const string&amp; basename,</span><br><span class="line">               off_t rollSize,</span><br><span class="line">               int flushInterval = 3);</span><br><span class="line"></span><br><span class="line">  ~AsyncLogging()</span><br><span class="line">  &#123;</span><br><span class="line">    if (running_)</span><br><span class="line">    &#123;</span><br><span class="line">      stop();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  //供前端生产者线程调用（日志数据写到缓冲区)</span><br><span class="line">  void append(const char* logline, int len);</span><br><span class="line"></span><br><span class="line">  void start()</span><br><span class="line">  &#123;</span><br><span class="line">    running_ = true;</span><br><span class="line">    thread_.start();//日志线程启动，调用threadFunc</span><br><span class="line">    latch_.wait();//等待线程启动</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  void stop() NO_THREAD_SAFETY_ANALYSIS</span><br><span class="line">  &#123;</span><br><span class="line">    running_ = false;</span><br><span class="line">    cond_.notify();</span><br><span class="line">    thread_.join();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line">  //供后端消费者线程调用（将数据写到日志文件)</span><br><span class="line">  void threadFunc();</span><br><span class="line">  //实例化 FixedBuffer 类模板，并指定模板参数的具体值</span><br><span class="line">  typedef muduo::detail::FixedBuffer&lt;muduo::detail::kLargeBuffer&gt; Buffer;</span><br><span class="line">  typedef std::vector&lt;std::unique_ptr&lt;Buffer&gt;&gt; BufferVector;</span><br><span class="line">  typedef BufferVector::value_type BufferPtr;//可理解为Buffer的智能指针，能管理BufFer的生存期</span><br><span class="line">                                             //BufferVector::value_type 表示 BufferVector 中的元素类型，也就是 std::unique_ptr&lt;Buffer&gt;类型,真备移动语义</span><br><span class="line">                                            //(两个unique_ptr不能指向一个对象，不能进行复制操作只能进行移动操作</span><br><span class="line"> </span><br><span class="line">  const int flushInterval_;//超时时间，在flushInterval_秒内，缓冲区没写满，仍将缓冲区中的数据写到文件中</span><br><span class="line">  std::atomic&lt;bool&gt; running_;</span><br><span class="line">  const string basename_;</span><br><span class="line">  const off_t rollSize_;//日志文件的滚动大小</span><br><span class="line">  muduo::Thread thread_;</span><br><span class="line">  muduo::CountDownLatch latch_;//用于等待线程启动</span><br><span class="line">  muduo::MutexLock mutex_;</span><br><span class="line">  muduo::Condition cond_ GUARDED_BY(mutex_);//条件变量与互斥量配合使用</span><br><span class="line">  BufferPtr currentBuffer_ GUARDED_BY(mutex_);//当前缓冲区，智能指针</span><br><span class="line">  BufferPtr nextBuffer_ GUARDED_BY(mutex_);//预备缓冲区</span><br><span class="line">  BufferVector buffers_ GUARDED_BY(mutex_);//待写入文件的已填满的缓冲区</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_BASE_ASYNCLOGGING_H</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 

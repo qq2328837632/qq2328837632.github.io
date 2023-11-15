@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="muduo库如何支持多线程 EventLoopThread (IO线程类) EventLoopThreadPool(IO线程池类) IO线程池的功能是开启若干个IO线程，并让这些IO线程处于事件循环的状态       TcpServer.cc关于EventLoopThreadPool部分12345678910111213141516171819202122232425262728293031323">
+<meta property="og:type" content="article">
+<meta property="og:title" content="muduo-网络库（5）">
+<meta property="og:url" content="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="muduo库如何支持多线程 EventLoopThread (IO线程类) EventLoopThreadPool(IO线程池类) IO线程池的功能是开启若干个IO线程，并让这些IO线程处于事件循环的状态       TcpServer.cc关于EventLoopThreadPool部分12345678910111213141516171819202122232425262728293031323">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230816193049699.png">
+<meta property="og:image" content="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230816193049699.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192430816.png">
+<meta property="og:image" content="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192430816.png">
+<meta property="og:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192738143.png">
+<meta property="og:image" content="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192738143.png">
+<meta property="article:published_time" content="2023-08-16T11:21:54.000Z">
+<meta property="article:modified_time" content="2023-08-24T06:42:41.146Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230816193049699.png">
+
+<link rel="canonical" href="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>muduo-网络库（5） | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          muduo-网络库（5）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-16 19:21:54" itemprop="dateCreated datePublished" datetime="2023-08-16T19:21:54+08:00">2023-08-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-24 14:42:41" itemprop="dateModified" datetime="2023-08-24T14:42:41+08:00">2023-08-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="muduo库如何支持多线程"><a href="#muduo库如何支持多线程" class="headerlink" title="muduo库如何支持多线程"></a>muduo库如何支持多线程</h1><ul>
+<li>EventLoopThread (IO线程类)</li>
+<li>EventLoopThreadPool(IO线程池类)<ul>
+<li>IO线程池的功能是开启若干个IO线程，并让这些IO线程处于事件循环的状态</li>
+</ul>
+</li>
+</ul>
+<p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230816193049699.png" alt="image-20230816193049699"></p>
+<img src="/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230816193049699.png" class title="This is an test image">
+
+<h2 id="TcpServer-cc关于EventLoopThreadPool部分"><a href="#TcpServer-cc关于EventLoopThreadPool部分" class="headerlink" title="TcpServer.cc关于EventLoopThreadPool部分"></a>TcpServer.cc关于EventLoopThreadPool部分</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">std::shared_ptr&lt;EventLoopThreadPool&gt; threadPool_;</span><br><span class="line">void setThreadInitCallback(const ThreadInitCallback&amp; cb)</span><br><span class="line">  &#123; threadInitCallback_ = cb; &#125;</span><br><span class="line">构造函数</span><br><span class="line">threadPool_(new EventLoopThreadPool(loop, name_))</span><br><span class="line"></span><br><span class="line">void TcpServer::setThreadNum(int numThreads)</span><br><span class="line">&#123;</span><br><span class="line">  assert(0 &lt;= numThreads);</span><br><span class="line">  threadPool_-&gt;setThreadNum(numThreads);//不包含主线程</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpServer::start()</span><br><span class="line">&#123;</span><br><span class="line">  if (started_.getAndSet(1) == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    threadPool_-&gt;start(threadInitCallback_);//启动线程池</span><br><span class="line"></span><br><span class="line">    assert(!acceptor_-&gt;listening());</span><br><span class="line">    //get_pointer返回原生指针</span><br><span class="line">    loop_-&gt;runInLoop(</span><br><span class="line">        std::bind(&amp;Acceptor::listen, get_pointer(acceptor_)));//ptr.get();裸指针是为了将对象指针传递给 std::bind，从而在可调用对象中使用</span><br><span class="line">  &#125;//acceptor_.get() 是 std::unique_ptr 类提供的成员函数 get() 的调用，它用于获取被智能指针管理的对象的原始裸指针</span><br><span class="line">  //智能指针不能直接传递对象，是因为智能指针对对象进行了所有权管理</span><br><span class="line">&#125;</span><br><span class="line">void TcpServer::newConnection(int sockfd, const InetAddress&amp; peerAddr)&#123;</span><br><span class="line"> //按照轮叫的方式选择一个EventLoop</span><br><span class="line">  EventLoop* ioLoop = threadPool_-&gt;getNextLoop();</span><br><span class="line">  TcpConnectionPtr conn(new TcpConnection(ioLoop,</span><br><span class="line">                                          connName,</span><br><span class="line">                                          sockfd,</span><br><span class="line">                                          localAddr,</span><br><span class="line">                                          peerAddr));</span><br><span class="line"> ioLoop-&gt;runInLoop(std::bind(&amp;TcpConnection::connectEstablished, conn));//再ioLoop所属线程调用connectEstablished</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>EventLoopThreadPool::start</code> 方法中，线程池会根据指定的线程数量创建并启动多个 <code>EventLoopThread</code> 线程，然后每个线程会创建一个 <code>EventLoop</code> 实例。通过调用 <code>threadInitCallback_</code> 回调函数，你可以在每个线程开始事件循环之前执行一些初始化操作，以确保线程处于正确的状态。</p>
+<p>因此，<code>threadPool_-&gt;start(threadInitCallback_)</code> 是用于启动整个线程池，其中每个线程会拥有自己的事件循环，并在事件循环开始之前调用 <code>threadInitCallback_</code> 进行初始化。这样就为每个线程提供了一个适当的上下文，以便它们可以正常地处理连接和事件。</p>
+<h2 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h2><p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192430816.png" alt="image-20230817192430816"></p>
+<img src="/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192430816.png" class title="This is an test image">
+
+<p><img src="/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192738143.png" alt="image-20230817192738143"></p>
+<img src="/2023/08/16/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%885%EF%BC%89/image-20230817192738143.png" class title="This is an test image">
+
+<p>主线程的文件描述符创建先后，3：pollerfd，4：timerfd，5：wakeupfd，6：listenfd，7：idlefd，再创建其它子线程（线程池）依此类推,子线程没有listenfd和idlefd,处理读事件的都是wakeupfd</p>
+<h2 id="EventLoopThreadPool-h"><a href="#EventLoopThreadPool-h" class="headerlink" title="EventLoopThreadPool.h"></a>EventLoopThreadPool.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_EVENTLOOPTHREADPOOL_H</span><br><span class="line">#define MUDUO_NET_EVENTLOOPTHREADPOOL_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/noncopyable.h&quot;</span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;functional&gt;</span><br><span class="line">#include &lt;memory&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">class EventLoop;</span><br><span class="line">class EventLoopThread;</span><br><span class="line"></span><br><span class="line">class EventLoopThreadPool : noncopyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  typedef std::function&lt;void(EventLoop*)&gt; ThreadInitCallback;</span><br><span class="line"></span><br><span class="line">  EventLoopThreadPool(EventLoop* baseLoop, const string&amp; nameArg);</span><br><span class="line">  ~EventLoopThreadPool();</span><br><span class="line">  void setThreadNum(int numThreads) &#123; numThreads_ = numThreads; &#125;</span><br><span class="line">  void start(const ThreadInitCallback&amp; cb = ThreadInitCallback());</span><br><span class="line"></span><br><span class="line">  // valid after calling start()</span><br><span class="line">  /// round-robin</span><br><span class="line">  EventLoop* getNextLoop();</span><br><span class="line"></span><br><span class="line">  /// with the same hash code, it will always return the same EventLoop</span><br><span class="line">  EventLoop* getLoopForHash(size_t hashCode);</span><br><span class="line"></span><br><span class="line">  std::vector&lt;EventLoop*&gt; getAllLoops();</span><br><span class="line"></span><br><span class="line">  bool started() const</span><br><span class="line">  &#123; return started_; &#125;</span><br><span class="line"></span><br><span class="line">  const string&amp; name() const</span><br><span class="line">  &#123; return name_; &#125;</span><br><span class="line"></span><br><span class="line"> private:</span><br><span class="line"></span><br><span class="line">  EventLoop* baseLoop_;//与Acceptor所属EventLoop相同</span><br><span class="line">  string name_;</span><br><span class="line">  bool started_;</span><br><span class="line">  int numThreads_;//线程数</span><br><span class="line">  int next_;//新连接到来，所选择EventLoop对象下标</span><br><span class="line">  std::vector&lt;std::unique_ptr&lt;EventLoopThread&gt;&gt; threads_;//IO线程列表</span><br><span class="line">  std::vector&lt;EventLoop*&gt; loops_;//EventLoop列表，EventLoop 对象的生命周期由其他IO线程负责</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_EVENTLOOPTHREADPOOL_H</span><br></pre></td></tr></table></figure>
+
+<h2 id="EventLoopThreadPool-cc"><a href="#EventLoopThreadPool-cc" class="headerlink" title="EventLoopThreadPool.cc"></a>EventLoopThreadPool.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/EventLoopThreadPool.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/EventLoop.h&quot;</span><br><span class="line">#include &quot;muduo/net/EventLoopThread.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const string&amp; nameArg)</span><br><span class="line">  : baseLoop_(baseLoop),</span><br><span class="line">    name_(nameArg),</span><br><span class="line">    started_(false),</span><br><span class="line">    numThreads_(0),</span><br><span class="line">    next_(0)</span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventLoopThreadPool::~EventLoopThreadPool()</span><br><span class="line">&#123;</span><br><span class="line">  // Don&#x27;t delete loop, it&#x27;s stack variable</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void EventLoopThreadPool::start(const ThreadInitCallback&amp; cb)</span><br><span class="line">&#123;</span><br><span class="line">  assert(!started_);</span><br><span class="line">  baseLoop_-&gt;assertInLoopThread();</span><br><span class="line"></span><br><span class="line">  started_ = true;</span><br><span class="line"></span><br><span class="line">  for (int i = 0; i &lt; numThreads_; ++i)</span><br><span class="line">  &#123;</span><br><span class="line">    char buf[name_.size() + 32];</span><br><span class="line">    snprintf(buf, sizeof buf, &quot;%s%d&quot;, name_.c_str(), i);</span><br><span class="line">    EventLoopThread* t = new EventLoopThread(cb, buf);</span><br><span class="line">    threads_.push_back(std::unique_ptr&lt;EventLoopThread&gt;(t));</span><br><span class="line">    loops_.push_back(t-&gt;startLoop());//启动EventLoopThread线程，将返回的loop压入容器，在进入事件循环之前，会调用cb即启动调用EventLoopThread::threadFunc</span><br><span class="line">  &#125;</span><br><span class="line">  if (numThreads_ == 0 &amp;&amp; cb)</span><br><span class="line">  &#123;</span><br><span class="line">    //只有一个EventLoop，在这个EventLoop进入事件循环之前，调用cb,baseLoop_ 表示了一个已经存在的 EventLoop 实例，通常是主线程的事件循环</span><br><span class="line">    cb(baseLoop_);//在每个 EventLoopThread 启动之前，让用户有机会在新线程的事件循环开始之前执行自定义的初始化操作</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventLoop* EventLoopThreadPool::getNextLoop()</span><br><span class="line">&#123;</span><br><span class="line">  baseLoop_-&gt;assertInLoopThread();</span><br><span class="line">  assert(started_);</span><br><span class="line">  EventLoop* loop = baseLoop_;</span><br><span class="line">  //如果loops_为空，则loop指向baseLoop</span><br><span class="line">  //如果不为空，按照round-robin (RR，轮叫）的调度方式选择一个EventLoop</span><br><span class="line">  if (!loops_.empty())</span><br><span class="line">  &#123;</span><br><span class="line">    // round-robin</span><br><span class="line">    loop = loops_[next_];</span><br><span class="line">    ++next_;</span><br><span class="line">    if (implicit_cast&lt;size_t&gt;(next_) &gt;= loops_.size())</span><br><span class="line">    &#123;</span><br><span class="line">      next_ = 0;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return loop;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventLoop* EventLoopThreadPool::getLoopForHash(size_t hashCode)</span><br><span class="line">&#123;</span><br><span class="line">  baseLoop_-&gt;assertInLoopThread();</span><br><span class="line">  EventLoop* loop = baseLoop_;</span><br><span class="line"></span><br><span class="line">  if (!loops_.empty())</span><br><span class="line">  &#123;</span><br><span class="line">    loop = loops_[hashCode % loops_.size()];</span><br><span class="line">  &#125;</span><br><span class="line">  return loop;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">std::vector&lt;EventLoop*&gt; EventLoopThreadPool::getAllLoops()</span><br><span class="line">&#123;</span><br><span class="line">  baseLoop_-&gt;assertInLoopThread();</span><br><span class="line">  assert(started_);</span><br><span class="line">  if (loops_.empty())</span><br><span class="line">  &#123;</span><br><span class="line">    return std::vector&lt;EventLoop*&gt;(1, baseLoop_);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    return loops_;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**<code>EventLoop\* EventLoopThreadPool::getLoopForHash(size_t hashCode)</code>**：</p>
+<p>此函数根据提供的哈希码从线程池中获取一个事件循环。哈希码用于确定应该为特定任务分配哪个事件循环。此函数的主要目的是确保不同的任务以一致的方式分配给不同的事件循环。这有助于在各个事件循环之间分布负载。</p>
+<p><code>getLoopForHash</code> 函数的步骤如下：</p>
+<ul>
+<li>它断言调用线程与与基本事件循环关联的线程相同。</li>
+<li>如果事件循环向量（<code>loops_</code>）不为空，则根据提供的哈希码从向量中选择一个事件循环。</li>
+<li>哈希码用于计算在 <code>loops_</code> 向量中的索引，从而在可用的事件循环之间分配任务。</li>
+<li>如果向量为空，则函数返回基本事件循环（<code>baseLoop_</code>）。</li>
+</ul>
+<h1 id="应用层缓冲区Buffer设计"><a href="#应用层缓冲区Buffer设计" class="headerlink" title="应用层缓冲区Buffer设计"></a>应用层缓冲区Buffer设计</h1><h2 id="Buffer-h"><a href="#Buffer-h" class="headerlink" title="Buffer.h"></a>Buffer.h</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MUDUO_NET_BUFFER_H</span><br><span class="line">#define MUDUO_NET_BUFFER_H</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/base/copyable.h&quot;</span><br><span class="line">#include &quot;muduo/base/StringPiece.h&quot;</span><br><span class="line">#include &quot;muduo/base/Types.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/Endian.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;algorithm&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line"></span><br><span class="line">#include &lt;assert.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">//#include &lt;unistd.h&gt;  // ssize_t</span><br><span class="line"></span><br><span class="line">namespace muduo</span><br><span class="line">&#123;</span><br><span class="line">namespace net</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">/// A buffer class modeled after org.jboss.netty.buffer.ChannelBuffer</span><br><span class="line">///</span><br><span class="line">/// @code</span><br><span class="line">/// +-------------------+------------------+------------------+</span><br><span class="line">/// | prependable bytes |  readable bytes  |  writable bytes  |</span><br><span class="line">/// |                   |     (CONTENT)    |                  |</span><br><span class="line">/// +-------------------+------------------+------------------+</span><br><span class="line">/// |                   |                  |                  |</span><br><span class="line">/// 0      &lt;=      readerIndex   &lt;=   writerIndex    &lt;=     size</span><br><span class="line">/// @endcode</span><br><span class="line">class Buffer : public muduo::copyable</span><br><span class="line">&#123;</span><br><span class="line"> public:</span><br><span class="line">  static const size_t kCheapPrepend = 8;</span><br><span class="line">  static const size_t kInitialSize = 1024;</span><br><span class="line"></span><br><span class="line">  explicit Buffer(size_t initialSize = kInitialSize)</span><br><span class="line">    : buffer_(kCheapPrepend + initialSize),//预先分配了1032字节</span><br><span class="line">      readerIndex_(kCheapPrepend),</span><br><span class="line">      writerIndex_(kCheapPrepend)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(readableBytes() == 0);</span><br><span class="line">    assert(writableBytes() == initialSize);</span><br><span class="line">    assert(prependableBytes() == kCheapPrepend);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // implicit copy-ctor, move-ctor, dtor and assignment are fine</span><br><span class="line">  // NOTE: implicit move-ctor is added in g++ 4.6</span><br><span class="line"></span><br><span class="line">  void swap(Buffer&amp; rhs)</span><br><span class="line">  &#123;</span><br><span class="line">    buffer_.swap(rhs.buffer_);</span><br><span class="line">    std::swap(readerIndex_, rhs.readerIndex_);</span><br><span class="line">    std::swap(writerIndex_, rhs.writerIndex_);</span><br><span class="line">  &#125;</span><br><span class="line">  size_t readableBytes() const</span><br><span class="line">  &#123; return writerIndex_ - readerIndex_; &#125;</span><br><span class="line"></span><br><span class="line">  size_t writableBytes() const</span><br><span class="line">  &#123; return buffer_.size() - writerIndex_; &#125;</span><br><span class="line"></span><br><span class="line">  size_t prependableBytes() const</span><br><span class="line">  &#123; return readerIndex_; &#125;</span><br><span class="line"></span><br><span class="line">  const char* peek() const//返回读的指针</span><br><span class="line">  &#123; return begin() + readerIndex_; &#125;</span><br><span class="line"></span><br><span class="line">  const char* findCRLF() const</span><br><span class="line">  &#123;</span><br><span class="line">    // FIXME: replace with memmem()?</span><br><span class="line">    const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF+2);</span><br><span class="line">    //从peek()到beginWrite()的范围内搜索回车换行字符序列 (&quot;\r\n&quot;) 是否存在，并返回匹配的第一个位置的迭代器或指针</span><br><span class="line">    return crlf == beginWrite() ? NULL : crlf;</span><br><span class="line">  &#125;</span><br><span class="line">   void retrieve(size_t len)//取数据</span><br><span class="line">  &#123;</span><br><span class="line">    assert(len &lt;= readableBytes());</span><br><span class="line">    if (len &lt; readableBytes())</span><br><span class="line">    &#123;</span><br><span class="line">      readerIndex_ += len;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      retrieveAll();//取所有</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  void retrieveAll()</span><br><span class="line">  &#123;</span><br><span class="line">    readerIndex_ = kCheapPrepend;</span><br><span class="line">    writerIndex_ = kCheapPrepend;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  string retrieveAllAsString()</span><br><span class="line">  &#123;</span><br><span class="line">    return retrieveAsString(readableBytes());</span><br><span class="line">  &#125;</span><br><span class="line">  //用于从数据源中读取指定长度的数据，将其存储为字符串，并将数据源中已读取的数据删除</span><br><span class="line">  string retrieveAsString(size_t len)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(len &lt;= readableBytes());</span><br><span class="line">    string result(peek(), len);</span><br><span class="line">    retrieve(len);</span><br><span class="line">    return result;</span><br><span class="line">  &#125;</span><br><span class="line">  //确保缓冲区可写空间&gt;=len，如果不足则扩充</span><br><span class="line">  void ensureWritableBytes(size_t len)</span><br><span class="line">  &#123;</span><br><span class="line">    if (writableBytes() &lt; len)</span><br><span class="line">    &#123;</span><br><span class="line">      makeSpace(len);</span><br><span class="line">    &#125;</span><br><span class="line">    assert(writableBytes() &gt;= len);</span><br><span class="line">  &#125;</span><br><span class="line">  //从缓冲区中读取一个32位大端字节序的整数，然后将其转换为主机字节序，并返回转换后的整数值</span><br><span class="line">  int32_t peekInt32() const</span><br><span class="line">  &#123;</span><br><span class="line">    assert(readableBytes() &gt;= sizeof(int32_t));</span><br><span class="line">    int32_t be32 = 0;</span><br><span class="line">    ::memcpy(&amp;be32, peek(), sizeof be32);</span><br><span class="line">    return sockets::networkToHost32(be32);</span><br><span class="line">  &#125;</span><br><span class="line">//在缓冲区的头部插入给定长度的数据。它会通过将已读索引向前移动，并将新数据复制到头部位置来实现</span><br><span class="line">  void prepend(const void* /*restrict*/ data, size_t len)</span><br><span class="line">  &#123;</span><br><span class="line">    assert(len &lt;= prependableBytes());</span><br><span class="line">    readerIndex_ -= len;</span><br><span class="line">    const char* d = static_cast&lt;const char*&gt;(data);</span><br><span class="line">    std::copy(d, d+len, begin()+readerIndex_);</span><br><span class="line">  &#125;</span><br><span class="line">  //伸缩空间，保留reserve个字节</span><br><span class="line">  //这个函数的作用是缩小当前缓冲区的容量，以释放不必要的内存。</span><br><span class="line">  //它通过创建一个临时的 other 缓冲区，将当前缓冲区中的数据追加到其中，然后交换它们的内容，实现缓冲区的内存收缩</span><br><span class="line">  void shrink(size_t reserve)</span><br><span class="line">  &#123;</span><br><span class="line">    // FIXME: use vector::shrink_to_fit() in C++ 11 if possible.</span><br><span class="line">    Buffer other;</span><br><span class="line">    other.ensureWritableBytes(readableBytes()+reserve);</span><br><span class="line">    other.append(toStringPiece());</span><br><span class="line">    swap(other);</span><br><span class="line">  &#125;</span><br><span class="line">private:</span><br><span class="line">	 void makeSpace(size_t len)</span><br><span class="line">  &#123;</span><br><span class="line">    if (writableBytes() + prependableBytes() &lt; len + kCheapPrepend)</span><br><span class="line">    &#123;</span><br><span class="line">      // FIXME: move readable data</span><br><span class="line">      buffer_.resize(writerIndex_+len);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      // move readable data to the front, make space inside buffer</span><br><span class="line">      assert(kCheapPrepend &lt; readerIndex_);</span><br><span class="line">      size_t readable = readableBytes();</span><br><span class="line">      //将位于 buffer_ 中 readerIndex_ 到 writerIndex_ 范围内的数据复制到 buffer_ 中的另一个位置，从 kCheapPrepend 开始</span><br><span class="line">      std::copy(begin()+readerIndex_,</span><br><span class="line">                begin()+writerIndex_,</span><br><span class="line">                begin()+kCheapPrepend);</span><br><span class="line">      readerIndex_ = kCheapPrepend;</span><br><span class="line">      writerIndex_ = readerIndex_ + readable;</span><br><span class="line">      assert(readable == readableBytes());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  private:</span><br><span class="line">  std::vector&lt;char&gt; buffer_;</span><br><span class="line">  size_t readerIndex_;</span><br><span class="line">  size_t writerIndex_;</span><br><span class="line"></span><br><span class="line">  static const char kCRLF[];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  // namespace net</span><br><span class="line">&#125;  // namespace muduo</span><br><span class="line"></span><br><span class="line">#endif  // MUDUO_NET_BUFFER_H</span><br></pre></td></tr></table></figure>
+
+<h2 id="Buffer-cc"><a href="#Buffer-cc" class="headerlink" title="Buffer.cc"></a>Buffer.cc</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;muduo/net/Buffer.h&quot;</span><br><span class="line"></span><br><span class="line">#include &quot;muduo/net/SocketsOps.h&quot;</span><br><span class="line"></span><br><span class="line">#include &lt;errno.h&gt;</span><br><span class="line">#include &lt;sys/uio.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace muduo;</span><br><span class="line">using namespace muduo::net;</span><br><span class="line"></span><br><span class="line">const char Buffer::kCRLF[] = &quot;\r\n&quot;;</span><br><span class="line"></span><br><span class="line">const size_t Buffer::kCheapPrepend;</span><br><span class="line">const size_t Buffer::kInitialSize;</span><br><span class="line">//结合栈上的空间，避免内存使用过大,提高内存使用率</span><br><span class="line">//如果有5k个连接，每个连接就分配64K+64k的缓冲区的话，将占用640M内存，而大多数时候，这些缓冲区的使用率很低</span><br><span class="line">ssize_t Buffer::readFd(int fd, int* savedErrno)</span><br><span class="line">&#123;</span><br><span class="line">  // saved an ioctl()/FIONREAD call to tell how much to read</span><br><span class="line">  char extrabuf[65536];//栈上的空间足够大，节省一次ioctl系统调用（获取有多少可读数据）</span><br><span class="line">  struct iovec vec[2];</span><br><span class="line">  const size_t writable = writableBytes();</span><br><span class="line">  //第一块缓冲区</span><br><span class="line">  vec[0].iov_base = begin()+writerIndex_;</span><br><span class="line">  vec[0].iov_len = writable;</span><br><span class="line">  //第二块缓冲区</span><br><span class="line">  vec[1].iov_base = extrabuf;</span><br><span class="line">  vec[1].iov_len = sizeof extrabuf;</span><br><span class="line">  // when there is enough space in this buffer, don&#x27;t read into extrabuf.</span><br><span class="line">  // when extrabuf is used, we read 128k-1 bytes at most.</span><br><span class="line">  const int iovcnt = (writable &lt; sizeof extrabuf) ? 2 : 1;//根据当前缓冲区的可写入大小与 extrabuf 的大小，确定要传递给 readv 函数的 iovec 结构体数量</span><br><span class="line">  const ssize_t n = sockets::readv(fd, vec, iovcnt);</span><br><span class="line">  if (n &lt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    *savedErrno = errno;</span><br><span class="line">  &#125;</span><br><span class="line">  else if (implicit_cast&lt;size_t&gt;(n) &lt;= writable)//第一块缓冲区足够容纳</span><br><span class="line">  &#123;</span><br><span class="line">    writerIndex_ += n;</span><br><span class="line">  &#125;</span><br><span class="line">  else       //当前缓冲区，不够容纳，因而数据放不到第一块的故接收到了第二块缓冲区extrabuf，将其append至buffer,</span><br><span class="line">  &#123;</span><br><span class="line">    writerIndex_ = buffer_.size();</span><br><span class="line">    append(extrabuf, n - writable);</span><br><span class="line">  &#125;</span><br><span class="line">  // if (n == writable + sizeof extrabuf)</span><br><span class="line">  // &#123;</span><br><span class="line">  //   goto line_30;</span><br><span class="line">  // &#125;</span><br><span class="line">  return n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="为什么需要有应用层缓冲区"><a href="#为什么需要有应用层缓冲区" class="headerlink" title="为什么需要有应用层缓冲区"></a>为什么需要有应用层缓冲区</h2><p>Non-blocking IO的核心思想是避免阻塞在read()或write()或其他IO系统调用上，这样可以最大限度地复用thread-of-control，让一个线程能服务于多个socket连接。IO线程只能阻塞在IO-multiplexing函数上，如 select()&#x2F;poll()&#x2F;epoll_wait()。这样一来，应用层的缓冲是必须的，每个TCP socket都要有stateful的 input buffer和 output buffer。</p>
+<p>TcpConnection必须要有output buffer考虑一个常见场景:程序想通过TCP连接发送100k字节的数据，但是在write()调用中，操作系统只接受了80k字节(受TCPadvertised window的控制，细节见TCPv1)，你肯定不想在原地等待，因为不知道会等多久(取决于对方什么时候接受数据，然后滑动TCP窗口)。程序应该尽快交出控制权，返回event loop。在这种情况下，剩余的20k字节数据怎么办?</p>
+<p>对于应用程序而言，它只管生成数据，它不应该关心到底数据是一次性发送还是分成几次发送，这些应该由网络库来操心，程序只要调用TcpConnection:send()就行了，网络库会负责到底。网络库应该接管这剩余的20k字节数据，把它保存在该TCP connection 的output buffer 里，然后注册POLLOUT事件，一旦socket变得可写就立刻发送数据。当然，这第二次write()也不一定能完全写入20k字节，如果还有剩余，网络库应该继续关注POLLOUT事件;如果写完了20k字节，网络库应该停止关注 POLLOUT，以免造成busy loop。(Muduo EventLoop采用的是epoll level trigger）</p>
+<p>如果程序又写入了50k字节，而这时候output buffer里还有待发送的20k数据，那么网络库不应该直接调用write()，而应该把这50k数据append在那20k数据之后，等socket变得可写的时候再一并写入。</p>
+<p>如果 output buffer里还有待发送的数据，而程序又想关闭连接（对程序而言，调用TcpConnection:send()之后他就认为数据迟早会发出去)，那么这时候网络库不能立刻关闭连接，而要等数据发送完毕。</p>
+<p>综上，要让程序在write操作上不阻塞，网络库必须要给每个tcp connection配置output buffer .</p>
+<h3 id="TcpConnection必须要有input-buffer"><a href="#TcpConnection必须要有input-buffer" class="headerlink" title="TcpConnection必须要有input buffer"></a>TcpConnection必须要有input buffer</h3><p>TCP是一个无边界的字节流协议，接收方必须要处理“收到的数据尚不构成一条完整的消息”和“一次收到两条消息的数据”等等情况。</p>
+<p>网络库在处理“socket可读”事件的时候，必须一次性把socket里的数据读完（从操作系统buffer搬到应用层buffer)，否则会反复触发POLLIN事件，造成busy-loop。</p>
+<p>那么网络库必然要应对“数据不完整”的情况，收到的数据先放到input buffer里，等构成一条完整的消息再通知程序的业务逻辑。这通常是codec的职责。</p>
+<p>最好一次性把内核缓冲区中的数据读完，当然分多次读也没有关系<br>接收到数据，存至input buffer,通知上层的应用程序,OnMessage(Buffer* buff)回调，根据应用层协议是否是一个完整的包，codec,如果不是一条完整的消息，不会取走数据，也不会进行相应的处理，如果是一条完整的消息，将取走这条消息，并进行相应的处理。 </p>
+<p>所以，在 tcp 网络编程中，网络库必须要给每个tcp connection配置inputbuffer。</p>
+<p>所有muduo中的IO都是带缓冲的IO (buffered IO)，你不会自己去read()或write()某个socket，只会操作TcpConnection 的 input buffer和 output buffer。更确切的说，是在onMessage()回调里读取 input buffer;调用TcpConnection:send()来间接操作output buffer，一般不会直接操作 output buffer。</p>
+<h2 id="Buffer结构"><a href="#Buffer结构" class="headerlink" title="Buffer结构"></a>Buffer结构</h2><p>Muduo Buffer的设计要点:</p>
+<ul>
+<li>对外表现为一块连续的内存(char*, len)，以方便客户代码的编写。</li>
+<li>其size()可以自动增长，以适应不同大小的消息。它不是一个fixed size array(即char buf[8192])。</li>
+<li>内部以vector of char来保存数据，并提供相应的访问函数。</li>
+</ul>
+<p>Buffer其实像是一个queue，从末尾写入数据，从头部读出数据。</p>
+<p>谁会用Buffer?谁写谁读?根据前文分析，TcpConnection会有两个 Buffer成员，input buffer 与output buffer。</p>
+<ul>
+<li>input buffer，TcpConnection会从 socket读取数据，然后写入input buffer(其实这一步是用 BufferreadFd()完成的);客户代码从input buffer读取数据。</li>
+<li>output buffer，客户代码会把数据写入 output buffer(其实这一步是用Tcp-Connection:send()完成的);TcpConnection 从 output buffer 读取数据并写入socket。</li>
+</ul>
+<p>其实，input和 output是针对客户代码而言，客户代码从input读，往output写。TcpConnection的读写正好相反。</p>
+<h3 id="Muduo-Buffer的数据结构"><a href="#Muduo-Buffer的数据结构" class="headerlink" title="Muduo Buffer的数据结构"></a>Muduo Buffer的数据结构</h3><p>Muduo中的<code>Buffer</code>类设计得很巧妙。它的实现主要基于一个<code>std::vector&lt;char&gt;</code>，但不同于一般的缓冲区，Muduo的<code>Buffer</code>具有前置空间(prependable space)、可读数据(readable data)和可写空间(writable space)三部分。</p>
+<p>以下是其核心的数据结构的概述：</p>
+<ol>
+<li><strong>std::vector<char> buffer_</char></strong>:<ul>
+<li>它是存储数据的核心结构。<code>buffer_</code>的大小通常大于实际数据量，以支持高效的数据插入和删除。</li>
+</ul>
+</li>
+<li><strong>size_t readerIndex_</strong>:<ul>
+<li>这是一个索引，指向<code>buffer_</code>中的第一个可读字节。所有在<code>readerIndex_</code>之前的字节都是前置空间，可用于某些特殊的前置操作。</li>
+</ul>
+</li>
+<li><strong>size_t writerIndex_</strong>:<ul>
+<li>这是一个索引，指向<code>buffer_</code>中的第一个可写字节。所有在<code>writerIndex_</code>之后的字节都是可写空间。</li>
+</ul>
+</li>
+</ol>
+<p>基于这些索引，<code>Buffer</code>的数据布局如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">| prependable bytes |  readable bytes  |  writable bytes  |</span><br><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">|                   |                  |                  |</span><br><span class="line">0      &lt;=      readerIndex_   &lt;=   writerIndex_   &lt;=   size()</span><br></pre></td></tr></table></figure>
+
+<p>以下是一些<code>Buffer</code>的基本操作及其对应的实现逻辑：</p>
+<ul>
+<li><strong>空闲空间</strong>: 使用<code>buffer_.capacity()</code>与<code>buffer_.size()</code>之间的差值来获取。</li>
+<li><strong>确保空间</strong>: 如果可写空间不足以容纳新的数据，<code>Buffer</code>可能需要重新分配空间。</li>
+<li><strong>读操作</strong>: 通常会移动<code>readerIndex_</code>。</li>
+<li><strong>写操作</strong>: 会移动<code>writerIndex_</code>，并在需要时重新分配空间。</li>
+<li><strong>prepend操作</strong>: 使用前置空间，在<code>readerIndex_</code>之前添加数据。</li>
+<li><strong>清空或重置</strong>: 通过重置<code>readerIndex_</code>和<code>writerIndex_</code>来实现。</li>
+</ul>
+<hr>
+<p>为什么我们不需要调用reserve()来预先分配空间?因为Buffer在构造函数里把初始size()设为1k，这样当size()超过1k的时候vector 会把 capacity()加倍，等于说resize()替我们做了reserve()的事。用一段简单的代码验证一下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;char&gt; vec;</span><br><span class="line">printf(”%zd %zd\n”, vec.size(), vec.capacity());</span><br><span class="line">vec.resize(1024);</span><br><span class="line">printf(”%zd %zd\n”, vec.size(), vec.capacity());</span><br><span class="line">vec.resize( 1300);</span><br><span class="line">printf(”%zd %zd\n”，vec.size(), vec.capacity());</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>初始时，空的vector <code>vec</code> 没有元素，因此大小和容量都为0。</li>
+<li>在调用 <code>vec.resize(1024)</code> 后，vector会分配至少1024个字节的内存空间，使其大小变为1024，而容量与大小相等，都为1024。</li>
+<li>接着调用 <code>vec.resize(1300)</code> 后，由于容量不足以容纳1300个元素，vector会重新分配内存空间，并将原来的1024个元素复制到新的内存空间中。此时，大小变为1300，而容量增长到2048。</li>
+</ul>
+<p>请注意，在这个过程中，vector的容量在需要时会自动增长，并且可能会超过当前元素的数量。</p>
+<h1 id="epoll使用LT模式的原因"><a href="#epoll使用LT模式的原因" class="headerlink" title="epoll使用LT模式的原因"></a>epoll使用LT模式的原因</h1><p>与poll兼容</p>
+<p>LT模式不会发生漏掉事件的BUG，但POLLOUT事件不能一开始就关注，否则会出现busy loop，而应该在write无法写入内核缓冲区的时候才关注，将未写入内核缓冲区的数据添加到应用层output buffer，直到应用层output buffer写完，停止关注POLLOUT事件。</p>
+<p>读写的时候不必等候EAGAIN，可以节省系统调用次效，降低迟。（注:如果用ET模式，读的时候读到EAGAIN,写的时候直到output buffer写完或者EAGAIN)</p>
+<h1 id="其他缓冲区设计方案"><a href="#其他缓冲区设计方案" class="headerlink" title="其他缓冲区设计方案"></a>其他缓冲区设计方案</h1><p>谈谈其他可能的应用层 buffer设计方案</p>
+<h2 id="不用vector-lt-char-gt"><a href="#不用vector-lt-char-gt" class="headerlink" title="不用vector&lt;char&gt;"></a>不用<code>vector&lt;char&gt;</code></h2><p>如果放弃“连续性”要求，可以用circular buffer，这样可以减少一点内存拷贝（没有“内部腾挪”)</p>
+<p>使用连续性要求（元素在内存中连续存储）的容器，如 <code>std::vector</code>，在许多情况下提供了高效的随机访问和尾部操作，但在某些情况下，可能会涉及内存的重新分配和数据复制，这可能会带来性能开销。</p>
+<p>C++ 标准库中没有直接支持的循环缓冲区（circular buffer）容器，但循环缓冲区在一些特定的应用场景中非常有用，特别是在需要在不断写入数据的同时，高效地读取最早写入的数据的情况下。</p>
+<p>循环缓冲区的主要特点包括：</p>
+<ol>
+<li><strong>环形结构</strong>: 循环缓冲区的内部数据结构是环形的，数据从队列的尾部写入，从队列的头部读取。当队列尾部到达缓冲区末尾时，写入操作会回到缓冲区的开头，实现循环的效果。</li>
+<li><strong>无需内存重分配</strong>: 循环缓冲区不需要频繁地进行内存重分配，因为其大小是固定的，当写入数据时，只需移动尾指针。这减少了内存分配和复制的开销。</li>
+<li><strong>减少内存拷贝</strong>: 由于数据在循环缓冲区中是连续存储的，而且没有内存重分配，读取最早写入的数据时，不需要进行大量的内存拷贝操作。读取操作只需调整头指针即可。</li>
+<li><strong>适用于实时流式数据</strong>: 循环缓冲区适用于需要实时处理流式数据的场景，如音频处理、网络数据包的缓冲等。通过不断写入新数据，同时高效读取最早写入的数据，可以实现数据的缓冲和流式处理。</li>
+</ol>
+<p>总之，循环缓冲区适用于需要高效地循环读取和写入数据的场景，它通过维护一个固定大小的环形结构，避免了内存重分配和大量的内存拷贝，从而在某些情况下提供了更好的性能和内存利用率。</p>
+<h2 id="Zero-copy"><a href="#Zero-copy" class="headerlink" title="Zero copy"></a>Zero copy</h2><p>实际上也不是真正意义上的零拷贝，因为数据从内核到用户空间，总是有一次拷贝的。除非把应用程序放到内核中才能实现真正的零拷贝。</p>
+<p><code>libevent</code> 2.0.x 提供了以下设计方案来实现分段连续的零拷贝缓冲区和散收 I&#x2F;O：</p>
+<ol>
+<li><strong>evbuffer 的分段连续缓冲区设计</strong>：<ul>
+<li><code>evbuffer</code> 是 <code>libevent</code> 中用于管理缓冲区的数据结构。它可以容纳多个内存块，这些内存块可以是连续的，也可以是分散的。这种设计允许在不进行数据拷贝的情况下管理和操作多个数据段。</li>
+<li>您可以使用 <code>evbuffer_add()</code> 函数将数据添加到 <code>evbuffer</code> 中。如果数据不连续，<code>evbuffer</code> 会自动将它们合并成连续的数据段。</li>
+<li>使用 <code>evbuffer_remove()</code> 函数可以从 <code>evbuffer</code> 中读取数据。这个函数允许您在一次操作中读取并删除数据，而不需要额外的拷贝。</li>
+</ul>
+</li>
+<li><strong>散收 I&#x2F;O 的应用</strong>：<ul>
+<li>散收 I&#x2F;O 是一种优化技术，用于将数据分散存储到多个缓冲区中或从多个缓冲区中进行聚集写入。这避免了将数据从用户空间到内核空间的拷贝，提高了性能。</li>
+<li>在 <code>libevent</code> 中，当数据从套接字读取到 <code>evbuffer</code> 时，<code>libevent</code> 可以使用散收 I&#x2F;O 将数据分散存储到多个数据段中，而不需要在用户空间进行拷贝。</li>
+<li>类似地，在写入数据到套接字时，<code>libevent</code> 可以使用聚集写入的方式，从 <code>evbuffer</code> 中聚集多个数据段，然后一次性进行写入。</li>
+</ul>
+</li>
+</ol>
+<h1 id="TcpConnection中增加send"><a href="#TcpConnection中增加send" class="headerlink" title="TcpConnection中增加send"></a>TcpConnection中增加send</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"> // void send(string&amp;&amp; message); // C++11</span><br><span class="line">  void send(const void* message, int len);</span><br><span class="line">  void send(const StringPiece&amp; message);</span><br><span class="line">  // void send(Buffer&amp;&amp; message); // C++11</span><br><span class="line">  void send(Buffer* message);  // this one will swap data</span><br><span class="line">  void shutdown(); // NOT thread safe, no simultaneous calling</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Buffer inputBuffer_;//应用层接受缓冲区</span><br><span class="line">Buffer outputBuffer_;//应用层发送缓冲区</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">void TcpConnection::send(const void* data, int len)</span><br><span class="line">&#123;</span><br><span class="line">  send(StringPiece(static_cast&lt;const char*&gt;(data), len));</span><br><span class="line">&#125;</span><br><span class="line">//线程安全，可以跨线程调用</span><br><span class="line">void TcpConnection::send(const StringPiece&amp; message)</span><br><span class="line">&#123;</span><br><span class="line">  if (state_ == kConnected)</span><br><span class="line">  &#123;</span><br><span class="line">    if (loop_-&gt;isInLoopThread())</span><br><span class="line">    &#123;</span><br><span class="line">      sendInLoop(message);</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      void (TcpConnection::*fp)(const StringPiece&amp; message) = &amp;TcpConnection::sendInLoop;</span><br><span class="line">      loop_-&gt;runInLoop(</span><br><span class="line">          std::bind(fp,</span><br><span class="line">                    this,     // FIXME</span><br><span class="line">                    message.as_string()));</span><br><span class="line">                    //std::forward&lt;string&gt;(message)));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// FIXME efficiency!!!</span><br><span class="line">void TcpConnection::send(Buffer* buf)</span><br><span class="line">&#123;</span><br><span class="line">  if (state_ == kConnected)</span><br><span class="line">  &#123;</span><br><span class="line">    if (loop_-&gt;isInLoopThread())</span><br><span class="line">    &#123;</span><br><span class="line">      sendInLoop(buf-&gt;peek(), buf-&gt;readableBytes());</span><br><span class="line">      buf-&gt;retrieveAll();</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      void (TcpConnection::*fp)(const StringPiece&amp; message) = &amp;TcpConnection::sendInLoop;</span><br><span class="line">      loop_-&gt;runInLoop(</span><br><span class="line">          std::bind(fp,</span><br><span class="line">                    this,     // FIXME</span><br><span class="line">                    buf-&gt;retrieveAllAsString()));</span><br><span class="line">                    //std::forward&lt;string&gt;(message)));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::sendInLoop(const StringPiece&amp; message)</span><br><span class="line">&#123;</span><br><span class="line">  sendInLoop(message.data(), message.size());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::sendInLoop(const void* data, size_t len)</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  sockets::write(channe1_-&gt;fd(),data,len);</span><br><span class="line">&#125;</span><br><span class="line">//通道可读事件到来的时候，回调TcpConnection::handleRead，_1是事件发生时间</span><br><span class="line">/*channel_-&gt;setReadCallback(</span><br><span class="line">      std::bind(&amp;TcpConnection::handleRead, this, _1));*/</span><br><span class="line">void TcpConnection::handleRead(Timestamp receiveTime)</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  int savedErrno = 0;</span><br><span class="line">  /*typedef std::function&lt;void (const TcpConnectionPtr&amp;,</span><br><span class="line">                            Buffer*,</span><br><span class="line">                            Timestamp)&gt; MessageCallback;*/</span><br><span class="line">  ssize_t n = inputBuffer_.readFd(channel_-&gt;fd(), &amp;savedErrno);</span><br><span class="line">  if (n &gt; 0)</span><br><span class="line">  &#123;</span><br><span class="line">    messageCallback_(shared_from_this(), &amp;inputBuffer_, receiveTime);//shared_from_this()将当前对象转换成shared_ptr，而不是裸指针</span><br><span class="line">  &#125;</span><br><span class="line">  else if (n == 0)</span><br><span class="line">  &#123;</span><br><span class="line">    handleClose();</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    errno = savedErrno;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;TcpConnection::handleRead&quot;;</span><br><span class="line">    handleError();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注释掉的C++11用法是使用右值引用（rvalue reference）和移动语义（move semantics）。在这段代码中，定义了两个使用右值引用的发送函数。</p>
+<p>首先是<code>void send(string&amp;&amp; message)</code>函数，它接受一个右值引用参数 <code>message</code>。右值引用通过使用 <code>&amp;&amp;</code> 修饰类型来标识，表示该参数可以接受临时对象或将要被移动的对象。这种方式可以避免不必要的复制操作，并通过移动语义将资源（如内存）从一个对象转移到另一个对象，提高性能。</p>
+<p>其次是<code>void send(Buffer&amp;&amp; message)</code>函数。它也接受一个右值引用参数 <code>message</code>，但这里的类型是 <code>Buffer</code>，而不是普通的 <code>string</code> 类型。通过右值引用和移动语义，可以高效地将 <code>Buffer</code> 对象的数据从原始对象转移到接收方，而不需要进行深拷贝。</p>
+<h1 id="TcpConnection中shutdown的处理方法"><a href="#TcpConnection中shutdown的处理方法" class="headerlink" title="TcpConnection中shutdown的处理方法"></a>TcpConnection中shutdown的处理方法</h1><p>连接状态更改为kDisconnecting,并没有关闭连接<br>服务器端主动断开与客户端的连接<br>这意味着客户端read返回为0,close(conn) ;</p>
+<p><code>conn-&gt;shutdown()</code> 会关闭服务器与客户端之间的连接，而不是关闭客户端。客户端可以通过相应的关闭操作来结束自己的连接</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">void TcpConnection::shutdown()</span><br><span class="line">&#123;</span><br><span class="line">  // FIXME: use compare and swap</span><br><span class="line">  //可以使用原子操作来比较当前状态是否为 kConnected，如果是，则使用原子操作修改状态为 kDisconnecting。</span><br><span class="line">  //这可以避免在多线程环境中多个线程同时检查并修改状态，从而避免竞态条件</span><br><span class="line">  /*AtomicIntegerT(const AtomicIntegerT&amp; that)</span><br><span class="line">     : value_(that.get())</span><br><span class="line">  &#123;&#125;*/</span><br><span class="line">  if (state_ == kConnected)</span><br><span class="line">  &#123;</span><br><span class="line">    setState(kDisconnecting);</span><br><span class="line">    // FIXME: shared_from_this()?</span><br><span class="line">    loop_-&gt;runInLoop(std::bind(&amp;TcpConnection::shutdownInLoop, this));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void TcpConnection::shutdownInLoop()</span><br><span class="line">&#123;</span><br><span class="line">  loop_-&gt;assertInLoopThread();</span><br><span class="line">  if (!channel_-&gt;isWriting())//不再关注pollout事件</span><br><span class="line">  &#123;</span><br><span class="line">    // we are not writing</span><br><span class="line">    socket_-&gt;shutdownWrite();//关闭写的这一半</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//只关闭写的这一半</span><br><span class="line">void sockets::shutdownWrite(int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">  if (::shutdown(sockfd, SHUT_WR) &lt; 0)//关闭套接字 sockfd 的写入端</span><br><span class="line">  &#123;</span><br><span class="line">    LOG_SYSERR &lt;&lt; &quot;sockets::shutdownWrite&quot;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试用例"><a href="#测试用例" class="headerlink" title="测试用例"></a>测试用例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">class TestServer&#123;</span><br><span class="line">public:</span><br><span class="line">TestServer(EventLoop*loop,const InetAddress&amp; listenAddr)</span><br><span class="line">			:loop_(loop),</span><br><span class="line">			server(loop,1istenAddr,&quot;TestServer&quot;)</span><br><span class="line">	&#123;</span><br><span class="line">	server_.setconnectionCa11back(</span><br><span class="line">		boost::bind(&amp;Testserver::onConnection,this，_1));</span><br><span class="line">	server_.setMessageCa11back(</span><br><span class="line">		boost::bind(&amp;TestServer::onMessage, this，_1,_2,_3));</span><br><span class="line">	message1_.resize(100);</span><br><span class="line">	message2_.resize(200);</span><br><span class="line">	std::fill(message1_.begin(),message1_.end(),&#x27;A&#x27;);</span><br><span class="line">	std::fill(message2_.begin(),message2_.end(),&#x27;B&#x27;);</span><br><span class="line">	&#125;</span><br><span class="line">	void start()&#123;</span><br><span class="line">		server_.start();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">	void:onConnection(const TcpConnectionPtr&amp; conn)</span><br><span class="line">	&#123;</span><br><span class="line">		if( conn-&gt;connected())&#123;</span><br><span class="line">			printf(&quot;onconnection(): new connettion [%s]from %s\n&quot;,</span><br><span class="line">				conn-&gt;name()-&gt;c_str(),</span><br><span class="line">				conn-&gt;peerAddress().toIpPort().c_str());</span><br><span class="line">			conn-&gt;send(message1_);</span><br><span class="line">			conn-&gt;send(message2_);</span><br><span class="line">			conn-&gt;shutdown();//关闭服务器与客户端之间的连接，而不是关闭客户端。</span><br><span class="line">			//这将导致服务端无法再向客户端发送数据，但服务端仍然可以接收来自客户端的数据</span><br><span class="line">			//这将关闭服务端连接的写入端，这在服务器端会导致客户端的read操作返回0,close(conn)和POLLHUP | POLLIN事件</span><br><span class="line">			//POLLHUP事件表示连接被挂起，即连接的一方关闭了连接或异常断开</span><br><span class="line">			//POLLIN事件表示连接上有数据可读</span><br><span class="line">		&#125;</span><br><span class="line">		else&#123;</span><br><span class="line">			printf(&quot;onconnection():connettion [%s] is down\n&quot;,</span><br><span class="line">				conn-&gt;name()-&gt;c_str());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	void onMessage(const TcpConnectionPtr&amp; conn,</span><br><span class="line">					Buffer* buf,</span><br><span class="line">					Timestamp receiveTime)</span><br><span class="line">	&#123;</span><br><span class="line">		muduo::string msg(buf-&gt;retrieveAllAsString());</span><br><span class="line">		printf(&quot;onMessage(): received %zd bytes from connection [%s] at %s\n&quot;,</span><br><span class="line">				msg.size(),</span><br><span class="line">				conn-&gt;name().c_str(),</span><br><span class="line">				receiveTime.toFormattedString().c_str());</span><br><span class="line">		conn-&gt;send(msg);</span><br><span class="line">	&#125;</span><br><span class="line">	EventLoop* l_;</span><br><span class="line">	TcpServer server_;</span><br><span class="line">	muduo::string message1_;</span><br><span class="line">	muduo::string message2_;</span><br><span class="line">&#125;;</span><br><span class="line">int main()&#123;</span><br><span class="line">	printf( &quot;main(): pid = %d\n&quot;,getpid());</span><br><span class="line">	InetAddress listenAddr(8888);</span><br><span class="line">	EventLoop loop;</span><br><span class="line">	TestServer server(&amp;loop,listenAddr);</span><br><span class="line">	server.start();</span><br><span class="line">	loop.loop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常情况下，服务端使用 <code>::shutdown(sockfd, SHUT_WR)</code> 来实现优雅的连接关闭，就像之前讨论的一样。这样，服务端会通知客户端它已经完成了数据的发送，并且客户端应该停止发送数据，但仍然可以接收来自客户端的数据。然后，服务端可以在需要的时候关闭整个连接。这种关闭方式可以确保连接的正常结束，而不会丢失任何数据或造成不必要的中断。</p>
+<p>当服务器关闭写入端时，会产生POLLHUP事件，用于通知客户端连接已关闭；同时，由于连接未完全关闭，客户端仍然可以从连接中读取数据，所以也会产生POLLIN事件。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/15/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%884%EF%BC%89/" rel="prev" title="muduo-网络库（4）">
+      <i class="fa fa-chevron-left"></i> muduo-网络库（4）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/20/muduo%E5%BA%93%E7%9A%84%E5%AD%A6%E4%B9%A0/muduo-%E7%BD%91%E7%BB%9C%E5%BA%93%EF%BC%886%EF%BC%89/" rel="next" title="muduo-网络库（6）">
+      muduo-网络库（6） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#muduo%E5%BA%93%E5%A6%82%E4%BD%95%E6%94%AF%E6%8C%81%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">muduo库如何支持多线程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TcpServer-cc%E5%85%B3%E4%BA%8EEventLoopThreadPool%E9%83%A8%E5%88%86"><span class="nav-number">1.1.</span> <span class="nav-text">TcpServer.cc关于EventLoopThreadPool部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">测试程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoopThreadPool-h"><span class="nav-number">1.3.</span> <span class="nav-text">EventLoopThreadPool.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EventLoopThreadPool-cc"><span class="nav-number">1.4.</span> <span class="nav-text">EventLoopThreadPool.cc</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%B1%82%E7%BC%93%E5%86%B2%E5%8C%BABuffer%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">应用层缓冲区Buffer设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer-h"><span class="nav-number">2.1.</span> <span class="nav-text">Buffer.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer-cc"><span class="nav-number">2.2.</span> <span class="nav-text">Buffer.cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%9C%89%E5%BA%94%E7%94%A8%E5%B1%82%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">2.3.</span> <span class="nav-text">为什么需要有应用层缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TcpConnection%E5%BF%85%E9%A1%BB%E8%A6%81%E6%9C%89input-buffer"><span class="nav-number">2.3.1.</span> <span class="nav-text">TcpConnection必须要有input buffer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer%E7%BB%93%E6%9E%84"><span class="nav-number">2.4.</span> <span class="nav-text">Buffer结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Muduo-Buffer%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.4.1.</span> <span class="nav-text">Muduo Buffer的数据结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#epoll%E4%BD%BF%E7%94%A8LT%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">epoll使用LT模式的原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%BC%93%E5%86%B2%E5%8C%BA%E8%AE%BE%E8%AE%A1%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">其他缓冲区设计方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E7%94%A8vector-lt-char-gt"><span class="nav-number">4.1.</span> <span class="nav-text">不用vector&lt;char&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zero-copy"><span class="nav-number">4.2.</span> <span class="nav-text">Zero copy</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TcpConnection%E4%B8%AD%E5%A2%9E%E5%8A%A0send"><span class="nav-number">5.</span> <span class="nav-text">TcpConnection中增加send</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TcpConnection%E4%B8%ADshutdown%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">TcpConnection中shutdown的处理方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B"><span class="nav-number">6.1.</span> <span class="nav-text">测试用例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
