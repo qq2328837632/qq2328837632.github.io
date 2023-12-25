@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="线程模块主要包含以下文件：    semaphore.h 信号量。semaphore类，封装了条件变量，提供了post和wait方法。    TaskExecutor.cpp，TaskExecutor.h 包括线程负载计数器(ThreadLoadCounter)、任务执行器(TaskExecutor)、任务执行器获取器(TaskExecutorGetterImp)、可取消任务封装类(TaskCan">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZLTool线程池组件">
+<meta property="og:url" content="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="线程模块主要包含以下文件：    semaphore.h 信号量。semaphore类，封装了条件变量，提供了post和wait方法。    TaskExecutor.cpp，TaskExecutor.h 包括线程负载计数器(ThreadLoadCounter)、任务执行器(TaskExecutor)、任务执行器获取器(TaskExecutorGetterImp)、可取消任务封装类(TaskCan">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220164902318.png">
+<meta property="og:image" content="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220164902318.png">
+<meta property="og:image" content="http://example.com/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220165017825.png">
+<meta property="og:image" content="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220165017825.png">
+<meta property="og:image" content="http://example.com/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231222171453254.png">
+<meta property="og:image" content="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231222171453254.png">
+<meta property="article:published_time" content="2023-12-20T07:34:33.000Z">
+<meta property="article:modified_time" content="2023-12-23T08:50:40.282Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220164902318.png">
+
+<link rel="canonical" href="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ZLTool线程池组件 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ZLTool线程池组件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-12-20 15:34:33" itemprop="dateCreated datePublished" datetime="2023-12-20T15:34:33+08:00">2023-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-23 16:50:40" itemprop="dateModified" datetime="2023-12-23T16:50:40+08:00">2023-12-23</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>线程模块主要包含以下文件：</p>
+<table>
+<thead>
+<tr>
+<th>semaphore.h</th>
+<th>信号量。semaphore类，封装了条件变量，提供了post和wait方法。</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TaskExecutor.cpp，TaskExecutor.h</td>
+<td>包括线程负载计数器(ThreadLoadCounter)、任务执行器(TaskExecutor)、任务执行器获取器(TaskExecutorGetterImp)、可取消任务封装类(TaskCancelableImp)</td>
+</tr>
+<tr>
+<td>TaskQueue.h</td>
+<td>任务队列。队列中存储的是函数对象，任务的类型是function&lt;void()&gt;，所以可以存储所有的可调用对象，包括函数、lambda表达式、重载了()运算符的类实例化对象。</td>
+</tr>
+<tr>
+<td>threadgroup.h</td>
+<td>线程组。管理一组线程。提供了创建线程(create_thread)、删除指定线程(remove_thread)、等待线程组中的线程退出(join_all)、判断指定线程是否在线程组中(is_thread_in)、判断当前线程是否在线程组中(is_this_thread_in)、获取当前线程组中线程数量(size)</td>
+</tr>
+<tr>
+<td>ThreadPool.h</td>
+<td>线程池。组件管理者，将任务队列以及线程组关联起来使用。继承了TaskExecutor，支持同步和 异步执行任务。</td>
+</tr>
+<tr>
+<td>WorkThreadPool.cpp，WorkThreadPool.h</td>
+<td>工作线程池，也是管理一组线程，但和ThreadPool不同，ThreadPool所有线程共享任务队列，存在竞争关系，而WorkThreadPool中的每个线程都有自己的队列(实际上是EventPoller管道事件驱动，一个 EventPoller对应一个线程)、各线程不存在竞争关系。</td>
+</tr>
+</tbody></table>
+<p>各文件中的类关系如下图：</p>
+<p><img src="/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220164902318.png" alt="image-20231220164902318"></p>
+<img src="/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220164902318.png" class title="This is an test image">
+
+<p><img src="/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220165017825.png" alt="image-20231220165017825"></p>
+<img src="/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231220165017825.png" class title="This is an test image">
+
+<hr>
+<p>线程池的两个基本组件：任务队列与线程组</p>
+<h1 id="任务队列TaskQueue"><a href="#任务队列TaskQueue" class="headerlink" title="任务队列TaskQueue"></a>任务队列TaskQueue</h1><p>封装TaskQueue类，提供了添加任务、获取任务、清空任务队列接口，通过semaphore控制添加与获取之间的同步。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename T&gt;</span><br><span class="line">class TaskQueue &#123;</span><br><span class="line">public:</span><br><span class="line">    //添加任务</span><br><span class="line">    template&lt;typename C&gt;</span><br><span class="line">    void push_task(C &amp;&amp;task_func);</span><br><span class="line">    template&lt;typename C&gt;</span><br><span class="line">    void push_task_first(C &amp;&amp;task_func);//C &amp;&amp;task_func 是一个右值引用参数</span><br><span class="line">    //当传递一个左值对象时，编译器会进行类型推导，将左值对象转换为右值引用。当传递一个右值对象时，直接使用右值引用接收，避免了额外的拷贝操作</span><br><span class="line">    //清空任务列队</span><br><span class="line">    void push_exit(size_t n);</span><br><span class="line">    //获取任务</span><br><span class="line"> bool get_task(T &amp;tsk);</span><br><span class="line">    size_t size();</span><br><span class="line">private:</span><br><span class="line">    List&lt;T&gt; _queue;</span><br><span class="line">    mutable mutex _mutex;</span><br><span class="line">    semaphore _sem;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>T &amp;tsk</code> 和 <code>C &amp;&amp;task_func</code> 都是用来传递参数的，但它们之间存在一些重要的区别。</p>
+<ol>
+<li>左值引用 vs 右值引用：<ul>
+<li><code>T &amp;tsk</code> 是左值引用，它只能绑定到左值对象（具名对象），不能绑定到临时对象或表达式；</li>
+<li><code>C &amp;&amp;task_func</code> 是右值引用，它可以绑定到临时对象（右值），也可以通过 <code>std::move</code> 将左值转换为右值引用。</li>
+</ul>
+</li>
+<li>对象生命周期管理：<ul>
+<li>通过左值引用传递参数，不会改变被引用对象的生命周期，而是直接操作原始对象；</li>
+<li>通过右值引用传递参数，可以移动语义，即允许将临时对象的资源所有权转移给目标对象，从而避免额外的拷贝操作</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>push_task在队列的尾部添加任务，push_task_first在队列的头部添加任务。</p>
+<p>为什么不直接使用void push_task(T &amp;&amp;task_func)而要用模板呢？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename C&gt; </span><br><span class="line"> void push_task(C &amp;&amp;task_func);</span><br><span class="line">void push_task(T &amp;&amp;task_func);</span><br><span class="line">void push_task(T &amp;task_func);</span><br><span class="line">void push_task(const T &amp;task_func);</span><br></pre></td></tr></table></figure>
+
+<p> push_task(T &amp;&amp;task_func)只能接受右值引用，push_task(T &amp;task_func)不能接受右值引用，push_task(const T &amp;task_func)接受右值时会产生临时变量。<strong>模板因为引用折叠，既能接受左值，也能接受右值。函数模板<code>push_task</code>接受了一个名为<code>task_func</code>的通用类型<code>C</code>的参数，该参数使用了右值引用折叠。因此，这个函数模板可以接受左值引用或右值引用，并且可以在传递参数时进行移动语义操作。</strong></p>
+<hr>
+<p>从队列中获取一个任务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">bool get_task(T &amp;tsk) &#123;</span><br><span class="line">    _sem.wait();</span><br><span class="line">    lock_guard&lt;decltype(_mutex)&gt; lock(_mutex);</span><br><span class="line">    if (_queue.size() == 0) &#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    //改成右值引用后性能提升了1倍多！</span><br><span class="line">    tsk = std::move(_queue.front());</span><br><span class="line">    _queue.pop_front();</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 阻塞在条件变量上，等待队列中添加任务或者通过push_exit主动退出</p>
+<p>清空任务列队(让get_task接口返回false)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_exit</span><span class="params">(<span class="type">size_t</span> n)</span> </span>&#123;</span><br><span class="line">    _sem.<span class="built_in">post</span>(n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>任务的数量由semaphore类中的_ count成员控制，正常情况下，每给队列添加一个任务，触发一次_sem.post(1)，任务数量加1，每次wait返回时，队列中都是有任务的，get_task总能获取到一个任务，返回true。此处，在实际没有给队列中添加任务的情况下，让wait多返回了n次，这n次get_task肯定是获取不到任务的，会返回false。线程池中利用get_task返回false来达到退出线程的目的。<strong>如启动了4个工作线程来获取任务，每个线程都等待在get_task上，主线程中调用push_exit(4)，get_task就会有四次返回false，以此让工作线程退出。</strong></p>
+<h2 id="semaphore"><a href="#semaphore" class="headerlink" title="semaphore"></a>semaphore</h2><p>封装条件变量condition_variable_any的使用，提供了post和wait接口。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">void post(size_t n = 1) &#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(_mutex);</span><br><span class="line">    _count += n;</span><br><span class="line">    if(n == 1)&#123;</span><br><span class="line">        _condition.notify_one();</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        _condition.notify_all();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void wait() &#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(_mutex);</span><br><span class="line">    while (_count == 0) &#123;</span><br><span class="line">        _condition.wait(lock);</span><br><span class="line">    &#125;</span><br><span class="line">    --_count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> _ count成员记录希望wait接口返回的次数。默认情况下，每调用一次post，_ count加1，通过notify_one，所有等待在_ condition.wait上的线程其中一个被唤醒。如果n大于1，将通过notify_all唤醒所有等待在_condition.wait上的线程。</p>
+<p>对于生产者消费者模型，count记录产品数量，post每次生产一个或者多个产品，wait每次消费一个产品，wait被唤醒后，会一直执行，直到产品都被消耗完。</p>
+<p>在线程池的实现中，通过在没有添加任务的情况下，调用post(n&gt;1)来控制线程的退出。</p>
+<h1 id="线程组thread-group"><a href="#线程组thread-group" class="headerlink" title="线程组thread_group"></a>线程组thread_group</h1><p>管理一组线程，接口：添加线程、删除线程、等待线程组中所有线程退出、判断指定的线程是否在线程组中、判断当前线程是否在线程组中</p>
+<h3 id="判断当前线程是否在线程组中"><a href="#判断当前线程是否在线程组中" class="headerlink" title="判断当前线程是否在线程组中"></a>判断当前线程是否在线程组中</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool is_this_thread_in() &#123;</span><br><span class="line">    auto thread_id = this_thread::get_id();</span><br><span class="line">    if(_thread_id == thread_id)&#123;//意义是？比unordered_map遍历快？为了提高运行效率？</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return _threads.find(thread_id) != _threads.end();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断指定的线程是否在线程组中"><a href="#判断指定的线程是否在线程组中" class="headerlink" title="判断指定的线程是否在线程组中"></a>判断指定的线程是否在线程组中</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool is_thread_in(thread* thrd) &#123;</span><br><span class="line">    if (!thrd) &#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    auto it = _threads.find(thrd-&gt;get_id());</span><br><span class="line">    return it != _threads.end();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加线程"><a href="#添加线程" class="headerlink" title="添加线程"></a>添加线程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename F&gt;</span><br><span class="line">thread* create_thread(F &amp;&amp;threadfunc) &#123;</span><br><span class="line">    auto thread_new = std::make_shared&lt;thread&gt;(threadfunc);</span><br><span class="line">    _thread_id = thread_new-&gt;get_id();</span><br><span class="line">    _threads[_thread_id] = thread_new;</span><br><span class="line">    return thread_new.get();//调用 std::shared_ptr 对象的 get 方法，用于获取指向的原始指针</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除线程"><a href="#删除线程" class="headerlink" title="删除线程"></a>删除线程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void remove_thread(thread* thrd) &#123;</span><br><span class="line">    auto it = _threads.find(thrd-&gt;get_id());</span><br><span class="line">    if (it != _threads.end()) &#123;</span><br><span class="line">        _threads.erase(it);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="等待线程组中所有线程退出"><a href="#等待线程组中所有线程退出" class="headerlink" title="等待线程组中所有线程退出"></a>等待线程组中所有线程退出</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void join_all() &#123;</span><br><span class="line">    if (is_this_thread_in()) &#123;</span><br><span class="line">        throw runtime_error(&quot;thread_group: trying joining itself&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    for (auto &amp;it : _threads) &#123;</span><br><span class="line">        if (it.second-&gt;joinable()) &#123;</span><br><span class="line">            it.second-&gt;join(); //等待线程主动退出</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    _threads.clear();//清空线程组 _threads，以便下次使用</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 C++ 中，当一个线程完成运行后，它需要被明确地加入（join），这样才能释放线程所占用的资源。因此，当 <code>it.second-&gt;joinable()</code> 返回 <code>true</code> 时，意味着线程仍在运行或者已经完成运行但尚未被加入，此时需要调用 <code>it.second-&gt;join()</code> 来等待线程完成并进行资源回收。相反，如果 <code>it.second-&gt;joinable()</code> 返回 <code>false</code>，则表示线程已经完成运行并且已经被加入，不再需要进一步处理。</p>
+<h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><p>基于**任务队列(TaskQueue)和线程组(thread_group)**，实现线程池，线程池中所有线程等待在任务队列上，循环执行：等待任务到来-&gt;获取到任务-&gt;执行任务。</p>
+<p> ThreadPool继承自TaskExecutor，TaskExecutor又同时继承了ThreadLoadCounter和TaskExecutorInterface，所以线程池支持负载统计、同步以及异步执行任务。以下是线程池支持的所有接口说明</p>
+<p><img src="/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231222171453254.png" alt="image-20231222171453254"></p>
+<img src="/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/image-20231222171453254.png" class title="This is an test image">
+
+<h3 id="start-创建并启动线程"><a href="#start-创建并启动线程" class="headerlink" title="start-创建并启动线程"></a>start-创建并启动线程</h3><p>线程组中创建指定数量的线程，当线程组中线程数不足时，补齐缺少的。已经达到指定数量时，该接口什么也不做。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">void start() &#123;</span><br><span class="line">        if (_thread_num &lt;= 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        size_t total = _thread_num - _thread_group.size();</span><br><span class="line">        for (size_t i = 0; i &lt; total; ++i) &#123;</span><br><span class="line">            _thread_group.create_thread([this, i]() &#123;run(i);&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="wait-等待线程组中所有线程退出"><a href="#wait-等待线程组中所有线程退出" class="headerlink" title="wait-等待线程组中所有线程退出"></a>wait-等待线程组中所有线程退出</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void wait() &#123;</span><br><span class="line">        _thread_group.join_all();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="shutdown-队列中所有任务执行完成后让线程退出"><a href="#shutdown-队列中所有任务执行完成后让线程退出" class="headerlink" title="shutdown-队列中所有任务执行完成后让线程退出"></a>shutdown-队列中所有任务执行完成后让线程退出</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void shutdown() &#123;</span><br><span class="line">        _queue.push_exit(_thread_num);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p> 队列的push_task和push_task_first会插入任务并触发一次唤醒wait的操作，等待在队列上的线程此时会从队列中获取到任务并执行。</p>
+<p>但是push_exit没有给队列插入任务，也会触发其参数指定的n次唤醒wait的操作，等待在队列上的线程被唤醒后，因为实际并没有插入任务，所以这n次是获取不到任务的，队列为空。</p>
+<p>基于上述条件，实现了run函数的自动退出(获取任务失败时，退出线程)，push_exit指定多唤醒的次数与线程组中线程数量一致，每唤醒一次，就有一个线程被退出，最终刚好让所有线程都退出。</p>
+<p>调用shutdown之后，需要调用wait()函数等待线程全部退出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">void run() &#123;</span><br><span class="line">        ThreadPool::setPriority(_priority);</span><br><span class="line">        Task::Ptr task;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            startSleep();</span><br><span class="line">            if (!_queue.get_task(task)) &#123;//引用传递</span><br><span class="line">                //空任务，退出线程</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">            sleepWakeUp();</span><br><span class="line">            try &#123;</span><br><span class="line">                (*task)();//执行任务的具体代码。然后将任务指针 task 置为空指针，表示该任务已经执行完毕</span><br><span class="line">                task = nullptr;</span><br><span class="line">            &#125; catch (std::exception &amp;ex) &#123;</span><br><span class="line">                ErrorL &lt;&lt; &quot;ThreadPool执行任务捕获到异常:&quot; &lt;&lt; ex.what();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="async-异步执行任务"><a href="#async-异步执行任务" class="headerlink" title="async-异步执行任务"></a>async-异步执行任务</h3><p>如果允许同步执行，并且当前调用线程在线程组中，则同步执行任务。否则将任务放入队列中异步执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Task::Ptr async(TaskIn task,bool may_sync = true) override &#123;</span><br><span class="line">        if (may_sync &amp;&amp; _thread_group.is_this_thread_in()) &#123;</span><br><span class="line">            task();</span><br><span class="line">            return nullptr;</span><br><span class="line">        &#125;</span><br><span class="line">        auto ret = std::make_shared&lt;Task&gt;(std::move(task));</span><br><span class="line">        _queue.push_task(ret);</span><br><span class="line">        return ret;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="async-first异步优先执行任务"><a href="#async-first异步优先执行任务" class="headerlink" title="async-first异步优先执行任务"></a>async-first异步优先执行任务</h3><p>与async的区别是，async将任务放在队尾，async-first将任务放在队首，确保优先执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Task::Ptr async_first(TaskIn task,bool may_sync = true) override&#123;</span><br><span class="line">        if (may_sync &amp;&amp; _thread_group.is_this_thread_in()) &#123;</span><br><span class="line">            task();</span><br><span class="line">            return nullptr;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        auto ret = std::make_shared&lt;Task&gt;(std::move(task));</span><br><span class="line">        _queue.push_task_first(ret);</span><br><span class="line">        return ret;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="任务类型"><a href="#任务类型" class="headerlink" title="任务类型"></a>任务类型</h1><p>这部分看一下任务队列中插入的任务类型。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TaskQueue&lt;Task::Ptr&gt; _queue;</span><br></pre></td></tr></table></figure>
+
+<p>队列中的任务类型是Task::Ptr，此外，我们还需要看另一个类型，TaskIn，他作为用户添加任务时的任务类型。在TaskExecutor.h中，两者声明如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">using TaskIn = function&lt;void()&gt;;</span><br><span class="line"></span><br><span class="line">using Task = TaskCancelableImp&lt;void()&gt;;</span><br><span class="line">using Ptr = std::shared_ptr&lt;TaskCancelableImp&gt;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TaskIn"><a href="#TaskIn" class="headerlink" title="TaskIn"></a>TaskIn</h2><p>一个基于std::function的可调用对象封装类型，其返回值是void，且没有参数。用户可以传入任何符合要求的可调用对象，如lambda表达式、函数指针、重载了operator()的类函数对象。 </p>
+<h2 id="Task-Ptr"><a href="#Task-Ptr" class="headerlink" title="Task::Ptr"></a>Task::Ptr</h2><p>TaskCancelableImp&lt;void()&gt;类型的智能指针。 <strong>TaskCancelableImp是一个可取消的任务封装器</strong>，实际上是对TaskIn的再次封装。TaskCancelableImp的内部存<strong>储了TaskIn类型的对象</strong>。</p>
+<p>看一下TaskCancelableImp的模板实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">template&lt;class R, class... ArgTypes&gt;</span><br><span class="line">class TaskCancelableImp;</span><br><span class="line"></span><br><span class="line">template&lt;class R, class... ArgTypes&gt;</span><br><span class="line">class TaskCancelableImp&lt;R(ArgTypes...)&gt; : public TaskCancelable &#123;</span><br><span class="line">public:</span><br><span class="line">    using Ptr = std::shared_ptr&lt;TaskCancelableImp&gt;;</span><br><span class="line">    using func_type = function&lt;R(ArgTypes...)&gt;;</span><br><span class="line"></span><br><span class="line">~TaskCancelableImp() = default;</span><br><span class="line"></span><br><span class="line">template&lt;typename FUNC&gt;</span><br><span class="line">TaskCancelableImp(FUNC &amp;&amp;task) &#123;</span><br><span class="line">    _strongTask = std::make_shared&lt;func_type&gt;(std::forward&lt;FUNC&gt;(task));</span><br><span class="line">    _weakTask = _strongTask;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void cancel() override &#123;</span><br><span class="line">    _strongTask = nullptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">operator bool() &#123;</span><br><span class="line">    return _strongTask &amp;&amp; *_strongTask;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void operator=(nullptr_t) &#123;</span><br><span class="line">    _strongTask = nullptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">R operator()(ArgTypes ...args) const &#123;</span><br><span class="line">    auto strongTask = _weakTask.lock();</span><br><span class="line">    if (strongTask &amp;&amp; *strongTask) &#123;</span><br><span class="line">        return (*strongTask)(forward&lt;ArgTypes&gt;(args)...);</span><br><span class="line">    &#125;</span><br><span class="line">    return defaultValue&lt;R&gt;();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected:</span><br><span class="line">    std::weak_ptr&lt;func_type&gt; _weakTask;</span><br><span class="line">    std::shared_ptr&lt;func_type&gt; _strongTask;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>class TaskCancelableImp&lt;R(ArgTypes…)&gt;是TaskCancelableImp的偏例化(部分特例化)，它的全特化版本就是Task（using Task &#x3D; TaskCancelableImp&lt;void()&gt;）。</p>
+<p>构造函数TaskCancelableImp(FUNC &amp;&amp;task) 中可以看出，它接受的是一个func_type类型的参数，<strong>即function&lt;R(ArgTypes…)&gt;，这与我们让用户输入的TaskIn的类型一致</strong>。该类<strong>提供了cancel接口，可以在任务执行前取消任务</strong>。</p>
+<p>当我们调用任务时，<code>operator()</code> 函数会首先检查 <code>_weakTask</code> 是否仍然有效，如果有效，则通过 <code>_weakTask</code> 获取到 <code>_strongTask</code> 的指针。如果 <code>_strongTask</code> 不为 <code>nullptr</code>，则会执行任务并返回结果；如果 <code>_strongTask</code> 已经被设置为 <code>nullptr</code>，则会返回默认值。</p>
+<p>因此，如果我们在任务执行前调用了 <code>cancel</code> 接口并将 <code>_strongTask</code> 设置为 <code>nullptr</code>，则在调用任务时会直接返回默认值，从而达到了取消任务的效果。</p>
+<p>为什么任务队列不直接使用TaskIn类型而<strong>要用Task类型</strong>呢？主要是为了支持任务的可中途取消。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TaskQueue&lt;std::shared_ptr&lt;TaskIn&gt;&gt; _queue;</span><br><span class="line">TaskQueue&lt;std::shared_ptr&lt;Task&gt;&gt; _queue;</span><br><span class="line">//TaskQueue&lt;Task::Ptr&gt; _queue;</span><br></pre></td></tr></table></figure>
+
+<p><code>_queue.get_task(task)</code>的task可以调用<code>task-&gt;cancel()</code>;</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>线程池的测试程序是test_threadPoolBenchmark.cpp文件，具体可以看源码。</p>
+<p>该部分使用了lambda表达式作为任务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pool.async([&amp;]()&#123;</span><br><span class="line">		   if(++count &gt;= 1000*10000)&#123;</span><br><span class="line">			   InfoL &lt;&lt; &quot;执行1000万任务总共耗时:&quot; &lt;&lt; ticker.elapsedTime() &lt;&lt; &quot;ms&quot;;</span><br><span class="line">		   &#125;</span><br><span class="line">		&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>当然也可以使用函数指针或者函数对象，以重载operator()的函数对象作为任务的代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class MyTask &#123;</span><br><span class="line">public:</span><br><span class="line">    MyTask(atomic_llong* pCount) :m_pCount(pCount)&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void operator()() &#123;</span><br><span class="line">	if (++(*m_pCount) &gt;= 1000 * 10000) &#123;</span><br><span class="line">		InfoL &lt;&lt; &quot;执行1000万任务总共耗时:&quot; &lt;&lt; ticker.elapsedTime() &lt;&lt; &quot;ms&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    atomic_llong* m_pCount;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyTask myTask(&amp;count);</span><br><span class="line">pool.async(myTask);</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/18/ZLTool-%E8%B5%84%E6%BA%90%E6%B1%A0/" rel="prev" title="ZLTool-资源池">
+      <i class="fa fa-chevron-left"></i> ZLTool-资源池
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/12/21/ZLTool-%E7%BA%BF%E7%A8%8B%E8%B4%9F%E8%BD%BD%E8%AE%A1%E7%AE%97%E5%99%A8/" rel="next" title="ZLTool-线程负载计算器">
+      ZLTool-线程负载计算器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97TaskQueue"><span class="nav-number">1.</span> <span class="nav-text">任务队列TaskQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#semaphore"><span class="nav-number">1.1.</span> <span class="nav-text">semaphore</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%BB%84thread-group"><span class="nav-number">2.</span> <span class="nav-text">线程组thread_group</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%BD%93%E5%89%8D%E7%BA%BF%E7%A8%8B%E6%98%AF%E5%90%A6%E5%9C%A8%E7%BA%BF%E7%A8%8B%E7%BB%84%E4%B8%AD"><span class="nav-number">2.0.1.</span> <span class="nav-text">判断当前线程是否在线程组中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%8C%87%E5%AE%9A%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%98%AF%E5%90%A6%E5%9C%A8%E7%BA%BF%E7%A8%8B%E7%BB%84%E4%B8%AD"><span class="nav-number">2.0.2.</span> <span class="nav-text">判断指定的线程是否在线程组中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.0.3.</span> <span class="nav-text">添加线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.0.4.</span> <span class="nav-text">删除线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E7%BA%BF%E7%A8%8B%E7%BB%84%E4%B8%AD%E6%89%80%E6%9C%89%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA"><span class="nav-number">2.0.5.</span> <span class="nav-text">等待线程组中所有线程退出</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">3.</span> <span class="nav-text">线程池</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#start-%E5%88%9B%E5%BB%BA%E5%B9%B6%E5%90%AF%E5%8A%A8%E7%BA%BF%E7%A8%8B"><span class="nav-number">3.0.1.</span> <span class="nav-text">start-创建并启动线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait-%E7%AD%89%E5%BE%85%E7%BA%BF%E7%A8%8B%E7%BB%84%E4%B8%AD%E6%89%80%E6%9C%89%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA"><span class="nav-number">3.0.2.</span> <span class="nav-text">wait-等待线程组中所有线程退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shutdown-%E9%98%9F%E5%88%97%E4%B8%AD%E6%89%80%E6%9C%89%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%AE%8C%E6%88%90%E5%90%8E%E8%AE%A9%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA"><span class="nav-number">3.0.3.</span> <span class="nav-text">shutdown-队列中所有任务执行完成后让线程退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#async-%E5%BC%82%E6%AD%A5%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.0.4.</span> <span class="nav-text">async-异步执行任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#async-first%E5%BC%82%E6%AD%A5%E4%BC%98%E5%85%88%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.0.5.</span> <span class="nav-text">async-first异步优先执行任务</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">任务类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TaskIn"><span class="nav-number">4.1.</span> <span class="nav-text">TaskIn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Ptr"><span class="nav-number">4.2.</span> <span class="nav-text">Task::Ptr</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

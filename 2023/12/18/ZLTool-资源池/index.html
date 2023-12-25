@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="源码结构分析该部分功能在ResourcePool.h中实现，由shared_ptr_imp、ResourcePool_l、ResourcePool三个类组成,资源池中的对象被获取使用后，直到使用完成回收后才能被下一个使用者获取到。 12&#x2F;&#x2F;显式释放对象,让对象重新进入循环列队，这时该对象应该会被后台线程持有并赋值    reservedObj.reset();  对象封装智能指针：shared_p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZLTool-资源池">
+<meta property="og:url" content="http://example.com/2023/12/18/ZLTool-%E8%B5%84%E6%BA%90%E6%B1%A0/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="源码结构分析该部分功能在ResourcePool.h中实现，由shared_ptr_imp、ResourcePool_l、ResourcePool三个类组成,资源池中的对象被获取使用后，直到使用完成回收后才能被下一个使用者获取到。 12&#x2F;&#x2F;显式释放对象,让对象重新进入循环列队，这时该对象应该会被后台线程持有并赋值    reservedObj.reset();  对象封装智能指针：shared_p">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-18T06:07:44.000Z">
+<meta property="article:modified_time" content="2023-12-18T08:17:57.207Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/12/18/ZLTool-%E8%B5%84%E6%BA%90%E6%B1%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ZLTool-资源池 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/12/18/ZLTool-%E8%B5%84%E6%BA%90%E6%B1%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ZLTool-资源池
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-12-18 14:07:44 / 修改时间：16:17:57" itemprop="dateCreated datePublished" datetime="2023-12-18T14:07:44+08:00">2023-12-18</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="源码结构分析"><a href="#源码结构分析" class="headerlink" title="源码结构分析"></a>源码结构分析</h1><p>该部分功能在ResourcePool.h中实现，由shared_ptr_imp、ResourcePool_l、ResourcePool三个类组成,资源池中的对象被获取使用后，直到使用完成回收后才能被下一个使用者获取到。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//显式释放对象,让对象重新进入循环列队，这时该对象应该会被后台线程持有并赋值</span><br><span class="line">    reservedObj.reset();</span><br></pre></td></tr></table></figure>
+
+<h2 id="对象封装智能指针：shared-ptr-imp"><a href="#对象封装智能指针：shared-ptr-imp" class="headerlink" title="对象封装智能指针：shared_ptr_imp"></a>对象封装智能指针：shared_ptr_imp</h2><p>智能指针实现类，管理资源的自动回收。每次要获取一个C资源对象到外部使用时，都先把该资源通过shared_ptr_imp进行封装，shared_ptr_imp对象析构时，会回收资源</p>
+<p>测试的代码是 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//大小为50的循环池</span><br><span class="line">    ResourcePool&lt;string_imp&gt; pool;</span><br><span class="line">    pool.setSize(50);</span><br><span class="line"></span><br><span class="line">    //获取一个对象,该对象将被主线程持有，并且不会被后台线程获取并赋值</span><br><span class="line">    auto reservedObj = pool.obtain();</span><br><span class="line">    </span><br><span class="line">    在ResourcePool中有</span><br><span class="line"> 	using ValuePtr = shared_ptr_imp&lt;C&gt;;   </span><br><span class="line">    ValuePtr obtain(const std::function&lt;void(C *)&gt; &amp;on_recycle = nullptr) &#123; return pool-&gt;obtain(on_recycle); &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename C&gt;</span><br><span class="line">class shared_ptr_imp : public std::shared_ptr&lt;C&gt; &#123;</span><br><span class="line">public:</span><br><span class="line">    shared_ptr_imp() &#123;&#125;</span><br><span class="line"> </span><br><span class="line">    /**</span><br><span class="line">     * 构造智能指针</span><br><span class="line">     * @param ptr 裸指针</span><br><span class="line">     * @param weakPool 管理本指针的循环池</span><br><span class="line">     * @param quit 对接是否放弃循环使用</span><br><span class="line">     */</span><br><span class="line">    shared_ptr_imp(C *ptr,</span><br><span class="line">                  const std::weak_ptr&lt;ResourcePool_l&lt;C&gt; &gt; &amp;weakPool,</span><br><span class="line">                   std::shared_ptr&lt;atomic_bool&gt; quit,</span><br><span class="line">                   const function&lt;void(C *)&gt; &amp;on_recycle);</span><br><span class="line"> </span><br><span class="line">    /**    </span><br><span class="line">    * 放弃或恢复回到循环池继续使用，该函数设置的_quit影响的是shared_ptr_imp构造函数中自定义的lambda删除器</span><br><span class="line">     * @param flag</span><br><span class="line">     */</span><br><span class="line">    void quit(bool flag = true)&#123;</span><br><span class="line">        if(_quit)&#123;//此处是判断指针是否有效，而不是判断_quit的值是否为true</span><br><span class="line">            *_quit = flag;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">private:</span><br><span class="line">    std::shared_ptr&lt;atomic_bool&gt; _quit;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>shared_ptr_imp的有参构造函数中，使用lambda自定义了自身析构时的删除器，该删除器决定了是删除C对象还是将C对象重新添加到对象池中。如下，可以看到，如果对象池还在使用，并且用户在资源没有被使用时不想删除资源，即回收资源(指定quit为false)，那么就会重新将该资源回收到对象池中，否则直接删除资源。此处，使用std::move将quit转为右值引用，通过_quit的移动构造函数转移了对象。lambda中捕获的quit即变成 _quit，后续通过void quit(bool flag &#x3D; true)函数可以修改 _quit的值来决定资源是否被删除。</p>
+<p>所以，shared_ptr_imp对象的构造和析构次数和C资源的构造析构次数是不一样的，两者没有关系，由用户指定C资源是回收还是删除。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">/* 自定义了删除器,删除器处理逻辑如下：</span><br><span class="line">1、如果对象池还在，且明确要回收该对象(quit为false)，则调用对象池的回收函数</span><br><span class="line">2、否则，直接删除该对象，不再放入对象池中 */</span><br><span class="line">template&lt;typename C&gt;</span><br><span class="line">shared_ptr_imp&lt;C&gt;::shared_ptr_imp(C *ptr,</span><br><span class="line">                                  const std::weak_ptr&lt;ResourcePool_l&lt;C&gt; &gt; &amp;weakPool,</span><br><span class="line">                                  std::shared_ptr&lt;atomic_bool&gt; quit,</span><br><span class="line">                                  const function&lt;void(C *)&gt; &amp;on_recycle) :</span><br><span class="line">        //lambda捕获quit后(值捕获，发生拷贝)，quit的引用计数变为2，函数退出后，引用计数变为1(形参释放)</span><br><span class="line">        //quit被转移到了_quit中，lambda中后续捕获的值即就是_quit的值，_quit的变更在void quit(bool flag = true)函数中</span><br><span class="line">        shared_ptr&lt;C&gt;(ptr, [weakPool, quit, on_recycle](C *ptr) &#123;</span><br><span class="line">            if (on_recycle) &#123;</span><br><span class="line">                on_recycle(ptr);</span><br><span class="line">            &#125;</span><br><span class="line">            auto strongPool = weakPool.lock();//将weakPool弱指针转换为strongPool强指针</span><br><span class="line">            if (strongPool &amp;&amp; !(*quit)) &#123;</span><br><span class="line">                //循环池还在并且不放弃放入循环池</span><br><span class="line">                strongPool-&gt;recycle(ptr);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                delete ptr; //quit为true，则删除该对象</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;), _quit(std::move(quit)) &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ResourcePool_l中的</span><br><span class="line">ValuePtr obtain(const std::function&lt;void(C *)&gt; &amp;on_recycle = nullptr) &#123;</span><br><span class="line">        return ValuePtr(getPtr(), _weak_self, std::make_shared&lt;std::atomic_bool&gt;(false), on_recycle);</span><br><span class="line"> &#125;</span><br><span class="line">测试代码</span><br><span class="line">//大小为50的循环池</span><br><span class="line">    ResourcePool&lt;string_imp&gt; pool;</span><br><span class="line">    pool.setSize(50);</span><br><span class="line"></span><br><span class="line">    //获取一个对象,该对象将被主线程持有，并且不会被后台线程获取并赋值</span><br><span class="line">    auto reservedObj = pool.obtain();</span><br><span class="line">    是在我们obtain后初始化的shared_ptr_imp</span><br></pre></td></tr></table></figure>
+
+<h2 id="资源池：ResourcePool-l"><a href="#资源池：ResourcePool-l" class="headerlink" title="资源池：ResourcePool_l"></a>资源池：ResourcePool_l</h2><p>管理资源，指定资源分配器、分配资源、回收资源、设置资源池大小。</p>
+<h3 id="资源分配"><a href="#资源分配" class="headerlink" title="资源分配"></a>资源分配</h3><p>1、如果获取到对象锁，且资源池不为空，则从池子中头部取出一个资源，如果资源池为空，则新分配一个资源<br>2、如果没有获取到对象锁，则直接新分配一个资源<br>3、将分配的资源封装成智能指针返回<br>备注：新分配的资源，由于要被使用，所以此处不能加入到资源池，在资源不再被使用，即智能指针释放时，才把资源添加到池子中；</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">ValuePtr obtain(const function&lt;void(C *)&gt; &amp;on_recycle = nullptr) &#123;</span><br><span class="line">        C *ptr;</span><br><span class="line">        auto is_busy = _busy.test_and_set();</span><br><span class="line">        if (!is_busy) &#123;</span><br><span class="line">            //获取到锁</span><br><span class="line">            if (_objs.size() == 0) &#123;</span><br><span class="line">                ptr = _allotter()</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                ptr = _objs.front();</span><br><span class="line">                _objs.pop_front();</span><br><span class="line">            &#125;</span><br><span class="line">            _busy.clear();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            //未获取到锁</span><br><span class="line">            ptr = _allotter();</span><br><span class="line">        &#125;</span><br><span class="line">        //第三个参数，默认指定该资源是需要回收的，可以通过quit函数修改后续是否需要回收</span><br><span class="line">        return ValuePtr(ptr, _weak_self, std::make_shared&lt;atomic_bool&gt;(false), on_recycle);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="资源回收"><a href="#资源回收" class="headerlink" title="资源回收"></a>资源回收</h3><p>1、如果获取到对象锁，且当前池中资源数量已达到上线，则不回收该资源，直接释放，否则回收。<br>2、如果没有获取到对象锁，则不回收该资源，直接释放。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void recycle(C *obj) &#123;</span><br><span class="line">        auto is_busy = _busy.test_and_set();</span><br><span class="line">        if (!is_busy) &#123;</span><br><span class="line">            //获取到锁</span><br><span class="line">            if (_objs.size() &gt;= _poolsize) &#123;</span><br><span class="line">                delete obj;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                _objs.emplace_back(obj);</span><br><span class="line">            &#125;</span><br><span class="line">            _busy.clear();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            //未获取到锁</span><br><span class="line">            delete obj;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置资源池的最大个数"><a href="#设置资源池的最大个数" class="headerlink" title="设置资源池的最大个数"></a>设置资源池的最大个数</h3><p>默认为8个。虽然资源池中的资源个数最多只能有_poolsize个，但是用户实际在使用的资源个数是没有限制的。</p>
+<p>从obtain函数可以看出，如果用户一直调用该函数分配资源，且不释放，那么肯定会超过_poolsize；</p>
+<p>从recycle函数可以看出，当资源池容量达到_poolsize后，其余待释放的资源是不会被回收的,释放当前obj。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void setSize(size_t size) &#123;</span><br><span class="line">        _poolsize = size;</span><br><span class="line">    &#125; </span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><code>std::shared_ptr&lt;C&gt;</code> 和 <code>std::enable_shared_from_this&lt;ResourcePool_l&lt;C&gt;&gt;</code> 分别提供了不同的功能，它们的继承关系是为了结合它们的优点。</p>
+<p>在这个代码中，<code>shared_ptr_imp</code> 继承自 <code>std::shared_ptr&lt;C&gt;</code> 主要是为了重载或扩展 <code>shared_ptr</code> 的行为，使其更加适合当前的需求。同时，<code>shared_ptr_imp</code> 可以利用 <code>std::shared_ptr&lt;C&gt;</code> 提供的各种成员函数和操作符来管理资源，例如：</p>
+<ul>
+<li><code>reset()</code>：释放当前指向的对象，同时将智能指针重置为一个空指针；</li>
+<li><code>operator-&gt;()</code> 和 <code>operator*()</code>：分别返回当前指向对象的指针和引用；</li>
+<li><code>use_count()</code>：返回当前指向对象的共享指针数量等等。</li>
+</ul>
+<p>而 <code>std::enable_shared_from_this&lt;ResourcePool_l&lt;C&gt;&gt;</code> 则提供了一个方便的方式来获取指向当前对象的共享指针，避免手动创建共享指针时可能出现的错误。通过继承 <code>std::enable_shared_from_this</code>，我们可以调用 <code>shared_from_this()</code> 函数来获取指向自身的共享指针。</p>
+<h2 id="对象池封装类：ResourcePool"><a href="#对象池封装类：ResourcePool" class="headerlink" title="对象池封装类：ResourcePool"></a>对象池封装类：ResourcePool</h2><p>ResourcePool_l对象是该类唯一的成员变量，该类实际上就是对ResourcePool_l的再次包装。</p>
+<p>因为在ResourcePool_l中，需要将自身传递到shared_ptr_imp的构造函数中，这里用到了shared_from_this()来获取一个shared_ptr实例。</p>
+<p>shared_from_this()有两个使用限制：</p>
+<p>1、不能在自身的构造函数中调用；</p>
+<p>2、只允许在先前已被std::shared_ptr 管理的对象上调用 shared_from_this 。</p>
+<p>所以作者提供了ResourcePool类，唯一的成员变量：<code>std::shared_ptr&lt;ResourcePool_l&lt;C&gt; &gt; pool;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ResourcePool() &#123;</span><br><span class="line">        pool.reset(new ResourcePool_l&lt;C&gt;());</span><br><span class="line">        pool-&gt;setup();</span><br><span class="line">    &#125;</span><br><span class="line">void setup() &#123; _weak_self = this-&gt;shared_from_this(); &#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/12/ZLTool-%E6%97%A5%E5%BF%97/" rel="prev" title="ZLTool-日志">
+      <i class="fa fa-chevron-left"></i> ZLTool-日志
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/12/20/ZLTool%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%BB%84%E4%BB%B6/" rel="next" title="ZLTool线程池组件">
+      ZLTool线程池组件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">源码结构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%B0%81%E8%A3%85%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%EF%BC%9Ashared-ptr-imp"><span class="nav-number">1.1.</span> <span class="nav-text">对象封装智能指针：shared_ptr_imp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E6%B1%A0%EF%BC%9AResourcePool-l"><span class="nav-number">1.2.</span> <span class="nav-text">资源池：ResourcePool_l</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D"><span class="nav-number">1.2.1.</span> <span class="nav-text">资源分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E5%9B%9E%E6%94%B6"><span class="nav-number">1.2.2.</span> <span class="nav-text">资源回收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E8%B5%84%E6%BA%90%E6%B1%A0%E7%9A%84%E6%9C%80%E5%A4%A7%E4%B8%AA%E6%95%B0"><span class="nav-number">1.2.3.</span> <span class="nav-text">设置资源池的最大个数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%B1%A0%E5%B0%81%E8%A3%85%E7%B1%BB%EF%BC%9AResourcePool"><span class="nav-number">1.3.</span> <span class="nav-text">对象池封装类：ResourcePool</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

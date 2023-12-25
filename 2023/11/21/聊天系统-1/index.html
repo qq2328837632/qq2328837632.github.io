@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="聊天系统编译过程对于编译来说，先创建build目录，进入之后先cmake ..,再make可以编译，make clean可以会清除先前构建的目标文件和可执行文件，使得代码回到未编译状态。 除了make clean之外，你可以使用make命令实现其他操作，比如：  make all：构建所有的目标 make ChatServer：构建ChatServer目标 make ChatClient：构建Ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊天系统-1">
+<meta property="og:url" content="http://example.com/2023/11/21/%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F-1/index.html">
+<meta property="og:site_name" content="肖汇林的博客">
+<meta property="og:description" content="聊天系统编译过程对于编译来说，先创建build目录，进入之后先cmake ..,再make可以编译，make clean可以会清除先前构建的目标文件和可执行文件，使得代码回到未编译状态。 除了make clean之外，你可以使用make命令实现其他操作，比如：  make all：构建所有的目标 make ChatServer：构建ChatServer目标 make ChatClient：构建Ch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-21T05:11:58.000Z">
+<meta property="article:modified_time" content="2023-11-26T14:14:06.616Z">
+<meta property="article:author" content="肖汇林">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/11/21/%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊天系统-1 | 肖汇林的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">肖汇林的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/21/%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="肖汇林">
+      <meta itemprop="description" content="选择有时候比努力更重要">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="肖汇林的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊天系统-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-11-21 13:11:58" itemprop="dateCreated datePublished" datetime="2023-11-21T13:11:58+08:00">2023-11-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-11-26 22:14:06" itemprop="dateModified" datetime="2023-11-26T22:14:06+08:00">2023-11-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="聊天系统"><a href="#聊天系统" class="headerlink" title="聊天系统"></a>聊天系统</h1><h2 id="编译过程"><a href="#编译过程" class="headerlink" title="编译过程"></a>编译过程</h2><p>对于编译来说，先创建build目录，进入之后先<code>cmake ..</code>,再make可以编译，make clean可以会清除先前构建的目标文件和可执行文件，使得代码回到未编译状态。</p>
+<p>除了<code>make clean</code>之外，你可以使用<code>make</code>命令实现其他操作，比如：</p>
+<ul>
+<li><code>make all</code>：构建所有的目标</li>
+<li><code>make ChatServer</code>：构建ChatServer目标</li>
+<li><code>make ChatClient</code>：构建ChatClient目标</li>
+<li><code>make depend</code>：检查并生成依赖关系</li>
+<li><code>make rebuild_cache</code>：重新运行CMake来重新生成构建系统</li>
+<li><code>make edit_cache</code>：编辑CMake的配置参数</li>
+</ul>
+<p>你还可以使用<code>make help</code>命令查看所有有效的目标及其说明</p>
+<p><code>cmake ..</code>命令的作用是在当前目录的上一级目录中寻找CMakeLists.txt文件，并以该文件作为输入，生成构建系统所需的Makefile或项目文件。这通常用于在构建过程中将构建系统的配置文件生成到一个单独的目录中，以保持源代码目录的清洁。</p>
+<p>在实际应用中，如果你的项目使用CMake进行构建管理，通常会在项目根目录中创建一个build目录，并在其中执行<code>cmake ..</code>命令，来生成构建系统所需的文件。这样做有利于隔离源代码和构建产物，方便项目管理和维护。</p>
+<h2 id="对muduo库的一些必要操作"><a href="#对muduo库的一些必要操作" class="headerlink" title="对muduo库的一些必要操作"></a>对muduo库的一些必要操作</h2><p>因为在make时出现了一些错误，显示不能加载头文件，说明没有正确引用头文件和静态库的链接，我的操作是怎样的：进入我在&#x2F;home&#x2F;xiaohuilin&#x2F;build目录下，这个目录是jmuduo生成的，进入build后利用<code>sudo make install</code>，在 Makefile 文件中，通常会定义 <code>install</code> 目标，并指定在执行 <code>make install</code> 时要执行的操作，这些操作可能包括复制文件到指定位置、设置文件权限、创建链接等。</p>
+<p>因此，当你执行 <code>sudo make install</code> 命令时，实际上是在调用 Makefile 文件中定义的 <code>install</code> 目标，并由该目标指定的命令执行相应的安装操作。Makefile文件是由CMakeList.txt生成的。</p>
+<p>在<code>sudo make install</code>，会得到头文件和静态库的目录，就可以知道位置了，接下来只需要修改一下CMakeList.txt的内容，就可以引用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">xiaohuilin@Ubuntu:~/聊天副本2/Service$ cat CMakeLists.txt </span><br><span class="line">cmake_minimum_required(VERSION 3.0)</span><br><span class="line">project(chat)</span><br><span class="line"></span><br><span class="line"># 配置编译选项</span><br><span class="line">set(CMAKE_CXX_FLAGS $&#123;CMAKE_CXX_FLAGS&#125; -g)</span><br><span class="line"></span><br><span class="line"># 配置最终的可执行文件输出的路径 </span><br><span class="line">set(EXECUTABLE_OUTPUT_PATH $&#123;PROJECT_SOURCE_DIR&#125;/bin)</span><br><span class="line"></span><br><span class="line"># 配置头文件的搜索路径</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/include)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/include/server)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/include/server/db)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/include/server/model)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/include/server/redis)</span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/thirdparty)</span><br><span class="line"># 添加 muduo 的头文件路径</span><br><span class="line">include_directories(/home/xiaohuilin/build/release-install-cpp11/include)</span><br><span class="line"># 加载子目录</span><br><span class="line">add_subdirectory(src)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">xiaohuilin@Ubuntu:~/聊天副本2/Service/src/server$ cat CMakeLists.txt </span><br><span class="line"># 定义了SRC_LIST变量，包含当前目录下所有的源文件</span><br><span class="line">aux_source_directory(. SRC_LIST)</span><br><span class="line">aux_source_directory(./model MODEL_LIST)</span><br><span class="line">aux_source_directory(./redis REDIS_LIST)</span><br><span class="line"></span><br><span class="line"># 指定生成可执行文件</span><br><span class="line">add_executable(ChatServer $&#123;SRC_LIST&#125; $&#123;MODEL_LIST&#125; $&#123;REDIS_LIST&#125;)</span><br><span class="line"># 指定可执行文件链接时需要的库文件</span><br><span class="line">target_link_libraries(ChatServer /home/xiaohuilin/build/release-install-cpp11/lib/libmuduo_base.a /home/xiaohuilin/build/release-install-cpp11/lib/libmuduo_net.a mysqlclient  hiredis pthread)</span><br></pre></td></tr></table></figure>
+
+<p>hiredis的一些步骤就跟muduo库一样了，</p>
+<p>你可以通过以下步骤下载和安装 hiredis 库文件：</p>
+<p>打开终端，使用以下命令克隆 hiredis 仓库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/redis/hiredis.git</span><br></pre></td></tr></table></figure>
+
+<p>进入克隆的 <code>hiredis</code> 目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd hiredis</span><br></pre></td></tr></table></figure>
+
+<p>编译和安装 hiredis 库。运行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+
+<p>有地方与muduo不一样，是安装在系统路径下的。根据CMakeLists.txt文件中的代码，可以看出执行<code>sudo make install</code>命令会将头文件和库文件安装到系统路径下。</p>
+<p>具体来说，在以下代码中指定了安装的目标路径：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cmakeCopy CodeINSTALL(TARGETS hiredis</span><br><span class="line">    EXPORT hiredis-targets</span><br><span class="line">    RUNTIME DESTINATION $&#123;CMAKE_INSTALL_BINDIR&#125;</span><br><span class="line">    LIBRARY DESTINATION $&#123;CMAKE_INSTALL_LIBDIR&#125;</span><br><span class="line">    ARCHIVE DESTINATION $&#123;CMAKE_INSTALL_LIBDIR&#125;)</span><br><span class="line"></span><br><span class="line">INSTALL(FILES hiredis.h read.h sds.h async.h alloc.h sockcompat.h</span><br><span class="line">    DESTINATION $&#123;CMAKE_INSTALL_INCLUDEDIR&#125;/hiredis)</span><br><span class="line"></span><br><span class="line">INSTALL(DIRECTORY adapters</span><br><span class="line">    DESTINATION $&#123;CMAKE_INSTALL_INCLUDEDIR&#125;/hiredis)</span><br><span class="line"></span><br><span class="line">INSTALL(FILES $&#123;CMAKE_CURRENT_BINARY_DIR&#125;/hiredis.pc</span><br><span class="line">    DESTINATION $&#123;CMAKE_INSTALL_LIBDIR&#125;/pkgconfig)</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>$&#123;CMAKE_INSTALL_BINDIR&#125;</code>表示可执行文件的安装路径，<code>$&#123;CMAKE_INSTALL_LIBDIR&#125;</code>表示库文件的安装路径，<code>$&#123;CMAKE_INSTALL_INCLUDEDIR&#125;</code>表示头文件的安装路径。</p>
+<p>因此，执行<code>sudo make install</code>命令后，头文件将被安装到<code>$&#123;CMAKE_INSTALL_INCLUDEDIR&#125;/hiredis</code>目录下，库文件将被安装到<code>$&#123;CMAKE_INSTALL_LIBDIR&#125;</code>目录下</p>
+<p>在大多数Linux系统上，<code>$&#123;CMAKE_INSTALL_LIBDIR&#125;</code>可能会被设置为<code>/usr/local/lib</code>或<code>/usr/lib</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/include/hiredis /usr/local/include/hiredis/adapters /usr/local/lib</span><br><span class="line">cp -pPR hiredis.h async.h read.h sds.h alloc.h sockcompat.h /usr/local/include/hiredis</span><br><span class="line">cp -pPR adapters/*.h /usr/local/include/hiredis/adapters</span><br><span class="line">cp -pPR libhiredis.so /usr/local/lib/libhiredis.so.1.2.1-dev</span><br><span class="line">cd /usr/local/lib &amp;&amp; ln -sf libhiredis.so.1.2.1-dev libhiredis.so &amp;&amp; ln -sf libhiredis.so.1.2.1-dev libhiredis.so.1</span><br><span class="line">cp -pPR libhiredis.a /usr/local/lib</span><br><span class="line">mkdir -p /usr/local/lib/pkgconfig</span><br><span class="line">cp -pPR hiredis.pc /usr/local/lib/pkgconfig</span><br></pre></td></tr></table></figure>
+
+<h2 id="对MySQL操作"><a href="#对MySQL操作" class="headerlink" title="对MySQL操作"></a>对MySQL操作</h2><p>在 Linux 下使用用户名 “ik” 登录数据库，通常可以通过以下命令行操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -u ik -p</span><br></pre></td></tr></table></figure>
+
+<p>在上述命令中：</p>
+<ul>
+<li><code>-u ik</code> 指定了要使用的用户名为 “ik”。</li>
+<li><code>-p</code> 表示需要输入密码进行登录。</li>
+</ul>
+<p>执行上述命令后，系统会提示你输入密码。输入正确的密码后，即可登录到 MySQL 数据库中</p>
+<p>在 MySQL 中，可以使用以下命令来查看数据库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show databases;</span><br></pre></td></tr></table></figure>
+
+<p>执行上述命令后，会列出当前 MySQL 服务器上的所有数据库。</p>
+<p>如果你想要查看特定数据库中的表，可以先选择数据库，然后使用以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use your_database_name;</span><br><span class="line">show tables;</span><br></pre></td></tr></table></figure>
+
+<p>将 <code>your_database_name</code> 替换为你希望查看的数据库名称。</p>
+<hr>
+<p>以下是一个简单示例，展示了如何在Qt项目中实现与OpenCV的集成和车牌识别功能。请注意，这只是一个示例，具体的实现可能因项目需求和环境而有所不同。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;opencv2/opencv.hpp&gt;</span><br><span class="line">#include &lt;QDebug&gt;</span><br><span class="line">#include &lt;QDateTime&gt;</span><br><span class="line"></span><br><span class="line">// 车牌识别函数</span><br><span class="line">QString recognizeLicensePlate(const cv::Mat&amp; image) &#123;</span><br><span class="line">    // 加载车牌识别模型，例如使用CascadeClassifier或者DNN模型</span><br><span class="line">    cv::CascadeClassifier plate_cascade;</span><br><span class="line">    if (!plate_cascade.load(&quot;path/to/license_plate_model.xml&quot;)) &#123;</span><br><span class="line">        qDebug() &lt;&lt; &quot;Failed to load license plate model!&quot;;</span><br><span class="line">        return &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 进行车牌识别</span><br><span class="line">    std::vector&lt;cv::Rect&gt; plates;</span><br><span class="line">    cv::Mat gray;</span><br><span class="line">    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);</span><br><span class="line">    cv::equalizeHist(gray, gray);</span><br><span class="line">    plate_cascade.detectMultiScale(gray, plates, 1.1, 3);</span><br><span class="line"></span><br><span class="line">    // 提取车牌号码并返回结果</span><br><span class="line">    if (!plates.empty()) &#123;</span><br><span class="line">        cv::Rect plateRect = plates[0];</span><br><span class="line">        cv::Mat plateImage = image(plateRect);</span><br><span class="line">        std::string licensePlate = /* 提取车牌号码的逻辑 */;</span><br><span class="line">        return QString::fromStdString(licensePlate);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return &quot;&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    // 读取车牌图片</span><br><span class="line">    cv::Mat image = cv::imread(&quot;path/to/license_plate_image.jpg&quot;);</span><br><span class="line">    if (image.empty()) &#123;</span><br><span class="line">        qDebug() &lt;&lt; &quot;Failed to load license plate image!&quot;;</span><br><span class="line">        return -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 进行车牌识别</span><br><span class="line">    QString licensePlate = recognizeLicensePlate(image);</span><br><span class="line">    if (licensePlate.isEmpty()) &#123;</span><br><span class="line">        qDebug() &lt;&lt; &quot;Failed to recognize license plate!&quot;;</span><br><span class="line">        return -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 获取当前时间和IP地址</span><br><span class="line">    QDateTime currentTime = QDateTime::currentDateTime();</span><br><span class="line">    QString ipAddress = /* 获取IP地址的逻辑 */;</span><br><span class="line"></span><br><span class="line">    // 构造数据库插入语句</span><br><span class="line">    QString insertStatement = QString(&quot;INSERT INTO cars (id, license_plate, time, ip) VALUES (&#x27;%1&#x27;, &#x27;%2&#x27;, &#x27;%3&#x27;, &#x27;%4&#x27;)&quot;)</span><br><span class="line">                                  .arg(&quot;your_id&quot;).arg(licensePlate).arg(currentTime.toString()).arg(ipAddress);</span><br><span class="line"></span><br><span class="line">    // 执行数据库插入操作</span><br><span class="line">    // ...</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例代码中，<code>recognizeLicensePlate</code>函数使用了OpenCV提供的图像处理和机器学习算法，结合你训练好的车牌识别模型，对输入的图像进行处理和识别。你需要根据实际情况加载和使用合适的模型。</p>
+<p>在主函数中，通过调用<code>recognizeLicensePlate</code>函数进行车牌识别，并获取识别结果。然后，使用Qt提供的功能获取当前时间和IP地址。最后，构造数据库插入语句并执行插入操作，将识别结果存储到数据库表”cars”中。</p>
+<p>请注意，在实际开发中，你需要根据自己的需求和环境，调整和完善代码。同时，你还需要实现获取IP地址的逻辑（例如使用网络API），以及数据库的连接和插入操作。</p>
+<p>希望这个示例能够帮助你开始在Qt项目中实现与OpenCV的集成和车牌识别功能，并将结果存储到数据库中。如果你有进一步的问题，请随时提问。</p>
+<hr>
+<p>检测分割部分  #include&lt;opencv2&#x2F;opencv.hpp&gt; #include&lt;opencv2&#x2F;core&#x2F;core.hpp&gt;  #include&lt;opencv2&#x2F;highgui&#x2F;highgui.hpp&gt; #include<iostream> #include<sstream> using namespace std; using namespace cv;   int  main_licenseprogress(Mat &amp; image);   &#x2F;&#x2F;int main() { &#x2F;&#x2F; string path &#x3D; “license&#x2F;license”; &#x2F;&#x2F; Mat image; &#x2F;&#x2F; for (int i &#x3D; 2; i &lt;&#x3D; 2; i++) { &#x2F;&#x2F; ostringstream oss; &#x2F;&#x2F; oss &lt;&lt; path &lt;&lt; i &lt;&lt; “.jpg”; &#x2F;&#x2F; cout &lt;&lt; “path &#x3D; “ &lt;&lt; path &lt;&lt; “str &#x3D; “ &lt;&lt; oss.str() &lt;&lt; endl; &#x2F;&#x2F; image &#x3D; imread(oss.str(), 1); &#x2F;&#x2F; main_licenseprogress(image); &#x2F;&#x2F; } &#x2F;&#x2F; system(“pause”); &#x2F;&#x2F; return 0; &#x2F;&#x2F;}     int main_licenseprogress(Mat &amp; image) { imshow(“test”, image); waitKey(1000); &#x2F;&#x2F;灰度化 Mat  gray_image; cvtColor(image, gray_image, CV_RGB2GRAY); imshow(“test”, gray_image); imwrite(“license3_gray.jpg”, gray_image);  waitKey(1000);   &#x2F;&#x2F;平滑处理 中值滤波 Mat blur_image; medianBlur(gray_image, blur_image, 3); imwrite(“blur_image.jpg”, blur_image); &#x2F;&#x2F;imshow(“test”, gray_image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;自适应二值化处理  由于candy 算子产生的图像已经是二值化图像，所以这里不做处理 &#x2F;&#x2F;Mat threadhold_image; &#x2F;&#x2F;threshold(blur_image, threadhold_image, 200, 255, CV_THRESH_BINARY); &#x2F;&#x2F;imshow(“test”, threadhold_image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;Candy&#x2F;sobel 边缘检测： float mask[3][3] &#x3D; { { 1,2,1 },{ 0,0,0 },{ -1,-2,-1 } }; Mat y_mask &#x3D; Mat(3, 3, CV_32F, mask) &#x2F; 8; Mat x_mask &#x3D; y_mask.t(); &#x2F;&#x2F; 转置 Mat sobelX, sobelY; filter2D(blur_image, sobelX, CV_32F, x_mask); filter2D(blur_image, sobelY, CV_32F, y_mask); sobelX &#x3D; abs(sobelX); sobelY &#x3D; abs(sobelY);   Mat candy_image; Canny(blur_image, candy_image, 500, 250, 3); &#x2F;&#x2F;imshow(“test”, candy_image); &#x2F;&#x2F;waitKey(1000); &#x2F;&#x2F;imshow(“test”, sobelY); &#x2F;&#x2F;waitKey(1000); imwrite(“candy_image.jpg”, candy_image);   &#x2F;&#x2F;形态学处理 &#x2F;&#x2F;图片膨胀处理 Mat dilate_image, erode_image; &#x2F;&#x2F;自定义 核进行 x 方向的膨胀腐蚀 Mat elementX &#x3D; getStructuringElement(MORPH_RECT, Size(25, 1)); Mat elementY &#x3D; getStructuringElement(MORPH_RECT, Size(1, 19)); Point point(-1, -1); dilate(candy_image, dilate_image, elementX, point, 2); imwrite(“dilate_image.jpg”, dilate_image); erode(dilate_image, erode_image, elementX, point, 4); imwrite(“erode_image.jpg”, erode_image); dilate(erode_image, dilate_image, elementX, point, 2); imwrite(“dilate_image1.jpg”, dilate_image); &#x2F;&#x2F;自定义 核进行 Y 方向的膨胀腐蚀 erode(dilate_image, erode_image, elementY, point, 1); imwrite(“erode_image1.jpg”, erode_image); dilate(erode_image, dilate_image, elementY, point, 2); &#x2F;&#x2F;imshow(“test”, dilate_image); &#x2F;&#x2F;waitKey(1000); imwrite(“dilate_image2.jpg”, dilate_image); &#x2F;&#x2F;噪声处理 &#x2F;&#x2F;平滑处理 中值滤波 Mat blurr_image; medianBlur(dilate_image, blurr_image, 15); medianBlur(blurr_image, blurr_image, 15); imshow(“test”, blurr_image); waitKey(1000);   &#x2F;&#x2F;矩形轮廓查找与筛选： Mat contour_image; &#x2F;&#x2F;深拷贝  查找轮廓会改变源图像信息，需要重新 拷贝 图像 contour_image &#x3D; blurr_image.clone(); vector&lt;vector<Point>&gt; contours; findContours(contour_image, contours, CV_RETR_EXTERNAL, CHAIN_APPROX_SIMPLE); &#x2F;&#x2F;画出轮廓 drawContours(contour_image, contours, -1, Scalar(255), 1); &#x2F;&#x2F;imshow(“test”, contour_image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;Mat cannyy_image; &#x2F;&#x2F;Canny(contour_image, cannyy_image, 500, 200, 3);   &#x2F;&#x2F;hough 直线  &#x2F;&#x2F;vector<Vec4i> lines; &#x2F;&#x2F;HoughLinesP(cannyy_image, lines, 1, CV_PI &#x2F; 180, 20, 10, 0); &#x2F;&#x2F;for (size_t i &#x3D; 0; i &lt; lines.size(); i++) { &#x2F;&#x2F; Vec4i l &#x3D; lines[i]; &#x2F;&#x2F; line(image, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 1, LINE_AA); &#x2F;&#x2F; cout &lt;&lt; “直线：  “&lt;&lt; i &lt;&lt;endl; &#x2F;&#x2F;} &#x2F;&#x2F;imshow(“test”, image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;轮廓表示为一个矩形  车牌提取 Mat  roi_image; vector<Point> rectPoint; for (int i &#x3D; 0; i &lt; contours.size(); i++) { Rect r &#x3D; boundingRect(Mat(contours[i])); &#x2F;&#x2F;RotatedRect r &#x3D; minAreaRect(Mat(contours[i])); cout &lt;&lt; “contours “ &lt;&lt; i &lt;&lt; “  height &#x3D; “ &lt;&lt; r.height &lt;&lt; “  width &#x3D; “ &lt;&lt; r.width &lt;&lt; “rate &#x3D; “ &lt;&lt; ((float)r.width &#x2F; r.height) &lt;&lt; endl; if ((float)r.width &#x2F; r.height &gt;&#x3D; 2.2 &amp;&amp; (float)r.width &#x2F; r.height &lt;&#x3D; 3.6) { cout &lt;&lt; “r.x &#x3D; “ &lt;&lt; r.x &lt;&lt; “  r.y  &#x3D; “ &lt;&lt; r.y &lt;&lt; endl; rectangle(contour_image, r, Scalar(0, 0, 255), 2); imwrite(“contour_image.jpg”, contour_image); Point p1, p2, p3, p4; p1.x &#x3D; r.x; p1.y &#x3D; r.y; p2.x &#x3D; r.x + r.width; p2.x &#x3D; r.y; p3.x &#x3D; r.x + r.width; p3.y &#x3D; r.y + r.height; p4.x &#x3D; r.x; p4.y &#x3D; r.y + r.height;   rectPoint.push_back(p1); rectPoint.push_back(p2); rectPoint.push_back(p3); rectPoint.push_back(p4);   for (int j &#x3D; 0; j &lt; contours[i].size(); j++) { cout &lt;&lt; “point &#x3D; “ &lt;&lt; contours[i][j] &lt;&lt; endl; } &#x2F;&#x2F;rectangle(image, r, Scalar(0, 0, 255), 3); roi_image &#x3D; image(r); } } imshow(“test”, roi_image); waitKey(1000); imwrite(“roi_image.jpg”, roi_image); &#x2F;&#x2F;图片放大 Mat large_image; int col &#x3D; roi_image.cols, row &#x3D; roi_image.rows; resize(roi_image, large_image, Size(300, 300 * row &#x2F; col)); imshow(“test”, large_image); waitKey(2000); &#x2F;&#x2F;车牌分割 &#x2F;&#x2F;灰度化  Mat  roi_gray_image; cvtColor(large_image, roi_gray_image, CV_RGB2GRAY); imshow(“test”, roi_gray_image); waitKey(1000);   &#x2F;&#x2F;中值滤波 增强边缘     &#x2F;&#x2F;Candy 边缘检测 Mat candy_roi_image; Canny(roi_gray_image, candy_roi_image, 450, 120, 3); imshow(“test”, candy_roi_image); imwrite(“candy_roi_image.jpg”, candy_roi_image); waitKey(1000); &#x2F;&#x2F;二值化 Mat roi_threadhold_image; threshold(candy_roi_image, roi_threadhold_image, 50, 255, CV_THRESH_BINARY); imshow(“test”, roi_threadhold_image); waitKey(1000); imwrite(“roi_threadhold_image.jpg”, roi_threadhold_image); &#x2F;&#x2F;平滑处理 中值滤波 &#x2F;&#x2F;Mat roi_blurr_image; &#x2F;&#x2F;medianBlur(roi_threadhold_image, roi_blurr_image, 1); &#x2F;&#x2F;imshow(“test”, roi_blurr_image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;查找轮廓 Mat roi_contours_image; vector&lt;vector<Point>&gt; roi_contours; roi_contours_image &#x3D; roi_threadhold_image.clone(); findContours(roi_contours_image, roi_contours, CV_RETR_EXTERNAL, CHAIN_APPROX_SIMPLE); &#x2F;&#x2F;画出轮廓 &#x2F;&#x2F;drawContours(roi_contours_image, roi_contours, -1, Scalar(255), 2); &#x2F;&#x2F;imshow(“test”, roi_contours_image); &#x2F;&#x2F;waitKey(1000);   &#x2F;&#x2F;轮廓表示成矩形 &#x2F;&#x2F;轮廓表示为一个矩形  车牌提取 vector<Point> roi_rectPoint; for (int i &#x3D; 0; i &lt; roi_contours.size(); i++) { Rect r &#x3D; boundingRect(Mat(roi_contours[i])); &#x2F;&#x2F;RotatedRect r &#x3D; minAreaRect(Mat(contours[i])); cout &lt;&lt; “contours “ &lt;&lt; i &lt;&lt; “  height &#x3D; “ &lt;&lt; r.height &lt;&lt; “  width &#x3D; “ &lt;&lt; r.width &lt;&lt; “rate &#x3D; “ &lt;&lt; ((float)r.width &#x2F; r.height) &lt;&lt; endl; cout &lt;&lt; “r.x &#x3D; “ &lt;&lt; r.x &lt;&lt; “  r.y  &#x3D; “ &lt;&lt; r.y &lt;&lt; endl;     &#x2F;&#x2F;rectangle(large_image, r, Scalar(0, 0, 255), 1); Point p1, p2, p3, p4; p1.x &#x3D; r.x; p1.y &#x3D; r.y; p2.x &#x3D; r.x + r.width; p2.x &#x3D; r.y; p3.x &#x3D; r.x + r.width; p3.y &#x3D; r.y + r.height; p4.x &#x3D; r.x; p4.y &#x3D; r.y + r.height;   roi_rectPoint.push_back(p1); roi_rectPoint.push_back(p2); roi_rectPoint.push_back(p3); roi_rectPoint.push_back(p4); for (int j &#x3D; 0; j &lt; roi_contours[i].size(); j++) { cout &lt;&lt; “point &#x3D; “ &lt;&lt; roi_contours[i][j] &lt;&lt; endl; } } imshow(“test”, roi_threadhold_image); waitKey(1000);   &#x2F;&#x2F;矩形轮廓特征提取 int contours_height[30], contours_width[30]; for (int i &#x3D; 0; i &lt; roi_contours.size(); i++) { Rect r &#x3D; boundingRect(Mat(roi_contours[i])); contours_height[i] &#x3D; r.height; contours_width[i] &#x3D; r.width; cout &lt;&lt; “contours_height &#x3D; “ &lt;&lt; r.height &lt;&lt; “ contours_width &#x3D; “ &lt;&lt; r.width &lt;&lt; endl; }   &#x2F;&#x2F;判断字符水平位置 int roi_col &#x3D; roi_threadhold_image.cols, roi_row &#x3D; roi_threadhold_image.rows, position1[50], position2[50], roi_width[50]; uchar pix; &#x2F;&#x2F;cout &lt;&lt; roi_threadhold_image &lt;&lt; endl;  &#x2F;&#x2F;确认为1 的像素 int pixrow[1000]; for (int i &#x3D; 0; i &lt; roi_col - 1; i++) { for (int j &#x3D; 0; j &lt; roi_row - 1; j++) { pix &#x3D; roi_threadhold_image.at<uchar>(j, i); pixrow[i] &#x3D; 0; if (pix &gt; 0) { pixrow[i] &#x3D; 1; break; } } } &#x2F;&#x2F;对数组进行滤波，减少突变概率 for (int i &#x3D; 2; i &lt; roi_col - 1 - 2; i++) { if ((pixrow[i - 1] + pixrow[i - 2] + pixrow[i + 1] + pixrow[i + 2]) &gt;&#x3D; 3) { pixrow[i] &#x3D; 1; } else if((pixrow[i - 1] + pixrow[i - 2] + pixrow[i + 1] + pixrow[i + 2]) &lt;&#x3D; 1) { pixrow[i] &#x3D; 0; } } &#x2F;&#x2F;确认字符位置 int count &#x3D; 0; bool flage &#x3D; false; for (int i &#x3D; 0; i &lt; roi_col - 1; i++) { pix &#x3D; pixrow[i]; if (pix &#x3D;&#x3D; 1 &amp;&amp; !flage) { flage &#x3D; true; position1[count] &#x3D; i; continue; } if (pix &#x3D;&#x3D; 0 &amp;&amp; flage) { flage &#x3D; false; position2[count] &#x3D; i; count++; } if (i &#x3D;&#x3D; (roi_col - 2) &amp;&amp; flage) { flage &#x3D; false; position2[count] &#x3D; i; count++; } } &#x2F;&#x2F;记录所有字符宽度 for (int n &#x3D; 0; n &lt; count; n++) { cout &lt;&lt; “ position1 &#x3D; “ &lt;&lt; position2[n] &lt;&lt;” position2 &#x3D; “&lt;&lt; position2[n] &lt;&lt; “distance &#x3D;” &lt;&lt; (position2[n] - position1[n]) &lt;&lt; endl; roi_width[n] &#x3D; position2[n] - position1[n]; } &#x2F;&#x2F; 减去最大值，最小值 int max &#x3D; roi_width[0], max_index &#x3D; 0; int min &#x3D; roi_width[0], min_index &#x3D; 0; for (int n &#x3D; 1; n &lt; count; n++) { if (max &lt; roi_width[n]) { max &#x3D; roi_width[n]; max_index &#x3D; n; } if (min &gt; roi_width[n]) { min &#x3D; roi_width[n]; min_index &#x3D; n; } } int index &#x3D; 0; int new_roi_width[50]; for (int i &#x3D; 0; i &lt; count; i++) { if (i &#x3D;&#x3D; min_index || i &#x3D;&#x3D; max_index) {   } else { new_roi_width[index] &#x3D; roi_width[i]; index++; } } cout &lt;&lt; “count &#x3D; “ &lt;&lt; count &lt;&lt; endl; for (int i &#x3D; 0; i &lt; count - 2; i++) { cout &lt;&lt; “new roi width &#x3D; “ &lt;&lt; new_roi_width[i] &lt;&lt; endl; } &#x2F;&#x2F;取后面三个值的平均值： int avgre &#x3D; (int)((new_roi_width[count - 3] + new_roi_width[count - 4] + new_roi_width[count - 5]) &#x2F; 3.0); cout &lt;&lt; avgre &lt;&lt; endl; &#x2F;&#x2F;for (int i &#x3D; count-3; i &lt; count - 6; i–) { &#x2F;&#x2F;if (i &lt; 0) { &#x2F;&#x2F; break; &#x2F;&#x2F;} &#x2F;&#x2F;cout &lt;&lt; “count &#x3D; “ &lt;&lt; new_roi_width[i] &lt;&lt; endl; &#x2F;&#x2F;} &#x2F;&#x2F;字母位置信息确认 int licenseX[10], licenseW[10], licenseNum &#x3D; 0; int countX &#x3D; 0; for (int i &#x3D; 0; i &lt; count; i++) { if (roi_width[i] &gt; (avgre - 8) &amp;&amp; roi_width[i] &lt; (avgre + 8)) { licenseX[licenseNum] &#x3D; position1[i]; licenseW[licenseNum] &#x3D; roi_width[i]; licenseNum++; cout &lt;&lt; “licenseX &#x3D; “ &lt;&lt; licenseX[i] &lt;&lt; “  roi_width  &#x3D;” &lt;&lt; roi_width[i] &lt;&lt; endl; continue; } if (roi_width[i] &gt; (avgre * 2 - 10) &amp;&amp; roi_width[i] &lt; (avgre * 2 + 10)) { licenseX[licenseNum] &#x3D; position1[i]; licenseW[licenseNum] &#x3D; roi_width[i]; licenseNum++; cout &lt;&lt; “licenseX &#x3D; “ &lt;&lt; licenseX[i] &lt;&lt;”  roi_width  &#x3D;”&lt;&lt; roi_width[i]&lt;&lt; endl; } }   &#x2F;&#x2F;判断字符垂直位置 int licenseY[10], licenseH[10]; int position3[10], position4[10]; &#x2F;&#x2F;确认为1 的像素 int countYY &#x3D; 0; int pixcol[1000], row_height[10]; for (int temp &#x3D; 0; temp &lt; licenseNum; temp++) { for (int i &#x3D; 0; i &lt; roi_row - 1; i++) { for (int j &#x3D; licenseX[temp]; j &lt; (licenseX[temp]+ licenseW[temp]); j++) { pix &#x3D; roi_threadhold_image.at<uchar>(i, j); pixcol[i] &#x3D; 0; if (pix &gt; 0) { pixcol[i] &#x3D; 1; break; } } } &#x2F;&#x2F;对数组进行滤波，减少突变概率 for (int i &#x3D; 2; i &lt; roi_row - 1 - 2; i++) { if ((pixcol[i - 1] + pixcol[i - 2] + pixcol[i + 1] + pixcol[i + 2]) &gt;&#x3D; 3) { pixcol[i] &#x3D; 1; } else if ((pixcol[i - 1] + pixcol[i - 2] + pixcol[i + 1] + pixcol[i + 2]) &lt;&#x3D; 1) { pixcol[i] &#x3D; 0; } } &#x2F;&#x2F;确认字符位置 int countY &#x3D; 0; bool flage2 &#x3D; false; for (int i &#x3D; 0; i &lt; roi_row - 1; i++) { pix &#x3D; pixcol[i]; if (pix &#x3D;&#x3D; 1 &amp;&amp; !flage2) { flage2 &#x3D; true; position3[countY] &#x3D; i; continue; } if (pix &#x3D;&#x3D; 0 &amp;&amp; flage2) { flage2 &#x3D; false; position4[countY] &#x3D; i; countY++; } }  &#x2F;&#x2F;记录所有字符宽度 for (int n &#x3D; 0; n &lt; countY; n++) { cout &lt;&lt; “ position3 &#x3D; “ &lt;&lt; position3[n] &lt;&lt; “ position4 &#x3D; “ &lt;&lt; position4[n] &lt;&lt; “distance &#x3D;” &lt;&lt; (position4[n] - position3[n]) &lt;&lt; endl; row_height[countYY] &#x3D; position4[n] - position3[n]; licenseY[countYY] &#x3D; position3[n]; licenseH[countYY] &#x3D; row_height[countYY]; } countYY++; }  &#x2F;&#x2F;截取字符 Mat licenseN &#x3D; Mat(Scalar(0)); cout &lt;&lt; “countYY &#x3D; “&lt;&lt; countYY &lt;&lt; endl; for (int i &#x3D; 0; i &lt; countYY; i++) { Rect rect(licenseX[i], licenseY[i], licenseW[i], licenseH[i]); cout &lt;&lt; “position &#x3D; “ &lt;&lt; licenseX[i] &lt;&lt; “  “ &lt;&lt; licenseY[i] &lt;&lt; “  “ &lt;&lt; licenseW[i] &lt;&lt; “  “ &lt;&lt; licenseH[i] &lt;&lt; endl; licenseN &#x3D; large_image(rect); imshow(“test1”+i, licenseN); ostringstream oss; oss &lt;&lt; “licenseN” &lt;&lt; i &lt;&lt; “.jpg”; imwrite(oss.str(), licenseN); waitKey(1000); }    cout &lt;&lt; “license plate process” &lt;&lt; endl; return 0; }      识别部分：  #include&lt;opencv2&#x2F;opencv.hpp&gt; #include&lt;opencv2&#x2F;core&#x2F;core.hpp&gt; #include&lt;opencv2&#x2F;highgui&#x2F;highgui.hpp&gt; #include &lt;opencv2&#x2F;ml&#x2F;ml.hpp&gt; #include<iostream> #include<sstream> using namespace std; using namespace cv; using namespace ml;     float sumMatValue(const Mat &amp; image) { float sumValue &#x3D; 0; int r &#x3D; image.rows; int c &#x3D; image.cols; if (image.isContinuous()) { c &#x3D; r*c; r &#x3D; 1; } for (int i &#x3D; 0; i &lt; r; i++) { const uchar *linePtr &#x3D; image.ptr<uchar>(i); for (int j &#x3D; 0; j &lt; c; j++) { sumValue +&#x3D; linePtr[j]; } } return sumValue; } void calcGradientFeat(Mat &amp; imgSrc, vector<float> &amp; feat) { Mat image; cvtColor(imgSrc, image, CV_BGR2GRAY); resize(image, image, Size(8, 16)); float mask[3][3] &#x3D; { { 1,2,1 },{ 0,0,0 },{ -1,-2,-1 } }; Mat y_mask &#x3D; Mat(3, 3, CV_32F, mask) &#x2F; 8; Mat x_mask &#x3D; y_mask.t(); &#x2F;&#x2F; 转置 Mat sobelX, sobelY;   filter2D(image, sobelX, CV_32F, x_mask); filter2D(image, sobelY, CV_32F, y_mask); sobelX &#x3D; abs(sobelX); sobelY &#x3D; abs(sobelY);   float totleValueX &#x3D; sumMatValue(sobelX); float totleValueY &#x3D; sumMatValue(sobelY); for (int i &#x3D; 0; i &lt; image.rows; i &#x3D; i + 4) { for (int j &#x3D; 0; j &lt; image.cols; j &#x3D; j + 4) { Mat subImageX &#x3D; sobelX(Rect(j, i, 4, 4)); feat.push_back(sumMatValue(subImageX) &#x2F; totleValueX); Mat subImageY &#x3D; sobelY(Rect(j, i, 4, 4)); feat.push_back(sumMatValue(subImageY) &#x2F; totleValueY); } }   Mat img2; resize(image, img2, Size(4, 8)); int r &#x3D; img2.rows; int c &#x3D; img2.cols; if (img2.isContinuous()) { c &#x3D; r*c; r &#x3D; 1; } for (int i &#x3D; 0; i &lt; r; i++) { const uchar *linePtr &#x3D; img2.ptr<uchar>(i); for (int j &#x3D; 0; j &lt; c; j++) { feat.push_back(linePtr[j]); } } &#x2F;&#x2F;       cout&lt;&lt;sobelX&lt;&lt;endl; &#x2F;&#x2F;     cout&lt;&lt;sobelY&lt;&lt;endl; &#x2F;&#x2F; cout&lt;&lt; x_mask&lt;&lt;endl; &#x2F;&#x2F; cout&lt;&lt;img2&lt;&lt;endl; &#x2F;&#x2F; for(int i&#x3D;0; i&lt;feat[num].size(); i++) &#x2F;&#x2F;   { &#x2F;&#x2F;           cout&lt;&lt;feat[i]&lt;&lt;endl; &#x2F;&#x2F;   } &#x2F;&#x2F;       imshow(“cat”, img2); &#x2F;&#x2F;       cout&lt;&lt;”sumValue &#x3D;”&lt;&lt;sumMatValue(image)&lt;&lt;endl; }   Ptr<StatModel> buildMLPClassifier(Mat &amp; input, Mat &amp; output) { Ptr<ANN_MLP> model; &#x2F;&#x2F;train classifier; int layer_sz[] &#x3D; { input.cols, 100 , output.cols }; int nlayers &#x3D; (int)(sizeof(layer_sz) &#x2F; sizeof(layer_sz[0])); Mat layer_sizes(1, nlayers, CV_32S, layer_sz); int method; double method_param; int max_iter; if (1) { method &#x3D; ANN_MLP::BACKPROP; method_param &#x3D; 0.01; max_iter &#x3D; 100; } else { method &#x3D; ANN_MLP::RPROP; method_param &#x3D; 0.1; max_iter &#x3D; 1000; } Ptr<TrainData> tData &#x3D; TrainData::create(input, ROW_SAMPLE, output); model &#x3D; ANN_MLP::create(); cout &lt;&lt; “create success” &lt;&lt; endl; model-&gt;setLayerSizes(layer_sizes); model-&gt;setActivationFunction(ANN_MLP::SIGMOID_SYM, 0, 0); model-&gt;setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, max_iter, FLT_EPSILON)); &#x2F;&#x2F;setIterCondition(max_iter, 0); model-&gt;setTrainMethod(method, method_param); cout &lt;&lt; “train data in process ….”&lt;&lt;endl; model-&gt;train(tData); cout &lt;&lt; “train success” &lt;&lt; endl; model-&gt;save(“mlp1.xml”); return model; } Ptr<StatModel> loadMLPClassifiler() {   Ptr<ANN_MLP> model &#x3D; Algorithm::load<ANN_MLP>(“mlp1.xml”); return model; }     int main_num_reconginzed() { Mat image; vector<float>feats; vector<float>test, test1; string path &#x3D; “code&#x2F;python_image_learn&#x2F;identfying_code_recognize&#x2F;charSamples&#x2F;“; int num &#x3D; 0; int classfilternum &#x3D; 34; int modlenum &#x3D; 30; for (int i &#x3D; 0; i &lt; classfilternum; i++) { for (int j &#x3D; 0; j &lt; modlenum; j++) { ostringstream oss; oss &lt;&lt; path &lt;&lt; i &lt;&lt; “&#x2F;“ &lt;&lt; j &lt;&lt; “.png”; &#x2F;&#x2F;cout&lt;&lt;oss.str()&lt;&lt;endl; image &#x3D; imread(oss.str()); calcGradientFeat(image, feats); num++;   if (i &#x3D;&#x3D; 11 &amp;&amp; j &#x3D;&#x3D; 10) { ostringstream oss; oss &lt;&lt; path &lt;&lt; i &lt;&lt; “&#x2F;“ &lt;&lt; (j + 1) &lt;&lt; “.png”; &#x2F;&#x2F;cout&lt;&lt;oss.str()&lt;&lt;endl; image &#x3D; imread(oss.str()); calcGradientFeat(image, test); } } } Mat input, output; input &#x3D; Mat(classfilternum*modlenum, 48, CV_32F); output &#x3D; Mat(classfilternum*modlenum, classfilternum, CV_32F, Scalar(0)); int r &#x3D; input.rows; int c &#x3D; input.cols; if (input.isContinuous()) { c &#x3D; r*c; r &#x3D; 1; } for (int i &#x3D; 0; i &lt; r; i++) { float *linePtr &#x3D; input.ptr<float>(i); for (int j &#x3D; 0; j &lt; c; j++) { linePtr[j] &#x3D; feats[c*i + j]; } } for (int i &#x3D; 0; i &lt; output.rows; i++) { float *lineoutput &#x3D; output.ptr<float>(i); lineoutput[i &#x2F; modlenum] &#x3D; 1; }   &#x2F;&#x2F;if( &#x2F;&#x2F;Ptr<StatModel> model &#x3D; buildMLPClassifier(input, output); Ptr<StatModel> model &#x3D; loadMLPClassifiler(); float response &#x3D; model-&gt;predict(test, test1); cout &lt;&lt; “response &#x3D; “ &lt;&lt; response &lt;&lt; endl; for (int i &#x3D; 0; i &lt; test1.size(); i++) { cout &lt;&lt; “test1 &#x3D; “ &lt;&lt; test1[i] &lt;&lt; endl; } &#x2F;&#x2F;cout&lt;&lt;input&lt;&lt;endl; &#x2F;&#x2F;cout&lt;&lt;”rows &#x3D; “&lt;&lt;input.rows&lt;&lt;”col &#x3D; “&lt;&lt;input.cols&lt;&lt;endl; &#x2F;&#x2F;cout&lt;&lt;output&lt;&lt;endl;    waitKey(0);                    &#x2F;&#x2F;等待按键 system(“pause”); return 0; }你能在上面代码基础上改成能够在Linux下使用在有车牌图片的情况下，能够识别并转换成id、license_plate、time和ip结构然后将识别结果数据插入到数据库表”cars”中吗，并给出具体过程和修改后的完整代码</StatModel></StatModel></float></float></float></float></ANN_MLP></ANN_MLP></StatModel></TrainData></ANN_MLP></StatModel></uchar></float></uchar></sstream></iostream></uchar></uchar></Point></Point></Point></Vec4i></Point></sstream></iostream></p>
+<p>2023&#x2F;11&#x2F;26 21:38:02</p>
+<p>首先，为了在Linux下使用OpenCV，您需要安装OpenCV库并将代码进行适当的修改。接下来，我将为您提供代码的修改和实现识别结果插入数据库表的具体过程。</p>
+<h3 id="修改后的完整代码"><a href="#修改后的完整代码" class="headerlink" title="修改后的完整代码"></a>修改后的完整代码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">cppCopy Code#include&lt;opencv2/opencv.hpp&gt;</span><br><span class="line">#include&lt;opencv2/core/core.hpp&gt;</span><br><span class="line">#include&lt;opencv2/highgui/highgui.hpp&gt;</span><br><span class="line">#include &lt;opencv2/ml/ml.hpp&gt;</span><br><span class="line">#include&lt;iostream&gt;</span><br><span class="line">#include&lt;sstream&gt;</span><br><span class="line">#include &lt;mysql/mysql.h&gt;  // 包含MySQL数据库接口的头文件</span><br><span class="line">using namespace std;</span><br><span class="line">using namespace cv;</span><br><span class="line">using namespace ml;</span><br><span class="line"></span><br><span class="line">// ...（前面的代码不变）</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    Mat image;</span><br><span class="line">    vector&lt;float&gt; feats;</span><br><span class="line">    vector&lt;float&gt; test, test1;</span><br><span class="line"></span><br><span class="line">    // 读取车牌图片并进行特征提取</span><br><span class="line">    string imagePath = &quot;path_to_license_plate_image.jpg&quot;;  // 替换为实际的车牌图片路径</span><br><span class="line">    image = imread(imagePath);</span><br><span class="line">    calcGradientFeat(image, feats);</span><br><span class="line"></span><br><span class="line">    // 加载训练好的模型</span><br><span class="line">    Ptr&lt;StatModel&gt; model = loadMLPClassifiler();</span><br><span class="line"></span><br><span class="line">    // 使用模型对车牌图片进行识别</span><br><span class="line">    float response = model-&gt;predict(feats, test1);</span><br><span class="line">    cout &lt;&lt; &quot;response = &quot; &lt;&lt; response &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    // 将识别结果插入到数据库表中</span><br><span class="line">    string id = &quot;123&quot;;  // 替换为实际的id</span><br><span class="line">    string licensePlate = &quot;粤B12345&quot;;  // 替换为实际的车牌号</span><br><span class="line">    string time = &quot;2023-11-26 13:37:51&quot;;  // 替换为实际的时间</span><br><span class="line">    string ip = &quot;192.168.1.100&quot;;  // 替换为实际的IP地址</span><br><span class="line"></span><br><span class="line">    // 连接数据库</span><br><span class="line">    MYSQL *conn;</span><br><span class="line">    conn = mysql_init(NULL);</span><br><span class="line">    if (conn == NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        fprintf(stderr, &quot;mysql_init failed\n&quot;);</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    conn = mysql_real_connect(conn, &quot;localhost&quot;, &quot;username&quot;, &quot;password&quot;, &quot;database_name&quot;, 0, NULL, 0);</span><br><span class="line">    if (conn == NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        fprintf(stderr, &quot;mysql_real_connect failed\n&quot;);</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 插入数据到数据库表</span><br><span class="line">    stringstream query;</span><br><span class="line">    query &lt;&lt; &quot;INSERT INTO cars (id, license_plate, time, ip) VALUES (&#x27;&quot; &lt;&lt; id &lt;&lt; &quot;&#x27;, &#x27;&quot; &lt;&lt; licensePlate &lt;&lt; &quot;&#x27;, &#x27;&quot; &lt;&lt; time &lt;&lt; &quot;&#x27;, &#x27;&quot; &lt;&lt; ip &lt;&lt; &quot;&#x27;)&quot;;</span><br><span class="line">    if (mysql_query(conn, query.str().c_str()))</span><br><span class="line">    &#123;</span><br><span class="line">        fprintf(stderr, &quot;Query failed (%s)\n&quot;, mysql_error(conn));</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; &quot;Data inserted successfully&quot; &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 关闭数据库连接</span><br><span class="line">    mysql_close(conn);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="具体过程"><a href="#具体过程" class="headerlink" title="具体过程"></a>具体过程</h3><ol>
+<li>安装OpenCV库并配置编译环境。</li>
+<li>将上述修改后的完整代码保存为 <code>recognize_and_insert.cpp</code>。</li>
+<li>编译代码：<code>g++ recognize_and_insert.cpp -o recognize_and_insert </code>。</li>
+<li>运行可执行文件：<code>./recognize_and_insert</code>。</li>
+</ol>
+<p>在具体插入数据库的过程中，确保在代码中替换示例中的数据库连接信息和实际的识别结果数据。这样便能够将识别结果数据插入到名为 <code>cars</code> 的数据库表中。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/09/17/c%E5%92%8Cc++/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-4/" rel="prev" title="数据结构-4">
+      <i class="fa fa-chevron-left"></i> 数据结构-4
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/12/12/ZLTool-%E6%97%A5%E5%BF%97/" rel="next" title="ZLTool-日志">
+      ZLTool-日志 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%81%8A%E5%A4%A9%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.</span> <span class="nav-text">聊天系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">编译过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9muduo%E5%BA%93%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%85%E8%A6%81%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">对muduo库的一些必要操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9MySQL%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">对MySQL操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.1.</span> <span class="nav-text">修改后的完整代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">1.3.2.</span> <span class="nav-text">具体过程</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">肖汇林</p>
+  <div class="site-description" itemprop="description">选择有时候比努力更重要</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">肖汇林</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
